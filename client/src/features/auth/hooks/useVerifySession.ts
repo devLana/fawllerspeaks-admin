@@ -48,6 +48,7 @@ const useVerifySession = (
               break;
 
             case "SessionIdValidationError":
+            case "UserSessionError":
               if (isMounted) {
                 setErrorMessage(
                   "Current logged in session could not be verified"
