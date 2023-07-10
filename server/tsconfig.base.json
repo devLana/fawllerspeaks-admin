@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    /* Modules */
+    "moduleResolution": "node",
+    "baseUrl": "src",
+    "paths": {
+      "@server": ["index"],
+      "@features/*": ["features/*"],
+      "@lib/*": ["lib/*"],
+      "@schema": ["schema"],
+      "@services/*": ["services/*"],
+      "@types": ["types"],
+      "@resolverTypes": ["types/resolverTypes"],
+      "@utils": ["utils"],
+      "@tests": ["utils/tests"]
+    },
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+
+    /* Type Checking */
+    "strict": true,
+
+    /* Completeness */
+    "skipLibCheck": true
+  }
+}

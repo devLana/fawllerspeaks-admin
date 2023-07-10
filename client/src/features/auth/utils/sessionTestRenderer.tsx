@@ -1,0 +1,27 @@
+import { MockedProvider, type MockedResponse } from "@apollo/client/testing";
+import { type RenderOptions, render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+import { ApolloContext } from "@context/ApolloContext";
+import SessionProvider from "../components/SessionProvider";
+import { TEXT_NODE } from "./VerifySessionMocks";
+import testLayout from "@utils/testLayout";
+
+const TestComponent = () => <span>{TEXT_NODE}</span>;
+export const mockFn = jest.fn().mockName("apolloAuthHeaderHandler");
+
+const SessionProviderTestUI = ({ mocks }: { mocks: MockedResponse[] }) => (
+  <ApolloContext.Provider value={mockFn}>
+    <MockedProvider mocks={mocks}>
+      <SessionProvider layout={testLayout} page={<TestComponent />} />
+    </MockedProvider>
+  </ApolloContext.Provider>
+);
+
+export const sessionTestRenderer = (
+  mocks: MockedResponse[] = [],
+  options?: RenderOptions
+) => ({
+  user: userEvent.setup(),
+  ...render(<SessionProviderTestUI mocks={mocks} />, options),
+});

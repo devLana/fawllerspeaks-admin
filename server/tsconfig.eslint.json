@@ -1,0 +1,16 @@
+{
+  // Top Level
+  "include": ["src/**/*", ".eslintrc.js"],
+  "extends": "./tsconfig.base.json",
+
+  "compilerOptions": {
+    // Modules
+    "types": ["@types/node"],
+
+    // Emit
+    "noEmit": true,
+
+    // JavaScript Support
+    "allowJs": true
+  }
+}

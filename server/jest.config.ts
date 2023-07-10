@@ -1,0 +1,20 @@
+export default {
+  clearMocks: true,
+  displayName: "AppServer",
+  errorOnDeprecated: true,
+  moduleFileExtensions: ["ts", "js"],
+  moduleNameMapper: {
+    "^@server$": "<rootDir>/src",
+    "^@features/(.*)$": "<rootDir>/src/features/$1",
+    "^@lib/(.*)$": "<rootDir>/src/lib/$1",
+    "^@schema$": "<rootDir>/src/schema",
+    "^@services/(.*)$": "<rootDir>/src/services/$1",
+    "^@types$": "<rootDir>/src/types",
+    "^@resolverTypes$": "<rootDir>/src/types/resolverTypes",
+    "^@utils$": "<rootDir>/src/utils",
+    "^@tests$": "<rootDir>/src/utils/tests",
+  },
+  setupFiles: ["dotenv/config"],
+  testEnvironment: "node",
+  verbose: true,
+};

@@ -1,0 +1,85 @@
+import bcrypt from "bcrypt";
+import type { Pool } from "pg";
+
+import { unRegisteredUser, registeredUser } from "../mocks";
+import type { DbTestUser } from "@types";
+
+interface Users {
+  readonly registeredUser: DbTestUser;
+  readonly unregisteredUser: DbTestUser;
+}
+
+const testUsers = async (db: Pool): Promise<Users> => {
+  try {
+    const unregisterPromise = bcrypt.hash(unRegisteredUser.password, 10);
+    const registerPromise = bcrypt.hash(registeredUser.password, 10);
+
+    const [unRegisterHash, registerHash] = await Promise.all([
+      unregisterPromise,
+      registerPromise,
+    ]);
+
+    const registered = db.query<DbTestUser>(
+      `INSERT INTO users (
+        email,
+        password,
+        first_name,
+        last_name,
+        date_created,
+        is_registered,
+        reset_token
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING
+        image,
+        user_id "userId",
+        date_created "dateCreated",
+        reset_token "resetToken"`,
+      [
+        registeredUser.email,
+        registerHash,
+        registeredUser.firstName,
+        registeredUser.lastName,
+        Date.now(),
+        registeredUser.registered,
+        `{${registeredUser.resetToken[0]}, ${registeredUser.resetToken[1]}}`,
+      ]
+    );
+
+    const unRegistered = db.query<DbTestUser>(
+      `INSERT INTO users (
+        email,
+        password,
+        date_created,
+        is_registered,
+        reset_token
+      ) VALUES ($1, $2, $3, $4, $5)
+      RETURNING
+        image,
+        user_id "userId",
+        date_created "dateCreated",
+        reset_token "resetToken"`,
+      [
+        unRegisteredUser.email,
+        unRegisterHash,
+        Date.now(),
+        unRegisteredUser.registered,
+        `{${unRegisteredUser.resetToken[0]}, ${unRegisteredUser.resetToken[1]}}`,
+      ]
+    );
+
+    const [registerRes, unregisterRes] = await Promise.all([
+      registered,
+      unRegistered,
+    ]);
+
+    return {
+      registeredUser: registerRes.rows[0],
+      unregisteredUser: unregisterRes.rows[0],
+    };
+  } catch (err) {
+    console.log("Create Test Users Error - ", err);
+    throw new Error("Unable to create test users");
+  }
+};
+
+export default testUsers;

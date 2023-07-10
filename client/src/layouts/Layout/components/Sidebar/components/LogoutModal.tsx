@@ -1,0 +1,103 @@
+import * as React from "react";
+import { useRouter } from "next/router";
+
+import { useApolloClient, useMutation } from "@apollo/client";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import LoadingButton from "@mui/lab/LoadingButton";
+
+import { useSession } from "@context/SessionContext";
+import { SESSION_ID } from "@utils/constants";
+import { LOGOUT } from "../LOGOUT";
+
+interface LogoutModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onApiError: (msg: string) => void;
+}
+
+const msg = "You are unable to logout at the moment. Please try again later";
+
+const LogoutModal = ({ isOpen, onClose, onApiError }: LogoutModalProps) => {
+  const [loading, setLoading] = React.useState(false);
+
+  const { replace } = useRouter();
+
+  const client = useApolloClient();
+  const [logout] = useMutation(LOGOUT, {
+    onError(err) {
+      const message = err.graphQLErrors[0] ? err.graphQLErrors[0].message : msg;
+      onApiError(message);
+    },
+  });
+
+  const { handleClearRefreshTokenTimer } = useSession();
+
+  const handleLogout = async () => {
+    const sessionId = localStorage.getItem(SESSION_ID);
+
+    if (sessionId) {
+      setLoading(true);
+
+      const { data: response } = await logout({ variables: { sessionId } });
+
+      if (response) {
+        switch (response.logout.__typename) {
+          case "SessionIdValidationError":
+            onApiError(response.logout.sessionIdError);
+            break;
+
+          case "UnknownError":
+            onApiError("The current session could not be verified");
+            break;
+
+          case "NotAllowedError":
+            onApiError("You cannot perform that action right now");
+            break;
+
+          case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
+            handleClearRefreshTokenTimer();
+            void client.clearStore();
+            void replace("/login?status=unauthenticated");
+            break;
+
+          case "Response":
+            localStorage.removeItem(SESSION_ID);
+            handleClearRefreshTokenTimer();
+            void client.clearStore();
+            void replace("/login");
+            break;
+
+          default:
+            onApiError(msg);
+        }
+      }
+    }
+  };
+
+  return (
+    <Dialog open={isOpen}>
+      <DialogContent>
+        <DialogContentText>Logout of FawllerSpeaks Admin?</DialogContentText>
+      </DialogContent>
+      <DialogActions sx={{ justifyContent: "center" }}>
+        <LoadingButton
+          onClick={handleLogout}
+          loading={loading}
+          variant="contained"
+        >
+          <span>Logout</span>
+        </LoadingButton>
+        <Button disabled={loading} onClick={onClose}>
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default LogoutModal;

@@ -1,0 +1,25 @@
+{
+  // Top Level
+  "include": ["src/**/*"],
+  "exclude": [
+    "src/**/__tests__",
+    "src/features/**/utils/**/*.test.ts",
+    "src/utils/tests"
+  ],
+  "extends": "./tsconfig.base.json",
+
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2022",
+
+    /* Modules */
+    "module": "commonjs",
+
+    /* Emit */
+    "noEmitOnError": true,
+    "outDir": "build",
+
+    /* Interop Constraints */
+    "forceConsistentCasingInFileNames": true
+  }
+}

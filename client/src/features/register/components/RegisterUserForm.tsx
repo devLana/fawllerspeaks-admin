@@ -1,0 +1,103 @@
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import LoadingButton from "@mui/lab/LoadingButton";
+import type { UseFormRegister, FieldErrors } from "react-hook-form";
+
+import PasswordInput from "@components/PasswordInput";
+import type { MutationRegisterUserArgs } from "@apiTypes";
+
+type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
+
+interface RegisterUserFormProps {
+  isLoading: boolean;
+  onSubmit: React.FormEventHandler<HTMLFormElement>;
+  register: UseFormRegister<RegisterUserArgs>;
+  fieldErrors: FieldErrors<RegisterUserArgs>;
+}
+
+const RegisterUserForm = ({
+  isLoading,
+  onSubmit,
+  register,
+  fieldErrors,
+}: RegisterUserFormProps) => (
+  <form onSubmit={onSubmit} noValidate>
+    <Box marginBottom={3.3}>
+      <Typography align="center" gutterBottom>
+        Account information
+      </Typography>
+      <Grid container rowSpacing={3} columnSpacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            id="first__name"
+            autoFocus
+            autoComplete="given-name"
+            label="First Name"
+            margin="none"
+            fullWidth
+            {...register("firstName")}
+            helperText={
+              fieldErrors.firstName ? fieldErrors.firstName.message : null
+            }
+            error={!!fieldErrors.firstName}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            id="last-name"
+            autoComplete="family-name"
+            label="Last Name"
+            margin="none"
+            fullWidth
+            {...register("lastName")}
+            helperText={
+              fieldErrors.lastName ? fieldErrors.lastName.message : null
+            }
+            error={!!fieldErrors.lastName}
+          />
+        </Grid>
+      </Grid>
+    </Box>
+    <Box marginBottom={3}>
+      <Typography align="center" gutterBottom>
+        Update account password
+      </Typography>
+      <Grid container rowSpacing={3} columnSpacing={2}>
+        <Grid item xs={12} sm={6}>
+          <PasswordInput
+            id="password"
+            autoComplete="new-password"
+            label="Password"
+            register={register("password")}
+            fieldError={fieldErrors.password}
+            margin="none"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <PasswordInput
+            id="confirm__password"
+            autoComplete="new-password"
+            label="Confirm Password"
+            register={register("confirmPassword")}
+            fieldError={fieldErrors.confirmPassword}
+            margin="none"
+          />
+        </Grid>
+      </Grid>
+    </Box>
+    <LoadingButton
+      loading={isLoading}
+      variant="contained"
+      size="large"
+      type="submit"
+      fullWidth
+      sx={{ textTransform: "uppercase" }}
+    >
+      <span>Register</span>
+    </LoadingButton>
+  </form>
+);
+
+export default RegisterUserForm;

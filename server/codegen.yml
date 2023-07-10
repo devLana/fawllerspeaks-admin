@@ -1,0 +1,12 @@
+overwrite: true
+schema: "src/schema/typeDefs.ts"
+generates:
+  src/types/resolverTypes.ts:
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"
+    config:
+      useIndexSignature: true
+      contextType: ".#APIContext"
+require:
+  - tsconfig-paths/register
