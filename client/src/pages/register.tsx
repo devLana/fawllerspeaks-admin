@@ -11,7 +11,7 @@ import Toast from "@components/Toast";
 import Card from "@components/Card";
 import RegisterUserForm from "@features/register/components/RegisterUserForm";
 import { REGISTER_USER } from "@features/register/REGISTER_USER";
-import { registerUserValidator } from "@features/register/registerUserValidator";
+import { registerUserValidator } from "@features/register/utils/registerUserValidator";
 import { SESSION_ID } from "@utils/constants";
 import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";

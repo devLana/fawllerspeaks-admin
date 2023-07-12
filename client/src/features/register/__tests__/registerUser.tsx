@@ -18,7 +18,7 @@ import {
   table2,
   validationOne,
   validationTwo,
-} from "../utils/registerUserMocks";
+} from "../utils/registerUser.mocks";
 import { renderTestUI } from "@utils/renderTestUI";
 import { SESSION_ID } from "@utils/constants";
 
