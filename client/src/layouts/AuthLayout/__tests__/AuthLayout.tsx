@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 
-import Layout from ".";
+import Layout from "..";
 import { renderTestUI } from "@utils/renderTestUI";
 
 describe("Authentication Pages Layout", () => {

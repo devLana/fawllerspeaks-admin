@@ -1,5 +1,5 @@
 import { renderTestUI } from "@utils/renderTestUI";
-import AuthLayoutThemeToggle from ".";
+import AuthLayoutThemeToggle from "../components/AuthLayoutThemeButton";
 import { screen } from "@testing-library/react";
 import { DEFAULT_THEME } from "@utils/constants";
 
