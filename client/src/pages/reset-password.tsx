@@ -14,14 +14,14 @@ import ResetPasswordForm from "@features/resetPassword/components/ResetPasswordF
 import ResetPasswordSuccess from "@features/resetPassword/components/ResetPasswordSuccess";
 import { RESET_PASSWORD } from "@features/resetPassword/mutations/RESET_PASSWORD";
 import { onError } from "@features/resetPassword/utils/onError";
-import { resetPasswordValidator } from "@features/resetPassword/resetPasswordValidator";
+import { resetPasswordValidator } from "@features/resetPassword/utils/resetPasswordValidator";
 import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 import type { MutationResetPasswordArgs } from "@apiTypes";
 
 import verifyPasswordResetToken, {
   type ResetPasswordPageData,
-} from "@features/resetPassword/verifyPasswordResetToken";
+} from "@features/resetPassword/utils/verifyPasswordResetToken";
 
 type OmitToken = Omit<MutationResetPasswordArgs, "token">;
 type View = "form" | "unregistered error" | "success";

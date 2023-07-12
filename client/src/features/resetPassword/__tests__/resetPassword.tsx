@@ -18,7 +18,7 @@ import {
   verifyErrors,
   verifyProps,
   verifyValidate,
-} from "../utils/resetPasswordMocks";
+} from "../utils/resetPassword.mocks";
 
 jest.mock("@lib/apolloClient");
 

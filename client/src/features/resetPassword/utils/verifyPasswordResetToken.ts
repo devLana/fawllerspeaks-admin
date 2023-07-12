@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 
 import apolloClient from "@lib/apolloClient";
-import { VERIFY_PASSWORD_RESET_TOKEN } from "./mutations/VERIFY_PASSWORD_RESET_TOKEN";
+import { VERIFY_PASSWORD_RESET_TOKEN } from "../mutations/VERIFY_PASSWORD_RESET_TOKEN";
 
 interface VerifiedData {
   email: string;
