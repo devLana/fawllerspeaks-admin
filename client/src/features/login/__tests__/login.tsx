@@ -17,7 +17,7 @@ import {
   redirectStatus,
   EMAIL,
   PASSWORD,
-} from "../utils/loginMocks";
+} from "../utils/login.mocks";
 
 describe("Login Page", () => {
   beforeAll(() => {

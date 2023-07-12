@@ -15,7 +15,7 @@ import NextLink from "@components/NextLink";
 import Card from "@components/Card";
 import LoginForm from "@features/login/components/LoginForm";
 import { LOGIN_USER } from "@features/login/LOGIN_USER";
-import { loginValidator } from "@features/login/loginValidator";
+import { loginValidator } from "@features/login/utils/loginValidator";
 import { SESSION_ID } from "@utils/constants";
 import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
