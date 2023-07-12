@@ -8,7 +8,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
-import transition from "@layouts/Layout/transition";
+import transition from "@layouts/Layout/utils/transition";
 import type { MuiIconType } from "@types";
 
 interface SidebarItemProps {

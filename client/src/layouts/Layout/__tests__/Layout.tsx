@@ -9,7 +9,7 @@ import {
   avatar,
   errorsTable,
   logoutTable,
-} from "./LayoutMocks";
+} from "../utils/Layout.mocks";
 import { renderTestUI, stopRefreshTokenTimer } from "@utils/renderTestUI";
 import { DEFAULT_THEME, SESSION_ID } from "@utils/constants";
 

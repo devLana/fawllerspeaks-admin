@@ -9,7 +9,7 @@ import Loader from "@components/Loader";
 import ErrorAlert from "@features/auth/components/ErrorAlert";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
-import transition from "./transition";
+import transition from "./utils/transition";
 
 interface LayoutProps extends MetaInfo {
   children: React.ReactElement;

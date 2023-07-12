@@ -9,7 +9,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import Toast from "@components/Toast";
 import LogoutModal from "./LogoutModal";
-import transition from "@layouts/Layout/transition";
+import transition from "@layouts/Layout/utils/transition";
 import type { MuiIconType } from "@types";
 
 interface SidebarLogoutButtonProps {

@@ -11,7 +11,7 @@ import SidebarLogoutButton from "./components/SidebarLogoutButton";
 import SidebarNewLink from "./components/SidebarNewLink";
 import SidebarToggleButton from "./components/SidebarToggleButton";
 import { topLinks, postLinks, otherLinks } from "./sidebarMenu";
-import transition from "../../transition";
+import transition from "../../utils/transition";
 
 interface SidebarProps {
   smDrawerWidth: string;

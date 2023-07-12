@@ -10,7 +10,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NextLink from "@components/NextLink";
 import NavbarAvatar from "./components/NavbarAvatar";
 import NavbarThemeButton from "./components/NavbarThemeButton";
-import transition from "../../transition";
+import transition from "../../utils/transition";
 
 interface NavbarProps {
   isOpen: boolean;

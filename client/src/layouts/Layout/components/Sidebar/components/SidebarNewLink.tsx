@@ -6,7 +6,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
 import type { MuiIconType } from "@types";
-import transition from "@layouts/Layout/transition";
+import transition from "@layouts/Layout/utils/transition";
 
 interface SidebarNewLinkProps {
   label: string;
