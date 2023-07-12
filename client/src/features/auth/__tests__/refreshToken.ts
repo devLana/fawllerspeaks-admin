@@ -7,11 +7,8 @@ import {
   refresh,
   table1,
   table2,
-} from "@features/auth/utils/RefreshTokenMocks";
-import {
-  mockFn,
-  sessionTestRenderer,
-} from "@features/auth/utils/sessionTestRenderer";
+} from "../utils/refreshToken.mocks";
+import { mockFn, sessionTestRenderer } from "../utils/sessionTestRenderer";
 import { SESSION_ID } from "@utils/constants";
 
 jest.useFakeTimers();

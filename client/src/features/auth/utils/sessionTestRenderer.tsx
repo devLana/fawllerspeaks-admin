@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 
 import { ApolloContext } from "@context/ApolloContext";
 import SessionProvider from "../components/SessionProvider";
-import { TEXT_NODE } from "./VerifySessionMocks";
+import { TEXT_NODE } from "./verifySession.mocks";
 import testLayout from "@utils/testLayout";
 
 const TestComponent = () => <span>{TEXT_NODE}</span>;

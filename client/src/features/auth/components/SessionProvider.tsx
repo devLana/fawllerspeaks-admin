@@ -4,8 +4,8 @@ import * as React from "react";
 import { useRouter } from "next/router";
 
 import { SessionContext } from "@context/SessionContext";
-import useRefreshToken from "../../hooks/useRefreshToken";
-import useVerifySession from "../../hooks/useVerifySession";
+import useRefreshToken from "../hooks/useRefreshToken";
+import useVerifySession from "../hooks/useVerifySession";
 import type { PageLayout } from "@types";
 
 interface SessionProvideProps {

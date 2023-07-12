@@ -12,11 +12,8 @@ import {
   tableThree,
   tableTwo,
   TEXT_NODE,
-} from "@features/auth/utils/VerifySessionMocks";
-import {
-  mockFn,
-  sessionTestRenderer,
-} from "@features/auth/utils/sessionTestRenderer";
+} from "../utils/verifySession.mocks";
+import { mockFn, sessionTestRenderer } from "../utils/sessionTestRenderer";
 import { SESSION_ID } from "@utils/constants";
 
 const mock = jwtDecode as jest.MockedFunction<() => never>;
