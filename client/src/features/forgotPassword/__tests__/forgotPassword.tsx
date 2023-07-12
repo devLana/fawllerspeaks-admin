@@ -12,7 +12,7 @@ import {
   testTable,
   unsupported,
   validation,
-} from "../utils/forgotPasswordMocks";
+} from "../utils/forgotPassword.mocks";
 
 describe("Forgot Password Page", () => {
   beforeAll(() => {

@@ -15,7 +15,7 @@ import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
 import ForgotPasswordForm from "@features/forgotPassword/components/ForgotPasswordForm";
 import ForgotPasswordSuccess from "@features/forgotPassword/components/ForgotPasswordSuccess";
 import { FORGOT_PASSWORD } from "@features/forgotPassword/FORGOT_PASSWORD";
-import { forgotPasswordValidator } from "@features/forgotPassword/forgotPasswordValidator";
+import { forgotPasswordValidator } from "@features/forgotPassword/utils/forgotPasswordValidator";
 import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 import type { MutationForgotPasswordArgs } from "@apiTypes";
