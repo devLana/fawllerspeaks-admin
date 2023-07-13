@@ -1,19 +1,37 @@
 import { GraphQLError } from "graphql";
+import { gql } from "@apollo/client";
 import type { MockedResponse } from "@apollo/client/testing";
 
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
-
-export const LOGGED_IN_SESSION_ID = "LOGGED_IN_SESSION_ID";
+import { testCache } from "./sessionTestRenderer";
 
 interface Expected {
   message: string;
   gql: () => MockedResponse[];
 }
 
+const testUserId = "New_Authenticated_User_Id";
+export const newAccessToken = "new_access_token";
+export const LOGGED_IN_SESSION_ID = "LOGGED_IN_SESSION_ID";
+
 const request: MockedResponse["request"] = {
   query: REFRESH_TOKEN,
   variables: { sessionId: LOGGED_IN_SESSION_ID },
+};
+
+export const getTestUserToken = () => {
+  const user = testCache.readFragment<{ accessToken: string }>({
+    id: `User:${testUserId}`,
+    fragment: gql`
+      fragment GetTestUserToken on User {
+        accessToken
+      }
+    `,
+  });
+
+  if (!user) throw Error("Test user not found");
+  return user;
 };
 
 const login = {
@@ -30,11 +48,11 @@ const login = {
               __typename: "UserData",
               user: {
                 __typename: "User",
-                accessToken: "accessToken",
+                accessToken: "old_access_token",
                 dateCreated: Date.now(),
                 email: "mail@example.com",
                 firstName: "first name",
-                id: "User_Session_ID",
+                id: testUserId,
                 image: null,
                 isRegistered: false,
                 lastName: "last name",
@@ -130,7 +148,7 @@ export const refresh = {
           data: {
             refreshToken: {
               __typename: "AccessToken",
-              accessToken: "new_accessToken",
+              accessToken: newAccessToken,
               status: "SUCCESS",
             },
           },
