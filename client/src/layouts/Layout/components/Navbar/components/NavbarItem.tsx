@@ -1,3 +1,6 @@
+import React from "react";
+import { useRouter } from "next/router";
+
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -5,10 +8,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
-import type { MuiIconType } from "@types";
 import transition from "@layouts/Layout/utils/transition";
+import type { MuiIconType } from "@types";
 
-interface SidebarNewLinkProps {
+interface NavbarItemProps {
   label: string;
   href: string;
   Icon: MuiIconType;
@@ -16,28 +19,40 @@ interface SidebarNewLinkProps {
   smMatches: boolean;
 }
 
-const SidebarNewLink = (props: SidebarNewLinkProps) => {
+const NavbarItem = (props: NavbarItemProps) => {
+  const { pathname } = useRouter();
+
   const { label, href, Icon, isOpen, smMatches } = props;
+  const isActive = pathname === href;
 
   return (
     <Tooltip title={!isOpen && smMatches ? label : null} placement="right">
       <ListItem
         sx={{
           py: 1,
-          px: { xs: 3.2, sm: isOpen ? 3.2 : 1 },
-          transition: theme => ({ sm: transition(theme, isOpen, "padding") }),
+          pr: 0,
+          pl: { xs: 3.2, sm: isOpen ? 3.2 : 1 },
+          transition: theme => ({
+            sm: transition(theme, isOpen, "padding-left"),
+          }),
         }}
       >
         <ListItemButton
           sx={theme => ({
-            borderRadius: 1,
-            color: "#fff",
-            bgcolor: "primary.main",
+            py: 1,
+            pl: 2,
+            pr: 0,
+            bgcolor: isActive ? "primary.light" : "transparent",
+            color: isActive ? "primary.dark" : "secondary.dark",
+            borderRadius: "1.5rem 0 0 1.5rem",
             transition: transition(theme, isOpen, [
               "background-color",
               "padding",
             ]),
-            "&:hover": { color: "#fff", bgcolor: "primary.dark" },
+            "&:hover": {
+              bgcolor: isActive ? "primary.light" : "secondary.light",
+              color: isActive ? "primary.dark" : "secondary.dark",
+            },
             [theme.breakpoints.up("sm")]: {
               px: isOpen ? 2 : 1,
               whiteSpace: "nowrap",
@@ -49,7 +64,7 @@ const SidebarNewLink = (props: SidebarNewLinkProps) => {
         >
           <ListItemIcon
             sx={{
-              color: "#fff",
+              color: isActive ? "primary.dark" : "secondary.dark",
               ml: { sm: isOpen ? 0 : 0.5 },
               transition: theme => ({
                 sm: transition(theme, isOpen, "margin-left"),
@@ -65,4 +80,4 @@ const SidebarNewLink = (props: SidebarNewLinkProps) => {
   );
 };
 
-export default SidebarNewLink;
+export default NavbarItem;

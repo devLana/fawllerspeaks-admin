@@ -12,14 +12,14 @@ import LogoutModal from "./LogoutModal";
 import transition from "@layouts/Layout/utils/transition";
 import type { MuiIconType } from "@types";
 
-interface SidebarLogoutButtonProps {
+interface NavbarLogoutButtonProps {
   label: string;
   Icon: MuiIconType;
   isOpen: boolean;
   smMatches: boolean;
 }
 
-const SidebarLogoutButton = (props: SidebarLogoutButtonProps) => {
+const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
   const { Icon, label, isOpen, smMatches } = props;
 
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
@@ -98,4 +98,4 @@ const SidebarLogoutButton = (props: SidebarLogoutButtonProps) => {
   );
 };
 
-export default SidebarLogoutButton;
+export default NavbarLogoutButton;

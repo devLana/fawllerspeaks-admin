@@ -1,71 +1,113 @@
-import Image from "next/image";
+import * as React from "react";
 
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
 
-import NextLink from "@components/NextLink";
-import NavbarAvatar from "./components/NavbarAvatar";
-import NavbarThemeButton from "./components/NavbarThemeButton";
+import NavbarItem from "./components/NavbarItem";
+import NavbarLogoutButton from "./components/NavbarLogoutButton";
+import NavbarNewLink from "./components/NavbarNewLink";
+import NavbarToggleButton from "./components/NavbarToggleButton";
+import { topLinks, postLinks, otherLinks } from "./navbarMenu";
 import transition from "../../utils/transition";
 
 interface NavbarProps {
-  isOpen: boolean;
-  drawerWidth: string;
   smDrawerWidth: string;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  drawerWidth: string;
+  onToggle: () => void;
+  isOpen: boolean;
+  setNavBarIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Navbar = ({
-  isOpen,
-  drawerWidth,
   smDrawerWidth,
-  onClick,
-}: NavbarProps) => (
-  <AppBar
-    sx={theme => ({
-      [theme.breakpoints.up("sm")]: {
-        width: `calc(100% - ${isOpen ? drawerWidth : smDrawerWidth})`,
-        ml: isOpen ? drawerWidth : smDrawerWidth,
-        transition: transition(theme, isOpen, ["width", "margin-left"]),
-      },
-    })}
-  >
-    <Toolbar>
-      <IconButton
-        size="large"
-        edge="start"
-        color="inherit"
-        aria-label="Show sidebar"
-        sx={{ mr: 1, display: { sm: "none" } }}
-        onClick={onClick}
-      >
-        <MenuIcon />
-      </IconButton>
-      <Box sx={{ maxWidth: "10rem", width: "40%", mr: "auto" }}>
-        <NextLink
-          href="/"
-          sx={{ display: "flex" }}
-          aria-label="Click to go to the dashboard"
-        >
-          <Image
-            src="/logo.png"
-            alt="FawllerSpeaks logo"
-            width={465}
-            height={88}
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
-        </NextLink>
-      </Box>
-      <Stack direction="row" spacing={{ xs: 1, sm: 2 }} alignItems="center">
-        <NavbarThemeButton />
-        <NavbarAvatar />
-      </Stack>
-    </Toolbar>
-  </AppBar>
-);
+  drawerWidth,
+  isOpen,
+  onToggle,
+  setNavBarIsOpen,
+}: NavbarProps) => {
+  const theme = useTheme();
+  const smMatches = useMediaQuery(theme.breakpoints.up("sm"));
+  const mdMatches = useMediaQuery(theme.breakpoints.up("md"));
+
+  React.useEffect(() => {
+    if (mdMatches) {
+      setNavBarIsOpen(true);
+    } else {
+      setNavBarIsOpen(false);
+    }
+  }, [mdMatches, setNavBarIsOpen]);
+
+  return (
+    <Drawer
+      open={smMatches || isOpen}
+      onClose={smMatches ? undefined : onToggle}
+      variant={smMatches ? "permanent" : "temporary"}
+      sx={{
+        "& .MuiDrawer-paper": {
+          [theme.breakpoints.up("sm")]: {
+            width: isOpen ? drawerWidth : smDrawerWidth,
+            transition: transition(theme, isOpen, "width"),
+          },
+        },
+      }}
+    >
+      <NavbarToggleButton isOpen={isOpen} onClick={onToggle} />
+      <nav>
+        <List>
+          {topLinks.map(({ primary, ...link }) => (
+            <React.Fragment key={link.label}>
+              {primary ? (
+                <NavbarNewLink
+                  {...link}
+                  isOpen={isOpen}
+                  smMatches={smMatches}
+                />
+              ) : (
+                <NavbarItem {...link} isOpen={isOpen} smMatches={smMatches} />
+              )}
+            </React.Fragment>
+          ))}
+        </List>
+        <Divider />
+        <List>
+          {postLinks.map(link => (
+            <NavbarItem
+              key={link.label}
+              {...link}
+              isOpen={isOpen}
+              smMatches={smMatches}
+            />
+          ))}
+        </List>
+        <Divider />
+        <List>
+          {otherLinks.map(({ Icon, label, ...link }) => (
+            <React.Fragment key={label}>
+              {link.type === "link" ? (
+                <NavbarItem
+                  label={label}
+                  href={link.href}
+                  Icon={Icon}
+                  isOpen={isOpen}
+                  smMatches={smMatches}
+                />
+              ) : (
+                <NavbarLogoutButton
+                  label={label}
+                  Icon={Icon}
+                  isOpen={isOpen}
+                  smMatches={smMatches}
+                />
+              )}
+            </React.Fragment>
+          ))}
+        </List>
+      </nav>
+    </Drawer>
+  );
+};
 
 export default Navbar;

@@ -7,8 +7,8 @@ import useCheckAuth from "@hooks/useCheckAuth";
 import Metadata, { type MetaInfo } from "@components/Metadata";
 import Loader from "@components/Loader";
 import ErrorAlert from "@features/auth/components/ErrorAlert";
-import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
+import Header from "./components/Header";
 import transition from "./utils/transition";
 
 interface LayoutProps extends MetaInfo {
@@ -21,7 +21,7 @@ const drawerWidth = "13.75rem";
 const smDrawerWidth = "4.0625rem";
 
 const Layout = (props: LayoutProps) => {
-  const [sideBarIsOpen, setSideBarIsOpen] = React.useState(false);
+  const [navBarIsOpen, setNavBarIsOpen] = React.useState(false);
 
   useCheckAuth();
 
@@ -36,8 +36,8 @@ const Layout = (props: LayoutProps) => {
     content = children;
   }
 
-  const handleOpenSidebar = () => setSideBarIsOpen(true);
-  const handleToggleSidebar = () => setSideBarIsOpen(!sideBarIsOpen);
+  const handleOpenNavbar = () => setNavBarIsOpen(true);
+  const handleToggleNavbar = () => setNavBarIsOpen(!navBarIsOpen);
 
   return (
     <Box
@@ -46,27 +46,27 @@ const Layout = (props: LayoutProps) => {
         pt: "5rem",
         pb: "4rem",
         width: {
-          sm: `calc(100% - ${sideBarIsOpen ? drawerWidth : smDrawerWidth})`,
+          sm: `calc(100% - ${navBarIsOpen ? drawerWidth : smDrawerWidth})`,
         },
-        ml: { sm: sideBarIsOpen ? drawerWidth : smDrawerWidth },
+        ml: { sm: navBarIsOpen ? drawerWidth : smDrawerWidth },
         transition: theme => ({
-          sm: transition(theme, sideBarIsOpen, ["width", "margin-left"]),
+          sm: transition(theme, navBarIsOpen, ["width", "margin-left"]),
         }),
       }}
     >
       <Metadata {...metaProps} />
-      <Navbar
-        isOpen={sideBarIsOpen}
+      <Header
+        isOpen={navBarIsOpen}
         smDrawerWidth={smDrawerWidth}
         drawerWidth={drawerWidth}
-        onClick={handleOpenSidebar}
+        onClick={handleOpenNavbar}
       />
-      <Sidebar
+      <Navbar
         smDrawerWidth={smDrawerWidth}
         drawerWidth={drawerWidth}
-        isOpen={sideBarIsOpen}
-        onToggle={handleToggleSidebar}
-        setSideBarIsOpen={setSideBarIsOpen}
+        isOpen={navBarIsOpen}
+        onToggle={handleToggleNavbar}
+        setNavBarIsOpen={setNavBarIsOpen}
       />
       <main>
         <Container>{content}</Container>

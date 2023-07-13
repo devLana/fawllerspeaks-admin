@@ -5,7 +5,7 @@ import { useAppTheme } from "@context/MUIThemeContext";
 import { themes } from "@utils/appThemes";
 import { DEFAULT_THEME } from "@utils/constants";
 
-const NavbarThemeButton = () => {
+const HeaderThemeButton = () => {
   const { appTheme } = useTheme();
   const handleAppTheme = useAppTheme();
 
@@ -26,4 +26,4 @@ const NavbarThemeButton = () => {
   );
 };
 
-export default NavbarThemeButton;
+export default HeaderThemeButton;

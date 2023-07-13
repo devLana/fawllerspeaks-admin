@@ -66,8 +66,8 @@ describe("Protected Pages Layout", () => {
     });
   });
 
-  describe("Layout navbar", () => {
-    describe("Navbar theme button", () => {
+  describe("Layout header", () => {
+    describe("Header theme button", () => {
       it("Click theme button to change app theme", async () => {
         const { user } = renderTestUI(<Layout {...props}>{page}</Layout>);
 
@@ -86,12 +86,12 @@ describe("Protected Pages Layout", () => {
       });
     });
 
-    describe("Navbar user avatar", () => {
+    describe("Header user avatar", () => {
       it("User information is not available, Render an icon avatar", () => {
         renderTestUI(<Layout {...props}>{page}</Layout>);
 
         expect(
-          screen.getByRole("presentation", { name: "Unknown User" })
+          screen.getByRole("img", { name: "Unknown user avatar" })
         ).toBeInTheDocument();
       });
 
@@ -113,7 +113,7 @@ describe("Protected Pages Layout", () => {
     });
   });
 
-  describe("Layout sidebar", () => {
+  describe("Layout navbar", () => {
     const mock = useMediaQuery as jest.MockedFunction<() => boolean>;
     mock.mockReturnValue(true);
 
@@ -128,7 +128,7 @@ describe("Protected Pages Layout", () => {
       localStorage.removeItem(SESSION_ID);
     });
 
-    describe("Sidebar logout button", () => {
+    describe("Navbar logout button", () => {
       it("Open and close the logout modal", async () => {
         const { user } = renderTestUI(<Layout {...props}>{page}</Layout>);
 

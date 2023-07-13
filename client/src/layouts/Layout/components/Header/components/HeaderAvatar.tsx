@@ -18,7 +18,7 @@ const bgColor = (appTheme: AppTheme) => {
   return appTheme === "sunny" ? "primary.dark" : "primary.light";
 };
 
-const NavAvatar = () => {
+const HeaderAvatar = () => {
   const client = useApolloClient();
   const { userId } = useSession();
 
@@ -37,8 +37,8 @@ const NavAvatar = () => {
     return (
       <Avatar
         sx={{ bgcolor: ({ appTheme }) => bgColor(appTheme) }}
-        role="presentation"
-        aria-label="Unknown User"
+        role="img"
+        aria-label="Unknown user avatar"
       >
         <PersonIcon />
       </Avatar>
@@ -52,7 +52,7 @@ const NavAvatar = () => {
       <NextLink
         href="/profile"
         sx={{ fontStyle: "normal" }}
-        aria-label="Go to profile page"
+        aria-label="Profile page"
       >
         <Avatar
           // component={Image}
@@ -69,7 +69,7 @@ const NavAvatar = () => {
     <NextLink
       href="/profile"
       sx={{ fontStyle: "normal" }}
-      aria-label="Go to profile page"
+      aria-label="Profile page"
     >
       <Avatar
         sx={{ bgcolor: ({ appTheme }) => bgColor(appTheme), fontSize: 17 }}
@@ -80,4 +80,4 @@ const NavAvatar = () => {
   );
 };
 
-export default NavAvatar;
+export default HeaderAvatar;

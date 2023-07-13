@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import { gql } from "@apollo/client";
 import type { MockedResponse } from "@apollo/client/testing";
 
-import { LOGOUT } from "../components/Sidebar/LOGOUT";
+import { LOGOUT } from "../components/Navbar/LOGOUT";
 import { testCache, testUserId } from "@utils/renderTestUI";
 
 export const avatar = (hasImage: boolean) => {
