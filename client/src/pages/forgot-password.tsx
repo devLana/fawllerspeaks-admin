@@ -21,17 +21,14 @@ import type { NextPageWithLayout } from "@types";
 import type { MutationForgotPasswordArgs } from "@apiTypes";
 
 type View = "form" | "unregistered error" | "success";
+type Status = "idle" | "submitting" | "error";
 
 const ForgotPassword: NextPageWithLayout = () => {
-  const [hasError, setHasError] = React.useState(false);
   const [view, setView] = React.useState<View>("form");
-  const [loading, setLoading] = React.useState(false);
+  const [status, setStatus] = React.useState<Status>("idle");
 
   const [mutation, { error, data }] = useMutation(FORGOT_PASSWORD, {
-    onError() {
-      setHasError(true);
-      setLoading(false);
-    },
+    onError: () => setStatus("error"),
   });
 
   const {
@@ -46,7 +43,7 @@ const ForgotPassword: NextPageWithLayout = () => {
   const { statusMessage, setStatusMessage } = useStatusAlert();
 
   const submitHandler = async (values: MutationForgotPasswordArgs) => {
-    setLoading(true);
+    setStatus("submitting");
 
     const { data: mutationData } = await mutation({ variables: values });
 
@@ -55,18 +52,15 @@ const ForgotPassword: NextPageWithLayout = () => {
         case "EmailValidationError": {
           const { emailError } = mutationData.forgotPassword;
 
-          if (emailError) {
-            setError("email", { message: emailError }, { shouldFocus: true });
-          }
-
-          setLoading(false);
+          setError("email", { message: emailError }, { shouldFocus: true });
+          setStatus("idle");
           break;
         }
 
         case "NotAllowedError":
         case "ServerError":
-          setHasError(true);
-          setLoading(false);
+        default:
+          setStatus("error");
           break;
 
         case "RegistrationError":
@@ -76,10 +70,6 @@ const ForgotPassword: NextPageWithLayout = () => {
         case "Response":
           setView("success");
           break;
-
-        default:
-          setHasError(true);
-          setLoading(false);
       }
     }
   };
@@ -109,12 +99,12 @@ const ForgotPassword: NextPageWithLayout = () => {
 
   return (
     <>
-      {hasError && (
+      {status === "error" && (
         <Toast
           horizontal="center"
           vertical="top"
-          isOpen={hasError}
-          onClose={() => setHasError(false)}
+          isOpen={true}
+          onClose={() => setStatus("idle")}
           direction="down"
           severity="error"
           content={alertMessage}
@@ -124,7 +114,7 @@ const ForgotPassword: NextPageWithLayout = () => {
         <Toast
           horizontal="center"
           vertical="top"
-          isOpen={!!statusMessage}
+          isOpen={true}
           onClose={() => setStatusMessage(null)}
           direction="down"
           severity="info"
@@ -140,7 +130,7 @@ const ForgotPassword: NextPageWithLayout = () => {
           password reset link sent to you
         </Typography>
         <ForgotPasswordForm
-          isLoading={loading}
+          isLoading={status === "submitting"}
           register={register}
           fieldErrors={errors}
           onSubmit={handleSubmit(submitHandler)}

@@ -21,18 +21,16 @@ import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 import type { MutationLoginArgs } from "@apiTypes";
 
+type Status = "idle" | "submitting" | "error" | "success";
+
 const Login: NextPageWithLayout = () => {
-  const [hasError, setHasError] = React.useState(false);
   const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState(false);
+  const [status, setStatus] = React.useState<Status>("idle");
 
   const { replace, isReady, query } = useRouter();
 
   const [login, { data, error }] = useMutation(LOGIN_USER, {
-    onError() {
-      setHasError(true);
-      setLoading(false);
-    },
+    onError: () => setStatus("error"),
   });
 
   const {
@@ -64,17 +62,12 @@ const Login: NextPageWithLayout = () => {
   }, [isReady, query.status]);
 
   const submitHandler = async (values: MutationLoginArgs) => {
-    setLoading(true);
+    setStatus("submitting");
 
     const { data: loginData } = await login({ variables: values });
 
     if (loginData) {
       switch (loginData.login.__typename) {
-        case "NotAllowedError":
-          setHasError(true);
-          setLoading(false);
-          break;
-
         case "LoginValidationError": {
           const { emailError, passwordError: pwdError } = loginData.login;
           const focus = { shouldFocus: true };
@@ -82,9 +75,14 @@ const Login: NextPageWithLayout = () => {
           if (pwdError) setError("password", { message: pwdError }, focus);
           if (emailError) setError("email", { message: emailError }, focus);
 
-          setLoading(false);
+          setStatus("idle");
           break;
         }
+
+        case "NotAllowedError":
+        default:
+          setStatus("error");
+          break;
 
         case "UserData": {
           const { __typename = "User", ...user } = loginData.login.user;
@@ -96,15 +94,12 @@ const Login: NextPageWithLayout = () => {
           }
 
           localStorage.setItem(SESSION_ID, user.sessionId);
+          setStatus("success");
           handleAuthHeader(user.accessToken);
           handleRefreshToken(user.accessToken);
           handleUserId(`${__typename}:${user.id}`);
           break;
         }
-
-        default:
-          setHasError(true);
-          setLoading(false);
       }
     }
   };
@@ -120,12 +115,12 @@ const Login: NextPageWithLayout = () => {
 
   return (
     <>
-      {hasError && (
+      {status === "error" && (
         <Toast
           horizontal="center"
           vertical="top"
-          isOpen={hasError}
-          onClose={() => setHasError(false)}
+          isOpen={true}
+          onClose={() => setStatus("idle")}
           direction="down"
           severity="error"
           content={alertMessage}
@@ -145,7 +140,7 @@ const Login: NextPageWithLayout = () => {
       <Typography variant="h1">Sign In</Typography>
       <Card sx={{ maxWidth: { xs: "21.875rem", sm: "25rem" } }}>
         <LoginForm
-          isLoading={loading}
+          isLoading={status === "submitting" || status === "success"}
           onSubmit={handleSubmit(submitHandler)}
           register={register}
           fieldErrors={errors}

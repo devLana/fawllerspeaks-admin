@@ -129,6 +129,7 @@ describe("Login Page", () => {
         expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
         expect(refreshTokenHandler).toHaveBeenCalledTimes(1);
         expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
+        expect(screen.getByRole("button", { name: "Login" })).toBeDisabled();
       }
     );
   });

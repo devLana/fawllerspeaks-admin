@@ -18,18 +18,15 @@ import type { NextPageWithLayout } from "@types";
 import type { MutationRegisterUserArgs } from "@apiTypes";
 
 type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
+type Status = "idle" | "submitting" | "error";
 
 const RegisterUser: NextPageWithLayout = () => {
-  const [hasError, setHasError] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
+  const [status, setStatus] = React.useState<Status>("idle");
 
   const router = useRouter();
 
   const [registerUser, { error }] = useMutation(REGISTER_USER, {
-    onError() {
-      setHasError(true);
-      setLoading(false);
-    },
+    onError: () => setStatus("error"),
   });
 
   const {
@@ -42,7 +39,7 @@ const RegisterUser: NextPageWithLayout = () => {
   });
 
   const submitHandler = async (values: RegisterUserArgs) => {
-    setLoading(true);
+    setStatus("submitting");
 
     const { data: registeredData } = await registerUser({
       variables: { userInput: values },
@@ -76,7 +73,7 @@ const RegisterUser: NextPageWithLayout = () => {
             setError("firstName", { message: firstNameError }, focus);
           }
 
-          setLoading(false);
+          setStatus("idle");
           break;
         }
 
@@ -100,8 +97,7 @@ const RegisterUser: NextPageWithLayout = () => {
 
         case "NotAllowedError":
         default:
-          setHasError(true);
-          setLoading(false);
+          setStatus("error");
           break;
       }
     }
@@ -116,12 +112,12 @@ const RegisterUser: NextPageWithLayout = () => {
 
   return (
     <>
-      {hasError && (
+      {status === "error" && (
         <Toast
           horizontal="center"
           vertical="top"
-          isOpen={hasError}
-          onClose={() => setHasError(false)}
+          isOpen={true}
+          onClose={() => setStatus("idle")}
           direction="down"
           severity="error"
           content={alertMessage}
@@ -132,7 +128,7 @@ const RegisterUser: NextPageWithLayout = () => {
       </Typography>
       <Card sx={{ width: "100%", maxWidth: { xs: "22.5rem", sm: "43rem" } }}>
         <RegisterUserForm
-          isLoading={loading}
+          isLoading={status === "submitting"}
           onSubmit={handleSubmit(submitHandler)}
           register={register}
           fieldErrors={errors}
