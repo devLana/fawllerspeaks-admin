@@ -79,7 +79,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
       {modalIsOpen && (
         <LogoutModal
           isOpen={modalIsOpen}
-          onClose={handleCloseModal}
+          onClick={handleCloseModal}
           onApiError={handleToast}
         />
       )}

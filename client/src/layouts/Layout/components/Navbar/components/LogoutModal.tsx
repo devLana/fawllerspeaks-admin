@@ -15,14 +15,14 @@ import { LOGOUT } from "../LOGOUT";
 
 interface LogoutModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClick: () => void;
   onApiError: (msg: string) => void;
 }
 
 const msg = "You are unable to logout at the moment. Please try again later";
 
-const LogoutModal = ({ isOpen, onClose, onApiError }: LogoutModalProps) => {
-  const [loading, setLoading] = React.useState(false);
+const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
+  const [status, setStatus] = React.useState<"idle" | "requesting">("idle");
 
   const { replace } = useRouter();
 
@@ -40,7 +40,7 @@ const LogoutModal = ({ isOpen, onClose, onApiError }: LogoutModalProps) => {
     const sessionId = localStorage.getItem(SESSION_ID);
 
     if (sessionId) {
-      setLoading(true);
+      setStatus("requesting");
 
       const { data: response } = await logout({ variables: { sessionId } });
 
@@ -80,19 +80,21 @@ const LogoutModal = ({ isOpen, onClose, onApiError }: LogoutModalProps) => {
   };
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} aria-describedby="logout__description">
       <DialogContent>
-        <DialogContentText>Logout of FawllerSpeaks Admin?</DialogContentText>
+        <DialogContentText id="logout__description">
+          Logout of FawllerSpeaks Admin?
+        </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center" }}>
         <LoadingButton
           onClick={handleLogout}
-          loading={loading}
+          loading={status === "requesting"}
           variant="contained"
         >
           <span>Logout</span>
         </LoadingButton>
-        <Button disabled={loading} onClick={onClose}>
+        <Button disabled={status === "requesting"} onClick={onClick}>
           Cancel
         </Button>
       </DialogActions>
