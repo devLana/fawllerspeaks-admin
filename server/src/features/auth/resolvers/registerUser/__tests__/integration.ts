@@ -15,6 +15,7 @@ import { clearCookies } from "@features/auth/utils";
 import {
   args,
   cookies,
+  createdAt,
   registerMock,
   validateCookie,
   validations,
@@ -137,7 +138,7 @@ describe("Test register user resolver", () => {
       expect(data).toHaveProperty("user.lastName", args.lastName);
       expect(data).toHaveProperty("user.image", null);
       expect(data).toHaveProperty("user.isRegistered", true);
-      expect(data).toHaveProperty("user.dateCreated", 75696453539);
+      expect(data).toHaveProperty("user.dateCreated", createdAt);
       expect(data).toHaveProperty("user.accessToken", "Jayson_web__T0k3n");
       expect(data).toHaveProperty("user.sessionId", "Session_Id");
       expect(data).toHaveProperty("status", "SUCCESS");

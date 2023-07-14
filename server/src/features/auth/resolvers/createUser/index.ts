@@ -4,7 +4,13 @@ import Joi, { ValidationError } from "joi";
 import createUserMail from "./createUserMail";
 import { EmailValidationError } from "../types";
 import { bytesHash } from "@features/auth/utils";
-import { MailError, Response, NotAllowedError, ServerError } from "@utils";
+import {
+  MailError,
+  Response,
+  NotAllowedError,
+  ServerError,
+  DATE_CREATED_MULTIPLIER,
+} from "@utils";
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -36,9 +42,11 @@ const createUser: CreateUser = async (_, { email }, { db }) => {
 
     if (rows.length > 0) return new NotAllowedError(msg);
 
+    const createdAt = Date.now() / DATE_CREATED_MULTIPLIER;
+
     await db.query(
       `INSERT INTO users (email, password, date_created) VALUES ($1, $2, $3)`,
-      [validatedEmail, hash, Date.now()]
+      [validatedEmail, hash, createdAt]
     );
 
     await createUserMail(validatedEmail, password);

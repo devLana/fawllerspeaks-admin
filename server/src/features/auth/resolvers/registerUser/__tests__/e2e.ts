@@ -6,6 +6,13 @@ import { startServer } from "@server";
 import { db } from "@services/db";
 
 import {
+  gqlValidation,
+  sessionCookies,
+  userInput,
+  validations,
+  verifyE2eCookie,
+} from "../registerUserTestUtils";
+import {
   post,
   REGISTER_USER,
   testUsers,
@@ -13,16 +20,10 @@ import {
   loginTestUser,
   unRegisteredUser,
 } from "@tests";
+import { DATE_CREATED_MULTIPLIER } from "@utils";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
 import { Status } from "@resolverTypes";
-import {
-  gqlValidation,
-  sessionCookies,
-  userInput,
-  validations,
-  verifyE2eCookie,
-} from "../registerUserTestUtils";
 
 type RegisterUser = TestData<{ registerUser: Record<string, unknown> }>;
 
@@ -189,7 +190,7 @@ describe("Register user - E2E", () => {
           lastName: "Simpson",
           image: null,
           isRegistered: true,
-          dateCreated: +user.dateCreated,
+          dateCreated: +user.dateCreated * DATE_CREATED_MULTIPLIER,
           accessToken: unregisteredJwt,
           sessionId: unregisteredSessionId,
         },

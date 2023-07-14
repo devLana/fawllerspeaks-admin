@@ -9,6 +9,7 @@ import { db } from "@services/db";
 
 import { gqlValidation, validations, verifyInputs } from "../loginTestUtils";
 import { registeredUser, post, LOGIN, testUsers } from "@tests";
+import { DATE_CREATED_MULTIPLIER } from "@utils";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
 import { Status } from "@resolverTypes";
@@ -109,7 +110,7 @@ describe("Login - E2E", () => {
           lastName: registeredUser.lastName,
           image: null,
           isRegistered: registeredUser.registered,
-          dateCreated: +user.dateCreated,
+          dateCreated: +user.dateCreated * DATE_CREATED_MULTIPLIER,
           accessToken: expect.stringMatching(JWT_REGEX),
           sessionId: expect.stringMatching(SESSION_ID_REGEX),
         },

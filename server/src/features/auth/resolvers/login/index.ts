@@ -2,7 +2,11 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import { NotAllowedError, generateErrorsObject } from "@utils";
+import {
+  DATE_CREATED_MULTIPLIER,
+  NotAllowedError,
+  generateErrorsObject,
+} from "@utils";
 import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
 import { UserData } from "../types";
 import { LoginValidationError } from "./LoginValidationError";
@@ -108,7 +112,7 @@ const login: Login = async (_, args, { db, req, res }) => {
       lastName,
       image,
       isRegistered,
-      dateCreated,
+      dateCreated: dateCreated * DATE_CREATED_MULTIPLIER,
       accessToken,
       sessionId,
     };

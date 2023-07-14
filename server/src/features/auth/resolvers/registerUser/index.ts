@@ -8,6 +8,7 @@ import { clearCookies } from "@features/auth/utils";
 
 import {
   AuthenticationError,
+  DATE_CREATED_MULTIPLIER,
   NotAllowedError,
   RegistrationError,
   UnknownError,
@@ -124,7 +125,7 @@ const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
       lastName,
       image: rows[0].image,
       isRegistered: true,
-      dateCreated: rows[0].dateCreated,
+      dateCreated: rows[0].dateCreated * DATE_CREATED_MULTIPLIER,
       accessToken,
       sessionId: rows[0].sessionId,
     });

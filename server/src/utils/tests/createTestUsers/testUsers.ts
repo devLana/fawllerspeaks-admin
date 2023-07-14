@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import type { Pool } from "pg";
 
 import { unRegisteredUser, registeredUser } from "../mocks";
+import { DATE_CREATED_MULTIPLIER } from "../../constants";
 import type { DbTestUser } from "@types";
 
 interface Users {
@@ -39,7 +40,7 @@ const testUsers = async (db: Pool): Promise<Users> => {
         registerHash,
         registeredUser.firstName,
         registeredUser.lastName,
-        Date.now(),
+        Date.now() / DATE_CREATED_MULTIPLIER,
         registeredUser.registered,
         `{${registeredUser.resetToken[0]}, ${registeredUser.resetToken[1]}}`,
       ]
@@ -61,7 +62,7 @@ const testUsers = async (db: Pool): Promise<Users> => {
       [
         unRegisteredUser.email,
         unRegisterHash,
-        Date.now(),
+        Date.now() / DATE_CREATED_MULTIPLIER,
         unRegisteredUser.registered,
         `{${unRegisteredUser.resetToken[0]}, ${unRegisteredUser.resetToken[1]}}`,
       ]

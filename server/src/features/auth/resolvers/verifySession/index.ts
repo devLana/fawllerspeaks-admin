@@ -11,6 +11,7 @@ import {
 
 import { verify } from "@lib/tokenPromise";
 import {
+  DATE_CREATED_MULTIPLIER,
   MailError,
   NotAllowedError,
   UnknownError,
@@ -112,7 +113,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       lastName: rows[0].lastName,
       image: rows[0].image,
       isRegistered: rows[0].isRegistered,
-      dateCreated: rows[0].dateCreated,
+      dateCreated: rows[0].dateCreated * DATE_CREATED_MULTIPLIER,
       accessToken,
       sessionId: validatedSession,
     };
@@ -167,7 +168,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
           lastName: rows[0].lastName,
           image: rows[0].image,
           isRegistered: rows[0].isRegistered,
-          dateCreated: rows[0].dateCreated,
+          dateCreated: rows[0].dateCreated * DATE_CREATED_MULTIPLIER,
           accessToken,
           sessionId: rows[0].sessionId,
         };
