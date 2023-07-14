@@ -3,7 +3,7 @@ import Joi, { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
 import {
-  DATE_CREATED_MULTIPLIER,
+  DATE_COLUMN_MULTIPLIER,
   NotAllowedError,
   generateErrorsObject,
 } from "@utils";
@@ -63,7 +63,7 @@ const login: Login = async (_, args, { db, req, res }) => {
         password "userPassword",
         user_id "userId",
         is_registered "isRegistered",
-        date_created "dateCreated"
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated"
       FROM users
       WHERE lower(email) = $1`,
       [email.toLowerCase()]
@@ -112,7 +112,7 @@ const login: Login = async (_, args, { db, req, res }) => {
       lastName,
       image,
       isRegistered,
-      dateCreated: dateCreated * DATE_CREATED_MULTIPLIER,
+      dateCreated,
       accessToken,
       sessionId,
     };

@@ -22,7 +22,6 @@ import {
   testSession,
   unRegisteredUser as unRegisteredTestUser,
 } from "@tests";
-import { DATE_CREATED_MULTIPLIER } from "@utils";
 
 import { Status } from "@resolverTypes";
 import type { APIContext, DbTestUser, TestData } from "@types";
@@ -182,8 +181,7 @@ describe("Refresh TOken - E2E", () => {
             lastName: unRegisteredTestUser.lastName,
             image: null,
             isRegistered: unRegisteredTestUser.registered,
-            dateCreated:
-              +unregisteredUser.dateCreated * DATE_CREATED_MULTIPLIER,
+            dateCreated: +unregisteredUser.dateCreated,
             accessToken: expect.stringMatching(JWT_REGEX),
             sessionId: unregisteredSessionId,
           },
@@ -263,7 +261,7 @@ describe("Refresh TOken - E2E", () => {
             lastName: registeredTestUser.lastName,
             image: null,
             isRegistered: registeredTestUser.registered,
-            dateCreated: +registeredUser.dateCreated * DATE_CREATED_MULTIPLIER,
+            dateCreated: +registeredUser.dateCreated,
             accessToken: expect.stringMatching(JWT_REGEX),
             sessionId: registeredSessionId,
           },

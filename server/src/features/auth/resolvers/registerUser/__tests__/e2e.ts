@@ -20,7 +20,6 @@ import {
   loginTestUser,
   unRegisteredUser,
 } from "@tests";
-import { DATE_CREATED_MULTIPLIER } from "@utils";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
 import { Status } from "@resolverTypes";
@@ -190,7 +189,7 @@ describe("Register user - E2E", () => {
           lastName: "Simpson",
           image: null,
           isRegistered: true,
-          dateCreated: +user.dateCreated * DATE_CREATED_MULTIPLIER,
+          dateCreated: +user.dateCreated,
           accessToken: unregisteredJwt,
           sessionId: unregisteredSessionId,
         },

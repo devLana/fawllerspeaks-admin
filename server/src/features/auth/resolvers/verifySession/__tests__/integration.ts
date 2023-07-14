@@ -17,7 +17,6 @@ import { verify } from "@lib/tokenPromise";
 
 import {
   cookies,
-  createdAt,
   data,
   dbResponse,
   email,
@@ -223,7 +222,7 @@ describe("Test verify session resolver", () => {
         expect(result).toHaveProperty("user.lastName", data.lastName);
         expect(result).toHaveProperty("user.image", data.image);
         expect(result).toHaveProperty("user.isRegistered", obj.isRegistered);
-        expect(result).toHaveProperty("user.dateCreated", createdAt);
+        expect(result).toHaveProperty("user.dateCreated", data.dateCreated);
         expect(result).toHaveProperty(
           "user.accessToken",
           expect.stringMatching(JWT_REGEX)
@@ -334,7 +333,7 @@ describe("Test verify session resolver", () => {
         expect(result).toHaveProperty("user.lastName", data.lastName);
         expect(result).toHaveProperty("user.image", data.image);
         expect(result).toHaveProperty("user.isRegistered", true);
-        expect(result).toHaveProperty("user.dateCreated", createdAt);
+        expect(result).toHaveProperty("user.dateCreated", data.dateCreated);
         expect(result).toHaveProperty(
           "user.accessToken",
           expect.stringMatching(JWT_REGEX)

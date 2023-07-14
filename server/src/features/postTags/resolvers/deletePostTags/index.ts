@@ -6,7 +6,7 @@ import Joi, { ValidationError } from "joi";
 // import deletePostTagsWorker from "./deletePostTagsWorker";
 import { PostTags, PostTagsWarning } from "../types";
 import { DeletePostTagsValidationError } from "./DeletePostTagsValidationError";
-import { DATE_CREATED_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
+import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -56,8 +56,8 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
       RETURNING
         tag_id id,
         name,
-        date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
-        last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"`,
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"`,
       [validatedTagIds]
     );
 

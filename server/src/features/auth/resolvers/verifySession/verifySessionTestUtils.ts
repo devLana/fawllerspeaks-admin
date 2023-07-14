@@ -1,5 +1,4 @@
 import type { Cookies } from "@types";
-import { DATE_CREATED_MULTIPLIER } from "@utils";
 
 type GQL = [
   string,
@@ -12,7 +11,6 @@ export const token = "refresh.token.string";
 export const sessionId = "session_id_string";
 export const loggedInUserId = "user_user";
 export const email = "test@mail.com";
-export const createdAt = Date.now();
 
 export const dbResponse = {
   refreshToken: `${cookies.sig}.${cookies.auth}.${cookies.token}`,
@@ -20,7 +18,7 @@ export const dbResponse = {
   firstName: "first_name",
   lastName: "last_name",
   image: null,
-  dateCreated: createdAt / DATE_CREATED_MULTIPLIER,
+  dateCreated: 54787683464,
 };
 
 export const data = {

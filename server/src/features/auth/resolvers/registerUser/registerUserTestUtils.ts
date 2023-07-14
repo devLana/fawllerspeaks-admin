@@ -1,5 +1,4 @@
 import type { Cookies } from "@types";
-import { DATE_CREATED_MULTIPLIER } from "@utils";
 
 interface Input {
   firstName: string;
@@ -36,7 +35,6 @@ export const userInput = {
 };
 
 export const sessionCookies = "auth=auth; sig=sig; token=token";
-export const createdAt = Date.now();
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [
   [
@@ -149,7 +147,7 @@ export const registerMock = [
     isRegistered: false,
     email: "test@mail.com",
     image: null,
-    dateCreated: createdAt / DATE_CREATED_MULTIPLIER,
+    dateCreated: 75696453539,
     sessionId: "Session_Id",
   },
 ];

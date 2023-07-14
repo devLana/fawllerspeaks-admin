@@ -8,7 +8,7 @@ import { clearCookies } from "@features/auth/utils";
 
 import {
   AuthenticationError,
-  DATE_CREATED_MULTIPLIER,
+  DATE_COLUMN_MULTIPLIER,
   NotAllowedError,
   RegistrationError,
   UnknownError,
@@ -87,7 +87,7 @@ const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
         email,
         image,
         is_registered "isRegistered",
-        date_created "dateCreated",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
         session_id "sessionId"
       FROM users LEFT JOIN sessions ON user_id = "user"
       WHERE user_id = $1 AND refresh_token = $2`,
@@ -125,7 +125,7 @@ const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
       lastName,
       image: rows[0].image,
       isRegistered: true,
-      dateCreated: rows[0].dateCreated * DATE_CREATED_MULTIPLIER,
+      dateCreated: rows[0].dateCreated,
       accessToken,
       sessionId: rows[0].sessionId,
     });

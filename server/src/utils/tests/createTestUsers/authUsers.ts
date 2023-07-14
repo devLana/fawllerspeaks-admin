@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import type { Pool } from "pg";
 
 import { unRegisteredUser, registeredUser, newRegisteredUser } from "../mocks";
-import { DATE_CREATED_MULTIPLIER } from "../../constants";
+import { DATE_COLUMN_MULTIPLIER } from "../../constants";
 import type { DbTestUser } from "@types";
 
 interface Users {
@@ -36,14 +36,14 @@ const authUsers = async (db: Pool): Promise<Users> => {
       RETURNING
         image,
         user_id "userId",
-        date_created "dateCreated",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
         reset_token "resetToken"`,
       [
         registeredUser.email,
         registerHash,
         registeredUser.firstName,
         registeredUser.lastName,
-        Date.now() / DATE_CREATED_MULTIPLIER,
+        Date.now() / DATE_COLUMN_MULTIPLIER,
         registeredUser.registered,
         `{${registeredUser.resetToken[0]}, ${registeredUser.resetToken[1]}}`,
       ]
@@ -62,14 +62,14 @@ const authUsers = async (db: Pool): Promise<Users> => {
       RETURNING
         image,
         user_id "userId",
-        date_created "dateCreated",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
         reset_token "resetToken"`,
       [
         newRegisteredUser.email,
         newRegisterHash,
         newRegisteredUser.firstName,
         newRegisteredUser.lastName,
-        Date.now() / DATE_CREATED_MULTIPLIER,
+        Date.now() / DATE_COLUMN_MULTIPLIER,
         newRegisteredUser.registered,
         `{${newRegisteredUser.resetToken[0]}, ${newRegisteredUser.resetToken[1]}}`,
       ]
@@ -86,12 +86,12 @@ const authUsers = async (db: Pool): Promise<Users> => {
       RETURNING
         image,
         user_id "userId",
-        date_created "dateCreated",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
         reset_token "resetToken"`,
       [
         unRegisteredUser.email,
         unRegisterHash,
-        Date.now() / DATE_CREATED_MULTIPLIER,
+        Date.now() / DATE_COLUMN_MULTIPLIER,
         unRegisteredUser.registered,
         `{${unRegisteredUser.resetToken[0]}, ${unRegisteredUser.resetToken[1]}}`,
       ]

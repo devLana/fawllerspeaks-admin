@@ -5,13 +5,7 @@ import bcrypt from "bcrypt";
 import login from "..";
 import { setCookies, JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
 
-import {
-  args,
-  cookies,
-  createdAt,
-  mockUser,
-  validations,
-} from "../loginTestUtils";
+import { args, cookies, mockUser, validations } from "../loginTestUtils";
 import { mockContext, info, spyDb } from "@tests";
 
 type Module = typeof import("@features/auth/utils");
@@ -125,7 +119,7 @@ describe("Test login resolver", () => {
       expect(result).toHaveProperty("user.lastName", user.lastName);
       expect(result).toHaveProperty("user.image", user.image);
       expect(result).toHaveProperty("user.isRegistered", user.isRegistered);
-      expect(result).toHaveProperty("user.dateCreated", createdAt);
+      expect(result).toHaveProperty("user.dateCreated", user.dateCreated);
       expect(result).toHaveProperty(
         "user.accessToken",
         expect.stringMatching(JWT_REGEX)
@@ -160,7 +154,7 @@ describe("Test login resolver", () => {
       expect(result).toHaveProperty("user.lastName", user.lastName);
       expect(result).toHaveProperty("user.image", user.image);
       expect(result).toHaveProperty("user.isRegistered", user.isRegistered);
-      expect(result).toHaveProperty("user.dateCreated", createdAt);
+      expect(result).toHaveProperty("user.dateCreated", user.dateCreated);
       expect(result).toHaveProperty(
         "user.accessToken",
         expect.stringMatching(JWT_REGEX)

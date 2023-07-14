@@ -1,5 +1,4 @@
 import { registeredUser } from "@tests";
-import { DATE_CREATED_MULTIPLIER } from "@utils";
 
 interface Input {
   [key: string]: unknown;
@@ -18,7 +17,6 @@ type Validations = [string, Input, [InputErrors, InputErrors]][];
 
 export const cookies = { auth: "auth", sig: "sig", token: "token" };
 export const args = { email: "test_mail@example.com", password: "df_i4irh983" };
-export const createdAt = Date.now();
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [
   [
@@ -74,5 +72,5 @@ export const mockUser = {
   image: null,
   userId: "user id",
   isRegistered: false,
-  dateCreated: createdAt / DATE_CREATED_MULTIPLIER,
+  dateCreated: 546576,
 };

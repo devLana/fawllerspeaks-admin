@@ -5,7 +5,7 @@ import { EditedPostTag } from "./EditedPostTag";
 import { DuplicatePostTagError } from "../types";
 import { EditPostTagValidationError } from "./EditPostTagValidationError";
 import {
-  DATE_CREATED_MULTIPLIER,
+  DATE_COLUMN_MULTIPLIER,
   NotAllowedError,
   UnknownError,
   generateErrorsObject,
@@ -51,8 +51,8 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
       `SELECT
         name,
         tag_id id,
-        date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
-        last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
       FROM post_tags
       WHERE tag_id = $1`,
       [tagId]
@@ -74,9 +74,9 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
         RETURNING
           tag_id id,
           name,
-          date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
-          last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"`,
-        [name, Date.now() / DATE_CREATED_MULTIPLIER, tagId]
+          date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+          last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"`,
+        [name, Date.now() / DATE_COLUMN_MULTIPLIER, tagId]
       );
 
       return new EditedPostTag(updateTag[0]);
@@ -105,9 +105,9 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
       RETURNING
         tag_id id,
         name,
-        date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
-        last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"`,
-      [name, Date.now() / DATE_CREATED_MULTIPLIER, tagId]
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"`,
+      [name, Date.now() / DATE_COLUMN_MULTIPLIER, tagId]
     );
 
     return new EditedPostTag(updateTag[0]);

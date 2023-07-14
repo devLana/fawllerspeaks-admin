@@ -1,6 +1,5 @@
 import { PostStatus } from "@resolverTypes";
 import type { TestUser, TestPosts, RemoveNull } from "@types";
-import { DATE_COLUMN_MULTIPLIER } from "../constants";
 
 type RemoveNullFromTestUser = RemoveNull<TestUser>;
 

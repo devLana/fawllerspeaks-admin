@@ -9,7 +9,7 @@ import {
   Response,
   NotAllowedError,
   ServerError,
-  DATE_CREATED_MULTIPLIER,
+  DATE_COLUMN_MULTIPLIER,
 } from "@utils";
 
 import type { MutationResolvers } from "@resolverTypes";
@@ -42,11 +42,9 @@ const createUser: CreateUser = async (_, { email }, { db }) => {
 
     if (rows.length > 0) return new NotAllowedError(msg);
 
-    const createdAt = Date.now() / DATE_CREATED_MULTIPLIER;
-
     await db.query(
       `INSERT INTO users (email, password, date_created) VALUES ($1, $2, $3)`,
-      [validatedEmail, hash, createdAt]
+      [validatedEmail, hash, Date.now() / DATE_COLUMN_MULTIPLIER]
     );
 
     await createUserMail(validatedEmail, password);
