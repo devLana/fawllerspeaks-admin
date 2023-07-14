@@ -1,5 +1,6 @@
 import type { Pool } from "pg";
 
+import { DATE_COLUMN_MULTIPLIER } from "@utils";
 import type { PostTag } from "@resolverTypes";
 
 const getPostTags = async (db: Pool, tags: string[]) => {
@@ -7,8 +8,8 @@ const getPostTags = async (db: Pool, tags: string[]) => {
     `SELECT
       tag_id id,
       name,
-      date_created "dateCreated",
-      last_modified "lastModified"
+      date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+      last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
     FROM
       post_tags
     WHERE

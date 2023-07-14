@@ -1,5 +1,6 @@
 import { PostStatus } from "@resolverTypes";
 import type { TestUser, TestPosts, RemoveNull } from "@types";
+import { DATE_COLUMN_MULTIPLIER } from "../constants";
 
 type RemoveNullFromTestUser = RemoveNull<TestUser>;
 
@@ -98,7 +99,7 @@ export const publishedTestPosts: TestPosts = {
     status: PostStatus.Published,
     slug: "First Published post slug",
     imageBanner: null,
-    datePublished: Date.now(),
+    datePublished: null,
     lastModified: null,
     isInBin: false,
     isDeleted: false,
@@ -109,7 +110,7 @@ export const publishedTestPosts: TestPosts = {
     content: "Second Published Post Content",
     status: PostStatus.Published,
     imageBanner: null,
-    datePublished: Date.now(),
+    datePublished: null,
     lastModified: null,
     isInBin: false,
     isDeleted: false,

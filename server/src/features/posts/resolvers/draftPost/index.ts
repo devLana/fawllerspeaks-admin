@@ -9,7 +9,12 @@ import {
   UnauthorizedAuthorError,
   NotAllowedPostActionError,
 } from "../types";
-import { NotAllowedError, UnknownError, generateErrorsObject } from "@utils";
+import {
+  DATE_COLUMN_MULTIPLIER,
+  NotAllowedError,
+  UnknownError,
+  generateErrorsObject,
+} from "@utils";
 
 import {
   type MutationResolvers,
@@ -186,7 +191,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
         RETURNING
           post_id "postId",
           image_banner "imageBanner",
-          date_created "dateCreated",
+          date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
           date_published "datePublished",
           last_modified "lastModified",
           views,
@@ -228,7 +233,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
         RETURNING
           post_id "postId",
           image_banner "imageBanner",
-          date_created "dateCreated",
+          date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
           date_published "datePublished",
           last_modified "lastModified",
           views,
@@ -242,7 +247,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           user,
           PostStatus.Draft,
           slug,
-          Date.now(),
+          Date.now() / DATE_COLUMN_MULTIPLIER,
           dbTags,
         ]
       );

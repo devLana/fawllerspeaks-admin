@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 
 import { getPostUrl, mapPostTags } from "@features/posts/utils";
+import { DATE_COLUMN_MULTIPLIER } from "../constants";
 
 import type { DbFindPost, TestPosts, PostAuthor } from "@types";
 import type { Post, PostTag } from "@resolverTypes";
@@ -50,9 +51,9 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
         status,
         slug,
         image_banner "imageBanner",
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
@@ -66,7 +67,7 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
         posts.first.status,
         posts.first.slug,
         posts.first.imageBanner,
-        Date.now(),
+        Date.now() / DATE_COLUMN_MULTIPLIER,
         posts.first.datePublished,
         posts.first.lastModified,
         posts.first.isInBin,
@@ -80,7 +81,7 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
         posts.second.status,
         null,
         posts.second.imageBanner,
-        Date.now(),
+        Date.now() / DATE_COLUMN_MULTIPLIER,
         posts.second.datePublished,
         posts.second.lastModified,
         posts.second.isInBin,

@@ -4,7 +4,12 @@ import Joi, { ValidationError } from "joi";
 import { getPostTags, getPostUrl } from "@features/posts/utils";
 import { SinglePost, DuplicatePostTitleError } from "../types";
 import { CreatePostValidationError } from "./CreatePostValidationError";
-import { NotAllowedError, UnknownError, generateErrorsObject } from "@utils";
+import {
+  DATE_COLUMN_MULTIPLIER,
+  NotAllowedError,
+  UnknownError,
+  generateErrorsObject,
+} from "@utils";
 
 import {
   type MutationResolvers,
@@ -120,7 +125,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       RETURNING
         post_id "postId",
         image_banner "imageBanner",
-        date_created "dateCreated",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
         date_published "datePublished",
         last_modified "lastModified",
         views,
@@ -134,7 +139,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
         user,
         PostStatus.Unpublished,
         slug,
-        Date.now(),
+        Date.now() / DATE_COLUMN_MULTIPLIER,
         dbTags,
       ]
     );

@@ -3,7 +3,7 @@ import { GraphQLError } from "graphql";
 import { Posts } from "../types";
 import { EmptyBinWarning } from "./EmptyBinWarning";
 import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import { NotAllowedError } from "@utils";
+import { DATE_COLUMN_MULTIPLIER, NotAllowedError } from "@utils";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -33,8 +33,8 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
       `SELECT
         tag_id id,
         name,
-        date_created "dateCreated",
-        last_modified "lastModified"
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
       FROM post_tags`
     );
 
@@ -68,9 +68,9 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
         status,
         slug,
         image_banner "imageBanner",
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
         views,
         likes,
         tags`,

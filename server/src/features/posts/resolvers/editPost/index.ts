@@ -9,7 +9,12 @@ import {
   SinglePost,
   UnauthorizedAuthorError,
 } from "../types";
-import { NotAllowedError, UnknownError, generateErrorsObject } from "@utils";
+import {
+  DATE_COLUMN_MULTIPLIER,
+  NotAllowedError,
+  UnknownError,
+  generateErrorsObject,
+} from "@utils";
 
 import {
   type MutationResolvers,
@@ -164,14 +169,22 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       WHERE post_id = $7
       RETURNING
         image_banner "imageBanner",
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
         is_deleted "isDeleted"`,
-      [title, description, content, dbSlug, Date.now(), dbTags, postId]
+      [
+        title,
+        description,
+        content,
+        dbSlug,
+        Date.now() / DATE_COLUMN_MULTIPLIER,
+        dbTags,
+        postId,
+      ]
     );
 
     const [edited] = editedPost;

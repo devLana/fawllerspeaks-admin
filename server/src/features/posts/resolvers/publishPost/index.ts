@@ -8,7 +8,7 @@ import {
   UnauthorizedAuthorError,
 } from "../types";
 import { getPostTags, getPostUrl } from "@features/posts/utils";
-import { NotAllowedError, UnknownError } from "@utils";
+import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
 
 import { type MutationResolvers, PostStatus } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -95,15 +95,15 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
         content,
         slug,
         image_banner "imageBanner",
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
         is_deleted "isDeleted",
         tags`,
-      [PostStatus.Published, Date.now(), post]
+      [PostStatus.Published, Date.now() / DATE_COLUMN_MULTIPLIER, post]
     );
 
     const [updated] = updatePost;

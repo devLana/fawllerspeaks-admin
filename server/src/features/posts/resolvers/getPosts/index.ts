@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 
 import { Posts } from "../types";
 import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import { NotAllowedError } from "@utils";
+import { DATE_COLUMN_MULTIPLIER, NotAllowedError } from "@utils";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -22,8 +22,8 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
       `SELECT
         tag_id id,
         name,
-        date_created "dateCreated",
-        last_modified "lastModified"
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
       FROM post_tags`
     );
 
@@ -37,9 +37,9 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
         status,
         slug,
         image_banner "imageBanner",
-        posts.date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
+        posts.date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
         views,
         likes,
         is_in_bin "isInBin",

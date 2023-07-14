@@ -8,7 +8,7 @@ import {
   PostsWarning,
   UnauthorizedAuthorError,
 } from "../types";
-import { NotAllowedError, UnknownError } from "@utils";
+import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
 
 import type { MutationResolvers, PostTag, Post } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -63,8 +63,8 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
       `SELECT
         tag_id id,
         name,
-        date_created "dateCreated",
-        last_modified "lastModified"
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
       FROM post_tags`
     );
 
@@ -107,9 +107,9 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
         status,
         slug,
         image_banner "imageBanner",
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
         views,
         likes,
         tags`,

@@ -8,7 +8,7 @@ import {
   UnauthorizedAuthorError,
 } from "../types";
 import { getPostTags, getPostUrl } from "@features/posts/utils";
-import { NotAllowedError, UnknownError } from "@utils";
+import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
 
 import { type MutationResolvers, PostStatus } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -92,8 +92,8 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
         content,
         slug,
         image_banner "imageBanner",
-        date_created "dateCreated",
-        last_modified "lastModified",
+        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
