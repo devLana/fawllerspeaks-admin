@@ -1,4 +1,6 @@
 import type { Pool } from "pg";
+
+import { DATE_CREATED_MULTIPLIER } from "../constants";
 import type { PostTag } from "@resolverTypes";
 
 const createTestPostTags = async (db: Pool): Promise<PostTag[]> => {
@@ -11,19 +13,19 @@ const createTestPostTags = async (db: Pool): Promise<PostTag[]> => {
       RETURNING
         tag_id id,
         name,
-        date_created "dateCreated",
-        last_Modified "lastModified"`,
+        date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
+        last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"`,
       [
         "tag10",
-        Date.now(),
+        Date.now() / DATE_CREATED_MULTIPLIER,
         "tag11",
-        Date.now(),
+        Date.now() / DATE_CREATED_MULTIPLIER,
         "tag12",
-        Date.now(),
+        Date.now() / DATE_CREATED_MULTIPLIER,
         "tag13",
-        Date.now(),
+        Date.now() / DATE_CREATED_MULTIPLIER,
         "tag14",
-        Date.now(),
+        Date.now() / DATE_CREATED_MULTIPLIER,
       ]
     );
 

@@ -8,28 +8,28 @@ const tags = ["tag1", "tag2", "tag3", "tag4"];
 const tag1 = {
   id: "100",
   name: tags[0],
-  dateCreated: 1,
+  dateCreated: Date.now(),
   lastModified: null,
 };
 
 const tag2 = {
   id: "500",
   name: tags[1],
-  dateCreated: 10,
+  dateCreated: Date.now(),
   lastModified: null,
 };
 
 const tag3 = {
   id: "21",
   name: tags[2],
-  dateCreated: 235,
+  dateCreated: Date.now(),
   lastModified: null,
 };
 
 const tag4 = {
   id: "436921",
   name: tags[3],
-  dateCreated: 51244,
+  dateCreated: Date.now(),
   lastModified: null,
 };
 

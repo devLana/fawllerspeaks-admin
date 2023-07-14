@@ -80,7 +80,7 @@ describe("Test edit post tag resolver", () => {
     const tag1 = {
       name: tag.name,
       id: tag.tagId,
-      dateCreated: 47,
+      dateCreated: Date.now(),
       lastModified: null,
     };
 
@@ -100,15 +100,15 @@ describe("Test edit post tag resolver", () => {
   it("Updates post tag(case-insensitive)", async () => {
     const tag1 = {
       ...lowerTag,
-      dateCreated: 47,
+      dateCreated: Date.now(),
       lastModified: null,
     };
 
     const tag2 = {
       name: tag.name,
       id: tag.tagId,
-      dateCreated: 47,
-      lastModified: 980,
+      dateCreated: Date.now(),
+      lastModified: Date.now(),
     };
 
     const spy = spyDb({ rows: [{ isRegistered: true }] });
@@ -130,7 +130,7 @@ describe("Test edit post tag resolver", () => {
     const tag1 = {
       name: tag.name,
       id: tag.tagId,
-      dateCreated: 47,
+      dateCreated: Date.now(),
       lastModified: null,
     };
 
@@ -158,7 +158,7 @@ describe("Test edit post tag resolver", () => {
     const tag1 = {
       name: tag.name,
       id: tag.tagId,
-      dateCreated: 47,
+      dateCreated: Date.now(),
       lastModified: null,
     };
 
@@ -186,15 +186,15 @@ describe("Test edit post tag resolver", () => {
     const tag1 = {
       name: newTag.name,
       id: newTag.tagId,
-      dateCreated: 47,
+      dateCreated: Date.now(),
       lastModified: null,
     };
 
     const tag2 = {
       name: tag.name,
       id: tag.tagId,
-      dateCreated: 873,
-      lastModified: 930,
+      dateCreated: Date.now(),
+      lastModified: Date.now(),
     };
 
     const spy = spyDb({ rows: [{ isRegistered: true }] });

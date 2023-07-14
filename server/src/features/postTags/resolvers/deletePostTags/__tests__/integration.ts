@@ -13,28 +13,28 @@ const tagIds = [randomUUID(), randomUUID(), randomUUID(), randomUUID()];
 const tag1 = {
   id: tagIds[0],
   name: "tag1",
-  dateCreated: 56,
+  dateCreated: Date.now(),
   lastModified: null,
 };
 
 const tag2 = {
   id: tagIds[1],
   name: "tag2",
-  dateCreated: 5346,
+  dateCreated: Date.now(),
   lastModified: 67,
 };
 
 const tag3 = {
   id: tagIds[2],
   name: "tag3",
-  dateCreated: 4,
+  dateCreated: Date.now(),
   lastModified: null,
 };
 
 const tag4 = {
   id: tagIds[3],
   name: "tag4",
-  dateCreated: 70,
+  dateCreated: Date.now(),
   lastModified: null,
 };
 

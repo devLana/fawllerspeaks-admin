@@ -3,7 +3,7 @@ import Joi, { ValidationError } from "joi";
 
 import { PostTags, PostTagsWarning, DuplicatePostTagError } from "../types";
 import { CreatePostTagsValidationError } from "./CreatePostTagsValidationError";
-import { NotAllowedError } from "@utils";
+import { DATE_CREATED_MULTIPLIER, NotAllowedError } from "@utils";
 
 import type { ResolverFunc } from "@types";
 import type { MutationResolvers, PostTag } from "@resolverTypes";
@@ -78,7 +78,7 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
       insertParams = `${insertParams}${str}`;
       index += 1;
 
-      insertInput.push(validatedTag, Date.now());
+      insertInput.push(validatedTag, Date.now() / DATE_CREATED_MULTIPLIER);
     }
 
     if (insertParams && insertInput.length > 0) {
@@ -92,7 +92,7 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
         RETURNING
           tag_id id,
           name,
-          date_created "dateCreated",
+          date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
           last_Modified "lastModified"`,
         insertInput
       ));

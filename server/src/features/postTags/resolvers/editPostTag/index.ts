@@ -4,7 +4,12 @@ import Joi, { ValidationError } from "joi";
 import { EditedPostTag } from "./EditedPostTag";
 import { DuplicatePostTagError } from "../types";
 import { EditPostTagValidationError } from "./EditPostTagValidationError";
-import { NotAllowedError, UnknownError, generateErrorsObject } from "@utils";
+import {
+  DATE_CREATED_MULTIPLIER,
+  NotAllowedError,
+  UnknownError,
+  generateErrorsObject,
+} from "@utils";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";
@@ -46,8 +51,8 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
       `SELECT
         name,
         tag_id id,
-        date_created "dateCreated",
-        last_Modified "lastModified"
+        date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
+        last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"
       FROM post_tags
       WHERE tag_id = $1`,
       [tagId]
@@ -69,9 +74,9 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
         RETURNING
           tag_id id,
           name,
-          date_created "dateCreated",
-          last_Modified "lastModified"`,
-        [name, Date.now(), tagId]
+          date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
+          last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"`,
+        [name, Date.now() / DATE_CREATED_MULTIPLIER, tagId]
       );
 
       return new EditedPostTag(updateTag[0]);
@@ -100,9 +105,9 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
       RETURNING
         tag_id id,
         name,
-        date_created "dateCreated",
-        last_Modified "lastModified"`,
-      [name, Date.now(), tagId]
+        date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
+        last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"`,
+      [name, Date.now() / DATE_CREATED_MULTIPLIER, tagId]
     );
 
     return new EditedPostTag(updateTag[0]);

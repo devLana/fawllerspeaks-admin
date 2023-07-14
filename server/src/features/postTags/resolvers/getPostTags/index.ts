@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 
 import { PostTags } from "../types";
-import { NotAllowedError } from "@utils";
+import { DATE_CREATED_MULTIPLIER, NotAllowedError } from "@utils";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -25,8 +25,8 @@ const getPostTags: GetPostTags = async (_, __, { db, user }) => {
       `SELECT
         name,
         tag_id id,
-        date_created "dateCreated",
-        last_Modified "lastModified"
+        date_created * ${DATE_CREATED_MULTIPLIER} "dateCreated",
+        last_Modified * ${DATE_CREATED_MULTIPLIER} "lastModified"
       FROM post_tags`
     );
 

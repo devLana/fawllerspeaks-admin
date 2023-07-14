@@ -36,15 +36,15 @@ describe("Test get post tags resolver", () => {
     const tag1 = {
       id: "1",
       name: "tag1",
-      dateCreated: 847,
+      dateCreated: Date.now(),
       lastModified: null,
     };
 
     const tag2 = {
       id: "2",
       name: "tag2",
-      dateCreated: 847,
-      lastModified: 456,
+      dateCreated: Date.now(),
+      lastModified: Date.now(),
     };
 
     const spy = spyDb({ rows: [{ isRegistered: true }] });
