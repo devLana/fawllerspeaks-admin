@@ -6,7 +6,7 @@ export const authTypeDefs = `#graphql
     lastName: String
     image: String
     isRegistered: Boolean!
-    dateCreated: Float!
+    dateCreated: String!
     accessToken: String!
     sessionId: ID!
   }

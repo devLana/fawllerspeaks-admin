@@ -148,7 +148,7 @@ export type EditedProfile = {
 
 export type EmailValidationError = {
   __typename?: 'EmailValidationError';
-  emailError?: Maybe<Scalars['String']>;
+  emailError: Scalars['String'];
   status: Status;
 };
 
@@ -516,7 +516,7 @@ export type ServerError = BaseResponse & {
 
 export type SessionIdValidationError = {
   __typename?: 'SessionIdValidationError';
-  sessionIdError?: Maybe<Scalars['String']>;
+  sessionIdError: Scalars['String'];
   status: Status;
 };
 
@@ -547,7 +547,7 @@ export type UnknownError = BaseResponse & {
 export type User = {
   __typename?: 'User';
   accessToken: Scalars['String'];
-  dateCreated: Scalars['Float'];
+  dateCreated: Scalars['String'];
   email: Scalars['String'];
   firstName?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
@@ -581,7 +581,7 @@ export type VerifyResetToken = NotAllowedError | RegistrationError | VerifiedRes
 export type VerifyResetTokenValidationError = {
   __typename?: 'VerifyResetTokenValidationError';
   status: Status;
-  tokenError?: Maybe<Scalars['String']>;
+  tokenError: Scalars['String'];
 };
 
 export type VerifySession = NotAllowedError | SessionIdValidationError | UnknownError | UserData | UserSessionError;
@@ -937,7 +937,7 @@ export type EditedProfileResolvers<ContextType = APIContext, ParentType extends 
 }>;
 
 export type EmailValidationErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['EmailValidationError'] = ResolversParentTypes['EmailValidationError']> = ResolversObject<{
-  emailError?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  emailError?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -1158,7 +1158,7 @@ export type ServerErrorResolvers<ContextType = APIContext, ParentType extends Re
 }>;
 
 export type SessionIdValidationErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['SessionIdValidationError'] = ResolversParentTypes['SessionIdValidationError']> = ResolversObject<{
-  sessionIdError?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  sessionIdError?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -1183,7 +1183,7 @@ export type UnknownErrorResolvers<ContextType = APIContext, ParentType extends R
 
 export type UserResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  dateCreated?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  dateCreated?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   firstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -1219,7 +1219,7 @@ export type VerifyResetTokenResolvers<ContextType = APIContext, ParentType exten
 
 export type VerifyResetTokenValidationErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['VerifyResetTokenValidationError'] = ResolversParentTypes['VerifyResetTokenValidationError']> = ResolversObject<{
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
-  tokenError?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  tokenError?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
