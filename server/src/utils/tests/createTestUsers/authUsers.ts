@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import type { Pool } from "pg";
 
 import { unRegisteredUser, registeredUser, newRegisteredUser } from "../mocks";
+import dateToISOString from "../../dateToISOSTring";
 import type { DbTestUser } from "@types";
 
 interface Users {
@@ -97,9 +98,18 @@ const authUsers = async (db: Pool): Promise<Users> => {
     ]);
 
     return {
-      registeredUser: registerRes.rows[0],
-      unregisteredUser: unregisterRes.rows[0],
-      newRegisteredUser: newRegisterRes.rows[0],
+      registeredUser: {
+        ...registerRes.rows[0],
+        dateCreated: dateToISOString(registerRes.rows[0].dateCreated),
+      },
+      unregisteredUser: {
+        ...unregisterRes.rows[0],
+        dateCreated: dateToISOString(unregisterRes.rows[0].dateCreated),
+      },
+      newRegisteredUser: {
+        ...newRegisterRes.rows[0],
+        dateCreated: dateToISOString(newRegisterRes.rows[0].dateCreated),
+      },
     };
   } catch (err) {
     console.log("Create Reset Password Users Error - ", err);

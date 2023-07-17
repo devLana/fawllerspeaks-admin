@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import type { Pool } from "pg";
 
 import { unRegisteredUser, registeredUser, postAuthor } from "../mocks";
+import dateToISOString from "../../dateToISOSTring";
 import type { DbTestUser } from "@types";
 
 export interface Users {
@@ -95,9 +96,18 @@ const postsUsers = async (db: Pool): Promise<Users> => {
     ]);
 
     return {
-      registeredUser: registerRes.rows[0],
-      unregisteredUser: unregisterRes.rows[0],
-      postAuthor: authorRes.rows[0],
+      registeredUser: {
+        ...registerRes.rows[0],
+        dateCreated: dateToISOString(registerRes.rows[0].dateCreated),
+      },
+      unregisteredUser: {
+        ...unregisterRes.rows[0],
+        dateCreated: dateToISOString(unregisterRes.rows[0].dateCreated),
+      },
+      postAuthor: {
+        ...authorRes.rows[0],
+        dateCreated: dateToISOString(authorRes.rows[0].dateCreated),
+      },
     };
   } catch (err) {
     console.log("Create Posts Users Error - ", err);

@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import type { Pool } from "pg";
 
 import { unRegisteredUser, registeredUser } from "../mocks";
+import dateToISOString from "../../dateToISOSTring";
 import type { DbTestUser } from "@types";
 
 interface Users {
@@ -69,8 +70,14 @@ const testUsers = async (db: Pool): Promise<Users> => {
     ]);
 
     return {
-      registeredUser: registerRes.rows[0],
-      unregisteredUser: unregisterRes.rows[0],
+      registeredUser: {
+        ...registerRes.rows[0],
+        dateCreated: dateToISOString(registerRes.rows[0].dateCreated),
+      },
+      unregisteredUser: {
+        ...unregisterRes.rows[0],
+        dateCreated: dateToISOString(unregisterRes.rows[0].dateCreated),
+      },
     };
   } catch (err) {
     console.log("Create Test Users Error - ", err);
