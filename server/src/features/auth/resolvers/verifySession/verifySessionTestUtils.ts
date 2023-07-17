@@ -12,13 +12,16 @@ export const sessionId = "session_id_string";
 export const loggedInUserId = "user_user";
 export const email = "test@mail.com";
 
+const dateCreated = "2022-11-07 13:22:43.717+01";
+export const mockDate = "2022-11-07T12:22:43.717Z";
+
 export const dbResponse = {
   refreshToken: `${cookies.sig}.${cookies.auth}.${cookies.token}`,
   email: "mail@mail.com",
   firstName: "first_name",
   lastName: "last_name",
   image: null,
-  dateCreated: 54787683464,
+  dateCreated,
 };
 
 export const data = {

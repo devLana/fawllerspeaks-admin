@@ -18,6 +18,9 @@ type Validations = [string, Input, [InputErrors, InputErrors]][];
 export const cookies = { auth: "auth", sig: "sig", token: "token" };
 export const args = { email: "test_mail@example.com", password: "df_i4irh983" };
 
+const dateCreated = "2022-11-07 13:22:43.717+01";
+export const mockDate = "2022-11-07T12:22:43.717Z";
+
 export const validations = (nullOrUndefined: null | undefined): Validations => [
   [
     "empty email and password",
@@ -72,5 +75,5 @@ export const mockUser = {
   image: null,
   userId: "user id",
   isRegistered: false,
-  dateCreated: 546576,
+  dateCreated,
 };

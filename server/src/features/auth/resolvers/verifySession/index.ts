@@ -11,11 +11,11 @@ import {
 
 import { verify } from "@lib/tokenPromise";
 import {
-  DATE_COLUMN_MULTIPLIER,
   MailError,
   NotAllowedError,
   UnknownError,
   UserSessionError,
+  dateToISOString,
 } from "@utils";
 
 import { type QueryResolvers } from "@resolverTypes";
@@ -32,7 +32,7 @@ interface DBResponse {
   lastName: string | null;
   image: string | null;
   isRegistered: boolean;
-  dateCreated: number;
+  dateCreated: string;
 }
 
 type TDBResponse = Omit<DBResponse, "sessionId">;
@@ -74,7 +74,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
         last_name "lastName",
         image,
         is_Registered "isRegistered",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated"
+        date_created "dateCreated"
       FROM sessions LEFT JOIN users ON "user" = user_id
       WHERE session_id = $1`,
       [validatedSession]
@@ -113,7 +113,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       lastName: rows[0].lastName,
       image: rows[0].image,
       isRegistered: rows[0].isRegistered,
-      dateCreated: rows[0].dateCreated,
+      dateCreated: dateToISOString(rows[0].dateCreated),
       accessToken,
       sessionId: validatedSession,
     };
@@ -132,7 +132,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
             last_name "lastName",
             image,
             is_Registered "isRegistered",
-            date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated"
+            date_created "dateCreated"
           FROM sessions LEFT JOIN users ON "user" = user_id
           WHERE session_id = $1`,
           [validatedSession]
@@ -168,7 +168,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
           lastName: rows[0].lastName,
           image: rows[0].image,
           isRegistered: rows[0].isRegistered,
-          dateCreated: rows[0].dateCreated,
+          dateCreated: dateToISOString(rows[0].dateCreated),
           accessToken,
           sessionId: rows[0].sessionId,
         };

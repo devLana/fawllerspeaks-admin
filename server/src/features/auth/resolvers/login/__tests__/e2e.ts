@@ -109,7 +109,7 @@ describe("Login - E2E", () => {
           lastName: registeredUser.lastName,
           image: null,
           isRegistered: registeredUser.registered,
-          dateCreated: +user.dateCreated,
+          dateCreated: user.dateCreated,
           accessToken: expect.stringMatching(JWT_REGEX),
           sessionId: expect.stringMatching(SESSION_ID_REGEX),
         },

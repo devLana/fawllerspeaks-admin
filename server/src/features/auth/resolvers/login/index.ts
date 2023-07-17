@@ -2,14 +2,10 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import {
-  DATE_COLUMN_MULTIPLIER,
-  NotAllowedError,
-  generateErrorsObject,
-} from "@utils";
-import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
 import { UserData } from "../types";
 import { LoginValidationError } from "./LoginValidationError";
+import { NotAllowedError, dateToISOString, generateErrorsObject } from "@utils";
+import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, Cookies, ValidationErrorObject } from "@types";
@@ -24,7 +20,7 @@ interface DBUser {
   userPassword: string;
   userId: string;
   isRegistered: boolean;
-  dateCreated: number;
+  dateCreated: string;
 }
 
 const login: Login = async (_, args, { db, req, res }) => {
@@ -63,7 +59,7 @@ const login: Login = async (_, args, { db, req, res }) => {
         password "userPassword",
         user_id "userId",
         is_registered "isRegistered",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated"
+        date_created "dateCreated"
       FROM users
       WHERE lower(email) = $1`,
       [email.toLowerCase()]
@@ -112,7 +108,7 @@ const login: Login = async (_, args, { db, req, res }) => {
       lastName,
       image,
       isRegistered,
-      dateCreated,
+      dateCreated: dateToISOString(dateCreated),
       accessToken,
       sessionId,
     };

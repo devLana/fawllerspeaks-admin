@@ -189,7 +189,7 @@ describe("Register user - E2E", () => {
           lastName: "Simpson",
           image: null,
           isRegistered: true,
-          dateCreated: +user.dateCreated,
+          dateCreated: user.dateCreated,
           accessToken: unregisteredJwt,
           sessionId: unregisteredSessionId,
         },
