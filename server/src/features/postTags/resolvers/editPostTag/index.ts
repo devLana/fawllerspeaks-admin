@@ -5,9 +5,9 @@ import { EditedPostTag } from "./EditedPostTag";
 import { DuplicatePostTagError } from "../types";
 import { EditPostTagValidationError } from "./EditPostTagValidationError";
 import {
-  DATE_COLUMN_MULTIPLIER,
   NotAllowedError,
   UnknownError,
+  dateToISOString,
   generateErrorsObject,
 } from "@utils";
 
@@ -51,8 +51,8 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
       `SELECT
         name,
         tag_id id,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
+        date_created "dateCreated",
+        last_Modified "lastModified"
       FROM post_tags
       WHERE tag_id = $1`,
       [tagId]
@@ -64,7 +64,14 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
 
     const [tag] = findTagId;
 
-    if (tag.name === name) return new EditedPostTag(tag);
+    if (tag.name === name)
+      return new EditedPostTag({
+        ...tag,
+        dateCreated: dateToISOString(tag.dateCreated),
+        lastModified: tag.lastModified
+          ? dateToISOString(tag.lastModified)
+          : tag.lastModified,
+      });
 
     if (tag.name.toLowerCase() === name.toLowerCase()) {
       const { rows: updateTag } = await db.query<PostTag>(
@@ -74,12 +81,18 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
         RETURNING
           tag_id id,
           name,
-          date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-          last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"`,
-        [name, Date.now() / DATE_COLUMN_MULTIPLIER, tagId]
+          date_created "dateCreated",
+          last_Modified "lastModified"`,
+        [name, new Date().toISOString(), tagId]
       );
 
-      return new EditedPostTag(updateTag[0]);
+      return new EditedPostTag({
+        ...updateTag[0],
+        dateCreated: dateToISOString(updateTag[0].dateCreated),
+        lastModified: updateTag[0].lastModified
+          ? dateToISOString(updateTag[0].lastModified)
+          : updateTag[0].lastModified,
+      });
     }
 
     const { rows: findTagName } = await db.query<{ name: string }>(
@@ -105,12 +118,18 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
       RETURNING
         tag_id id,
         name,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"`,
-      [name, Date.now() / DATE_COLUMN_MULTIPLIER, tagId]
+        date_created "dateCreated",
+        last_Modified "lastModified"`,
+      [name, new Date().toISOString(), tagId]
     );
 
-    return new EditedPostTag(updateTag[0]);
+    return new EditedPostTag({
+      ...updateTag[0],
+      dateCreated: dateToISOString(updateTag[0].dateCreated),
+      lastModified: updateTag[0].lastModified
+        ? dateToISOString(updateTag[0].lastModified)
+        : updateTag[0].lastModified,
+    });
   } catch (err) {
     if (err instanceof ValidationError) {
       const { nameError, tagIdError } = generateErrorsObject(

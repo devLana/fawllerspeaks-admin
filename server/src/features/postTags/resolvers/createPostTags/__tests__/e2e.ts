@@ -5,7 +5,7 @@ import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 import { db } from "@services/db";
 import { startServer } from "@server";
 
-import { UUID_REGEX } from "@utils";
+import { DATE_REGEX, UUID_REGEX } from "@utils";
 import { CREATE_POST_TAGS, testUsers, loginTestUser, post } from "@tests";
 
 import type { APIContext, TestData } from "@types";
@@ -142,21 +142,21 @@ describe("Create post tags - E2E", () => {
           __typename: "PostTag",
           id: expect.stringMatching(UUID_REGEX),
           name: "tag1",
-          dateCreated: expect.any(Number),
+          dateCreated: expect.stringMatching(DATE_REGEX),
           lastModified: null,
         },
         {
           __typename: "PostTag",
           id: expect.stringMatching(UUID_REGEX),
           name: "tag2",
-          dateCreated: expect.any(Number),
+          dateCreated: expect.stringMatching(DATE_REGEX),
           lastModified: null,
         },
         {
           __typename: "PostTag",
           id: expect.stringMatching(UUID_REGEX),
           name: "tag3",
-          dateCreated: expect.any(Number),
+          dateCreated: expect.stringMatching(DATE_REGEX),
           lastModified: null,
         },
       ]),
@@ -184,14 +184,14 @@ describe("Create post tags - E2E", () => {
           __typename: "PostTag",
           id: expect.stringMatching(UUID_REGEX),
           name: "tag4",
-          dateCreated: expect.any(Number),
+          dateCreated: expect.stringMatching(DATE_REGEX),
           lastModified: null,
         },
         {
           __typename: "PostTag",
           id: expect.stringMatching(UUID_REGEX),
           name: "tag5",
-          dateCreated: expect.any(Number),
+          dateCreated: expect.stringMatching(DATE_REGEX),
           lastModified: null,
         },
       ],

@@ -4,34 +4,31 @@ import createPostTags from "..";
 import { mockContext, info, spyDb } from "@tests";
 
 const tags = ["tag1", "tag2", "tag3", "tag4"];
+const dateCreated = "2022-11-07 13:22:43.717+01";
+const mockDate = "2022-11-07T12:22:43.717Z";
 
-const tag1 = {
-  id: "100",
-  name: tags[0],
-  dateCreated: 73485,
-  lastModified: null,
-};
+const mockTag1 = { id: "100", name: tags[0], lastModified: null };
+const mockTag2 = { id: "500", name: tags[1], lastModified: null };
+const mockTag3 = { id: "21", name: tags[2], lastModified: null };
+const mockTag4 = { id: "436921", name: tags[3], lastModified: null };
 
-const tag2 = {
-  id: "500",
-  name: tags[1],
-  dateCreated: 1734,
-  lastModified: null,
-};
+const dbTag1 = { ...mockTag1, dateCreated };
+const dbTag2 = { ...mockTag2, dateCreated };
+const dbTag3 = { ...mockTag3, dateCreated };
+const dbTag4 = { ...mockTag4, dateCreated };
 
-const tag3 = {
-  id: "21",
-  name: tags[2],
-  dateCreated: 87876,
-  lastModified: null,
-};
+const dbAlreadyCreatedTags = [{ name: tags[0] }, { name: tags[1] }];
+const dbAllCreatedTags = [
+  { name: tags[0] },
+  { name: tags[1] },
+  { name: tags[2] },
+  { name: tags[3] },
+];
 
-const tag4 = {
-  id: "436921",
-  name: tags[3],
-  dateCreated: 45,
-  lastModified: null,
-};
+const tag1 = { ...mockTag1, dateCreated: mockDate };
+const tag2 = { ...mockTag2, dateCreated: mockDate };
+const tag3 = { ...mockTag3, dateCreated: mockDate };
+const tag4 = { ...mockTag4, dateCreated: mockDate };
 
 beforeEach(() => {
   mockContext.user = "logged_In_User_Id";
@@ -94,14 +91,16 @@ describe("Test create post tags resolver", () => {
   it("Creates post tags from input array", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true }] })
       .mockReturnValueOnce({ rows: [] })
-      .mockReturnValueOnce({ rows: [tag1, tag2, tag3, tag4] });
+      .mockReturnValueOnce({ rows: [dbTag1, dbTag2, dbTag3, dbTag4] });
 
     const result = await createPostTags({}, { tags }, mockContext, info);
 
     expect(spy).toHaveBeenCalledTimes(3);
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: [tag1, tag2, tag3, tag4] });
+    expect(spy).toHaveNthReturnedWith(3, {
+      rows: [dbTag1, dbTag2, dbTag3, dbTag4],
+    });
 
     expect(result).toHaveProperty("tags", [tag1, tag2, tag3, tag4]);
     expect(result).toHaveProperty("status", "SUCCESS");
@@ -112,15 +111,15 @@ describe("Test create post tags resolver", () => {
       "2 post tags created. 'tag1' and 1 other post tag have already been created";
 
     const spy = spyDb({ rows: [{ isRegistered: true }] })
-      .mockReturnValueOnce({ rows: [tag1, tag2] })
-      .mockReturnValueOnce({ rows: [tag3, tag4] });
+      .mockReturnValueOnce({ rows: dbAlreadyCreatedTags })
+      .mockReturnValueOnce({ rows: [dbTag3, dbTag4] });
 
     const result = await createPostTags({}, { tags }, mockContext, info);
 
     expect(spy).toHaveBeenCalledTimes(3);
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-    expect(spy).toHaveNthReturnedWith(2, { rows: [tag1, tag2] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: [tag3, tag4] });
+    expect(spy).toHaveNthReturnedWith(2, { rows: dbAlreadyCreatedTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: [dbTag3, dbTag4] });
 
     expect(result).toHaveProperty("tags", [tag3, tag4]);
     expect(result).toHaveProperty("message", errorMsg);
@@ -129,13 +128,13 @@ describe("Test create post tags resolver", () => {
 
   it("Should return error if all input post tags already exists", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true }] });
-    spy.mockReturnValueOnce({ rows: [tag1, tag2, tag3, tag4] });
+    spy.mockReturnValueOnce({ rows: dbAllCreatedTags });
 
     const result = await createPostTags({}, { tags }, mockContext, info);
 
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-    expect(spy).toHaveNthReturnedWith(2, { rows: [tag1, tag2, tag3, tag4] });
+    expect(spy).toHaveNthReturnedWith(2, { rows: dbAllCreatedTags });
 
     expect(result).not.toHaveProperty("tags");
 

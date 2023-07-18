@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 
 import { PostTags } from "../types";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError } from "@utils";
+import { NotAllowedError, dateToISOString } from "@utils";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -21,14 +21,22 @@ const getPostTags: GetPostTags = async (_, __, { db, user }) => {
       return new NotAllowedError("Unable to get post tags");
     }
 
-    const { rows: tags } = await db.query<PostTag>(
+    let { rows: tags } = await db.query<PostTag>(
       `SELECT
         name,
         tag_id id,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
+        date_created "dateCreated",
+        last_Modified "lastModified"
       FROM post_tags`
     );
+
+    tags = tags.map(tag => ({
+      ...tag,
+      dateCreated: dateToISOString(tag.dateCreated),
+      lastModified: tag.lastModified
+        ? dateToISOString(tag.lastModified)
+        : tag.lastModified,
+    }));
 
     return new PostTags(tags);
   } catch {

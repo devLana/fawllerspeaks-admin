@@ -6,7 +6,7 @@ import Joi, { ValidationError } from "joi";
 // import deletePostTagsWorker from "./deletePostTagsWorker";
 import { PostTags, PostTagsWarning } from "../types";
 import { DeletePostTagsValidationError } from "./DeletePostTagsValidationError";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
+import { NotAllowedError, UnknownError, dateToISOString } from "@utils";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -50,16 +50,24 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
       return new NotAllowedError(`Unable to delete post ${tagOrTags}`);
     }
 
-    const { rows: deletedTags } = await db.query<PostTag>(
+    let { rows: deletedTags } = await db.query<PostTag>(
       `DELETE FROM post_tags WHERE
         tag_id = ANY ($1)
       RETURNING
         tag_id id,
         name,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"`,
+        date_created "dateCreated",
+        last_Modified "lastModified"`,
       [validatedTagIds]
     );
+
+    deletedTags = deletedTags.map(tag => ({
+      ...tag,
+      dateCreated: dateToISOString(tag.dateCreated),
+      lastModified: tag.lastModified
+        ? dateToISOString(tag.lastModified)
+        : tag.lastModified,
+    }));
 
     // On a new thread delete from a post's tags, every tag in deletedTags
     if (deletedTags.length > 0) {

@@ -9,32 +9,42 @@ import { mockContext, info, spyDb } from "@tests";
 
 const uuid = randomUUID();
 const tagIds = [randomUUID(), randomUUID(), randomUUID(), randomUUID()];
+const dateCreated = "2022-11-07 13:22:43.717+01";
+const returnDateCreated = "2022-11-07T12:22:43.717Z";
+const dateModified = "2022-12-15 02:00:15.126+01";
+const returnDateModified = "2022-12-15T01:00:15.126Z";
+
+const mockTag1 = { id: tagIds[0], name: "tag1" };
+const mockTag2 = { id: tagIds[1], name: "tag2" };
+const mockTag3 = { id: tagIds[2], name: "tag3" };
+const mockTag4 = { id: tagIds[3], name: "tag4" };
+
+const dbTag1 = { ...mockTag1, dateCreated, lastModified: null };
+const dbTag2 = { ...mockTag2, dateCreated, lastModified: dateModified };
+const dbTag3 = { ...mockTag3, dateCreated, lastModified: null };
+const dbTag4 = { ...mockTag4, dateCreated, lastModified: null };
 
 const tag1 = {
-  id: tagIds[0],
-  name: "tag1",
-  dateCreated: 56,
+  ...mockTag1,
+  dateCreated: returnDateCreated,
   lastModified: null,
 };
 
 const tag2 = {
-  id: tagIds[1],
-  name: "tag2",
-  dateCreated: 7853,
-  lastModified: 67,
+  ...mockTag2,
+  dateCreated: returnDateCreated,
+  lastModified: returnDateModified,
 };
 
 const tag3 = {
-  id: tagIds[2],
-  name: "tag3",
-  dateCreated: 893475,
+  ...mockTag3,
+  dateCreated: returnDateCreated,
   lastModified: null,
 };
 
 const tag4 = {
-  id: tagIds[3],
-  name: "tag4",
-  dateCreated: 3745,
+  ...mockTag4,
+  dateCreated: returnDateCreated,
   lastModified: null,
 };
 
@@ -137,13 +147,15 @@ describe("Test delete post tags resolver", () => {
 
   it("Deletes all post tags provided in the input array", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true }] });
-    spy.mockReturnValueOnce({ rows: [tag1, tag2, tag3, tag4] });
+    spy.mockReturnValueOnce({ rows: [dbTag1, dbTag2, dbTag3, dbTag4] });
 
     const result = await deletePostTags({}, { tagIds }, mockContext, info);
 
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-    expect(spy).toHaveNthReturnedWith(2, { rows: [tag1, tag2, tag3, tag4] });
+    expect(spy).toHaveNthReturnedWith(2, {
+      rows: [dbTag1, dbTag2, dbTag3, dbTag4],
+    });
 
     expect(result).toHaveProperty("tags", [tag1, tag2, tag3, tag4]);
     expect(result).toHaveProperty("status", "SUCCESS");
@@ -154,7 +166,7 @@ describe("Test delete post tags resolver", () => {
   });
 
   it("Should return warning message if at least one post tag could not be deleted", async () => {
-    const testTagIds = [tag2, tag4];
+    const testTagIds = [dbTag2, dbTag4];
     const errorMsg =
       "tag2 and 1 other post tag deleted. 2 post tags could not be deleted";
 
@@ -167,7 +179,7 @@ describe("Test delete post tags resolver", () => {
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
     expect(spy).toHaveNthReturnedWith(2, { rows: testTagIds });
 
-    expect(result).toHaveProperty("tags", testTagIds);
+    expect(result).toHaveProperty("tags", [tag2, tag4]);
     expect(result).toHaveProperty("message", errorMsg);
     expect(result).toHaveProperty("status", "WARN");
 

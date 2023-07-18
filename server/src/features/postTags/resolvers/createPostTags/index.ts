@@ -3,7 +3,7 @@ import Joi, { ValidationError } from "joi";
 
 import { PostTags, PostTagsWarning, DuplicatePostTagError } from "../types";
 import { CreatePostTagsValidationError } from "./CreatePostTagsValidationError";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError } from "@utils";
+import { NotAllowedError, dateToISOString } from "@utils";
 
 import type { ResolverFunc } from "@types";
 import type { MutationResolvers, PostTag } from "@resolverTypes";
@@ -66,19 +66,17 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
 
     const insertInput: (string | number)[] = [];
     let insertParams = "";
-    let index = 0;
+    let index = 1;
     let createdTags: PostTag[] = [];
 
     for (const validatedTag of validatedTags) {
       if (set.has(validatedTag.toLowerCase())) continue;
 
-      const modifier = index + 1;
-      const str = `($${index + modifier}, $${index + modifier + 1}), `;
+      const sqlParams = `($${index}), `;
 
-      insertParams = `${insertParams}${str}`;
+      insertParams = `${insertParams}${sqlParams}`;
+      insertInput.push(validatedTag);
       index += 1;
-
-      insertInput.push(validatedTag, Date.now() / DATE_COLUMN_MULTIPLIER);
     }
 
     if (insertParams && insertInput.length > 0) {
@@ -86,17 +84,22 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
 
       ({ rows: createdTags } = await db.query<PostTag>(
         `INSERT INTO
-          post_tags (name, date_created)
+          post_tags (name)
         VALUES
           ${sqlParams}
         RETURNING
           tag_id id,
           name,
-          date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+          date_created "dateCreated",
           last_Modified "lastModified"`,
         insertInput
       ));
     }
+
+    createdTags = createdTags.map(createdTag => ({
+      ...createdTag,
+      dateCreated: dateToISOString(createdTag.dateCreated),
+    }));
 
     if (alreadyPostTagsWarning.length > 0) {
       if (createdTags.length === 0) {

@@ -17,6 +17,7 @@ import {
 
 import type { APIContext, TestData } from "@types";
 import { type PostTag, Status } from "@resolverTypes";
+import { DATE_REGEX } from "@utils";
 
 type EditTag = TestData<{ editPostTag: Record<string, unknown> }>;
 
@@ -191,7 +192,7 @@ describe("Edit post tags - E2E", () => {
         __typename: "PostTag",
         id: postTags[1].id,
         name: variables.name,
-        lastModified: expect.any(Number),
+        lastModified: expect.stringMatching(DATE_REGEX),
         dateCreated: postTags[1].dateCreated,
       },
       status: Status.Success,
@@ -254,7 +255,7 @@ describe("Edit post tags - E2E", () => {
         __typename: "PostTag",
         id: postTags[0].id,
         name: variables.name,
-        lastModified: expect.any(Number),
+        lastModified: expect.stringMatching(DATE_REGEX),
         dateCreated: postTags[0].dateCreated,
       },
       status: Status.Success,
