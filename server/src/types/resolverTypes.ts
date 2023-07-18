@@ -362,14 +362,14 @@ export type Post = {
   __typename?: 'Post';
   author: Scalars['String'];
   content?: Maybe<Scalars['String']>;
-  dateCreated: Scalars['Float'];
-  datePublished?: Maybe<Scalars['Float']>;
+  dateCreated: Scalars['String'];
+  datePublished?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   imageBanner?: Maybe<Scalars['String']>;
   isDeleted: Scalars['Boolean'];
   isInBin: Scalars['Boolean'];
-  lastModified?: Maybe<Scalars['Float']>;
+  lastModified?: Maybe<Scalars['String']>;
   likes: Scalars['Int'];
   slug?: Maybe<Scalars['String']>;
   status: PostStatus;
@@ -685,7 +685,6 @@ export type ResolversTypes = ResolversObject<{
   EmailValidationError: ResolverTypeWrapper<EmailValidationError>;
   EmptyBin: ResolversTypes['EmptyBinWarning'] | ResolversTypes['NotAllowedError'] | ResolversTypes['Posts'];
   EmptyBinWarning: ResolverTypeWrapper<EmptyBinWarning>;
-  Float: ResolverTypeWrapper<Scalars['Float']>;
   ForgotGeneratePassword: ResolversTypes['EmailValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'];
   GetPost: ResolversTypes['NotAllowedError'] | ResolversTypes['PostIdValidationError'] | ResolversTypes['SinglePost'] | ResolversTypes['UnknownError'];
   GetPostTags: ResolversTypes['NotAllowedError'] | ResolversTypes['PostTags'];
@@ -765,7 +764,6 @@ export type ResolversParentTypes = ResolversObject<{
   EmailValidationError: EmailValidationError;
   EmptyBin: ResolversParentTypes['EmptyBinWarning'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['Posts'];
   EmptyBinWarning: EmptyBinWarning;
-  Float: Scalars['Float'];
   ForgotGeneratePassword: ResolversParentTypes['EmailValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'];
   GetPost: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostIdValidationError'] | ResolversParentTypes['SinglePost'] | ResolversParentTypes['UnknownError'];
   GetPostTags: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostTags'];
@@ -1024,14 +1022,14 @@ export type NotAllowedPostActionErrorResolvers<ContextType = APIContext, ParentT
 export type PostResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = ResolversObject<{
   author?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  dateCreated?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  datePublished?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  dateCreated?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  datePublished?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   imageBanner?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   isDeleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   isInBin?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  lastModified?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  lastModified?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   likes?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   slug?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['PostStatus'], ParentType, ContextType>;

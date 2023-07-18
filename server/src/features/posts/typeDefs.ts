@@ -9,9 +9,9 @@ export const postsTypeDefs = `#graphql
     slug: String
     url: String!
     imageBanner: String
-    dateCreated: Float!
-    datePublished: Float
-    lastModified: Float
+    dateCreated: String!
+    datePublished: String
+    lastModified: String
     views: Int!
     likes: Int!
     isInBin: Boolean!
