@@ -399,9 +399,9 @@ export enum PostStatus {
 
 export type PostTag = {
   __typename?: 'PostTag';
-  dateCreated: Scalars['Float'];
+  dateCreated: Scalars['String'];
   id: Scalars['ID'];
-  lastModified?: Maybe<Scalars['Float']>;
+  lastModified?: Maybe<Scalars['String']>;
   name: Scalars['String'];
 };
 
@@ -1055,9 +1055,9 @@ export type PostIdsValidationErrorResolvers<ContextType = APIContext, ParentType
 }>;
 
 export type PostTagResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['PostTag'] = ResolversParentTypes['PostTag']> = ResolversObject<{
-  dateCreated?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  dateCreated?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  lastModified?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  lastModified?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

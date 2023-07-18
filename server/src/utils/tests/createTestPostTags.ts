@@ -1,40 +1,29 @@
 import type { Pool } from "pg";
 
-import { DATE_COLUMN_MULTIPLIER } from "../constants";
 import type { PostTag } from "@resolverTypes";
+import dateToISOString from "../dateToISOSTring";
 
 const createTestPostTags = async (db: Pool): Promise<PostTag[]> => {
   try {
     const { rows } = await db.query<PostTag>(
       `INSERT INTO
-        post_tags (name, date_created)
+        post_tags (name)
       VALUES
-        ($1, $2), ($3, $4), ($5, $6), ($7, $8), ($9, $10)
+        ($1), ($2), ($3), ($4), ($5)
       RETURNING
         tag_id id,
         name,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_Modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"`,
-      [
-        "tag10",
-        Date.now() / DATE_COLUMN_MULTIPLIER,
-        "tag11",
-        Date.now() / DATE_COLUMN_MULTIPLIER,
-        "tag12",
-        Date.now() / DATE_COLUMN_MULTIPLIER,
-        "tag13",
-        Date.now() / DATE_COLUMN_MULTIPLIER,
-        "tag14",
-        Date.now() / DATE_COLUMN_MULTIPLIER,
-      ]
+        date_created "dateCreated",
+        last_Modified "lastModified"`,
+      ["tag10", "tag11", "tag12", "tag13", "tag14"]
     );
 
     return rows.map(row => ({
       __typename: "PostTag",
       ...row,
-      dateCreated: row.dateCreated ? Number(row.dateCreated) : row.dateCreated,
+      dateCreated: dateToISOString(row.dateCreated),
       lastModified: row.lastModified
-        ? Number(row.lastModified)
+        ? dateToISOString(row.lastModified)
         : row.lastModified,
     }));
   } catch (err) {
