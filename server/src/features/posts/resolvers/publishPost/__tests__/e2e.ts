@@ -16,6 +16,7 @@ import {
   createAllTestPosts,
   PUBLISH_POST,
 } from "@tests";
+import { DATE_REGEX } from "@utils";
 
 import type { APIContext, TestData } from "@types";
 import { type PostTag, type Post, Status, PostStatus } from "@resolverTypes";
@@ -210,7 +211,7 @@ describe("Publish post - E2E", () => {
       post: {
         ...testPost,
         status: PostStatus.Published,
-        datePublished: expect.any(Number),
+        datePublished: expect.stringMatching(DATE_REGEX),
       },
       status: Status.Success,
     });

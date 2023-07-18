@@ -39,6 +39,10 @@ export type MockPostTags = { id: string; name: string }[];
 export const UUID = randomUUID();
 export const userId = "mocked_user_id";
 export const name = "Author Name";
+const dateCreated = "2021-05-17 13:22:43.717+01";
+const returnDateCreated = "2021-05-17T12:22:43.717Z";
+const lastModified = "2023-02-14 20:18:59.953+01";
+const returnLastModified = "2023-02-14T19:18:59.953Z";
 
 export const postFields = {
   postId: UUID,
@@ -57,24 +61,15 @@ export const post = {
   slug: "post/slug",
 };
 
-export const dbReturned = {
+export const dbPost = {
   imageBanner: null,
-  dateCreated: 47567,
+  dateCreated,
   datePublished: null,
-  lastModified: 1248993,
+  lastModified,
   views: 0,
   likes: 0,
   isInBin: false,
   isDeleted: false,
-};
-
-export const returnData = {
-  ...dbReturned,
-  id: UUID,
-  title: post.title,
-  description: post.description,
-  content: post.content,
-  author: name,
 };
 
 export const mockPostTags1: MockPostTags = [
@@ -96,16 +91,28 @@ export const postInfo = {
   foundTags: mockPostTags2,
 };
 
-export const data1 = {
-  ...returnData,
+const returnPost = {
+  ...dbPost,
+  id: UUID,
+  title: post.title,
+  description: post.description,
+  content: post.content,
+  author: name,
+  dateCreated: returnDateCreated,
+  datePublished: null,
+  lastModified: returnLastModified,
+};
+
+export const returnPost1 = {
+  ...returnPost,
   status: "Unpublished",
   url: `${urls.siteUrl}/blog/current-slug`,
   slug: "Current_Slug",
   tags: mockPostTags2,
 };
 
-export const data2 = {
-  ...returnData,
+export const returnPost2 = {
+  ...returnPost,
   url: `${urls.siteUrl}/blog/post-slug`,
   slug: "post/slug",
   tags: mockPostTags1,

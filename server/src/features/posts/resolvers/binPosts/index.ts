@@ -11,7 +11,7 @@ import {
   PostsWarning,
   UnauthorizedAuthorError,
 } from "../types";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
+import { NotAllowedError, UnknownError, dateToISOString } from "@utils";
 // import binPostsWorker from "./binPostsWorker";
 
 import {
@@ -71,8 +71,8 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
       `SELECT
         tag_id id,
         name,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
+        date_created "dateCreated",
+        last_modified "lastModified"
       FROM post_tags`
     );
 
@@ -95,7 +95,15 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
     const map = new Map<string, PostTag>();
 
     postTags.rows.forEach(postTag => {
-      map.set(postTag.id, postTag);
+      const tag = {
+        ...postTag,
+        dateCreated: dateToISOString(postTag.dateCreated),
+        lastModified: postTag.lastModified
+          ? dateToISOString(postTag.lastModified)
+          : postTag.lastModified,
+      };
+
+      map.set(tag.id, tag);
     });
 
     const { rows: binnedPosts } = await db.query<DbPost>(
@@ -113,9 +121,9 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
         status,
         slug,
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         is_deleted "isDeleted",
@@ -143,9 +151,13 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
         url: postUrl,
         slug: binnedPost.slug,
         imageBanner: binnedPost.imageBanner,
-        dateCreated: binnedPost.dateCreated,
-        datePublished: binnedPost.datePublished,
-        lastModified: binnedPost.lastModified,
+        dateCreated: dateToISOString(binnedPost.dateCreated),
+        datePublished: binnedPost.datePublished
+          ? dateToISOString(binnedPost.datePublished)
+          : binnedPost.datePublished,
+        lastModified: binnedPost.lastModified
+          ? dateToISOString(binnedPost.lastModified)
+          : binnedPost.lastModified,
         views: binnedPost.views,
         likes: binnedPost.likes,
         isInBin: true,

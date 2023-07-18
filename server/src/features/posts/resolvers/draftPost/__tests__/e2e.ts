@@ -6,7 +6,7 @@ import { type ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@services/db";
 
-import { UUID_REGEX, urls } from "@utils";
+import { DATE_REGEX, UUID_REGEX, urls } from "@utils";
 import {
   DRAFT_POST,
   createTestPostTags,
@@ -359,7 +359,7 @@ describe("Draft post - E2E", () => {
         slug: testPost.slug,
         url: `${urls.siteUrl}/blog/new-draft-post-slug`,
         imageBanner: null,
-        dateCreated: expect.any(Number),
+        dateCreated: expect.stringMatching(DATE_REGEX),
         datePublished: null,
         lastModified: null,
         views: 0,

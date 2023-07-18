@@ -102,12 +102,15 @@ export const validationTestsTable = (nullOrUndefined?: null): Tuple[] => [
   ],
 ];
 
-export const dbReturned = {
+const dateCreated = "2021-05-17 13:22:43.717+01";
+export const returnDateCreated = "2021-05-17T12:22:43.717Z";
+
+export const dbPost = {
   postId: "generated_post_id",
   imageBanner: null,
-  dateCreated: 47567,
+  dateCreated,
   datePublished: null,
-  lastModified: 1248993,
+  lastModified: null,
   views: 0,
   likes: 0,
   isInBin: false,

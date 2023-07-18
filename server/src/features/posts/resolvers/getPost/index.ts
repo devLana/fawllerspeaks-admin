@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
 import { PostIdValidationError, SinglePost } from "../types";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
+import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
 import { getPostTags, getPostUrl } from "@features/posts/utils";
 
 import type { QueryResolvers } from "@resolverTypes";
@@ -40,9 +40,9 @@ const getPost: GetPost = async (_, { postId }, { user, db }) => {
         status,
         slug,
         image_banner "imageBanner",
-        posts.date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        posts.date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
@@ -80,9 +80,13 @@ const getPost: GetPost = async (_, { postId }, { user, db }) => {
       url: postUrl,
       slug: found.slug,
       imageBanner: found.imageBanner,
-      dateCreated: found.dateCreated,
-      datePublished: found.datePublished,
-      lastModified: found.lastModified,
+      dateCreated: dateToISOString(found.dateCreated),
+      datePublished: found.datePublished
+        ? dateToISOString(found.datePublished)
+        : found.datePublished,
+      lastModified: found.lastModified
+        ? dateToISOString(found.lastModified)
+        : found.lastModified,
       views: found.views,
       likes: found.likes,
       isInBin: found.isInBin,

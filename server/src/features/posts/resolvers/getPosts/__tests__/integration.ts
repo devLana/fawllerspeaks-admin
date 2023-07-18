@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "@jest/globals";
 
 import getPosts from "..";
-import { dbPosts, posts, tags } from "../testData";
+import { dbPosts, returnPosts, tags } from "../testData";
 import { info, mockContext, spyDb } from "@tests";
 
 beforeEach(() => {
@@ -47,7 +47,7 @@ describe("Test get posts resolver", () => {
     expect(spy).toHaveNthReturnedWith(2, { rows: tags });
     expect(spy).toHaveNthReturnedWith(3, { rows: dbPosts });
 
-    expect(result).toHaveProperty("posts", posts);
+    expect(result).toHaveProperty("posts", returnPosts);
     expect(result).toHaveProperty("status", "SUCCESS");
   });
 });

@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 
 import { Posts } from "../types";
 import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError } from "@utils";
+import { dateToISOString, NotAllowedError } from "@utils";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -22,8 +22,8 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
       `SELECT
         tag_id id,
         name,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
+        date_created "dateCreated",
+        last_modified "lastModified"
       FROM post_tags`
     );
 
@@ -37,9 +37,9 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
         status,
         slug,
         image_banner "imageBanner",
-        posts.date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        posts.date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
@@ -62,7 +62,15 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
     const map = new Map<string, PostTag>();
 
     postTags.rows.forEach(postTag => {
-      map.set(postTag.id, postTag);
+      const tag = {
+        ...postTag,
+        dateCreated: dateToISOString(postTag.dateCreated),
+        lastModified: postTag.lastModified
+          ? dateToISOString(postTag.lastModified)
+          : postTag.lastModified,
+      };
+
+      map.set(tag.id, tag);
     });
 
     const posts = savedPosts.rows.map(post => {
@@ -79,9 +87,13 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
         url: postUrl,
         slug: post.slug,
         imageBanner: post.imageBanner,
-        dateCreated: post.dateCreated,
-        datePublished: post.datePublished,
-        lastModified: post.lastModified,
+        dateCreated: dateToISOString(post.dateCreated),
+        datePublished: post.datePublished
+          ? dateToISOString(post.datePublished)
+          : post.datePublished,
+        lastModified: post.lastModified
+          ? dateToISOString(post.lastModified)
+          : post.lastModified,
         views: post.views,
         likes: post.likes,
         isInBin: post.isInBin,

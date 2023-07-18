@@ -8,7 +8,7 @@ import {
   UnauthorizedAuthorError,
 } from "../types";
 import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
+import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
 
 import type { MutationResolvers, PostTag, Post } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -63,8 +63,8 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
       `SELECT
         tag_id id,
         name,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
+        date_created "dateCreated",
+        last_modified "lastModified"
       FROM post_tags`
     );
 
@@ -87,7 +87,15 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
     const map = new Map<string, PostTag>();
 
     postTags.rows.forEach(postTag => {
-      map.set(postTag.id, postTag);
+      const tag = {
+        ...postTag,
+        dateCreated: dateToISOString(postTag.dateCreated),
+        lastModified: postTag.lastModified
+          ? dateToISOString(postTag.lastModified)
+          : postTag.lastModified,
+      };
+
+      map.set(tag.id, tag);
     });
 
     const { rows: unBinnedPosts } = await db.query<DbPost>(
@@ -105,9 +113,9 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
         status,
         slug,
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         is_deleted "isDeleted",
@@ -136,9 +144,13 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
         url: postUrl,
         slug: unBinnedPost.slug,
         imageBanner: unBinnedPost.imageBanner,
-        dateCreated: unBinnedPost.dateCreated,
-        datePublished: unBinnedPost.datePublished,
-        lastModified: unBinnedPost.lastModified,
+        dateCreated: dateToISOString(unBinnedPost.dateCreated),
+        datePublished: unBinnedPost.datePublished
+          ? dateToISOString(unBinnedPost.datePublished)
+          : unBinnedPost.datePublished,
+        lastModified: unBinnedPost.lastModified
+          ? dateToISOString(unBinnedPost.lastModified)
+          : unBinnedPost.lastModified,
         views: unBinnedPost.views,
         likes: unBinnedPost.likes,
         isInBin: false,

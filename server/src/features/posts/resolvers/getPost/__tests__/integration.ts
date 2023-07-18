@@ -14,6 +14,8 @@ type PostTags = { id: string; name: string }[];
 type MockType = jest.MockedFunction<() => PostTags | null>;
 
 const postId = randomUUID();
+const dateCreated = "2021-05-17 13:22:43.717+01";
+const returnDateCreated = "2021-05-17T12:22:43.717Z";
 const data = {
   title: "post title",
   description: "post description",
@@ -22,7 +24,7 @@ const data = {
   slug: "post slug",
   status: "Unpublished",
   imageBanner: null,
-  dateCreated: 7826790478972,
+  dateCreated,
   datePublished: null,
   lastModified: null,
   views: 10,
@@ -130,7 +132,7 @@ describe("Test get post resolver", () => {
     expect(result).toHaveProperty("post.slug", data.slug);
     expect(result).toHaveProperty("post.url", `${urls.siteUrl}/blog/post-slug`);
     expect(result).toHaveProperty("post.imageBanner", data.imageBanner);
-    expect(result).toHaveProperty("post.dateCreated", data.dateCreated);
+    expect(result).toHaveProperty("post.dateCreated", returnDateCreated);
     expect(result).toHaveProperty("post.datePublished", data.datePublished);
     expect(result).toHaveProperty("post.lastModified", data.lastModified);
     expect(result).toHaveProperty("post.views", data.views);

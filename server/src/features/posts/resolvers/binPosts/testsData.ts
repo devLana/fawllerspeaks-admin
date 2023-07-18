@@ -5,33 +5,57 @@ type Tuple = [string, string[], string];
 
 const UUID = randomUUID();
 const postTagIds = ["1", "2", "3", "4"];
+const dateCreated = "2021-05-17 13:22:43.717+01";
+const returnDateCreated = "2021-05-17T12:22:43.717Z";
+const datePublished = "2021-06-11 09:44:02.213+01";
+const returnDatePublished = "2021-06-11T08:44:02.213Z";
+const lastModified = "2023-02-14 20:18:59.953+01";
+const returnLastModified = "2023-02-14T19:18:59.953Z";
 
 export const name = "Author Name";
 export const postIds = [UUID, randomUUID(), randomUUID(), randomUUID()];
 
-export const postTags = [
-  { id: "1", name: "tag1" },
-  { id: "2", name: "tag2" },
-  { id: "3", name: "tag3" },
-  { id: "4", name: "tag4" },
+export const dbPostTags = [
+  { id: "1", name: "tag1", dateCreated, lastModified },
+  { id: "2", name: "tag2", dateCreated, lastModified: null },
+  { id: "3", name: "tag3", dateCreated, lastModified },
+  { id: "4", name: "tag4", dateCreated, lastModified: null },
 ];
 
-const dbPost = {
+const returnPostTags = [
+  {
+    id: "1",
+    name: "tag1",
+    dateCreated: returnDateCreated,
+    lastModified: returnLastModified,
+  },
+  { id: "2", name: "tag2", dateCreated: returnDateCreated, lastModified: null },
+  {
+    id: "3",
+    name: "tag3",
+    dateCreated: returnDateCreated,
+    lastModified: returnLastModified,
+  },
+  { id: "4", name: "tag4", dateCreated: returnDateCreated, lastModified: null },
+];
+
+const mockPost = {
   description: "binnedPost.description",
   content: "binnedPost.content",
   imageBanner: null,
-  dateCreated: 78345635992342,
-  datePublished: 873465736583,
-  lastModified: null,
+  dateCreated,
   views: 0,
   likes: 0,
   isDeleted: false,
 };
+const returnPost = { ...mockPost, author: name, isInBin: true };
 
 export const dbPost1 = {
   postId: postIds[0],
   title: "post1",
-  ...dbPost,
+  ...mockPost,
+  datePublished,
+  lastModified,
   status: "Published",
   slug: null,
   tags: null,
@@ -40,7 +64,9 @@ export const dbPost1 = {
 export const dbPost2 = {
   postId: postIds[1],
   title: "post2",
-  ...dbPost,
+  ...mockPost,
+  datePublished: null,
+  lastModified: null,
   status: "Unpublished",
   slug: "post.2.slug",
   tags: null,
@@ -49,7 +75,9 @@ export const dbPost2 = {
 export const dbPost3 = {
   postId: postIds[2],
   title: "post3",
-  ...dbPost,
+  ...mockPost,
+  datePublished,
+  lastModified: null,
   status: "Published",
   slug: "post_3_slug",
   tags: postTagIds,
@@ -58,56 +86,68 @@ export const dbPost3 = {
 export const dbPost4 = {
   postId: postIds[3],
   title: "post4",
-  ...dbPost,
+  ...mockPost,
+  datePublished: null,
+  lastModified: null,
   status: "Draft",
   slug: null,
   tags: postTagIds,
 };
 
-const returnPost = {
-  ...dbPost,
-  author: name,
-  isInBin: true,
-};
-
 export const returnPost1 = {
+  ...mockPost,
+  ...returnPost,
   id: postIds[0],
   title: "post1",
-  ...returnPost,
   status: "Published",
-  url: `${urls.siteUrl}/blog/post1`,
   slug: null,
+  url: `${urls.siteUrl}/blog/post1`,
+  dateCreated: returnDateCreated,
+  datePublished: returnDatePublished,
+  lastModified: returnLastModified,
   tags: null,
 };
 
 export const returnPost2 = {
+  ...mockPost,
+  ...returnPost,
   id: postIds[1],
   title: "post2",
-  ...returnPost,
   status: "Unpublished",
-  url: `${urls.siteUrl}/blog/post-2-slug`,
   slug: "post.2.slug",
+  url: `${urls.siteUrl}/blog/post-2-slug`,
+  dateCreated: returnDateCreated,
+  datePublished: null,
+  lastModified: null,
   tags: null,
 };
 
 export const returnPost3 = {
+  ...mockPost,
+  ...returnPost,
   id: postIds[2],
   title: "post3",
-  ...returnPost,
   status: "Published",
-  url: `${urls.siteUrl}/blog/post-3-slug`,
   slug: "post_3_slug",
-  tags: postTags,
+  url: `${urls.siteUrl}/blog/post-3-slug`,
+  dateCreated: returnDateCreated,
+  datePublished: returnDatePublished,
+  lastModified: null,
+  tags: returnPostTags,
 };
 
 export const returnPost4 = {
+  ...mockPost,
+  ...returnPost,
   id: postIds[3],
   title: "post4",
-  ...returnPost,
   status: "Draft",
-  url: `${urls.siteUrl}/blog/post4`,
   slug: null,
-  tags: postTags,
+  url: `${urls.siteUrl}/blog/post4`,
+  dateCreated: returnDateCreated,
+  datePublished: null,
+  lastModified: null,
+  tags: returnPostTags,
 };
 
 export const validationsTable: Tuple[] = [

@@ -1,21 +1,27 @@
 import type { Pool } from "pg";
 
-import { DATE_COLUMN_MULTIPLIER } from "@utils";
 import type { PostTag } from "@resolverTypes";
+import { dateToISOString } from "@utils";
 
 const getPostTags = async (db: Pool, tags: string[]) => {
-  const { rows } = await db.query<PostTag>(
+  let { rows } = await db.query<PostTag>(
     `SELECT
       tag_id id,
       name,
-      date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-      last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
-    FROM
-      post_tags
-    WHERE
-      tag_id = ANY ($1)`,
+      date_created "dateCreated",
+      last_modified "lastModified"
+    FROM post_tags
+    WHERE tag_id = ANY ($1)`,
     [tags]
   );
+
+  rows = rows.map(row => ({
+    ...row,
+    dateCreated: dateToISOString(row.dateCreated),
+    lastModified: row.lastModified
+      ? dateToISOString(row.lastModified)
+      : row.lastModified,
+  }));
 
   return rows.length === 0 ? null : rows;
 };

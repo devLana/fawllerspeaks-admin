@@ -7,7 +7,7 @@ import binPosts from "..";
 import {
   name,
   postIds,
-  postTags,
+  dbPostTags,
   dbPost1,
   dbPost2,
   dbPost3,
@@ -104,7 +104,7 @@ describe("Test bin posts resolvers", () => {
   test("Should move all provided posts in the input array to bin", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true, name }] });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: postTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [dbPost1, dbPost2, dbPost3, dbPost4] });
 
     const result = await binPosts({}, { postIds }, mockContext, info);
@@ -117,7 +117,7 @@ describe("Test bin posts resolvers", () => {
       rows: [{ isRegistered: true, name }],
     });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: postTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, {
       rows: [dbPost1, dbPost2, dbPost3, dbPost4],
     });
@@ -137,7 +137,7 @@ describe("Test bin posts resolvers", () => {
   test("Returns warning if at least one post could not be moved to bin", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true, name }] });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: postTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [dbPost2, dbPost4] });
 
     const result = await binPosts({}, { postIds }, mockContext, info);
@@ -150,7 +150,7 @@ describe("Test bin posts resolvers", () => {
       rows: [{ isRegistered: true, name }],
     });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: postTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, { rows: [dbPost2, dbPost4] });
 
     expect(result).toHaveProperty("status", "WARN");
@@ -165,7 +165,7 @@ describe("Test bin posts resolvers", () => {
   test("Should return error if no post could be moved to bin", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true }] });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: postTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [] });
 
     const result = await binPosts({}, { postIds }, mockContext, info);
@@ -176,7 +176,7 @@ describe("Test bin posts resolvers", () => {
     expect(spy).toHaveBeenCalledTimes(4);
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: postTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, { rows: [] });
 
     expect(result).not.toHaveProperty("posts");

@@ -7,7 +7,7 @@ import {
   dbPost1,
   dbPost2,
   name,
-  postTags,
+  dbPostTags,
   returnPost1,
   returnPost2,
 } from "../testsData";
@@ -53,14 +53,14 @@ describe("Test empty bin resolver", () => {
     const spyData = [{ isRegistered: true, name }];
     const message = "You have no posts in your bin to delete";
     const spy = spyDb({ rows: spyData });
-    spy.mockReturnValueOnce({ rows: postTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [] });
 
     const data = await emptyBin({}, {}, mockContext, info);
 
     expect(spy).toHaveBeenCalledTimes(3);
     expect(spy).toHaveNthReturnedWith(1, { rows: spyData });
-    expect(spy).toHaveNthReturnedWith(2, { rows: postTags });
+    expect(spy).toHaveNthReturnedWith(2, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(3, { rows: [] });
 
     expect(data).toHaveProperty("message", message);
@@ -70,14 +70,14 @@ describe("Test empty bin resolver", () => {
   test("Should empty all posts from bin", async () => {
     const spyData = [{ isRegistered: true, name }];
     const spy = spyDb({ rows: spyData });
-    spy.mockReturnValueOnce({ rows: postTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [dbPost1, dbPost2] });
 
     const data = await emptyBin({}, {}, mockContext, info);
 
     expect(spy).toHaveBeenCalledTimes(3);
     expect(spy).toHaveNthReturnedWith(1, { rows: spyData });
-    expect(spy).toHaveNthReturnedWith(2, { rows: postTags });
+    expect(spy).toHaveNthReturnedWith(2, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(3, { rows: [dbPost1, dbPost2] });
 
     expect(data).toHaveProperty("posts", [returnPost1, returnPost2]);

@@ -17,6 +17,8 @@ import {
   post,
   data,
   tags,
+  returnDateCreated,
+  returnDatePublished,
 } from "../testsData";
 
 type MockType = jest.MockedFunction<() => PostTags | null>;
@@ -116,8 +118,8 @@ describe("Test publish post resolver", () => {
     expect(result).toHaveProperty("post.url", `${urls.siteUrl}/blog/sl-ug`);
     expect(result).toHaveProperty("post.slug", "SL_UG");
     expect(result).toHaveProperty("post.imageBanner", null);
-    expect(result).toHaveProperty("post.dateCreated", 5767653);
-    expect(result).toHaveProperty("post.datePublished", 67824244);
+    expect(result).toHaveProperty("post.dateCreated", returnDateCreated);
+    expect(result).toHaveProperty("post.datePublished", returnDatePublished);
     expect(result).toHaveProperty("post.lastModified", null);
     expect(result).toHaveProperty("post.views", 10);
     expect(result).toHaveProperty("post.likes", 11);

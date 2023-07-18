@@ -5,9 +5,9 @@ import { getPostTags, getPostUrl } from "@features/posts/utils";
 import { SinglePost, DuplicatePostTitleError } from "../types";
 import { CreatePostValidationError } from "./CreatePostValidationError";
 import {
-  DATE_COLUMN_MULTIPLIER,
   NotAllowedError,
   UnknownError,
+  dateToISOString,
   generateErrorsObject,
 } from "@utils";
 
@@ -81,10 +81,8 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       `SELECT
         is_registered "isRegistered",
         concat(first_name,' ', last_name) name
-      FROM
-        users
-      WHERE
-        user_id = $1`,
+      FROM users
+      WHERE user_id = $1`,
       [user]
     );
 
@@ -119,29 +117,19 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
         author,
         status,
         slug,
-        date_created,
         tags
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING
         post_id "postId",
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+        date_created "dateCreated",
         date_published "datePublished",
         last_modified "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
         is_deleted "isDeleted"`,
-      [
-        title,
-        description,
-        content,
-        user,
-        PostStatus.Unpublished,
-        slug,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
-        dbTags,
-      ]
+      [title, description, content, user, PostStatus.Unpublished, slug, dbTags]
     );
 
     const [saved] = savedPost;
@@ -158,9 +146,13 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       url: postUrl,
       slug,
       imageBanner: saved.imageBanner,
-      dateCreated: saved.dateCreated,
-      datePublished: saved.datePublished,
-      lastModified: saved.lastModified,
+      dateCreated: dateToISOString(saved.dateCreated),
+      datePublished: saved.datePublished
+        ? dateToISOString(saved.datePublished)
+        : saved.datePublished,
+      lastModified: saved.lastModified
+        ? dateToISOString(saved.lastModified)
+        : saved.lastModified,
       views: saved.views,
       likes: saved.likes,
       isInBin: saved.isInBin,

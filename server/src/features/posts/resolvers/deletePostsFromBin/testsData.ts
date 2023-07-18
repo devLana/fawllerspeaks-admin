@@ -6,21 +6,42 @@ type Tuple = [string, string[], string];
 export const name = "Author Name";
 const UUID = randomUUID();
 const postTagIds = ["1", "2", "3", "4"];
+const dateCreated = "2021-05-17 13:22:43.717+01";
+const returnDateCreated = "2021-05-17T12:22:43.717Z";
+const lastModified = "2023-02-14 20:18:59.953+01";
+const returnLastModified = "2023-02-14T19:18:59.953Z";
 
 export const postIds = [UUID, randomUUID(), randomUUID(), randomUUID()];
 
-export const postTags = [
-  { id: "1", name: "tag1" },
-  { id: "2", name: "tag2" },
-  { id: "3", name: "tag3" },
-  { id: "4", name: "tag4" },
+export const dbPostTags = [
+  { id: "1", name: "tag1", dateCreated, lastModified },
+  { id: "2", name: "tag2", dateCreated, lastModified: null },
+  { id: "3", name: "tag3", dateCreated, lastModified },
+  { id: "4", name: "tag4", dateCreated, lastModified: null },
 ];
 
-const dbPost = {
+const returnPostTags = [
+  {
+    id: "1",
+    name: "tag1",
+    dateCreated: returnDateCreated,
+    lastModified: returnLastModified,
+  },
+  { id: "2", name: "tag2", dateCreated: returnDateCreated, lastModified: null },
+  {
+    id: "3",
+    name: "tag3",
+    dateCreated: returnDateCreated,
+    lastModified: returnLastModified,
+  },
+  { id: "4", name: "tag4", dateCreated: returnDateCreated, lastModified: null },
+];
+
+const mockPost = {
   description: "deletedPost.description",
   content: "deletedPost.content",
   imageBanner: null,
-  dateCreated: 78345635992342,
+  dateCreated,
   datePublished: null,
   lastModified: null,
   views: 0,
@@ -30,7 +51,7 @@ const dbPost = {
 export const dbPost1 = {
   postId: postIds[0],
   title: "post1",
-  ...dbPost,
+  ...mockPost,
   status: "Unpublished",
   slug: null,
   tags: null,
@@ -39,7 +60,7 @@ export const dbPost1 = {
 export const dbPost2 = {
   postId: postIds[1],
   title: "post2",
-  ...dbPost,
+  ...mockPost,
   status: "Unpublished",
   slug: "post.2.slug",
   tags: null,
@@ -48,7 +69,7 @@ export const dbPost2 = {
 export const dbPost3 = {
   postId: postIds[2],
   title: "post3",
-  ...dbPost,
+  ...mockPost,
   status: "Draft",
   slug: "post_3_slug",
   tags: postTagIds,
@@ -57,15 +78,16 @@ export const dbPost3 = {
 export const dbPost4 = {
   postId: postIds[3],
   title: "post4",
-  ...dbPost,
+  ...mockPost,
   status: "Draft",
   slug: null,
   tags: postTagIds,
 };
 
 export const returnPost = {
-  ...dbPost,
+  ...mockPost,
   author: name,
+  dateCreated: returnDateCreated,
   isInBin: true,
   isDeleted: true,
 };
@@ -97,7 +119,7 @@ export const returnPost3 = {
   status: "Draft",
   url: `${urls.siteUrl}/blog/post-3-slug`,
   slug: "post_3_slug",
-  tags: postTags,
+  tags: returnPostTags,
 };
 
 export const returnPost4 = {
@@ -107,7 +129,7 @@ export const returnPost4 = {
   status: "Draft",
   url: `${urls.siteUrl}/blog/post4`,
   slug: null,
-  tags: postTags,
+  tags: returnPostTags,
 };
 
 export const validationsTable: Tuple[] = [

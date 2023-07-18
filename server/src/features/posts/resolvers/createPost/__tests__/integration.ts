@@ -5,7 +5,7 @@ import { describe, test, expect, beforeEach, jest } from "@jest/globals";
 
 import createPost from "..";
 import { getPostTags } from "@features/posts/utils";
-import { validationTestsTable, dbReturned } from "../testsData";
+import { validationTestsTable, dbPost, returnDateCreated } from "../testsData";
 
 import { urls } from "@utils";
 import { info, mockContext, spyDb } from "@tests";
@@ -138,7 +138,7 @@ describe("Test createPost resolver", () => {
 
     const spy = spyDb({ rows: [{ isRegistered: true, name }] });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: [dbReturned] });
+    spy.mockReturnValueOnce({ rows: [dbPost] });
 
     const result = await createPost({}, { post }, mockContext, info);
 
@@ -151,7 +151,7 @@ describe("Test createPost resolver", () => {
       rows: [{ isRegistered: true, name }],
     });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: [dbReturned] });
+    expect(spy).toHaveNthReturnedWith(3, { rows: [dbPost] });
 
     expect(result).toHaveProperty("post.id", "generated_post_id");
     expect(result).toHaveProperty("post.title", post.title);
@@ -162,9 +162,9 @@ describe("Test createPost resolver", () => {
     expect(result).toHaveProperty("post.slug", post.slug);
     expect(result).toHaveProperty("post.url", `${urls.siteUrl}/blog/post-slug`);
     expect(result).toHaveProperty("post.imageBanner", null);
-    expect(result).toHaveProperty("post.dateCreated", 47567);
+    expect(result).toHaveProperty("post.dateCreated", returnDateCreated);
     expect(result).toHaveProperty("post.datePublished", null);
-    expect(result).toHaveProperty("post.lastModified", 1248993);
+    expect(result).toHaveProperty("post.lastModified", null);
     expect(result).toHaveProperty("post.views", 0);
     expect(result).toHaveProperty("post.likes", 0);
     expect(result).toHaveProperty("post.isInBin", false);

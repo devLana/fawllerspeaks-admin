@@ -10,7 +10,7 @@ import {
   UnauthorizedAuthorError,
 } from "../types";
 import {
-  DATE_COLUMN_MULTIPLIER,
+  dateToISOString,
   NotAllowedError,
   UnknownError,
   generateErrorsObject,
@@ -169,9 +169,9 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       WHERE post_id = $7
       RETURNING
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
@@ -181,7 +181,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
         description,
         content,
         dbSlug,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
+        new Date().toISOString(),
         dbTags,
         postId,
       ]
@@ -201,6 +201,13 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       status: postStatus,
       url: postUrl,
       slug: dbSlug,
+      dateCreated: dateToISOString(edited.dateCreated),
+      datePublished: edited.datePublished
+        ? dateToISOString(edited.datePublished)
+        : edited.datePublished,
+      lastModified: edited.lastModified
+        ? dateToISOString(edited.lastModified)
+        : edited.lastModified,
       tags: returnTags,
     });
   } catch (err) {

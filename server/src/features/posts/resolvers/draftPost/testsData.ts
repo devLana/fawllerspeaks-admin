@@ -39,10 +39,13 @@ export type Tags = { id: string }[];
 export const userId = randomUUID();
 export const UUID = randomUUID();
 
+const dateCreated = "2021-05-17 13:22:43.717+01";
+const returnDateCreated = "2021-05-17T12:22:43.717Z";
+
 export const dbData = {
   postId: UUID,
   imageBanner: null,
-  dateCreated: Date.now(),
+  dateCreated,
   datePublished: null,
   lastModified: null,
   views: 0,
@@ -70,9 +73,9 @@ export const draftResult = {
   url: `${urls.siteUrl}/blog/post-slug`,
   slug: "POST SLUG",
   imageBanner: dbData.imageBanner,
-  dateCreated: dbData.dateCreated,
-  datePublished: dbData.datePublished,
-  lastModified: dbData.lastModified,
+  dateCreated: returnDateCreated,
+  datePublished: null,
+  lastModified: null,
   views: dbData.views,
   likes: dbData.likes,
   isInBin: dbData.isInBin,

@@ -3,7 +3,7 @@ import { GraphQLError } from "graphql";
 import { Posts } from "../types";
 import { EmptyBinWarning } from "./EmptyBinWarning";
 import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError } from "@utils";
+import { NotAllowedError, dateToISOString } from "@utils";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -33,8 +33,8 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
       `SELECT
         tag_id id,
         name,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
+        date_created "dateCreated",
+        last_modified "lastModified"
       FROM post_tags`
     );
 
@@ -50,16 +50,22 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
     const map = new Map<string, PostTag>();
 
     postTags.forEach(postTag => {
-      map.set(postTag.id, postTag);
+      const tag = {
+        ...postTag,
+        dateCreated: dateToISOString(postTag.dateCreated),
+        lastModified: postTag.lastModified
+          ? dateToISOString(postTag.lastModified)
+          : postTag.lastModified,
+      };
+
+      map.set(tag.id, tag);
     });
 
     const { rows: emptiedPosts } = await db.query<DbPost>(
-      `UPDATE posts SET
-        is_deleted = $1
-      WHERE
-        author = $2
-      AND
-        is_in_bin = $3
+      `UPDATE posts
+      SET is_deleted = $1
+      WHERE author = $2
+      AND is_in_bin = $3
       RETURNING
         post_id "postId",
         title,
@@ -68,9 +74,9 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
         status,
         slug,
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         tags`,
@@ -95,9 +101,13 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
         url: postUrl,
         slug: post.slug,
         imageBanner: post.imageBanner,
-        dateCreated: post.dateCreated,
-        datePublished: post.datePublished,
-        lastModified: post.lastModified,
+        dateCreated: dateToISOString(post.dateCreated),
+        datePublished: post.datePublished
+          ? dateToISOString(post.datePublished)
+          : post.datePublished,
+        lastModified: post.lastModified
+          ? dateToISOString(post.lastModified)
+          : post.lastModified,
         views: post.views,
         likes: post.likes,
         isInBin: true,

@@ -19,6 +19,9 @@ export const mockPostTags: MockPostTags = [
   { id: "4", name: "tag4" },
 ];
 
+const dateCreated = "2021-05-17 13:22:43.717+01";
+const returnDateCreated = "2021-05-17T12:22:43.717Z";
+
 export const post = {
   authorId: userId,
   status: "Published",
@@ -30,7 +33,7 @@ export const data = {
   description: "description",
   content: "content",
   imageBanner: null,
-  dateCreated: 5767653,
+  dateCreated,
   lastModified: null,
   views: 10,
   likes: 11,
@@ -43,6 +46,7 @@ export const returnData = {
   id: UUID,
   author: post.authorName,
   status: "Unpublished",
+  dateCreated: returnDateCreated,
   datePublished: null,
   url: `${urls.siteUrl}/blog/sl-ug`,
   slug: "SL.UG",

@@ -6,7 +6,7 @@ import {
   dbPost2,
   dbPost3,
   dbPost4,
-  mockPostTags,
+  dbPostTags,
   name,
   postIds,
   returnPost1,
@@ -79,7 +79,7 @@ describe("Test Un-bin posts resolvers", () => {
     const posts = [returnPost1, returnPost2, returnPost3, returnPost4];
     const spy = spyDb({ rows: spyData1 });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: mockPostTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: spyData2 });
 
     const result = await unBinPosts({}, { postIds }, mockContext, info);
@@ -87,7 +87,7 @@ describe("Test Un-bin posts resolvers", () => {
     expect(spy).toHaveBeenCalledTimes(4);
     expect(spy).toHaveNthReturnedWith(1, { rows: spyData1 });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: mockPostTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, { rows: spyData2 });
 
     expect(result).not.toHaveProperty("message");
@@ -100,7 +100,7 @@ describe("Test Un-bin posts resolvers", () => {
     const spyData = [{ isRegistered: true, name }];
     const spy = spyDb({ rows: spyData });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: mockPostTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [dbPost2, dbPost4] });
 
     const result = await unBinPosts({}, { postIds }, mockContext, info);
@@ -108,7 +108,7 @@ describe("Test Un-bin posts resolvers", () => {
     expect(spy).toHaveBeenCalledTimes(4);
     expect(spy).toHaveNthReturnedWith(1, { rows: spyData });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: mockPostTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, { rows: [dbPost2, dbPost4] });
 
     expect(result).toHaveProperty("posts", [returnPost2, returnPost4]);
@@ -120,7 +120,7 @@ describe("Test Un-bin posts resolvers", () => {
     const message = "The provided posts could not be removed from bin";
     const spy = spyDb({ rows: [{ isRegistered: true }] });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: mockPostTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [] });
 
     const result = await unBinPosts({}, { postIds }, mockContext, info);
@@ -128,7 +128,7 @@ describe("Test Un-bin posts resolvers", () => {
     expect(spy).toHaveBeenCalledTimes(4);
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: mockPostTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, { rows: [] });
 
     expect(result).not.toHaveProperty("posts");

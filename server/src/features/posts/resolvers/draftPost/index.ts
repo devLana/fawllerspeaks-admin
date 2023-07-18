@@ -10,9 +10,9 @@ import {
   NotAllowedPostActionError,
 } from "../types";
 import {
-  DATE_COLUMN_MULTIPLIER,
   NotAllowedError,
   UnknownError,
+  dateToISOString,
   generateErrorsObject,
 } from "@utils";
 
@@ -191,7 +191,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
         RETURNING
           post_id "postId",
           image_banner "imageBanner",
-          date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+          date_created "dateCreated",
           date_published "datePublished",
           last_modified "lastModified",
           views,
@@ -227,29 +227,19 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           author,
           status,
           slug,
-          date_created,
           tags
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING
           post_id "postId",
           image_banner "imageBanner",
-          date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
+          date_created "dateCreated",
           date_published "datePublished",
           last_modified "lastModified",
           views,
           likes,
           is_in_bin "isInBin",
           is_deleted "isDeleted"`,
-        [
-          title,
-          description,
-          content,
-          user,
-          PostStatus.Draft,
-          slug,
-          Date.now() / DATE_COLUMN_MULTIPLIER,
-          dbTags,
-        ]
+        [title, description, content, user, PostStatus.Draft, slug, dbTags]
       );
 
       savedPost = newDraft;
@@ -273,9 +263,13 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
       url: postUrl,
       slug: slug ?? newSlug,
       imageBanner: savedPost.imageBanner,
-      dateCreated: savedPost.dateCreated,
-      datePublished: savedPost.datePublished,
-      lastModified: savedPost.lastModified,
+      dateCreated: dateToISOString(savedPost.dateCreated),
+      datePublished: savedPost.datePublished
+        ? dateToISOString(savedPost.datePublished)
+        : savedPost.datePublished,
+      lastModified: savedPost.lastModified
+        ? dateToISOString(savedPost.lastModified)
+        : savedPost.lastModified,
       views: savedPost.views,
       likes: savedPost.likes,
       isInBin: savedPost.isInBin,

@@ -8,7 +8,7 @@ import {
   UnauthorizedAuthorError,
 } from "../types";
 import { getPostTags, getPostUrl } from "@features/posts/utils";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
+import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
 
 import { type MutationResolvers, PostStatus } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -46,10 +46,8 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
         author "authorId",
         first_name || ' ' || last_name "authorName",
         status
-      FROM
-        posts LEFT JOIN users ON author = user_id
-      WHERE
-        post_id = $1`,
+      FROM posts LEFT JOIN users ON author = user_id
+      WHERE post_id = $1`,
       [post]
     );
 
@@ -85,7 +83,8 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
     const { rows: updatePost } = await db.query<
       Omit<DbFindPost, "status" | "author" | "postId">
     >(
-      `UPDATE posts SET
+      `UPDATE posts
+      SET
         status = $1,
         date_published = $2
       WHERE post_id = $3
@@ -95,15 +94,15 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
         content,
         slug,
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
         is_deleted "isDeleted",
         tags`,
-      [PostStatus.Published, Date.now() / DATE_COLUMN_MULTIPLIER, post]
+      [PostStatus.Published, new Date().toISOString(), post]
     );
 
     const [updated] = updatePost;
@@ -120,9 +119,13 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
       url,
       slug: updated.slug,
       imageBanner: updated.imageBanner,
-      dateCreated: updated.dateCreated,
-      datePublished: updated.datePublished,
-      lastModified: updated.lastModified,
+      dateCreated: dateToISOString(updated.dateCreated),
+      datePublished: updated.datePublished
+        ? dateToISOString(updated.datePublished)
+        : updated.datePublished,
+      lastModified: updated.lastModified
+        ? dateToISOString(updated.lastModified)
+        : updated.lastModified,
       views: updated.views,
       likes: updated.likes,
       isInBin: updated.isInBin,

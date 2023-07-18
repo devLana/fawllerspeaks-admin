@@ -20,7 +20,7 @@ import {
   postAuthor,
   postsUsers,
 } from "@tests";
-import { urls } from "@utils";
+import { DATE_REGEX, urls } from "@utils";
 
 import { type PostTag, type Post, Status } from "@resolverTypes";
 import type { APIContext, TestData } from "@types";
@@ -261,7 +261,7 @@ describe("Edit post - E2E", () => {
         title: postData.title,
         description: postData.description,
         content: postData.content,
-        lastModified: expect.any(Number),
+        lastModified: expect.stringMatching(DATE_REGEX),
       },
       status: Status.Success,
     });
@@ -289,7 +289,7 @@ describe("Edit post - E2E", () => {
         content: testPost.content,
         slug: testPost.slug,
         url: `${urls.siteUrl}/blog/post-slug`,
-        lastModified: expect.any(Number),
+        lastModified: expect.stringMatching(DATE_REGEX),
         tags: expect.arrayContaining(postTags),
       },
       status: Status.Success,
@@ -319,7 +319,7 @@ describe("Edit post - E2E", () => {
         content: testPost.content,
         slug: testPost.slug,
         url: `${urls.siteUrl}/blog/post-slug`,
-        lastModified: expect.any(Number),
+        lastModified: expect.stringMatching(DATE_REGEX),
         tags: expect.arrayContaining(postTags),
       },
       status: Status.Success,
@@ -350,7 +350,7 @@ describe("Edit post - E2E", () => {
         content: testPost.content,
         slug: testPost.slug,
         url: `${urls.siteUrl}/blog/post-slug`,
-        lastModified: expect.any(Number),
+        lastModified: expect.stringMatching(DATE_REGEX),
         tags: expect.arrayContaining(postTags),
       },
       status: Status.Success,
@@ -380,7 +380,7 @@ describe("Edit post - E2E", () => {
         content: testPost.content,
         slug: testPost.slug,
         url: `${urls.siteUrl}/blog/post-slug`,
-        lastModified: expect.any(Number),
+        lastModified: expect.stringMatching(DATE_REGEX),
         tags: expect.arrayContaining(postTags),
       },
       status: Status.Success,

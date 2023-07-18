@@ -14,11 +14,11 @@ import {
   name,
   postInfo,
   UUID,
-  dbReturned,
+  dbPost,
   postFields,
   mockPostTags2,
-  data1,
-  data2,
+  returnPost1,
+  returnPost2,
 } from "../testsData";
 
 type MockType = jest.MockedFunction<() => MockPostTags | null>;
@@ -173,7 +173,7 @@ describe("Test editPost resolver", () => {
     const spy = spyDb({ rows: [{ isRegistered: true }] });
     spy.mockReturnValueOnce({ rows: [postInfo] });
     spy.mockReturnValueOnce({ rows: [{ postId: UUID }] });
-    spy.mockReturnValueOnce({ rows: [dbReturned] });
+    spy.mockReturnValueOnce({ rows: [dbPost] });
 
     const result = await editPost({}, { post: postFields }, mockContext, info);
 
@@ -181,13 +181,13 @@ describe("Test editPost resolver", () => {
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
     expect(spy).toHaveNthReturnedWith(2, { rows: [postInfo] });
     expect(spy).toHaveNthReturnedWith(3, { rows: [{ postId: UUID }] });
-    expect(spy).toHaveNthReturnedWith(4, { rows: [dbReturned] });
+    expect(spy).toHaveNthReturnedWith(4, { rows: [dbPost] });
 
     expect(getPostTags).toHaveBeenCalledTimes(1);
     expect(getPostTags).toHaveBeenCalledWith(mockContext.db, foundTags);
     expect(getPostTags).toHaveReturnedWith(mockPostTags2);
 
-    expect(result).toHaveProperty("post", data1);
+    expect(result).toHaveProperty("post", returnPost1);
     expect(result).toHaveProperty("status", "SUCCESS");
   });
 
@@ -199,13 +199,13 @@ describe("Test editPost resolver", () => {
   ])(
     "Should edit %s post with %s title",
     async (_, __, postStatus, titleData) => {
-      const data = { ...data2, status: postStatus };
+      const data = { ...returnPost2, status: postStatus };
       const spyData = [{ authorName: name, authorId: userId, postStatus }];
 
       const spy = spyDb({ rows: [{ isRegistered: true }] });
       spy.mockReturnValueOnce({ rows: spyData });
       spy.mockReturnValueOnce({ rows: titleData });
-      spy.mockReturnValueOnce({ rows: [dbReturned] });
+      spy.mockReturnValueOnce({ rows: [dbPost] });
 
       const result = await editPost({}, { post }, mockContext, info);
 
@@ -217,7 +217,7 @@ describe("Test editPost resolver", () => {
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
       expect(spy).toHaveNthReturnedWith(2, { rows: spyData });
       expect(spy).toHaveNthReturnedWith(3, { rows: titleData });
-      expect(spy).toHaveNthReturnedWith(4, { rows: [dbReturned] });
+      expect(spy).toHaveNthReturnedWith(4, { rows: [dbPost] });
 
       expect(result).toHaveProperty("post", data);
       expect(result).toHaveProperty("status", "SUCCESS");

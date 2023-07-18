@@ -16,6 +16,11 @@ export const mockPostTags: PostTags = [
   { id: "3", name: "tag3" },
 ];
 
+const dateCreated = "2021-05-17 13:22:43.717+01";
+export const returnDateCreated = "2021-05-17T12:22:43.717Z";
+const datePublished = "2021-06-11 09:44:02.213+01";
+export const returnDatePublished = "2021-06-11T08:44:02.213Z";
+
 export const post = {
   authorId: userId,
   status: "Unpublished",
@@ -27,8 +32,8 @@ export const data = {
   description: "description",
   content: "content",
   imageBanner: null,
-  dateCreated: 5767653,
-  datePublished: 67824244,
+  dateCreated,
+  datePublished,
   lastModified: null,
   views: 10,
   likes: 11,

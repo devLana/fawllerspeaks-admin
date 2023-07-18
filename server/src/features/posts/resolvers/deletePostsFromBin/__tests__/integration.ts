@@ -8,7 +8,7 @@ import {
   dbPost4,
   name,
   postIds,
-  postTags,
+  dbPostTags,
   returnPost1,
   returnPost2,
   returnPost3,
@@ -91,7 +91,7 @@ describe("Test delete posts from bin resolver", () => {
   test("Should delete all provided posts in the input array from bin", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true, name }] });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: postTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [dbPost1, dbPost2, dbPost3, dbPost4] });
 
     const result = await deletePostsFromBin({}, { postIds }, mockContext, info);
@@ -101,7 +101,7 @@ describe("Test delete posts from bin resolver", () => {
       rows: [{ isRegistered: true, name }],
     });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: postTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, {
       rows: [dbPost1, dbPost2, dbPost3, dbPost4],
     });
@@ -120,7 +120,7 @@ describe("Test delete posts from bin resolver", () => {
   test("Returns warning if at least one post could not be deleted from bin", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true, name }] });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: postTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [dbPost2, dbPost4] });
 
     const result = await deletePostsFromBin({}, { postIds }, mockContext, info);
@@ -130,7 +130,7 @@ describe("Test delete posts from bin resolver", () => {
       rows: [{ isRegistered: true, name }],
     });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: postTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, { rows: [dbPost2, dbPost4] });
 
     expect(result).toHaveProperty("posts", [returnPost2, returnPost4]);
@@ -144,7 +144,7 @@ describe("Test delete posts from bin resolver", () => {
   test("Should return error if no post could be deleted from bin", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true }] });
     spy.mockReturnValueOnce({ rows: [] });
-    spy.mockReturnValueOnce({ rows: postTags });
+    spy.mockReturnValueOnce({ rows: dbPostTags });
     spy.mockReturnValueOnce({ rows: [] });
 
     const result = await deletePostsFromBin({}, { postIds }, mockContext, info);
@@ -152,7 +152,7 @@ describe("Test delete posts from bin resolver", () => {
     expect(spy).toHaveBeenCalledTimes(4);
     expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
     expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: postTags });
+    expect(spy).toHaveNthReturnedWith(3, { rows: dbPostTags });
     expect(spy).toHaveNthReturnedWith(4, { rows: [] });
 
     expect(result).not.toHaveProperty("message", "posts");

@@ -8,7 +8,7 @@ import {
   PostsWarning,
   UnauthorizedAuthorError,
 } from "../types";
-import { DATE_COLUMN_MULTIPLIER, NotAllowedError, UnknownError } from "@utils";
+import { NotAllowedError, UnknownError, dateToISOString } from "@utils";
 
 import type { MutationResolvers, PostTag, Post } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
@@ -63,8 +63,8 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
       `SELECT
         tag_id id,
         name,
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified"
+        date_created "dateCreated",
+        last_modified "lastModified"
       FROM post_tags`
     );
 
@@ -87,7 +87,15 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
     const map = new Map<string, PostTag>();
 
     postTags.rows.forEach(postTag => {
-      map.set(postTag.id, postTag);
+      const tag = {
+        ...postTag,
+        dateCreated: dateToISOString(postTag.dateCreated),
+        lastModified: postTag.lastModified
+          ? dateToISOString(postTag.lastModified)
+          : postTag.lastModified,
+      };
+
+      map.set(tag.id, tag);
     });
 
     const { rows: deletedPosts } = await db.query<DbPost>(
@@ -107,9 +115,9 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
         status,
         slug,
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         tags`,
@@ -134,9 +142,13 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
         url: postUrl,
         slug: deletedPost.slug,
         imageBanner: deletedPost.imageBanner,
-        dateCreated: deletedPost.dateCreated,
-        datePublished: deletedPost.datePublished,
-        lastModified: deletedPost.lastModified,
+        dateCreated: dateToISOString(deletedPost.dateCreated),
+        datePublished: deletedPost.datePublished
+          ? dateToISOString(deletedPost.datePublished)
+          : deletedPost.datePublished,
+        lastModified: deletedPost.lastModified
+          ? dateToISOString(deletedPost.lastModified)
+          : deletedPost.lastModified,
         views: deletedPost.views,
         likes: deletedPost.likes,
         isInBin: true,
