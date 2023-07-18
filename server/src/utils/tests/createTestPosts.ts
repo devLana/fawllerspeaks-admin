@@ -1,7 +1,7 @@
 import type { Pool } from "pg";
 
 import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import { DATE_COLUMN_MULTIPLIER } from "../constants";
+import dateToISOString from "../dateToISOSTring";
 
 import type { DbFindPost, TestPosts, PostAuthor } from "@types";
 import type { Post, PostTag } from "@resolverTypes";
@@ -33,15 +33,14 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
         status,
         slug,
         image_banner,
-        date_created,
         date_published,
         last_modified,
         is_in_bin,
         is_deleted,
         tags
       ) VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13),
-        ($14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12),
+        ($13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
       RETURNING
         post_id "postId",
         title,
@@ -51,9 +50,9 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
         status,
         slug,
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
@@ -67,7 +66,6 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
         posts.first.status,
         posts.first.slug,
         posts.first.imageBanner,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
         posts.first.datePublished,
         posts.first.lastModified,
         posts.first.isInBin,
@@ -81,7 +79,6 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
         posts.second.status,
         null,
         posts.second.imageBanner,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
         posts.second.datePublished,
         posts.second.lastModified,
         posts.second.isInBin,
@@ -95,11 +92,11 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
       const mappedTags = post.tags ? mapPostTags(post.tags, map) : null;
 
       const datePublished = post.datePublished
-        ? Number(post.datePublished)
+        ? dateToISOString(post.datePublished)
         : post.datePublished;
 
       const lastModified = post.lastModified
-        ? Number(post.lastModified)
+        ? dateToISOString(post.lastModified)
         : post.lastModified;
 
       return {
@@ -113,7 +110,7 @@ const createTestPosts = async (params: Params): Promise<Post[]> => {
         url: postUrl,
         slug: post.slug,
         imageBanner: post.imageBanner,
-        dateCreated: Number(post.dateCreated),
+        dateCreated: dateToISOString(post.dateCreated),
         datePublished,
         lastModified,
         views: post.views,

@@ -7,7 +7,7 @@ import {
   publishedTestPosts,
   draftTestPosts,
 } from "./mocks";
-import { DATE_COLUMN_MULTIPLIER } from "../constants";
+import dateToISOString from "../dateToISOSTring";
 
 import { type PostTag, type Post, PostStatus } from "@resolverTypes";
 import type { DbFindPost, PostAuthor } from "@types";
@@ -42,19 +42,18 @@ const createBinnedTestPosts = async ({
         status,
         slug,
         image_banner,
-        date_created,
         date_published,
         last_modified,
         is_in_bin,
         is_deleted,
         tags
       ) VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13),
-        ($14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26),
-        ($27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39),
-        ($40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $50, $51, $52),
-        ($53, $54, $55, $56, $57, $58, $59, $60, $61, $62, $63, $64, $65),
-        ($66, $67, $68, $69, $70, $71, $72, $73, $74, $75,$76, $77, $78)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12),
+        ($13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24),
+        ($25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36),
+        ($37, $38, $39, $40, $41, $42, $43, $44, $45, $46, $47, $48),
+        ($49, $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $60),
+        ($61, $62, $63, $64, $65, $66, $67, $68, $69, $70, $71, $72)
       RETURNING
         post_id "postId",
         title,
@@ -64,9 +63,9 @@ const createBinnedTestPosts = async ({
         status,
         slug,
         image_banner "imageBanner",
-        date_created * ${DATE_COLUMN_MULTIPLIER} "dateCreated",
-        date_published * ${DATE_COLUMN_MULTIPLIER} "datePublished",
-        last_modified * ${DATE_COLUMN_MULTIPLIER} "lastModified",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
         views,
         likes,
         is_in_bin "isInBin",
@@ -80,7 +79,6 @@ const createBinnedTestPosts = async ({
         unpublishedTestPosts.first.status,
         unpublishedTestPosts.first.slug,
         null,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
         null,
         null,
         isInBin,
@@ -94,7 +92,6 @@ const createBinnedTestPosts = async ({
         unpublishedTestPosts.second.status,
         null,
         null,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
         null,
         null,
         isInBin,
@@ -108,8 +105,7 @@ const createBinnedTestPosts = async ({
         publishedTestPosts.first.status,
         publishedTestPosts.first.slug,
         null,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
+        new Date().toISOString(),
         null,
         isInBin,
         false,
@@ -122,8 +118,7 @@ const createBinnedTestPosts = async ({
         publishedTestPosts.second.status,
         null,
         null,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
+        new Date().toISOString(),
         null,
         isInBin,
         false,
@@ -136,7 +131,6 @@ const createBinnedTestPosts = async ({
         draftTestPosts.first.status,
         draftTestPosts.first.slug,
         null,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
         null,
         null,
         isInBin,
@@ -150,7 +144,6 @@ const createBinnedTestPosts = async ({
         draftTestPosts.second.status,
         null,
         null,
-        Date.now() / DATE_COLUMN_MULTIPLIER,
         null,
         null,
         isInBin,
@@ -168,11 +161,11 @@ const createBinnedTestPosts = async ({
       const mappedTags = !row.tags ? null : mapPostTags(row.tags, map);
 
       const datePublished = row.datePublished
-        ? Number(row.datePublished)
+        ? dateToISOString(row.datePublished)
         : row.datePublished;
 
       const lastModified = row.lastModified
-        ? Number(row.lastModified)
+        ? dateToISOString(row.lastModified)
         : row.lastModified;
 
       const post = {
@@ -186,7 +179,7 @@ const createBinnedTestPosts = async ({
         url: postUrl,
         slug: row.slug,
         imageBanner: row.imageBanner,
-        dateCreated: Number(row.dateCreated),
+        dateCreated: dateToISOString(row.dateCreated),
         datePublished,
         lastModified,
         views: row.views,
