@@ -1,13 +1,15 @@
 import type { CookieOptions, Response } from "express";
 
-import { nodeEnv } from "@utils";
+// import { nodeEnv } from "@utils";
 import type { Cookies } from "@types";
 
 export const cookieOptions: CookieOptions = {
   maxAge: 365 * 24 * 60 * 60 * 1000,
   httpOnly: true,
-  secure: nodeEnv === "production",
-  sameSite: nodeEnv === "production" ? "none" : false,
+  // secure: nodeEnv === "production",
+  // sameSite: nodeEnv === "production" ? "none" : false,
+  secure: true,
+  sameSite: "none",
 };
 
 export const setCookies = (res: Response, cookies: Cookies) => {

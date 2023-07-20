@@ -44,14 +44,13 @@ export const startServer = async (port: number) => {
       origin:
         nodeEnv === "production"
           ? [
-              "https://https://fawllerspeaks.com",
               "https://https://app.fawllerspeaks.com",
               "https://studio.apollographql.com",
             ]
           : [
               "http://localhost:4000",
               "http://localhost:4040",
-              "http://localhost:3000",
+              "https://sandbox.embed.apollographql.com",
             ],
       methods: "POST",
       credentials: true,
