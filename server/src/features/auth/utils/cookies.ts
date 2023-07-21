@@ -6,10 +6,13 @@ import type { Cookies } from "@types";
 export const cookieOptions: CookieOptions = {
   maxAge: 365 * 24 * 60 * 60 * 1000,
   httpOnly: true,
-  // secure: nodeEnv === "production",
-  // sameSite: nodeEnv === "production" ? "none" : false,
-  secure: true,
   sameSite: "none",
+
+  /** Postman cookie options */
+  // secure: nodeEnv === "production",
+
+  /** Apollo explorer(development) cookie options */
+  secure: true,
 };
 
 export const setCookies = (res: Response, cookies: Cookies) => {
