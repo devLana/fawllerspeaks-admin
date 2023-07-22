@@ -2,13 +2,11 @@ import { GraphQLError } from "graphql";
 import bcrypt from "bcrypt";
 import Joi, { ValidationError } from "joi";
 
-import { UserData } from "../types";
+import { RegisteredUser } from "./RegisteredUser";
 import { RegisterUserValidationError } from "./RegisterUserValidationError";
-import { clearCookies } from "@features/auth/utils";
 
 import {
   AuthenticationError,
-  NotAllowedError,
   RegistrationError,
   UnknownError,
   dateToISOString,
@@ -16,7 +14,7 @@ import {
 } from "@utils";
 
 import type { MutationResolvers } from "@resolverTypes";
-import type { Cookies, ResolverFunc, ValidationErrorObject } from "@types";
+import type { ResolverFunc, ValidationErrorObject } from "@types";
 
 type RegisterUser = ResolverFunc<MutationResolvers["registerUser"]>;
 
@@ -25,12 +23,9 @@ interface Select {
   image: string | null;
   isRegistered: boolean;
   dateCreated: string;
-  sessionId: string;
 }
 
-const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
-  const { db, user, res, req } = ctx;
-
+const registerUser: RegisterUser = async (_, { userInput }, { db, user }) => {
   const schema = Joi.object<typeof userInput>({
     firstName: Joi.string()
       .required()
@@ -73,33 +68,21 @@ const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
     const result = await schema.validateAsync(userInput, { abortEarly: false });
     const { firstName, lastName, password } = result;
 
-    const { auth, sig, token } = req.cookies as Cookies;
-
-    if (!auth || !sig || !token) {
-      return new NotAllowedError("Unable to register user");
-    }
-
-    const jwToken = `${sig}.${auth}.${token}`;
-
     const generateHash = bcrypt.hash(password, 10);
     const findUser = db.query<Select>(
       `SELECT
         email,
         image,
         is_registered "isRegistered",
-        date_created "dateCreated",
-        session_id "sessionId"
-      FROM users LEFT JOIN sessions ON user_id = "user"
-      WHERE user_id = $1 AND refresh_token = $2`,
-      [user, jwToken]
+        date_created "dateCreated"
+      FROM users
+      WHERE user_id = $1`,
+      [user]
     );
 
     const [hash, { rows }] = await Promise.all([generateHash, findUser]);
 
-    if (rows.length === 0 || !rows[0].sessionId) {
-      clearCookies(res);
-      return new UnknownError("Unable to register user");
-    }
+    if (rows.length === 0) return new UnknownError("Unable to register user");
 
     if (rows[0].isRegistered) {
       return new RegistrationError("User is already registered");
@@ -116,9 +99,7 @@ const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
       [firstName, lastName, hash, true, user]
     );
 
-    const accessToken = (req.headers.authorization ?? "").slice(7);
-
-    return new UserData({
+    return new RegisteredUser({
       id: user,
       email: rows[0].email,
       firstName,
@@ -126,8 +107,6 @@ const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
       image: rows[0].image,
       isRegistered: true,
       dateCreated: dateToISOString(rows[0].dateCreated),
-      accessToken,
-      sessionId: rows[0].sessionId,
     });
   } catch (err) {
     if (err instanceof ValidationError) {

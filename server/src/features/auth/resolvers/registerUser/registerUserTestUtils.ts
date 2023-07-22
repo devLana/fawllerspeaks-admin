@@ -1,5 +1,3 @@
-import type { Cookies } from "@types";
-
 interface Input {
   firstName: string;
   lastName: string;
@@ -33,8 +31,6 @@ export const userInput = {
   password: "abcdEf65#",
   confirmPassword: "abcdEf65#",
 };
-
-export const sessionCookies = "auth=auth; sig=sig; token=token";
 
 const dateCreated = "2022-11-07 13:22:43.717+01";
 export const mockDate = "2022-11-07T12:22:43.717Z";
@@ -103,6 +99,19 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
   ],
 ];
 
+export const verifyUser: [string, Record<string, unknown>[], string][] = [
+  [
+    "Return an error response if user is unknown",
+    [],
+    "Unable to register user",
+  ],
+  [
+    "User is already registered, Return an error response",
+    [{ isRegistered: true }],
+    "User is already registered",
+  ],
+];
+
 export const gqlValidation: [string, GQL][] = [
   [
     "null or undefined",
@@ -115,47 +124,10 @@ export const gqlValidation: [string, GQL][] = [
   ],
   [
     "number or boolean",
-    {
-      firstName: 698,
-      lastName: true,
-      password: 995,
-      confirmPassword: false,
-    },
-  ],
-];
-
-export const cookies = { auth: "auth", sig: "sig", token: "token" };
-
-export const validateCookie: [string, Cookies][] = [
-  [
-    "Return an error if cookie header has invalid values",
-    { auth: "", sig: "sig", token: "token" },
-  ],
-  [
-    "Return an error if cookie header has one or more missing cookies",
-    { auth: "auth", sig: "sig" },
-  ],
-];
-
-export const verifyUser: [string, Record<string, unknown>[]][] = [
-  ["is unknown", []],
-  [
-    "is logged in but does not have a valid session",
-    [{ email: "user@mail.com" }],
+    { firstName: 698, lastName: true, password: 995, confirmPassword: false },
   ],
 ];
 
 export const registerMock = [
-  {
-    isRegistered: false,
-    email: "test@mail.com",
-    image: null,
-    dateCreated,
-    sessionId: "Session_Id",
-  },
-];
-
-export const verifyE2eCookie: [string, string][] = [
-  ["invalid cookie values", "auth=auth; sig= ; token=token"],
-  ["missing cookies", "auth=auth; sig=sig"],
+  { isRegistered: false, email: "test@mail.com", image: null, dateCreated },
 ];
