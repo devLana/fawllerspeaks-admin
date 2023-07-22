@@ -68,7 +68,7 @@ export const LOGIN = `#graphql
         status
       }
 
-      ... on UserData {
+      ... on LoggedInUser {
         __typename
         user {
           __typename
@@ -79,9 +79,9 @@ export const LOGIN = `#graphql
           image
           isRegistered
           dateCreated
-          accessToken
-          sessionId
         }
+        accessToken
+        sessionId
         status
       }
     }
@@ -148,7 +148,7 @@ export const REGISTER_USER = `#graphql
         status
       }
 
-      ... on UserData {
+      ... on RegisteredUser {
         __typename
         user {
           __typename
@@ -159,8 +159,6 @@ export const REGISTER_USER = `#graphql
           image
           isRegistered
           dateCreated
-          accessToken
-          sessionId
         }
         status
       }
@@ -228,7 +226,7 @@ export const VERIFY_SESSION = `#graphql
         status
       }
 
-      ... on UserData {
+      ... on VerifiedSession {
         __typename
         user {
           __typename
@@ -239,9 +237,8 @@ export const VERIFY_SESSION = `#graphql
           image
           isRegistered
           dateCreated
-          accessToken
-          sessionId
         }
+        accessToken
         status
       }
     }

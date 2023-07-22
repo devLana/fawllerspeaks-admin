@@ -7,11 +7,11 @@ export const authTypeDefs = `#graphql
     image: String
     isRegistered: Boolean!
     dateCreated: String!
-    accessToken: String!
-    sessionId: ID!
   }
 
-  type UserData {
+  type LoggedInUser {
+    accessToken: String!
+    sessionId: ID!
     user: User!
     status: Status!
   }
@@ -24,6 +24,17 @@ export const authTypeDefs = `#graphql
   type VerifiedResetToken {
     email: String!
     resetToken: String!
+    status: Status!
+  }
+
+  type RegisteredUser {
+    user: User!
+    status: Status!
+  }
+
+  type VerifiedSession {
+    accessToken: String!
+    user: User!
     status: Status!
   }
 
@@ -67,19 +78,19 @@ export const authTypeDefs = `#graphql
 
   union ForgotGeneratePassword = Response | EmailValidationError | NotAllowedError | RegistrationError | ServerError
 
-  union Login = UserData | LoginValidationError | NotAllowedError
+  union Login = LoggedInUser | LoginValidationError | NotAllowedError
 
   union Logout = Response | SessionIdValidationError | AuthenticationError | NotAllowedError | UnknownError
 
   union RefreshToken = AccessToken | SessionIdValidationError | AuthenticationError | UserSessionError | NotAllowedError | UnknownError
 
-  union RegisterUser = UserData | RegisterUserValidationError | AuthenticationError | NotAllowedError | UnknownError | RegistrationError
+  union RegisterUser = RegisteredUser | RegisterUserValidationError | AuthenticationError | UnknownError | RegistrationError
 
   union ResetPassword = Response | ResetPasswordValidationError | NotAllowedError | RegistrationError
 
   union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | NotAllowedError | RegistrationError
 
-  union VerifySession = UserData | SessionIdValidationError | UserSessionError | NotAllowedError | UnknownError
+  union VerifySession = VerifiedSession | SessionIdValidationError | UserSessionError | NotAllowedError | UnknownError
 
   input RegisterUserInput {
     firstName: String!
