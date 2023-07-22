@@ -166,7 +166,15 @@ export type GetPostTags = NotAllowedError | PostTags;
 
 export type GetPosts = NotAllowedError | Posts;
 
-export type Login = LoginValidationError | NotAllowedError | UserData;
+export type LoggedInUser = {
+  __typename?: 'LoggedInUser';
+  accessToken: Scalars['String'];
+  sessionId: Scalars['ID'];
+  status: Status;
+  user: User;
+};
+
+export type Login = LoggedInUser | LoginValidationError | NotAllowedError;
 
 export type LoginValidationError = {
   __typename?: 'LoginValidationError';
@@ -360,14 +368,14 @@ export type Post = {
   __typename?: 'Post';
   author: Scalars['String'];
   content?: Maybe<Scalars['String']>;
-  dateCreated: Scalars['Float'];
-  datePublished?: Maybe<Scalars['Float']>;
+  dateCreated: Scalars['String'];
+  datePublished?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   imageBanner?: Maybe<Scalars['String']>;
   isDeleted: Scalars['Boolean'];
   isInBin: Scalars['Boolean'];
-  lastModified?: Maybe<Scalars['Float']>;
+  lastModified?: Maybe<Scalars['String']>;
   likes: Scalars['Int'];
   slug?: Maybe<Scalars['String']>;
   status: PostStatus;
@@ -397,9 +405,9 @@ export enum PostStatus {
 
 export type PostTag = {
   __typename?: 'PostTag';
-  dateCreated: Scalars['Float'];
+  dateCreated: Scalars['String'];
   id: Scalars['ID'];
-  lastModified?: Maybe<Scalars['Float']>;
+  lastModified?: Maybe<Scalars['String']>;
   name: Scalars['String'];
 };
 
@@ -466,7 +474,7 @@ export type QueryVerifySessionArgs = {
 
 export type RefreshToken = AccessToken | AuthenticationError | NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError;
 
-export type RegisterUser = AuthenticationError | NotAllowedError | RegisterUserValidationError | RegistrationError | UnknownError | UserData;
+export type RegisterUser = AuthenticationError | RegisterUserValidationError | RegisteredUser | RegistrationError | UnknownError;
 
 export type RegisterUserInput = {
   confirmPassword: Scalars['String'];
@@ -482,6 +490,12 @@ export type RegisterUserValidationError = {
   lastNameError?: Maybe<Scalars['String']>;
   passwordError?: Maybe<Scalars['String']>;
   status: Status;
+};
+
+export type RegisteredUser = {
+  __typename?: 'RegisteredUser';
+  status: Status;
+  user: User;
 };
 
 export type RegistrationError = BaseResponse & {
@@ -544,21 +558,13 @@ export type UnknownError = BaseResponse & {
 
 export type User = {
   __typename?: 'User';
-  accessToken: Scalars['String'];
-  dateCreated: Scalars['Float'];
+  dateCreated: Scalars['String'];
   email: Scalars['String'];
   firstName?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   image?: Maybe<Scalars['String']>;
   isRegistered: Scalars['Boolean'];
   lastName?: Maybe<Scalars['String']>;
-  sessionId: Scalars['ID'];
-};
-
-export type UserData = {
-  __typename?: 'UserData';
-  status: Status;
-  user: User;
 };
 
 export type UserSessionError = BaseResponse & {
@@ -574,6 +580,13 @@ export type VerifiedResetToken = {
   status: Status;
 };
 
+export type VerifiedSession = {
+  __typename?: 'VerifiedSession';
+  accessToken: Scalars['String'];
+  status: Status;
+  user: User;
+};
+
 export type VerifyResetToken = NotAllowedError | RegistrationError | VerifiedResetToken | VerifyResetTokenValidationError;
 
 export type VerifyResetTokenValidationError = {
@@ -582,4 +595,4 @@ export type VerifyResetTokenValidationError = {
   tokenError: Scalars['String'];
 };
 
-export type VerifySession = NotAllowedError | SessionIdValidationError | UnknownError | UserData | UserSessionError;
+export type VerifySession = NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError | VerifiedSession;
