@@ -1,5 +1,5 @@
 import {
-  type AccessTokenResolvers,
+  type AccessTokenResolvers as Resolvers,
   type AccessToken as AccessTokenData,
   Status,
 } from "@resolverTypes";
@@ -12,6 +12,6 @@ export class AccessToken implements AccessTokenData {
   }
 }
 
-export const AccessTokenResolver: AccessTokenResolvers = {
+export const AccessTokenResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof AccessToken,
 };

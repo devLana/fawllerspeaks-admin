@@ -9,17 +9,19 @@ import resetPassword from "./resetPassword";
 import generatePassword from "./generatePassword";
 import verifyResetToken from "./verifyResetToken";
 
-import { AccessTokenResolver } from "./refreshToken/AccessToken";
-import { VerifiedResetTokenResolver } from "./verifyResetToken/VerifiedResetToken";
-import { LoginValidationErrorResolver } from "./login/LoginValidationError";
-import { ResetPasswordValidationErrorResolver } from "./resetPassword/ResetPasswordValidationError";
-import { RegisterUserValidationErrorResolver } from "./registerUser/RegisterUserValidationError";
-import { VerifyResetTokenValidationErrorResolver } from "./verifyResetToken/VerifyResetTokenValidationError";
+import { LoggedInUserResolvers } from "./login/LoggedInUser";
+import { RegisteredUserResolvers } from "./registerUser/RegisteredUser";
+import { VerifiedSessionResolvers } from "./verifySession/VerifiedSession";
+import { AccessTokenResolvers } from "./refreshToken/AccessToken";
+import { VerifiedResetTokenResolvers } from "./verifyResetToken/VerifiedResetToken";
+import { LoginValidationErrorResolvers } from "./login/LoginValidationError";
+import { ResetPasswordValidationErrorResolvers } from "./resetPassword/ResetPasswordValidationError";
+import { RegisterUserValidationErrorResolvers } from "./registerUser/RegisterUserValidationError";
+import { VerifyResetTokenValidationErrorResolvers } from "./verifyResetToken/VerifyResetTokenValidationError";
 
 import {
-  UserDataResolver,
-  EmailValidationErrorResolver,
-  SessionIdValidationErrorResolver,
+  EmailValidationErrorResolvers,
+  SessionIdValidationErrorResolvers,
 } from "./types";
 
 import type {
@@ -30,7 +32,9 @@ import type {
 import type { ResolversMapper, ObjectMapper } from "@types";
 
 type TypeKeys =
-  | "UserData"
+  | "LoggedInUser"
+  | "RegisteredUser"
+  | "VerifiedSession"
   | "AccessToken"
   | "VerifiedResetToken"
   | "EmailValidationError"
@@ -79,14 +83,16 @@ export const authResolvers: AuthResolvers = {
   },
 
   Types: {
-    UserData: UserDataResolver,
-    AccessToken: AccessTokenResolver,
-    VerifiedResetToken: VerifiedResetTokenResolver,
-    EmailValidationError: EmailValidationErrorResolver,
-    LoginValidationError: LoginValidationErrorResolver,
-    ResetPasswordValidationError: ResetPasswordValidationErrorResolver,
-    SessionIdValidationError: SessionIdValidationErrorResolver,
-    RegisterUserValidationError: RegisterUserValidationErrorResolver,
-    VerifyResetTokenValidationError: VerifyResetTokenValidationErrorResolver,
+    LoggedInUser: LoggedInUserResolvers,
+    RegisteredUser: RegisteredUserResolvers,
+    VerifiedSession: VerifiedSessionResolvers,
+    AccessToken: AccessTokenResolvers,
+    VerifiedResetToken: VerifiedResetTokenResolvers,
+    EmailValidationError: EmailValidationErrorResolvers,
+    LoginValidationError: LoginValidationErrorResolvers,
+    ResetPasswordValidationError: ResetPasswordValidationErrorResolvers,
+    SessionIdValidationError: SessionIdValidationErrorResolvers,
+    RegisterUserValidationError: RegisterUserValidationErrorResolvers,
+    VerifyResetTokenValidationError: VerifyResetTokenValidationErrorResolvers,
   },
 };

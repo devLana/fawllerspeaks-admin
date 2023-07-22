@@ -12,6 +12,6 @@ export class VerifyResetTokenValidationError implements Errors {
   }
 }
 
-export const VerifyResetTokenValidationErrorResolver: Resolvers = {
+export const VerifyResetTokenValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof VerifyResetTokenValidationError,
 };

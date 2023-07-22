@@ -23,6 +23,6 @@ export class RegisterUserValidationError implements Errors {
   }
 }
 
-export const RegisterUserValidationErrorResolver: Resolvers = {
+export const RegisterUserValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof RegisterUserValidationError,
 };

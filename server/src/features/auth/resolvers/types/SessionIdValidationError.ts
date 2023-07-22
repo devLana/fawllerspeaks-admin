@@ -12,6 +12,6 @@ export class SessionIdValidationError implements Errors {
   }
 }
 
-export const SessionIdValidationErrorResolver: Resolvers = {
+export const SessionIdValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof SessionIdValidationError,
 };

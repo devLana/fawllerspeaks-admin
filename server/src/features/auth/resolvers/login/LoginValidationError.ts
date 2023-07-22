@@ -15,6 +15,6 @@ export class LoginValidationError implements Errors {
   }
 }
 
-export const LoginValidationErrorResolver: Resolvers = {
+export const LoginValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof LoginValidationError,
 };

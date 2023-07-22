@@ -1,5 +1,5 @@
 import {
-  type EmailValidationErrorResolvers,
+  type EmailValidationErrorResolvers as Resolvers,
   type EmailValidationError as Errors,
   Status,
 } from "@resolverTypes";
@@ -12,6 +12,6 @@ export class EmailValidationError implements Errors {
   }
 }
 
-export const EmailValidationErrorResolver: EmailValidationErrorResolvers = {
+export const EmailValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof EmailValidationError,
 };

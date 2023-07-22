@@ -1,5 +1,5 @@
 import {
-  type VerifiedResetTokenResolvers,
+  type VerifiedResetTokenResolvers as Resolvers,
   type VerifiedResetToken as VerifiedResetTokenResponse,
   Status,
 } from "@resolverTypes";
@@ -15,6 +15,6 @@ export class VerifiedResetToken implements VerifiedResetTokenResponse {
   }
 }
 
-export const VerifiedResetTokenResolver: VerifiedResetTokenResolvers = {
+export const VerifiedResetTokenResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof VerifiedResetToken,
 };
