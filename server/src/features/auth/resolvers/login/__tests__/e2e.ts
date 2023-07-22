@@ -100,7 +100,7 @@ describe("Login - E2E", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.login).not.toHaveProperty("password");
       expect(data.data?.login).toStrictEqual({
-        __typename: "UserData",
+        __typename: "LoggedInUser",
         user: {
           __typename: "User",
           email: registeredUser.email,
@@ -110,9 +110,9 @@ describe("Login - E2E", () => {
           image: null,
           isRegistered: registeredUser.registered,
           dateCreated: user.dateCreated,
-          accessToken: expect.stringMatching(JWT_REGEX),
-          sessionId: expect.stringMatching(SESSION_ID_REGEX),
         },
+        accessToken: expect.stringMatching(JWT_REGEX),
+        sessionId: expect.stringMatching(SESSION_ID_REGEX),
         status: Status.Success,
       });
     });

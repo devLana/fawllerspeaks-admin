@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import { UserData } from "../types";
+import { LoggedInUser } from "./LoggedInUser";
 import { LoginValidationError } from "./LoginValidationError";
 import { NotAllowedError, dateToISOString, generateErrorsObject } from "@utils";
 import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
@@ -109,11 +109,9 @@ const login: Login = async (_, args, { db, req, res }) => {
       image,
       isRegistered,
       dateCreated: dateToISOString(dateCreated),
-      accessToken,
-      sessionId,
     };
 
-    return new UserData(user);
+    return new LoggedInUser(user, accessToken, sessionId);
   } catch (err) {
     if (err instanceof ValidationError) {
       const { emailError, passwordError } = generateErrorsObject(

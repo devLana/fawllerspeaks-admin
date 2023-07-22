@@ -117,7 +117,6 @@ describe("Test login resolver", () => {
 
       expect(setCookies).toHaveBeenCalledTimes(1);
 
-      expect(result).toHaveProperty("status", "SUCCESS");
       expect(result).toHaveProperty("user");
       expect(result).toHaveProperty("user.email", user.userEmail);
       expect(result).toHaveProperty("user.id", user.userId);
@@ -127,13 +126,14 @@ describe("Test login resolver", () => {
       expect(result).toHaveProperty("user.isRegistered", user.isRegistered);
       expect(result).toHaveProperty("user.dateCreated", mockDate);
       expect(result).toHaveProperty(
-        "user.accessToken",
+        "accessToken",
         expect.stringMatching(JWT_REGEX)
       );
       expect(result).toHaveProperty(
-        "user.sessionId",
+        "sessionId",
         expect.stringMatching(SESSION_ID_REGEX)
       );
+      expect(result).toHaveProperty("status", "SUCCESS");
     });
   });
 
@@ -152,7 +152,6 @@ describe("Test login resolver", () => {
 
       expect(setCookies).toHaveBeenCalledTimes(1);
 
-      expect(result).toHaveProperty("status", "SUCCESS");
       expect(result).toHaveProperty("user");
       expect(result).toHaveProperty("user.email", user.userEmail);
       expect(result).toHaveProperty("user.id", user.userId);
@@ -162,13 +161,14 @@ describe("Test login resolver", () => {
       expect(result).toHaveProperty("user.isRegistered", user.isRegistered);
       expect(result).toHaveProperty("user.dateCreated", mockDate);
       expect(result).toHaveProperty(
-        "user.accessToken",
+        "accessToken",
         expect.stringMatching(JWT_REGEX)
       );
       expect(result).toHaveProperty(
-        "user.sessionId",
+        "sessionId",
         expect.stringMatching(SESSION_ID_REGEX)
       );
+      expect(result).toHaveProperty("status", "SUCCESS");
     });
   });
 });
