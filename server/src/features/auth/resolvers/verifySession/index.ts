@@ -2,7 +2,8 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
-import { SessionIdValidationError, UserData } from "../types";
+import { VerifiedSession } from "./VerifiedSession";
+import { SessionIdValidationError } from "../types";
 import {
   clearCookies,
   sessionMail,
@@ -24,7 +25,6 @@ import type { ResolverFunc, Cookies } from "@types";
 type VerifySession = ResolverFunc<QueryResolvers["verifySession"]>;
 
 interface DBResponse {
-  sessionId: string;
   refreshToken: string;
   email: string;
   userId: string;
@@ -34,8 +34,6 @@ interface DBResponse {
   isRegistered: boolean;
   dateCreated: string;
 }
-
-type TDBResponse = Omit<DBResponse, "sessionId">;
 
 const verifySession: VerifySession = async (_, args, { db, req, res }) => {
   if (!process.env.REFRESH_TOKEN_SECRET) {
@@ -65,7 +63,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       sub: string;
     };
 
-    const { rows } = await db.query<TDBResponse>(
+    const { rows } = await db.query<DBResponse>(
       `SELECT
         "user" "userId",
         refresh_token "refreshToken",
@@ -114,17 +112,14 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       image: rows[0].image,
       isRegistered: rows[0].isRegistered,
       dateCreated: dateToISOString(rows[0].dateCreated),
-      accessToken,
-      sessionId: validatedSession,
     };
 
-    return new UserData(user);
+    return new VerifiedSession(user, accessToken);
   } catch (err) {
     if (err instanceof TokenExpiredError) {
       try {
         const { rows } = await db.query<DBResponse>(
           `SELECT
-            session_id "sessionId",
             "user" "userId",
             refresh_token "refreshToken",
             email,
@@ -169,11 +164,9 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
           image: rows[0].image,
           isRegistered: rows[0].isRegistered,
           dateCreated: dateToISOString(rows[0].dateCreated),
-          accessToken,
-          sessionId: rows[0].sessionId,
         };
 
-        return new UserData(user);
+        return new VerifiedSession(user, accessToken);
       } catch (error) {
         if (error instanceof MailError) {
           return new NotAllowedError("Unable to verify session");

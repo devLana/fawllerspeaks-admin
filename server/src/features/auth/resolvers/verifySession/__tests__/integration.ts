@@ -215,7 +215,6 @@ describe("Test verify session resolver", () => {
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveNthReturnedWith(1, { rows: mockData });
 
-        expect(result).toHaveProperty("status", "SUCCESS");
         expect(result).toHaveProperty("user");
         expect(result).toHaveProperty("user.email", data.email);
         expect(result).toHaveProperty("user.id", obj.userId);
@@ -225,10 +224,10 @@ describe("Test verify session resolver", () => {
         expect(result).toHaveProperty("user.isRegistered", obj.isRegistered);
         expect(result).toHaveProperty("user.dateCreated", mockDate);
         expect(result).toHaveProperty(
-          "user.accessToken",
+          "accessToken",
           expect.stringMatching(JWT_REGEX)
         );
-        expect(result).toHaveProperty("user.sessionId", obj.sessionId);
+        expect(result).toHaveProperty("status", "SUCCESS");
       });
     });
 
@@ -326,7 +325,6 @@ describe("Test verify session resolver", () => {
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveNthReturnedWith(1, { rows: [mockObj] });
 
-        expect(result).toHaveProperty("status", "SUCCESS");
         expect(result).toHaveProperty("user");
         expect(result).toHaveProperty("user.email", data.email);
         expect(result).toHaveProperty("user.id", loggedInUserId);
@@ -336,10 +334,10 @@ describe("Test verify session resolver", () => {
         expect(result).toHaveProperty("user.isRegistered", true);
         expect(result).toHaveProperty("user.dateCreated", mockDate);
         expect(result).toHaveProperty(
-          "user.accessToken",
+          "accessToken",
           expect.stringMatching(JWT_REGEX)
         );
-        expect(result).toHaveProperty("user.sessionId", sessionId);
+        expect(result).toHaveProperty("status", "SUCCESS");
       });
     });
   });

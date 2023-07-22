@@ -172,7 +172,7 @@ describe("Refresh TOken - E2E", () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.verifySession).toStrictEqual({
-          __typename: "UserData",
+          __typename: "VerifiedSession",
           user: {
             __typename: "User",
             email: unRegisteredTestUser.email,
@@ -182,9 +182,8 @@ describe("Refresh TOken - E2E", () => {
             image: null,
             isRegistered: unRegisteredTestUser.registered,
             dateCreated: unregisteredUser.dateCreated,
-            accessToken: expect.stringMatching(JWT_REGEX),
-            sessionId: unregisteredSessionId,
           },
+          accessToken: expect.stringMatching(JWT_REGEX),
           status: Status.Success,
         });
       });
@@ -252,7 +251,7 @@ describe("Refresh TOken - E2E", () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.verifySession).toStrictEqual({
-          __typename: "UserData",
+          __typename: "VerifiedSession",
           user: {
             __typename: "User",
             email: registeredTestUser.email,
@@ -262,9 +261,8 @@ describe("Refresh TOken - E2E", () => {
             image: null,
             isRegistered: registeredTestUser.registered,
             dateCreated: registeredUser.dateCreated,
-            accessToken: expect.stringMatching(JWT_REGEX),
-            sessionId: registeredSessionId,
           },
+          accessToken: expect.stringMatching(JWT_REGEX),
           status: Status.Success,
         });
       });

@@ -51,7 +51,6 @@ export const validateSession: [string, Record<string, string>[]][] = [
 ];
 
 export const obj = {
-  sessionId,
   userId: "user_Id_One",
   isRegistered: false,
 };
