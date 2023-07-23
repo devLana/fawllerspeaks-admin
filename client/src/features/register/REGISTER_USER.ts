@@ -15,7 +15,7 @@ export const REGISTER_USER: RegisterUser = gql`
         status
       }
 
-      ... on NotAllowedError {
+      ... on AuthenticationError {
         message
         status
       }
@@ -25,17 +25,20 @@ export const REGISTER_USER: RegisterUser = gql`
         status
       }
 
-      ... on UserData {
+      ... on UnknownError {
+        message
+        status
+      }
+
+      ... on RegisteredUser {
         user {
-          email
           id
+          email
           firstName
           lastName
           image
           isRegistered
           dateCreated
-          accessToken
-          sessionId
         }
         status
       }

@@ -91,11 +91,10 @@ const RegisterUser: NextPageWithLayout = () => {
           void router.replace("/?status=registered");
           break;
 
-        case "UserData":
+        case "RegisteredUser":
           void router.replace("/");
           break;
 
-        case "NotAllowedError":
         default:
           setStatus("error");
           break;

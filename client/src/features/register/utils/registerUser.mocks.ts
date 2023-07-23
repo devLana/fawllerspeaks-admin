@@ -21,12 +21,12 @@ export const SESSIONID = "USER_SESSION_ID";
 export const FIRST_NAME = "FIRST_NAME";
 export const LAST_NAME = "LAST_NAME";
 export const PASSWORD = "Pass#W0rd";
-export const DATE_CREATED = Date.now();
 export const invalidFirstName = "First name cannot contain numbers";
 export const invalidLastName = "Last name cannot contain numbers";
 export const shortPassword = "Password must be at least 8 characters long";
 export const invalidPassword =
   "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
+
 const USER_ID = "SOME_RANDOM_USER_ID";
 const E_MAIL = "user_mail@example.com";
 const MESSAGE =
@@ -95,7 +95,6 @@ class ValidationMock<
 
 const auth = new ErrorMock("User is not logged in", "AuthenticationError");
 const unknown = new ErrorMock("User session unknown", "UnknownError");
-const notAllowed = new ErrorMock(MESSAGE, "NotAllowedError");
 const registered = new ErrorMock("User is registered", "RegistrationError");
 const unsupported = new ErrorMock(MESSAGE, "UnsupportedObjectType");
 
@@ -121,18 +120,16 @@ export const success = {
         result: {
           data: {
             registerUser: {
-              __typename: "UserData",
+              __typename: "RegisteredUser",
               user: {
                 __typename: "User",
-                accessToken: "accessToken",
-                dateCreated: DATE_CREATED,
+                dateCreated: new Date().toISOString(),
                 email: E_MAIL,
                 firstName: FIRST_NAME,
                 id: USER_ID,
                 image: null,
                 isRegistered: true,
                 lastName: LAST_NAME,
-                sessionId: SESSIONID,
               },
               status: "SUCCESS",
             },
@@ -163,7 +160,6 @@ export const table1: [string, Expected][] = [
   ["Response resolves to a graphql error", graphql],
   ["Request resolved with a network error", network],
   ["Response is an unsupported object", unsupported],
-  ["User registration failed", notAllowed],
 ];
 
 interface ErrorTests {
