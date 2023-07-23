@@ -85,18 +85,18 @@ class SuccessMock {
         result: {
           data: {
             login: {
-              __typename: "UserData",
+              __typename: "LoggedInUser",
+              accessToken: "accessToken",
+              sessionId: this.sessionId,
               user: {
                 __typename: "User",
-                accessToken: "accessToken",
-                dateCreated: Date.now(),
+                dateCreated: new Date().toISOString(),
                 email: "mail@example.com",
                 firstName: "first name",
                 id: "user_id",
                 image: null,
                 isRegistered: this.isRegistered,
                 lastName: "last Name",
-                sessionId: this.sessionId,
               },
               status: "SUCCESS",
             },

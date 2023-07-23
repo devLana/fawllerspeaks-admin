@@ -84,7 +84,7 @@ const Login: NextPageWithLayout = () => {
           setStatus("error");
           break;
 
-        case "UserData": {
+        case "LoggedInUser": {
           const { __typename = "User", ...user } = loginData.login.user;
 
           if (user.isRegistered) {
@@ -93,10 +93,10 @@ const Login: NextPageWithLayout = () => {
             void replace("/register");
           }
 
-          localStorage.setItem(SESSION_ID, user.sessionId);
+          localStorage.setItem(SESSION_ID, loginData.login.sessionId);
           setStatus("success");
-          handleAuthHeader(user.accessToken);
-          handleRefreshToken(user.accessToken);
+          handleAuthHeader(loginData.login.accessToken);
+          handleRefreshToken(loginData.login.accessToken);
           handleUserId(`${__typename}:${user.id}`);
           break;
         }
