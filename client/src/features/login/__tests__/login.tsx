@@ -25,6 +25,8 @@ describe("Login Page", () => {
     router.pathname = "/login";
   });
 
+  const emailLabel = { name: /e-?mail/i };
+
   describe("Redirect from other pages, get status param url query", () => {
     afterAll(() => {
       const router = useRouter();
@@ -48,21 +50,31 @@ describe("Login Page", () => {
     it("Display appropriate error messages if input fields are empty", async () => {
       const { user } = renderTestUI(<Login />);
 
-      await user.click(screen.getByRole("button", { name: "Login" }));
+      await user.click(screen.getByRole("button", { name: /login/i }));
 
-      expect(screen.getByText("Enter an e-mail address")).toBeInTheDocument();
-      expect(screen.getByText("Enter password")).toBeInTheDocument();
+      expect(screen.getByRole("textbox", emailLabel)).toHaveErrorMessage(
+        "Enter an e-mail address"
+      );
+
+      expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+        "Enter password"
+      );
     });
 
     it("Show invalid email error message if email input string is invalid", async () => {
       const { user } = renderTestUI(<Login />);
 
-      await user.type(screen.getByLabelText(/e-?mail/i), "invalid_email");
-      await user.type(screen.getByLabelText("Password"), "testing_password");
-      await user.click(screen.getByRole("button", { name: "Login" }));
+      await user.type(screen.getByRole("textbox", emailLabel), "invalid_email");
+      await user.type(screen.getByLabelText(/^password$/i), "testing_password");
+      await user.click(screen.getByRole("button", { name: /login/i }));
 
-      expect(screen.getByText("Invalid e-mail address")).toBeInTheDocument();
-      expect(screen.queryByText("Enter password")).not.toBeInTheDocument();
+      expect(screen.getByRole("textbox", emailLabel)).toHaveErrorMessage(
+        "Invalid e-mail address"
+      );
+
+      expect(screen.getByLabelText(/^password$/i)).not.toHaveErrorMessage(
+        "Enter password"
+      );
     });
   });
 
@@ -71,17 +83,24 @@ describe("Login Page", () => {
       const { user } = renderTestUI(<Login />, validationError.gql());
       const { emailError, passwordError } = validationError;
 
-      await user.type(screen.getByLabelText(/e-?mail/i), EMAIL);
-      await user.type(screen.getByLabelText("Password"), PASSWORD);
-      await user.click(screen.getByRole("button", { name: "Login" }));
+      await user.type(screen.getByRole("textbox", emailLabel), EMAIL);
+      await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+      await user.click(screen.getByRole("button", { name: /login/i }));
 
-      expect(screen.getByRole("button", { name: "Login" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
 
-      await expect(screen.findByText(emailError)).resolves.toBeInTheDocument();
-      expect(screen.getByText(passwordError)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByRole("textbox", emailLabel)).toHaveErrorMessage(
+          emailError
+        );
+      });
 
-      expect(screen.getByLabelText(/e-?mail/i)).toHaveFocus();
-      expect(screen.getByRole("button", { name: "Login" })).toBeEnabled();
+      expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+        passwordError
+      );
+
+      expect(screen.getByRole("textbox", emailLabel)).toHaveFocus();
+      expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
     });
 
     it.each(loginErrorTable)(
@@ -90,14 +109,14 @@ describe("Login Page", () => {
         const { user } = renderTestUI(<Login />, error.gql());
         const { message } = error;
 
-        await user.type(screen.getByLabelText(/e-?mail/i), EMAIL);
-        await user.type(screen.getByLabelText("Password"), PASSWORD);
-        await user.click(screen.getByRole("button", { name: "Login" }));
+        await user.type(screen.getByRole("textbox", emailLabel), EMAIL);
+        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+        await user.click(screen.getByRole("button", { name: /login/i }));
 
-        expect(screen.getByRole("button", { name: "Login" })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
 
         expect(await screen.findByRole("alert")).toHaveTextContent(message);
-        expect(screen.getByRole("button", { name: "Login" })).toBeEnabled();
+        expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
       }
     );
   });
@@ -113,11 +132,11 @@ describe("Login Page", () => {
         const { user } = renderTestUI(<Login />, mock.gql());
         const { replace } = useRouter();
 
-        await user.type(screen.getByLabelText(/e-?mail/i), EMAIL);
-        await user.type(screen.getByLabelText("Password"), PASSWORD);
-        await user.click(screen.getByRole("button", { name: "Login" }));
+        await user.type(screen.getByRole("textbox", emailLabel), EMAIL);
+        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+        await user.click(screen.getByRole("button", { name: /login/i }));
 
-        expect(screen.getByRole("button", { name: "Login" })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
 
         await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
         expect(replace).toHaveBeenCalledWith(page);
@@ -129,7 +148,7 @@ describe("Login Page", () => {
         expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
         expect(refreshTokenHandler).toHaveBeenCalledTimes(1);
         expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
-        expect(screen.getByRole("button", { name: "Login" })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
       }
     );
   });

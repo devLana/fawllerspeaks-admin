@@ -76,6 +76,7 @@ const Login: NextPageWithLayout = () => {
           if (emailError) setError("email", { message: emailError }, focus);
 
           setStatus("idle");
+
           break;
         }
 
@@ -98,6 +99,7 @@ const Login: NextPageWithLayout = () => {
           handleAuthHeader(loginData.login.accessToken);
           handleRefreshToken(loginData.login.accessToken);
           handleUserId(`${__typename}:${user.id}`);
+
           break;
         }
       }
