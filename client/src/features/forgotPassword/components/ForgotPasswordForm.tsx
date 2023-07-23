@@ -25,10 +25,15 @@ const ForgotPasswordForm = ({
       autoFocus
       label="E-Mail"
       margin={fieldErrors.email ? "dense" : "normal"}
+      error={!!fieldErrors.email}
       fullWidth
       {...register("email")}
-      helperText={fieldErrors.email ? fieldErrors.email.message : null}
-      error={!!fieldErrors.email}
+      helperText={fieldErrors.email?.message ?? null}
+      FormHelperTextProps={{ id: "email__error-message" }}
+      inputProps={{
+        "aria-errormessage": "email__error-message",
+        "aria-describedby": "email__error-message",
+      }}
     />
     <LoadingButton
       loading={isLoading}

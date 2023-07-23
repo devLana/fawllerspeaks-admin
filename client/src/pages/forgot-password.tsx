@@ -21,7 +21,7 @@ import type { NextPageWithLayout } from "@types";
 import type { MutationForgotPasswordArgs } from "@apiTypes";
 
 type View = "form" | "unregistered error" | "success";
-type Status = "idle" | "submitting" | "error";
+type Status = "idle" | "loading" | "error";
 
 const ForgotPassword: NextPageWithLayout = () => {
   const [view, setView] = React.useState<View>("form");
@@ -43,7 +43,7 @@ const ForgotPassword: NextPageWithLayout = () => {
   const { statusMessage, setStatusMessage } = useStatusAlert();
 
   const submitHandler = async (values: MutationForgotPasswordArgs) => {
-    setStatus("submitting");
+    setStatus("loading");
 
     const { data: mutationData } = await mutation({ variables: values });
 
@@ -54,6 +54,7 @@ const ForgotPassword: NextPageWithLayout = () => {
 
           setError("email", { message: emailError }, { shouldFocus: true });
           setStatus("idle");
+
           break;
         }
 
@@ -130,7 +131,7 @@ const ForgotPassword: NextPageWithLayout = () => {
           password reset link sent to you
         </Typography>
         <ForgotPasswordForm
-          isLoading={status === "submitting"}
+          isLoading={status === "loading"}
           register={register}
           fieldErrors={errors}
           onSubmit={handleSubmit(submitHandler)}

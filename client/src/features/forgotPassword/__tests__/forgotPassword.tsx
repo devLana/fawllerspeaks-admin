@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 
 import ForgotPassword from "@pages/forgot-password";
 import { renderTestUI } from "@utils/renderTestUI";
@@ -20,6 +20,7 @@ describe("Forgot Password Page", () => {
     router.pathname = "/forgot-password";
   });
 
+  const textBox = { name: /e-?mail/i };
   const name = "Send Reset Link";
 
   describe("After redirect from reset password page, get status token from page url query", () => {
@@ -48,7 +49,9 @@ describe("Forgot Password Page", () => {
 
       await user.click(screen.getByRole("button", { name }));
 
-      expect(screen.getByText("Enter an e-mail address")).toBeInTheDocument();
+      expect(screen.getByRole("textbox", textBox)).toHaveErrorMessage(
+        "Enter an e-mail address"
+      );
     });
 
     it("Display invalid email error message when user enters an invalid email", async () => {
@@ -57,21 +60,27 @@ describe("Forgot Password Page", () => {
       await user.type(screen.getByRole("textbox"), "invalid_email");
       await user.click(screen.getByRole("button", { name }));
 
-      expect(screen.getByText("Invalid e-mail address")).toBeInTheDocument();
+      expect(screen.getByRole("textbox", textBox)).toHaveErrorMessage(
+        "Invalid e-mail address"
+      );
     });
   });
 
-  describe("If server responds with an error object type", () => {
+  describe("Server responds with an error object type", () => {
     it("Set an error on the email field if error is a validation error", async () => {
       const { user } = renderTestUI(<ForgotPassword />, validation.gql());
       const { emailError } = validation;
 
-      await user.type(screen.getByRole("textbox"), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), EMAIL);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
 
-      await expect(screen.findByText(emailError)).resolves.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByRole("textbox", textBox)).toHaveErrorMessage(
+          emailError
+        );
+      });
 
       expect(screen.getByRole("textbox")).toHaveFocus();
       expect(screen.getByRole("button", { name })).toBeEnabled();
@@ -81,7 +90,7 @@ describe("Forgot Password Page", () => {
       const { user } = renderTestUI(<ForgotPassword />, expected.gql);
       const { message } = expected;
 
-      await user.type(screen.getByRole("textbox"), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), EMAIL);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
@@ -95,7 +104,7 @@ describe("Forgot Password Page", () => {
     it("Show an info dialog box if email is for an unregistered account", async () => {
       const { user } = renderTestUI(<ForgotPassword />, registration.gql());
 
-      await user.type(screen.getByRole("textbox"), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), EMAIL);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
@@ -112,7 +121,7 @@ describe("Forgot Password Page", () => {
       const { user } = renderTestUI(<ForgotPassword />, success.gql());
       const alertMessage = "Request Link Sent";
 
-      await user.type(screen.getByRole("textbox"), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), EMAIL);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
@@ -127,7 +136,7 @@ describe("Forgot Password Page", () => {
       const { user } = renderTestUI(<ForgotPassword />, unsupported.gql());
       const { message } = unsupported;
 
-      await user.type(screen.getByRole("textbox"), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), EMAIL);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();

@@ -24,13 +24,7 @@ const useStatusAlert = () => {
             break;
 
           case "fail":
-            setStatusMessage(message);
-            break;
-
           case "unsupported":
-            setStatusMessage(message);
-            break;
-
           case "api":
             setStatusMessage(message);
             break;
