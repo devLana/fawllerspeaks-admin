@@ -32,10 +32,8 @@ const SessionProvider = ({ layout, page }: SessionProvideProps) => {
     };
   }, []);
 
-  const { handleRefreshToken, handleClearRefreshTokenTimer } = useRefreshToken(
-    setErrorMessage,
-    userId
-  );
+  const { handleRefreshToken, handleClearRefreshTokenTimer } =
+    useRefreshToken(setErrorMessage);
 
   useVerifySession(handleRefreshToken, {
     setErrorMessage,

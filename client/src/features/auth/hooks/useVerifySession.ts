@@ -73,7 +73,7 @@ const useVerifySession = (
               }
               break;
 
-            case "UserData": {
+            case "VerifiedSession": {
               const { __typename = "User", ...user } = data.verifySession.user;
 
               if (user.isRegistered) {
@@ -93,8 +93,8 @@ const useVerifySession = (
                 setClientHasRendered(true);
               }
 
-              handleAuthHeader(user.accessToken);
-              handleRefreshToken(user.accessToken);
+              handleAuthHeader(data.verifySession.accessToken);
+              handleRefreshToken(data.verifySession.accessToken);
               setUserId(`${__typename}:${user.id}`);
 
               break;

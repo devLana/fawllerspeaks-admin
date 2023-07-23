@@ -1,10 +1,8 @@
 import { GraphQLError } from "graphql";
-import { gql } from "@apollo/client";
 import type { MockedResponse } from "@apollo/client/testing";
 
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
-import { testCache } from "./sessionTestRenderer";
 
 interface Expected {
   message: string;
@@ -20,21 +18,7 @@ const request: MockedResponse["request"] = {
   variables: { sessionId: LOGGED_IN_SESSION_ID },
 };
 
-export const getTestUserToken = () => {
-  const user = testCache.readFragment<{ accessToken: string }>({
-    id: `User:${testUserId}`,
-    fragment: gql`
-      fragment GetTestUserToken on User {
-        accessToken
-      }
-    `,
-  });
-
-  if (!user) throw Error("Test user not found");
-  return user;
-};
-
-const login = {
+const verify = {
   gql(): MockedResponse[] {
     return [
       {
@@ -45,18 +29,17 @@ const login = {
         result: {
           data: {
             verifySession: {
-              __typename: "UserData",
+              __typename: "VerifiedSession",
+              accessToken: "old_access_token",
               user: {
                 __typename: "User",
-                accessToken: "old_access_token",
-                dateCreated: Date.now(),
+                dateCreated: new Date().toISOString(),
                 email: "mail@example.com",
                 firstName: "first name",
                 id: testUserId,
                 image: null,
                 isRegistered: false,
                 lastName: "last name",
-                sessionId: LOGGED_IN_SESSION_ID,
               },
               status: "SUCCESS",
             },
@@ -87,7 +70,7 @@ class Mocks {
           },
         },
       },
-      ...login.gql(),
+      ...verify.gql(),
     ];
   }
 }
@@ -117,7 +100,7 @@ const validate = {
           },
         },
       },
-      ...login.gql(),
+      ...verify.gql(),
     ];
   },
 };
@@ -127,7 +110,7 @@ const graphql = {
   gql(): MockedResponse[] {
     return [
       { request, result: { errors: [new GraphQLError(this.message)] } },
-      ...login.gql(),
+      ...verify.gql(),
     ];
   },
 };
@@ -135,7 +118,7 @@ const graphql = {
 const network = {
   message: "Server is currently unreachable. Please try again later",
   gql(): MockedResponse[] {
-    return [{ request, error: new Error(this.message) }, ...login.gql()];
+    return [{ request, error: new Error(this.message) }, ...verify.gql()];
   },
 };
 
@@ -154,7 +137,7 @@ export const refresh = {
           },
         },
       },
-      ...login.gql(),
+      ...verify.gql(),
     ];
   },
 };

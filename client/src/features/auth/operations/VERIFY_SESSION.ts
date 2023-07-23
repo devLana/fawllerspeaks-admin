@@ -7,18 +7,8 @@ type VerifySession = DocNode<VerifySessionData, QueryVerifySessionArgs>;
 export const VERIFY_SESSION: VerifySession = gql`
   query VerifySession($sessionId: String!) {
     verifySession(sessionId: $sessionId) {
-      ... on UserData {
-        user {
-          email
-          id
-          firstName
-          lastName
-          image
-          isRegistered
-          dateCreated
-          accessToken
-          sessionId
-        }
+      ... on SessionIdValidationError {
+        sessionIdError
         status
       }
 
@@ -32,8 +22,22 @@ export const VERIFY_SESSION: VerifySession = gql`
         status
       }
 
-      ... on SessionIdValidationError {
-        sessionIdError
+      ... on UserSessionError {
+        message
+        status
+      }
+
+      ... on VerifiedSession {
+        accessToken
+        user {
+          id
+          email
+          firstName
+          lastName
+          image
+          isRegistered
+          dateCreated
+        }
         status
       }
     }

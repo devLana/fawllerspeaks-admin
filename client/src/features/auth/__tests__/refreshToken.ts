@@ -4,7 +4,6 @@ import { screen, waitFor } from "@testing-library/react";
 
 import {
   LOGGED_IN_SESSION_ID,
-  getTestUserToken,
   newAccessToken,
   refresh,
   table1,
@@ -55,7 +54,6 @@ describe("Refresh expired user access token", () => {
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());
       await waitFor(() => expect(mockFn).toHaveBeenCalledTimes(2));
       expect(mockFn).toHaveBeenCalledWith(newAccessToken);
-      expect(getTestUserToken()).toHaveProperty("accessToken", newAccessToken);
     });
   });
 });

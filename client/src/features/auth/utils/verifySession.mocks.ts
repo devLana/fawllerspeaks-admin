@@ -67,18 +67,17 @@ class MocksTwo {
         result: {
           data: {
             verifySession: {
-              __typename: "UserData",
+              __typename: "VerifiedSession",
+              accessToken: "accessToken",
               user: {
                 __typename: "User",
-                accessToken: "accessToken",
-                dateCreated: Date.now(),
+                dateCreated: new Date().toISOString(),
                 email: "mail@example.com",
                 firstName: "first name",
                 id: this.userId,
                 image: null,
                 isRegistered: this.isRegistered,
                 lastName: "last Name",
-                sessionId: LOGGED_IN_SESSION_ID,
               },
               status: "SUCCESS",
             },

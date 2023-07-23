@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import { ApolloError, gql, useApolloClient } from "@apollo/client";
+import { ApolloError, useApolloClient } from "@apollo/client";
 import jwt_decode, { type JwtPayload } from "jwt-decode";
 
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
@@ -15,7 +15,7 @@ type Claims = "exp" | "iat" | "sub";
 type Decoded = Required<Pick<JwtPayload, Claims>>;
 type SetErrorMessage = React.Dispatch<React.SetStateAction<SorN>>;
 
-const useRefreshToken = (setErrorMessage: SetErrorMessage, userId: SorN) => {
+const useRefreshToken = (setErrorMessage: SetErrorMessage) => {
   const [timer, setTimer] = React.useState(0);
   const refreshTokenTimerId = React.useRef<number>();
 
@@ -50,23 +50,10 @@ const useRefreshToken = (setErrorMessage: SetErrorMessage, userId: SorN) => {
           void router.replace("/login?status=unauthorized");
           break;
 
-        case "AccessToken": {
-          const { accessToken } = data.refreshToken;
-
-          handleAuthHeader(accessToken);
-          handleRefreshToken(accessToken);
-          client.writeFragment({
-            id: userId ?? "",
-            fragment: gql`
-              fragment UpdateAuthUser on User {
-                accessToken
-              }
-            `,
-            data: { accessToken },
-          });
-
+        case "AccessToken":
+          handleAuthHeader(data.refreshToken.accessToken);
+          handleRefreshToken(data.refreshToken.accessToken);
           break;
-        }
 
         default:
           throw new Error(
