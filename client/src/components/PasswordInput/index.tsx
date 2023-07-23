@@ -16,7 +16,7 @@ type PasswordProps = TextFieldProps & {
 };
 
 type ConfirmPasswordProps = TextFieldProps & {
-  id: "confirm__password";
+  id: "confirm-password";
   label: "Confirm Password";
   register: Password<"confirmPassword">;
   fieldError: FieldError | undefined;
@@ -37,6 +37,8 @@ const PasswordInput = ({
     setIsVisible(!isVisible);
   };
 
+  const ariaId = fieldError ? `${id}__error-message` : undefined;
+
   return (
     <TextField
       {...props}
@@ -48,10 +50,7 @@ const PasswordInput = ({
       error={!!fieldError}
       helperText={fieldError?.message ?? null}
       FormHelperTextProps={{ id: `${id}__error-message` }}
-      inputProps={{
-        "aria-errormessage": `${id}__error-message`,
-        "aria-describedby": `${id}__error-message`,
-      }}
+      inputProps={{ "aria-errormessage": ariaId, "aria-describedby": ariaId }}
       InputProps={{
         endAdornment: (
           <PasswordAdornment isVisible={isVisible} onClick={handleClick} />
