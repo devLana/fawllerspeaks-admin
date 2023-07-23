@@ -7,20 +7,15 @@ import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
 interface PasswordAdornmentProps {
   isVisible: boolean;
   onClick: () => void;
-  onMouseDown: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-const PasswordAdornment = ({
-  isVisible,
-  onClick,
-  onMouseDown,
-}: PasswordAdornmentProps) => (
+const PasswordAdornment = ({ isVisible, onClick }: PasswordAdornmentProps) => (
   <InputAdornment position="end">
     <Tooltip title={`${isVisible ? "Hide" : "Show"} password`}>
       <IconButton
         aria-label={`${isVisible ? "Hide" : "Show"} password`}
         onClick={onClick}
-        onMouseDown={onMouseDown}
+        onMouseDown={e => e.preventDefault()}
         edge="end"
       >
         {isVisible ? <VisibilityOffRoundedIcon /> : <VisibilityRoundedIcon />}

@@ -7,7 +7,6 @@ import PasswordAdornment from "./PasswordAdornment";
 
 type Name = "password" | "confirmPassword";
 type Password<TName extends Name> = UseFormRegisterReturn<TName>;
-type ButtonEventHandler = React.MouseEventHandler<HTMLButtonElement>;
 
 type PasswordProps = TextFieldProps & {
   id: "password";
@@ -38,29 +37,26 @@ const PasswordInput = ({
     setIsVisible(!isVisible);
   };
 
-  const handleMouseDown: ButtonEventHandler = e => {
-    e.preventDefault();
-  };
-
   return (
     <TextField
       {...props}
+      {...register}
       id={id}
       label={label}
       type={isVisible ? "text" : "password"}
       fullWidth
+      error={!!fieldError}
+      helperText={fieldError?.message ?? null}
+      FormHelperTextProps={{ id: `${id}__error-message` }}
+      inputProps={{
+        "aria-errormessage": `${id}__error-message`,
+        "aria-describedby": `${id}__error-message`,
+      }}
       InputProps={{
         endAdornment: (
-          <PasswordAdornment
-            isVisible={isVisible}
-            onClick={handleClick}
-            onMouseDown={handleMouseDown}
-          />
+          <PasswordAdornment isVisible={isVisible} onClick={handleClick} />
         ),
       }}
-      helperText={fieldError ? fieldError.message : null}
-      error={!!fieldError}
-      {...register}
     />
   );
 };
