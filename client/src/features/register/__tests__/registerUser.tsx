@@ -33,111 +33,154 @@ describe("Register User Page", () => {
   });
 
   const dryEvents = async (user: UserEvent) => {
-    const button = await screen.findByRole("button", { name: "Register" });
+    await user.type(
+      screen.getByRole("textbox", { name: /^first name$/i }),
+      FIRST_NAME
+    );
 
-    await user.type(screen.getByLabelText("First Name"), FIRST_NAME);
-    await user.type(screen.getByLabelText("Last Name"), LAST_NAME);
-    await user.type(screen.getByLabelText("Password"), PASSWORD);
-    await user.type(screen.getByLabelText("Confirm Password"), PASSWORD);
-    await user.click(button);
+    await user.type(
+      screen.getByRole("textbox", { name: /^last name$/i }),
+      LAST_NAME
+    );
 
-    expect(button).toBeDisabled();
+    await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+    await user.type(screen.getByLabelText(/^confirm password$/i), PASSWORD);
+    await user.click(screen.getByRole("button", { name: /^register$/i }));
+
+    expect(screen.getByRole("button", { name: /^register$/i })).toBeDisabled();
   };
 
   describe("Client side form validation", () => {
     it("Display error messages for empty input fields", async () => {
       const { user } = renderTestUI(<RegisterUser />);
-      const button = await screen.findByRole("button", { name: "Register" });
 
-      await user.click(button);
+      await user.click(screen.getByRole("button", { name: /^register$/i }));
 
-      expect(screen.getByText("Enter first name")).toBeInTheDocument();
-      expect(screen.getByText("Enter last name")).toBeInTheDocument();
-      expect(screen.getByText("Enter password")).toBeInTheDocument();
-      expect(screen.getByText("Enter confirm password")).toBeInTheDocument();
+      expect(
+        screen.getByRole("textbox", { name: /^first name$/i })
+      ).toHaveErrorMessage("Enter first name");
+
+      expect(
+        screen.getByRole("textbox", { name: /^last name$/i })
+      ).toHaveErrorMessage("Enter last name");
+
+      expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+        "Enter password"
+      );
+
+      expect(screen.getByLabelText(/^confirm password$/i)).toHaveErrorMessage(
+        "Enter confirm password"
+      );
     });
 
     it("Display an error message for invalid password", async () => {
       const { user } = renderTestUI(<RegisterUser />);
-      const button = await screen.findByRole("button", { name: "Register" });
-      const password = screen.getByLabelText("Password");
+      const password = screen.getByLabelText(/^password$/i);
 
       await user.type(password, "pass");
-      await user.click(button);
-      expect(screen.getByText(shortPassword)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      expect(password).toHaveErrorMessage(shortPassword);
 
       await user.clear(password);
       await user.type(password, "Pass!WOrd");
-      await user.click(button);
-      expect(screen.getByText(invalidPassword)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      expect(password).toHaveErrorMessage(invalidPassword);
 
       await user.clear(password);
       await user.type(password, "PASS!W0RD");
-      await user.click(button);
-      expect(screen.getByText(invalidPassword)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      expect(password).toHaveErrorMessage(invalidPassword);
 
       await user.clear(password);
       await user.type(password, "pass!w0rd");
-      await user.click(button);
-      expect(screen.getByText(invalidPassword)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      expect(password).toHaveErrorMessage(invalidPassword);
 
       await user.clear(password);
       await user.type(password, "PassW0rd");
-      await user.click(button);
-      expect(screen.getByText(invalidPassword)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      expect(password).toHaveErrorMessage(invalidPassword);
     });
 
     it("Display an error message if passwords do not match", async () => {
       const { user } = renderTestUI(<RegisterUser />);
-      const button = await screen.findByRole("button", { name: "Register" });
+      const confirmPassword = screen.getByLabelText(/^confirm password$/i);
 
-      await user.type(screen.getByLabelText("Password"), PASSWORD);
-      await user.type(screen.getByLabelText("Confirm Password"), "PASSWORD");
-      await user.click(button);
+      await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+      await user.type(confirmPassword, "PASSWORD");
+      await user.click(screen.getByRole("button", { name: /^register$/i }));
 
-      expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
+      expect(confirmPassword).toHaveErrorMessage("Passwords do not match");
     });
 
     it("Display an error message if first and last names are invalid", async () => {
       const { user } = renderTestUI(<RegisterUser />);
-      const button = await screen.findByRole("button", { name: "Register" });
+      const firstName = screen.getByRole("textbox", { name: /^first name$/i });
+      const lastName = screen.getByRole("textbox", { name: /^last name$/i });
 
-      await user.type(screen.getByLabelText("First Name"), "John123");
-      await user.type(screen.getByLabelText("Last Name"), "4D5o6e7");
-      await user.click(button);
+      await user.type(firstName, "John123");
+      await user.type(lastName, "4D5o6e7");
+      await user.click(screen.getByRole("button", { name: /^register$/i }));
 
-      expect(screen.getByText(invalidFirstName)).toBeInTheDocument();
-      expect(screen.getByText(invalidLastName)).toBeInTheDocument();
+      expect(firstName).toHaveErrorMessage(invalidFirstName);
+      expect(lastName).toHaveErrorMessage(invalidLastName);
     });
   });
 
   describe("Server responds with an error/unsupported object response", () => {
     describe("Validation errors", () => {
-      it("Show input error messages for a validation error", async () => {
+      it("Show input error messages for empty fields validation error", async () => {
         const { user } = renderTestUI(<RegisterUser />, validationOne.gql());
+        const fName = screen.getByRole("textbox", { name: /^first name$/i });
 
         await dryEvents(user);
 
-        expect(await screen.findByText("Enter first name")).toBeInTheDocument();
+        await waitFor(() => {
+          expect(fName).toHaveErrorMessage("Enter first name");
+        });
 
-        expect(screen.getByText("Enter last name")).toBeInTheDocument();
-        expect(screen.getByText("Enter password")).toBeInTheDocument();
-        expect(screen.getByLabelText("First Name")).toHaveFocus();
-        expect(screen.getByRole("button", { name: "Register" })).toBeEnabled();
+        expect(
+          screen.getByRole("textbox", { name: /^last name$/i })
+        ).toHaveErrorMessage("Enter last name");
+
+        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+          "Enter password"
+        );
+
+        expect(fName).toHaveFocus();
+
+        expect(
+          screen.getByRole("button", { name: /^register$/i })
+        ).toBeEnabled();
       });
 
-      it("Show input error messages for invalid input validation errors", async () => {
+      it("Show input error messages for invalid fields validation error", async () => {
         const { user } = renderTestUI(<RegisterUser />, validationTwo.gql());
+        const fName = screen.getByRole("textbox", { name: /^first name$/i });
 
         await dryEvents(user);
 
-        expect(await screen.findByText(invalidFirstName)).toBeInTheDocument();
+        await waitFor(() => {
+          expect(fName).toHaveErrorMessage(invalidFirstName);
+        });
 
-        expect(screen.getByText(invalidLastName)).toBeInTheDocument();
-        expect(screen.getByText(shortPassword)).toBeInTheDocument();
-        expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
-        expect(screen.getByLabelText("First Name")).toHaveFocus();
-        expect(screen.getByRole("button", { name: "Register" })).toBeEnabled();
+        expect(
+          screen.getByRole("textbox", { name: /^last name$/i })
+        ).toHaveErrorMessage(invalidLastName);
+
+        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+          shortPassword
+        );
+
+        expect(screen.getByLabelText(/^confirm password$/i)).toHaveErrorMessage(
+          "Passwords do not match"
+        );
+
+        expect(fName).toHaveFocus();
+
+        expect(
+          screen.getByRole("button", { name: /^register$/i })
+        ).toBeEnabled();
       });
     });
 
@@ -149,7 +192,9 @@ describe("Register User Page", () => {
 
         expect(await screen.findByRole("alert")).toBeInTheDocument();
         expect(screen.getByRole("alert")).toHaveTextContent(expected.message);
-        expect(screen.getByRole("button", { name: "Register" })).toBeEnabled();
+        expect(
+          screen.getByRole("button", { name: /^register$/i })
+        ).toBeEnabled();
       });
     });
 

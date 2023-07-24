@@ -18,7 +18,7 @@ import type { NextPageWithLayout } from "@types";
 import type { MutationRegisterUserArgs } from "@apiTypes";
 
 type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
-type Status = "idle" | "submitting" | "error";
+type Status = "idle" | "loading" | "error";
 
 const RegisterUser: NextPageWithLayout = () => {
   const [status, setStatus] = React.useState<Status>("idle");
@@ -39,7 +39,7 @@ const RegisterUser: NextPageWithLayout = () => {
   });
 
   const submitHandler = async (values: RegisterUserArgs) => {
-    setStatus("submitting");
+    setStatus("loading");
 
     const { data: registeredData } = await registerUser({
       variables: { userInput: values },
@@ -127,7 +127,7 @@ const RegisterUser: NextPageWithLayout = () => {
       </Typography>
       <Card sx={{ width: "100%", maxWidth: { xs: "22.5rem", sm: "43rem" } }}>
         <RegisterUserForm
-          isLoading={status === "submitting"}
+          isLoading={status === "loading"}
           onSubmit={handleSubmit(submitHandler)}
           register={register}
           fieldErrors={errors}

@@ -31,17 +31,24 @@ const RegisterUserForm = ({
       <Grid container rowSpacing={3} columnSpacing={2}>
         <Grid item xs={12} sm={6}>
           <TextField
-            id="first__name"
+            id="first-name"
             autoFocus
             autoComplete="given-name"
             label="First Name"
             margin="none"
+            error={!!fieldErrors.firstName}
+            helperText={fieldErrors.firstName?.message ?? null}
             fullWidth
             {...register("firstName")}
-            helperText={
-              fieldErrors.firstName ? fieldErrors.firstName.message : null
-            }
-            error={!!fieldErrors.firstName}
+            FormHelperTextProps={{ id: "first-name__error-message" }}
+            inputProps={{
+              "aria-errormessage": fieldErrors.firstName
+                ? "first-name__error-message"
+                : undefined,
+              "aria-describedby": fieldErrors.firstName
+                ? "first-name__error-message"
+                : undefined,
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -50,12 +57,19 @@ const RegisterUserForm = ({
             autoComplete="family-name"
             label="Last Name"
             margin="none"
+            helperText={fieldErrors.lastName?.message ?? null}
+            error={!!fieldErrors.lastName}
             fullWidth
             {...register("lastName")}
-            helperText={
-              fieldErrors.lastName ? fieldErrors.lastName.message : null
-            }
-            error={!!fieldErrors.lastName}
+            FormHelperTextProps={{ id: "last-name__error-message" }}
+            inputProps={{
+              "aria-errormessage": fieldErrors.lastName
+                ? "last-name__error-message"
+                : undefined,
+              "aria-describedby": fieldErrors.lastName
+                ? "last-name__error-message"
+                : undefined,
+            }}
           />
         </Grid>
       </Grid>
@@ -77,7 +91,7 @@ const RegisterUserForm = ({
         </Grid>
         <Grid item xs={12} sm={6}>
           <PasswordInput
-            id="confirm__password"
+            id="confirm-password"
             autoComplete="new-password"
             label="Confirm Password"
             register={register("confirmPassword")}
