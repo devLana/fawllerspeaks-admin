@@ -45,7 +45,7 @@ const ResetPasswordForm = ({
       margin={fieldErrors.password ? "dense" : "normal"}
     />
     <PasswordInput
-      id="confirm__password"
+      id="confirm-password"
       autoComplete="new-password"
       label="Confirm Password"
       register={register("confirmPassword")}

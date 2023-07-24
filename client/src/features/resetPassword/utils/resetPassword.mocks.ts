@@ -212,18 +212,34 @@ const resetGraphql = {
 };
 
 export const resetTableOne: [string, string, MockedResponse[]][] = [
-  ["a token validation error", "validation", resetValidationTwo.gql()],
-  ["a network error", "network", resetNetwork.gql()],
-  ["an unsupported object type", "unsupported", resetUnsupported.gql()],
+  [
+    "Redirect to forgot password page if sever responds with a token validation error",
+    "validation",
+    resetValidationTwo.gql(),
+  ],
+  [
+    "Redirect to forgot password page if sever responds with a network error",
+    "network",
+    resetNetwork.gql(),
+  ],
+  [
+    "Redirect to forgot password page if sever responds with an unsupported object type",
+    "unsupported",
+    resetUnsupported.gql(),
+  ],
 ];
 
 export const resetTableTwo: [string, string, MockedResponse[]][] = [
   [
-    "password reset token is unknown or has expired",
+    "Redirect to forgot password page if password reset token is unknown or has expired",
     "fail",
     resetNotAllowed.gql(),
   ],
-  ["server responds with a graphql error", "api", resetGraphql.gql()],
+  [
+    "Redirect to forgot password page if server responds with a graphql error",
+    "api",
+    resetGraphql.gql(),
+  ],
 ];
 
 export const resetTableThree: [string, string, MockedResponse[]][] = [

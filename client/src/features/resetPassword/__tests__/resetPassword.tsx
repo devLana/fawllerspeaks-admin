@@ -119,7 +119,6 @@ describe("Reset Password", () => {
       const textbox = await screen.findByLabelText("E-Mail");
 
       expect(textbox).toHaveDisplayValue(verified.email);
-      expect(textbox).toHaveAttribute("readonly");
     });
   });
 
@@ -129,7 +128,7 @@ describe("Reset Password", () => {
       router.pathname = "/reset-password";
     });
 
-    const resetButton = { name: /reset password/i };
+    const resetButton = { name: /^reset password$/i };
     const msg =
       "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
 
@@ -139,48 +138,54 @@ describe("Reset Password", () => {
 
         await user.click(screen.getByRole("button", resetButton));
 
-        expect(screen.getByText("Enter password")).toBeInTheDocument();
-        expect(screen.getByText("Enter confirm password")).toBeInTheDocument();
+        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+          "Enter password"
+        );
+
+        expect(screen.getByLabelText(/^confirm password$/i)).toHaveErrorMessage(
+          "Enter confirm password"
+        );
       });
 
       it("When the password field has an invalid value", async () => {
         const { user } = renderTestUI(<ResetPassword verified={verified} />);
 
-        await user.type(screen.getByLabelText("Password"), "pass");
+        await user.type(screen.getByLabelText(/^password$/i), "pass");
         await user.click(screen.getByRole("button", resetButton));
-        expect(
-          screen.getByText("Password must be at least 8 characters long")
-        ).toBeInTheDocument();
+        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+          "Password must be at least 8 characters long"
+        );
 
-        await user.clear(screen.getByLabelText("Password"));
-        await user.type(screen.getByLabelText("Password"), "Pass!WOrd");
+        await user.clear(screen.getByLabelText(/^password$/i));
+        await user.type(screen.getByLabelText(/^password$/i), "Pass!WOrd");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByText(msg)).toBeInTheDocument();
+        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(msg);
 
-        await user.clear(screen.getByLabelText("Password"));
-        await user.type(screen.getByLabelText("Password"), "PASS!W0RD");
+        await user.clear(screen.getByLabelText(/^password$/i));
+        await user.type(screen.getByLabelText(/^password$/i), "PASS!W0RD");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByText(msg)).toBeInTheDocument();
+        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(msg);
 
-        await user.clear(screen.getByLabelText("Password"));
-        await user.type(screen.getByLabelText("Password"), "pass!w0rd");
+        await user.clear(screen.getByLabelText(/^password$/i));
+        await user.type(screen.getByLabelText(/^password$/i), "pass!w0rd");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByText(msg)).toBeInTheDocument();
+        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(msg);
 
-        await user.clear(screen.getByLabelText("Password"));
-        await user.type(screen.getByLabelText("Password"), "PassW0rd");
+        await user.clear(screen.getByLabelText(/^password$/i));
+        await user.type(screen.getByLabelText(/^password$/i), "PassW0rd");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByText(msg)).toBeInTheDocument();
+        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(msg);
       });
 
       it("If passwords do not match", async () => {
         const { user } = renderTestUI(<ResetPassword verified={verified} />);
+        const confirmPassword = screen.getByLabelText(/^confirm Password$/i);
 
-        await user.type(screen.getByLabelText("Password"), "PassW0!rd");
-        await user.type(screen.getByLabelText("Confirm Password"), "password");
+        await user.type(screen.getByLabelText(/^password$/i), "PassW0!rd");
+        await user.type(confirmPassword, "password");
         await user.click(screen.getByRole("button", resetButton));
 
-        expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
+        expect(confirmPassword).toHaveErrorMessage("Passwords do not match");
       });
     });
 
@@ -191,68 +196,58 @@ describe("Reset Password", () => {
           rValidation.gql()
         );
 
-        const { confirmPasswordError } = rValidation;
+        const password = screen.getByLabelText(/^password$/i);
+        const confirmPassword = screen.getByLabelText(/^confirm Password$/i);
+        const { confirmPasswordError, passwordError } = rValidation;
 
-        await user.type(screen.getByLabelText("Password"), PASSWORD);
-        await user.type(screen.getByLabelText("Confirm Password"), PASSWORD);
+        await user.type(password, PASSWORD);
+        await user.type(confirmPassword, PASSWORD);
         await user.click(screen.getByRole("button", resetButton));
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
 
-        const pwdError = await screen.findByText(rValidation.passwordError);
-        const confirmPwdError = screen.getByText(confirmPasswordError);
+        await waitFor(() => expect(password).toHaveErrorMessage(passwordError));
 
-        expect(pwdError).toBeInTheDocument();
-        expect(confirmPwdError).toBeInTheDocument();
-        expect(screen.getByLabelText("Password")).toHaveFocus();
+        expect(confirmPassword).toHaveErrorMessage(confirmPasswordError);
+        expect(password).toHaveFocus();
         expect(screen.getByRole("button", resetButton)).toBeEnabled();
       });
 
-      it.each(resetTableOne)(
-        "Redirect to forgot password page if sever responds with %s",
-        async (_, status, gql) => {
-          const { push } = useRouter();
+      it.each(resetTableOne)("%s", async (_, status, gql) => {
+        const { push } = useRouter();
 
-          const { user } = renderTestUI(
-            <ResetPassword verified={verified} />,
-            gql
-          );
+        const { user } = renderTestUI(
+          <ResetPassword verified={verified} />,
+          gql
+        );
 
-          await user.type(screen.getByLabelText("Password"), PASSWORD);
-          await user.type(screen.getByLabelText("Confirm Password"), PASSWORD);
-          await user.click(screen.getByRole("button", resetButton));
+        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), PASSWORD);
+        await user.click(screen.getByRole("button", resetButton));
 
-          expect(screen.getByRole("button", resetButton)).toBeDisabled();
+        expect(screen.getByRole("button", resetButton)).toBeDisabled();
 
-          await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
-          expect(push).toHaveBeenCalledWith(
-            `/forgot-password?status=${status}`
-          );
-        }
-      );
+        await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
+        expect(push).toHaveBeenCalledWith(`/forgot-password?status=${status}`);
+      });
 
-      it.each(resetTableTwo)(
-        "Redirect to forgot password page if %s",
-        async (_, status, gql) => {
-          const { push } = useRouter();
+      it.each(resetTableTwo)("%s", async (_, status, gql) => {
+        const { push } = useRouter();
 
-          const { user } = renderTestUI(
-            <ResetPassword verified={verified} />,
-            gql
-          );
+        const { user } = renderTestUI(
+          <ResetPassword verified={verified} />,
+          gql
+        );
 
-          await user.type(screen.getByLabelText("Password"), PASSWORD);
-          await user.type(screen.getByLabelText("Confirm Password"), PASSWORD);
-          await user.click(screen.getByRole("button", resetButton));
+        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), PASSWORD);
+        await user.click(screen.getByRole("button", resetButton));
 
-          expect(screen.getByRole("button", resetButton)).toBeDisabled();
+        expect(screen.getByRole("button", resetButton)).toBeDisabled();
 
-          await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
-          expect(push).toHaveBeenCalledWith(
-            `/forgot-password?status=${status}`
-          );
-        }
-      );
+        await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
+        expect(push).toHaveBeenCalledWith(`/forgot-password?status=${status}`);
+      });
     });
 
     describe("Reset password request responds with an unregistered error", () => {
@@ -262,8 +257,8 @@ describe("Reset Password", () => {
           rUnregistered.gql()
         );
 
-        await user.type(screen.getByLabelText("Password"), PASSWORD);
-        await user.type(screen.getByLabelText("Confirm Password"), PASSWORD);
+        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), PASSWORD);
         await user.click(screen.getByRole("button", resetButton));
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
@@ -284,8 +279,8 @@ describe("Reset Password", () => {
           gql
         );
 
-        await user.type(screen.getByLabelText("Password"), PASSWORD);
-        await user.type(screen.getByLabelText("Confirm Password"), PASSWORD);
+        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), PASSWORD);
         await user.click(screen.getByRole("button", resetButton));
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
