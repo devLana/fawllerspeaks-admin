@@ -18,7 +18,7 @@ const LoginForm = ({
   register,
   fieldErrors,
 }: LoginFormProps) => {
-  const ariaId = fieldErrors.email ? "email__error-message" : undefined;
+  const ariaId = fieldErrors.email ? "email-error-message" : undefined;
 
   return (
     <form onSubmit={onSubmit} noValidate>
@@ -33,7 +33,7 @@ const LoginForm = ({
         fullWidth
         helperText={fieldErrors.email?.message ?? null}
         {...register("email")}
-        FormHelperTextProps={{ id: "email__error-message" }}
+        FormHelperTextProps={{ id: "email-error-message" }}
         inputProps={{ "aria-errormessage": ariaId, "aria-describedby": ariaId }}
       />
       <PasswordInput

@@ -40,13 +40,13 @@ const RegisterUserForm = ({
             helperText={fieldErrors.firstName?.message ?? null}
             fullWidth
             {...register("firstName")}
-            FormHelperTextProps={{ id: "first-name__error-message" }}
+            FormHelperTextProps={{ id: "first-name-error-message" }}
             inputProps={{
               "aria-errormessage": fieldErrors.firstName
-                ? "first-name__error-message"
+                ? "first-name-error-message"
                 : undefined,
               "aria-describedby": fieldErrors.firstName
-                ? "first-name__error-message"
+                ? "first-name-error-message"
                 : undefined,
             }}
           />
@@ -61,13 +61,13 @@ const RegisterUserForm = ({
             error={!!fieldErrors.lastName}
             fullWidth
             {...register("lastName")}
-            FormHelperTextProps={{ id: "last-name__error-message" }}
+            FormHelperTextProps={{ id: "last-name-error-message" }}
             inputProps={{
               "aria-errormessage": fieldErrors.lastName
-                ? "last-name__error-message"
+                ? "last-name-error-message"
                 : undefined,
               "aria-describedby": fieldErrors.lastName
-                ? "last-name__error-message"
+                ? "last-name-error-message"
                 : undefined,
             }}
           />

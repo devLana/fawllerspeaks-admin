@@ -17,7 +17,7 @@ const ForgotPasswordForm = ({
   register,
   fieldErrors,
 }: ForgotPasswordFormProps) => {
-  const ariaId = fieldErrors.email ? "email__error-message" : undefined;
+  const ariaId = fieldErrors.email ? "email-error-message" : undefined;
 
   return (
     <form onSubmit={onSubmit} noValidate>
@@ -32,7 +32,7 @@ const ForgotPasswordForm = ({
         fullWidth
         {...register("email")}
         helperText={fieldErrors.email?.message ?? null}
-        FormHelperTextProps={{ id: "email__error-message" }}
+        FormHelperTextProps={{ id: "email-error-message" }}
         inputProps={{ "aria-errormessage": ariaId, "aria-describedby": ariaId }}
       />
       <LoadingButton

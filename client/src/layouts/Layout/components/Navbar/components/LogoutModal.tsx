@@ -84,15 +84,15 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
     <Dialog
       open={isOpen}
       PaperProps={{ id: "logout-dialog" }}
-      aria-describedby="logout-dialog__description"
-      aria-labelledby="logout-dialog__title"
+      aria-describedby="logout-dialog-description"
+      aria-labelledby="logout-dialog-title"
     >
-      <DialogTitle id="logout-dialog__title" sx={{ textAlign: "center" }}>
+      <DialogTitle id="logout-dialog-title" sx={{ textAlign: "center" }}>
         Logout of your account
       </DialogTitle>
       <DialogContent>
         <DialogContentText
-          id="logout-dialog__description"
+          id="logout-dialog-description"
           sx={{ textAlign: "center" }}
         >
           Do you want to logout of FawllerSpeaks Admin?

@@ -37,7 +37,7 @@ const PasswordInput = ({
     setIsVisible(!isVisible);
   };
 
-  const ariaId = fieldError ? `${id}__error-message` : undefined;
+  const ariaId = fieldError ? `${id}-error-message` : undefined;
 
   return (
     <TextField
@@ -49,7 +49,7 @@ const PasswordInput = ({
       fullWidth
       error={!!fieldError}
       helperText={fieldError?.message ?? null}
-      FormHelperTextProps={{ id: `${id}__error-message` }}
+      FormHelperTextProps={{ id: `${id}-error-message` }}
       inputProps={{ "aria-errormessage": ariaId, "aria-describedby": ariaId }}
       InputProps={{
         endAdornment: (
