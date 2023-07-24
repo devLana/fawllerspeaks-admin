@@ -7,6 +7,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import { useSession } from "@context/SessionContext";
@@ -80,13 +81,24 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
   };
 
   return (
-    <Dialog open={isOpen} aria-describedby="logout__description">
+    <Dialog
+      open={isOpen}
+      PaperProps={{ id: "logout-dialog" }}
+      aria-describedby="logout-dialog__description"
+      aria-labelledby="logout-dialog__title"
+    >
+      <DialogTitle id="logout-dialog__title" sx={{ textAlign: "center" }}>
+        Logout of your account
+      </DialogTitle>
       <DialogContent>
-        <DialogContentText id="logout__description">
-          Logout of FawllerSpeaks Admin?
+        <DialogContentText
+          id="logout-dialog__description"
+          sx={{ textAlign: "center" }}
+        >
+          Do you want to logout of FawllerSpeaks Admin?
         </DialogContentText>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: "center" }}>
+      <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
         <LoadingButton
           onClick={handleLogout}
           loading={status === "requesting"}

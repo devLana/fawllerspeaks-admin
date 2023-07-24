@@ -52,12 +52,12 @@ const HeaderAvatar = () => {
       <NextLink
         href="/profile"
         sx={{ fontStyle: "normal" }}
-        aria-label="Profile page"
+        aria-label={`${firstName} ${lastName} profile page`}
       >
         <Avatar
           // component={Image}
           src={image}
-          alt={`${firstName} ${lastName}`}
+          alt={`${firstName} ${lastName} avatar`}
         />
       </NextLink>
     );
@@ -69,7 +69,7 @@ const HeaderAvatar = () => {
     <NextLink
       href="/profile"
       sx={{ fontStyle: "normal" }}
-      aria-label="Profile page"
+      aria-label={`${firstName} ${lastName} profile page`}
     >
       <Avatar
         sx={{ bgcolor: ({ appTheme }) => bgColor(appTheme), fontSize: 17 }}

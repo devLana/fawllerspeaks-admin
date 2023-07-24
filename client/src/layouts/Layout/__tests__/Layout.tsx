@@ -71,7 +71,8 @@ describe("Protected Pages Layout", () => {
       it("Click theme button to change app theme", async () => {
         const { user } = renderTestUI(<Layout {...props}>{page}</Layout>);
 
-        const button = screen.getByRole("button", { name: "Change app theme" });
+        const name = { name: /^change app theme$/i };
+        const button = screen.getByRole("button", name);
 
         await user.click(button);
         expect(localStorage.getItem(DEFAULT_THEME)).toBe("sunset");
@@ -91,7 +92,7 @@ describe("Protected Pages Layout", () => {
         renderTestUI(<Layout {...props}>{page}</Layout>);
 
         expect(
-          screen.getByRole("img", { name: "Unknown user avatar" })
+          screen.getByRole("img", { name: /^unknown user avatar$/i })
         ).toBeInTheDocument();
       });
 
@@ -100,7 +101,7 @@ describe("Protected Pages Layout", () => {
         renderTestUI(<Layout {...props}>{page}</Layout>);
 
         expect(
-          screen.getByRole("img", { name: "John Doe" })
+          screen.getByRole("img", { name: /^john doe avatar$/i })
         ).toBeInTheDocument();
       });
 
@@ -117,8 +118,9 @@ describe("Protected Pages Layout", () => {
     const mock = useMediaQuery as jest.MockedFunction<() => boolean>;
     mock.mockReturnValue(true);
 
-    const btnName = { name: "Logout" };
-    const cancelName = { name: "Cancel" };
+    const btnName = { name: /^logout$/i };
+    const cancelName = { name: /^cancel$/i };
+    const dialogName = { name: /logout of your account/i };
 
     beforeEach(() => {
       localStorage.setItem(SESSION_ID, LOGOUT_SESSION_ID);
@@ -134,14 +136,14 @@ describe("Protected Pages Layout", () => {
 
         await user.click(screen.getByRole("button", btnName));
 
-        const modal = screen.getByRole("dialog");
+        const modal = screen.getByRole("dialog", dialogName);
 
         expect(modal).toBeInTheDocument();
         expect(within(modal).getByRole("button", btnName)).toBeInTheDocument();
 
-        await user.click(within(modal).getByRole("button", { name: "Cancel" }));
+        await user.click(within(modal).getByRole("button", cancelName));
 
-        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(modal).not.toBeInTheDocument();
       });
 
       describe("Logout request receives an error/unsupported object response", () => {
@@ -153,7 +155,7 @@ describe("Protected Pages Layout", () => {
 
           await user.click(screen.getByRole("button", btnName));
 
-          const dialog = screen.getByRole("dialog");
+          const dialog = screen.getByRole("dialog", dialogName);
           const dialogLogout = within(dialog).getByRole("button", btnName);
           const cancelBtn = within(dialog).getByRole("button", cancelName);
 
@@ -179,7 +181,7 @@ describe("Protected Pages Layout", () => {
 
           await user.click(screen.getByRole("button", btnName));
 
-          const dialog = screen.getByRole("dialog");
+          const dialog = screen.getByRole("dialog", dialogName);
           const dialogLogout = within(dialog).getByRole("button", btnName);
           const cancelBtn = within(dialog).getByRole("button", cancelName);
 

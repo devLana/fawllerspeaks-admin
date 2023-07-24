@@ -11,7 +11,9 @@ describe("Auth Layout Theme Button", () => {
   it("Change app theme when theme menu item is clicked", async () => {
     const { user } = renderTestUI(<AuthLayoutThemeToggle />);
 
-    expect(screen.getByRole("button")).toHaveTextContent("Sunny");
+    expect(
+      screen.getByRole("button", { name: /^sunny$/i })
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button"));
 
@@ -23,10 +25,12 @@ describe("Auth Layout Theme Button", () => {
 
     await user.click(screen.getAllByRole("menuitem")[2]);
 
-    expect(screen.getByRole("button")).toHaveTextContent("Pitch Black");
+    expect(
+      screen.getByRole("button", { name: /^pitch black$/i })
+    ).toBeInTheDocument();
     expect(localStorage.getItem(DEFAULT_THEME)).toBe("pitch black");
 
-    await user.click(screen.getByRole("button"));
+    await user.click(screen.getByRole("button", { name: /^pitch black$/i }));
 
     expect(screen.getAllByRole("menuitem")[0]).not.toHaveClass("Mui-selected");
     expect(screen.getAllByRole("menuitem")[1]).not.toHaveClass("Mui-selected");
@@ -37,9 +41,11 @@ describe("Auth Layout Theme Button", () => {
     localStorage.setItem(DEFAULT_THEME, "sunset");
     const { user } = renderTestUI(<AuthLayoutThemeToggle />);
 
-    expect(screen.getByRole("button")).toHaveTextContent("Sunset");
+    expect(
+      screen.getByRole("button", { name: /^sunset$/i })
+    ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button"));
+    await user.click(screen.getByRole("button", { name: /^sunset$/i }));
 
     expect(screen.getByRole("menu")).toBeInTheDocument();
     expect(screen.getAllByRole("menuitem")).toHaveLength(3);

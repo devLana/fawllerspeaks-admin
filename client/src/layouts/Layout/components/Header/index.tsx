@@ -46,10 +46,10 @@ const Header = ({
         <MenuIcon />
       </IconButton>
       <Box sx={{ maxWidth: "10rem", width: "40%", mr: "auto" }}>
-        <NextLink href="/" sx={{ display: "flex" }} aria-label="Dashboard">
+        <NextLink href="/" sx={{ display: "flex" }} aria-label="Dashboard page">
           <Image
             src="/logo.png"
-            alt="FawllerSpeaks logo"
+            alt="FawllerSpeaks brand logo"
             width={465}
             height={88}
             style={{ maxWidth: "100%", height: "auto" }}

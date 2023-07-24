@@ -29,12 +29,12 @@ const AuthLayoutThemeButton = () => {
   return (
     <>
       <Button
-        id="toggle-app-current-theme"
+        id="app-theme__btn"
         variant="outlined"
         size="small"
-        aria-controls={isOpen ? "app-theme-menu" : undefined}
+        aria-controls={isOpen ? "app-theme__menu" : undefined}
         aria-haspopup="true"
-        aria-expanded={isOpen ? "true" : undefined}
+        aria-expanded={isOpen || undefined}
         startIcon={<ThemeIcon />}
         endIcon={<KeyboardArrowDownIcon />}
         onClick={e => setAnchor(e.currentTarget)}
@@ -42,10 +42,10 @@ const AuthLayoutThemeButton = () => {
         {themeName}
       </Button>
       <Menu
-        id="app-theme-menu"
+        id="app-theme__menu"
         open={isOpen}
         anchorEl={anchor}
-        MenuListProps={{ "aria-labelledby": "toggle-app-current-theme" }}
+        MenuListProps={{ "aria-labelledby": "app-theme__btn" }}
         onClose={() => setAnchor(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
