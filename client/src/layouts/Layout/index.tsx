@@ -6,7 +6,7 @@ import Container from "@mui/material/Container";
 import useCheckAuth from "@hooks/useCheckAuth";
 import Metadata, { type MetaInfo } from "@components/Metadata";
 import Loader from "@components/Loader";
-import ErrorAlert from "@features/auth/components/ErrorAlert";
+import ErrorAlert from "@components/ErrorAlert";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import transition from "./utils/transition";

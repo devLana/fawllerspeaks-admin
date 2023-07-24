@@ -3,7 +3,7 @@ import Container from "@mui/material/Container";
 import useCheckAuth from "@hooks/useCheckAuth";
 import Loader from "@components/Loader";
 import Metadata, { type MetaInfo } from "@components/Metadata";
-import ErrorAlert from "@features/auth/components/ErrorAlert";
+import ErrorAlert from "@components/ErrorAlert";
 import AuthLayoutThemeButton from "./components/AuthLayoutThemeButton";
 
 interface AuthLayoutProps extends MetaInfo {
