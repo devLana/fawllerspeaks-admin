@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import type { MockedResponse } from "@apollo/client/testing";
 
-import { LOGIN_USER } from "@features/login/LOGIN_USER";
+import { LOGIN_USER } from "../operations/LOGIN_USER";
 
 interface ExpectedError {
   message: string;

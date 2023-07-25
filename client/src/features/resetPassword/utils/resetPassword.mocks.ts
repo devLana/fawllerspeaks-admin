@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import type { MockedResponse } from "@apollo/client/testing";
 
-import { RESET_PASSWORD } from "@features/resetPassword/mutations/RESET_PASSWORD";
+import { RESET_PASSWORD } from "../operations/RESET_PASSWORD";
 
 const VERIFIED_PASSWORD_RESET_TOKEN = "VERIFIED_PASSWORD_RESET_TOKEN";
 

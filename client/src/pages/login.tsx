@@ -14,7 +14,7 @@ import AuthLayout from "@layouts/AuthLayout";
 import NextLink from "@components/NextLink";
 import Card from "@components/Card";
 import LoginForm from "@features/login/components/LoginForm";
-import { LOGIN_USER } from "@features/login/LOGIN_USER";
+import { LOGIN_USER } from "@features/login/operations/LOGIN_USER";
 import { loginValidator } from "@features/login/utils/loginValidator";
 import { SESSION_ID } from "@utils/constants";
 import uiLayout from "@utils/uiLayout";

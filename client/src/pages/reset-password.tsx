@@ -12,7 +12,7 @@ import Card from "@components/Card";
 import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
 import ResetPasswordForm from "@features/resetPassword/components/ResetPasswordForm";
 import ResetPasswordSuccess from "@features/resetPassword/components/ResetPasswordSuccess";
-import { RESET_PASSWORD } from "@features/resetPassword/mutations/RESET_PASSWORD";
+import { RESET_PASSWORD } from "@features/resetPassword/operations/RESET_PASSWORD";
 import { onError } from "@features/resetPassword/utils/onError";
 import { resetPasswordValidator } from "@features/resetPassword/utils/resetPasswordValidator";
 import uiLayout from "@utils/uiLayout";

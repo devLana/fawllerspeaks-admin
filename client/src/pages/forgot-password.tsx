@@ -6,7 +6,7 @@ import Divider from "@mui/material/Divider";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import useStatusAlert from "@features/forgotPassword/useStatusAlert";
+import useStatusAlert from "@features/forgotPassword/hooks/useStatusAlert";
 import AuthLayout from "@layouts/AuthLayout";
 import NextLink from "@components/NextLink";
 import Toast from "@components/Toast";
@@ -14,7 +14,7 @@ import Card from "@components/Card";
 import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
 import ForgotPasswordForm from "@features/forgotPassword/components/ForgotPasswordForm";
 import ForgotPasswordSuccess from "@features/forgotPassword/components/ForgotPasswordSuccess";
-import { FORGOT_PASSWORD } from "@features/forgotPassword/FORGOT_PASSWORD";
+import { FORGOT_PASSWORD } from "@features/forgotPassword/operations/FORGOT_PASSWORD";
 import { forgotPasswordValidator } from "@features/forgotPassword/utils/forgotPasswordValidator";
 import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";

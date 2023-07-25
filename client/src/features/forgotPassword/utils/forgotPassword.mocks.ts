@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import type { MockedResponse } from "@apollo/client/testing";
 
-import { FORGOT_PASSWORD } from "@features/forgotPassword/FORGOT_PASSWORD";
+import { FORGOT_PASSWORD } from "../operations/FORGOT_PASSWORD";
 
 interface Expected {
   message: string;

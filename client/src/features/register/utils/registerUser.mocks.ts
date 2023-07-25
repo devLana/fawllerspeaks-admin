@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import type { MockedResponse } from "@apollo/client/testing";
 
-import { REGISTER_USER } from "@features/register/REGISTER_USER";
+import { REGISTER_USER } from "../operations/REGISTER_USER";
 
 type SorN = string | null;
 
