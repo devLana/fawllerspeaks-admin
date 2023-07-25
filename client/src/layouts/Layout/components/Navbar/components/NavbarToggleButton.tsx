@@ -14,7 +14,12 @@ const NavbarToggleButton = ({ isOpen, onClick }: NavbarToggleButtonProps) => (
     <IconButton
       aria-label="Toggle navbar"
       onClick={onClick}
-      sx={{ transform: { sm: isOpen ? "rotate(0deg)" : "rotate(180deg)" } }}
+      sx={{
+        color: ({ appTheme }) => {
+          return appTheme === "sunny" ? "primary.dark" : "primary.main";
+        },
+        transform: { sm: isOpen ? "rotate(0deg)" : "rotate(180deg)" },
+      }}
     >
       <ChevronLeftIcon />
     </IconButton>

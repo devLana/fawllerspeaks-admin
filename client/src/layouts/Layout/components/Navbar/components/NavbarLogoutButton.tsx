@@ -44,31 +44,31 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
           }}
         >
           <ListItemButton
-            component={Button}
             sx={theme => ({
               borderRadius: 1,
-              color: "secondary:dark",
-              bgcolor: "secondary.light",
               transition: transition(theme, isOpen, [
                 "background-color",
                 "padding",
               ]),
-              "&:hover": { bgcolor: "secondary.main" },
+              "&:hover": {
+                bgcolor: "text.disabled",
+              },
               [theme.breakpoints.up("sm")]: {
                 px: isOpen ? 2 : 1,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
               },
             })}
+            component={Button}
             onClick={() => setModalIsOpen(true)}
             aria-haspopup="dialog"
             aria-controls={modalIsOpen ? "logout-dialog" : undefined}
             aria-expanded={modalIsOpen || undefined}
           >
-            <ListItemIcon sx={{ color: "secondary.dark" }}>
+            <ListItemIcon sx={{ color: "inherit" }}>
               <Icon />
             </ListItemIcon>
-            <ListItemText primary={label} sx={{ lineHeight: 0, m: 0 }} />
+            <ListItemText primary={label} sx={{ m: 0 }} />
           </ListItemButton>
         </ListItem>
       </Tooltip>

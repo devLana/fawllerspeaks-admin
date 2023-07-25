@@ -18,7 +18,7 @@ const Header = ({ onClick }: { onClick: () => void }) => (
       <IconButton
         size="large"
         edge="start"
-        color="inherit"
+        color="primary"
         aria-label="Show navbar"
         sx={{ mr: 1, display: { sm: "none" } }}
         onClick={onClick}

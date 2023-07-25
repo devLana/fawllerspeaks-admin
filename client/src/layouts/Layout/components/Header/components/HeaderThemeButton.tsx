@@ -20,7 +20,11 @@ const HeaderThemeButton = () => {
   };
 
   return (
-    <IconButton onClick={handleClick} aria-label="Change app theme">
+    <IconButton
+      onClick={handleClick}
+      aria-label="Change app theme"
+      sx={{ color: appTheme === "sunny" ? "primary.dark" : "primary.main" }}
+    >
       <Icon />
     </IconButton>
   );

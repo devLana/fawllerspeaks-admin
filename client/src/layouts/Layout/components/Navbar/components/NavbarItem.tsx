@@ -42,16 +42,16 @@ const NavbarItem = (props: NavbarItemProps) => {
             py: 1,
             pl: 2,
             pr: 0,
-            bgcolor: isActive ? "primary.light" : "transparent",
-            color: isActive ? "primary.dark" : "secondary.dark",
             borderRadius: "1.5rem 0 0 1.5rem",
+            bgcolor: isActive ? "primary.main" : "transparent",
+            color: isActive ? "primary.dark" : "inherit",
             transition: transition(theme, isOpen, [
               "background-color",
               "padding",
             ]),
             "&:hover": {
-              bgcolor: isActive ? "primary.light" : "secondary.light",
-              color: isActive ? "primary.dark" : "secondary.dark",
+              bgcolor: isActive ? "primary.main" : "text.disabled",
+              color: isActive ? "primary.dark" : "inherit",
             },
             [theme.breakpoints.up("sm")]: {
               px: isOpen ? 2 : 1,
@@ -62,12 +62,19 @@ const NavbarItem = (props: NavbarItemProps) => {
           component={NextLink}
           href={href}
         >
-          <ListItemIcon
-            sx={{ color: isActive ? "primary.dark" : "secondary.dark" }}
-          >
+          <ListItemIcon sx={{ color: "inherit" }}>
             <Icon />
           </ListItemIcon>
-          <ListItemText primary={label} sx={{ lineHeight: 0, m: 0 }} />
+          <ListItemText
+            primary={label}
+            sx={{
+              m: 0,
+              "& > .MuiTypography-root": {
+                fontWeight: isActive ? 700 : 400,
+                letterSpacing: isActive ? 0.5 : "normal",
+              },
+            }}
+          />
         </ListItemButton>
       </ListItem>
     </Tooltip>

@@ -6,17 +6,12 @@ import PersonIcon from "@mui/icons-material/Person";
 
 import { useSession } from "@context/SessionContext";
 import NextLink from "@components/NextLink";
-import type { AppTheme } from "@types";
 
 interface User {
   firstName: string;
   lastName: string;
   image: string | null;
 }
-
-const bgColor = (appTheme: AppTheme) => {
-  return appTheme === "sunny" ? "primary.dark" : "primary.light";
-};
 
 const HeaderAvatar = () => {
   const client = useApolloClient();
@@ -36,7 +31,9 @@ const HeaderAvatar = () => {
   if (!user) {
     return (
       <Avatar
-        sx={{ bgcolor: ({ appTheme }) => bgColor(appTheme) }}
+        sx={{
+          bgcolor: "text.disabled",
+        }}
         role="img"
         aria-label="Unknown user avatar"
       >
@@ -51,7 +48,6 @@ const HeaderAvatar = () => {
     return (
       <NextLink
         href="/profile"
-        sx={{ fontStyle: "normal" }}
         aria-label={`${firstName} ${lastName} profile page`}
       >
         <Avatar
@@ -72,7 +68,11 @@ const HeaderAvatar = () => {
       aria-label={`${firstName} ${lastName} profile page`}
     >
       <Avatar
-        sx={{ bgcolor: ({ appTheme }) => bgColor(appTheme), fontSize: 17 }}
+        sx={({ appTheme }) => ({
+          bgcolor: "text.disabled",
+          color: appTheme === "sunny" ? "primary.dark" : "primary.main",
+          fontSize: 17,
+        })}
       >
         {initials}
       </Avatar>

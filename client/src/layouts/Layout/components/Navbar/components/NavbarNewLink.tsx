@@ -33,7 +33,7 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
           sx={theme => ({
             borderRadius: 1,
             color: "#fff",
-            bgcolor: "primary.main",
+            bgcolor: "primary.dark",
             transition: transition(theme, isOpen, [
               "background-color",
               "padding",
@@ -48,7 +48,7 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
           component={NextLink}
           href={href}
         >
-          <ListItemIcon sx={{ color: "#fff" }}>
+          <ListItemIcon sx={{ color: "inherit" }}>
             <Icon />
           </ListItemIcon>
           <ListItemText primary={label} sx={{ lineHeight: 0, m: 0 }} />
