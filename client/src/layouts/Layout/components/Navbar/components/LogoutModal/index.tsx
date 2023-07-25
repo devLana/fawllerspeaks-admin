@@ -12,7 +12,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 import { useSession } from "@context/SessionContext";
 import { SESSION_ID } from "@utils/constants";
-import { LOGOUT } from "../LOGOUT";
+import { LOGOUT } from "./LOGOUT";
 
 interface LogoutModalProps {
   isOpen: boolean;

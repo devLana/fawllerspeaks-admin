@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -10,31 +11,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NextLink from "@components/NextLink";
 import HeaderAvatar from "./components/HeaderAvatar";
 import HeaderThemeButton from "./components/HeaderThemeButton";
-import transition from "../../utils/transition";
 
-interface HeaderProps {
-  isOpen: boolean;
-  drawerWidth: string;
-  smDrawerWidth: string;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-}
-
-const Header = ({
-  isOpen,
-  drawerWidth,
-  smDrawerWidth,
-  onClick,
-}: HeaderProps) => (
-  <AppBar
-    sx={theme => ({
-      [theme.breakpoints.up("sm")]: {
-        width: `calc(100% - ${isOpen ? drawerWidth : smDrawerWidth})`,
-        ml: isOpen ? drawerWidth : smDrawerWidth,
-        transition: transition(theme, isOpen, ["width", "margin-left"]),
-      },
-    })}
-  >
-    <Toolbar>
+const Header = ({ onClick }: { onClick: () => void }) => (
+  <AppBar sx={{ backgroundColor: "transparent" }}>
+    <Toolbar component={Container}>
       <IconButton
         size="large"
         edge="start"

@@ -10,24 +10,16 @@ import NavbarItem from "./components/NavbarItem";
 import NavbarLogoutButton from "./components/NavbarLogoutButton";
 import NavbarNewLink from "./components/NavbarNewLink";
 import NavbarToggleButton from "./components/NavbarToggleButton";
-import { topLinks, postLinks, otherLinks } from "./navbarMenu";
-import transition from "../../utils/transition";
+import { topLinks, postLinks, otherLinks } from "./utils/navbarMenu";
+import transition from "./utils/transition";
 
 interface NavbarProps {
-  smDrawerWidth: string;
-  drawerWidth: string;
   onToggle: () => void;
   isOpen: boolean;
   setNavBarIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Navbar = ({
-  smDrawerWidth,
-  drawerWidth,
-  isOpen,
-  onToggle,
-  setNavBarIsOpen,
-}: NavbarProps) => {
+const Navbar = ({ isOpen, onToggle, setNavBarIsOpen }: NavbarProps) => {
   const theme = useTheme();
   const smMatches = useMediaQuery(theme.breakpoints.up("sm"));
   const mdMatches = useMediaQuery(theme.breakpoints.up("md"));
@@ -48,8 +40,9 @@ const Navbar = ({
       sx={{
         "& .MuiDrawer-paper": {
           [theme.breakpoints.up("sm")]: {
-            width: isOpen ? drawerWidth : smDrawerWidth,
+            width: isOpen ? "12rem" : "4rem",
             transition: transition(theme, isOpen, "width"),
+            position: "static",
           },
         },
       }}
@@ -71,7 +64,7 @@ const Navbar = ({
             </React.Fragment>
           ))}
         </List>
-        <Divider />
+        <Divider sx={{ mr: { sm: 3 } }} />
         <List>
           {postLinks.map(link => (
             <NavbarItem
@@ -82,7 +75,7 @@ const Navbar = ({
             />
           ))}
         </List>
-        <Divider />
+        <Divider sx={{ mr: { sm: 3 } }} />
         <List>
           {otherLinks.map(({ Icon, label, ...link }) => (
             <React.Fragment key={label}>

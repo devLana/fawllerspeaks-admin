@@ -6,7 +6,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
 import type { MuiIconType } from "@types";
-import transition from "@layouts/Layout/utils/transition";
+import transition from "@layouts/Layout/components/Navbar/utils/transition";
 
 interface NavbarNewLinkProps {
   label: string;
@@ -24,7 +24,8 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
       <ListItem
         sx={{
           py: 1,
-          px: { xs: 3.2, sm: isOpen ? 3.2 : 1 },
+          px: 3,
+          pl: { sm: 0 },
           transition: theme => ({ sm: transition(theme, isOpen, "padding") }),
         }}
       >
@@ -47,15 +48,7 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
           component={NextLink}
           href={href}
         >
-          <ListItemIcon
-            sx={{
-              color: "#fff",
-              ml: { sm: isOpen ? 0 : 0.5 },
-              transition: theme => ({
-                sm: transition(theme, isOpen, "margin-left"),
-              }),
-            }}
-          >
+          <ListItemIcon sx={{ color: "#fff" }}>
             <Icon />
           </ListItemIcon>
           <ListItemText primary={label} sx={{ lineHeight: 0, m: 0 }} />

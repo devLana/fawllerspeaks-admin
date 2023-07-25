@@ -9,7 +9,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import Toast from "@components/Toast";
 import LogoutModal from "./LogoutModal";
-import transition from "@layouts/Layout/utils/transition";
+import transition from "@layouts/Layout/components/Navbar/utils/transition";
 import type { MuiIconType } from "@types";
 
 interface NavbarLogoutButtonProps {
@@ -38,7 +38,8 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
         <ListItem
           sx={{
             py: 1,
-            px: { xs: 3.2, sm: isOpen ? 3.2 : 1 },
+            px: 3,
+            pl: { sm: 0 },
             transition: theme => ({ sm: transition(theme, isOpen, "padding") }),
           }}
         >
@@ -64,15 +65,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
             aria-controls={modalIsOpen ? "logout-dialog" : undefined}
             aria-expanded={modalIsOpen || undefined}
           >
-            <ListItemIcon
-              sx={{
-                color: "secondary.dark",
-                ml: { sm: isOpen ? 0 : 0.5 },
-                transition: theme => ({
-                  sm: transition(theme, isOpen, "margin-left"),
-                }),
-              }}
-            >
+            <ListItemIcon sx={{ color: "secondary.dark" }}>
               <Icon />
             </ListItemIcon>
             <ListItemText primary={label} sx={{ lineHeight: 0, m: 0 }} />
