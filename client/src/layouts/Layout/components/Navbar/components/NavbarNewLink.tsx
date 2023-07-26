@@ -32,13 +32,12 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
         <ListItemButton
           sx={theme => ({
             borderRadius: 1,
-            color: "#fff",
-            bgcolor: "primary.dark",
-            transition: transition(theme, isOpen, [
-              "background-color",
-              "padding",
-            ]),
-            "&:hover": { color: "#fff", bgcolor: "primary.dark" },
+            border: 1,
+            borderColor: "primary.main",
+            color: "primary.main",
+            boxShadow: 3,
+            transition: transition(theme, isOpen, ["padding"]),
+            "&:hover": { color: "primary.main", bgcolor: "inherit" },
             [theme.breakpoints.up("sm")]: {
               px: isOpen ? 2 : 1,
               whiteSpace: "nowrap",

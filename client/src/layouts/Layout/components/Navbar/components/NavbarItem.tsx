@@ -28,14 +28,12 @@ const NavbarItem = (props: NavbarItemProps) => {
   return (
     <Tooltip title={!isOpen && smMatches ? label : null} placement="right">
       <ListItem
-        sx={{
+        sx={theme => ({
           py: 1,
           pr: 0,
           pl: { xs: 3, sm: 0 },
-          transition: theme => ({
-            sm: transition(theme, isOpen, "padding-left"),
-          }),
-        }}
+          transition: { sm: transition(theme, isOpen, "padding-left") },
+        })}
       >
         <ListItemButton
           sx={theme => ({
@@ -50,7 +48,7 @@ const NavbarItem = (props: NavbarItemProps) => {
               "padding",
             ]),
             "&:hover": {
-              bgcolor: isActive ? "primary.main" : "text.disabled",
+              bgcolor: isActive ? "primary.main" : "action.hover",
               color: isActive ? "primary.dark" : "inherit",
             },
             [theme.breakpoints.up("sm")]: {

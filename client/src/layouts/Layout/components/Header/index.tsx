@@ -20,7 +20,7 @@ const Header = ({ onClick }: { onClick: () => void }) => (
         edge="start"
         color="primary"
         aria-label="Show navbar"
-        sx={{ mr: 1, display: { sm: "none" } }}
+        sx={{ mr: 0.5, display: { sm: "none" } }}
         onClick={onClick}
       >
         <MenuIcon />

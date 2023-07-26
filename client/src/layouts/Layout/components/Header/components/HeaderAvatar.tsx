@@ -31,9 +31,7 @@ const HeaderAvatar = () => {
   if (!user) {
     return (
       <Avatar
-        sx={{
-          bgcolor: "text.disabled",
-        }}
+        sx={{ bgcolor: "text.disabled" }}
         role="img"
         aria-label="Unknown user avatar"
       >
@@ -47,7 +45,7 @@ const HeaderAvatar = () => {
   if (image) {
     return (
       <NextLink
-        href="/profile"
+        href="/settings/me"
         aria-label={`${firstName} ${lastName} profile page`}
       >
         <Avatar
@@ -63,14 +61,14 @@ const HeaderAvatar = () => {
 
   return (
     <NextLink
-      href="/profile"
+      href="/settings/me"
       sx={{ fontStyle: "normal" }}
       aria-label={`${firstName} ${lastName} profile page`}
     >
       <Avatar
         sx={({ appTheme }) => ({
-          bgcolor: "text.disabled",
-          color: appTheme === "sunny" ? "primary.dark" : "primary.main",
+          bgcolor: appTheme === "sunny" ? "secondary.light" : "secondary.dark",
+          color: "primary.main",
           fontSize: 17,
         })}
       >

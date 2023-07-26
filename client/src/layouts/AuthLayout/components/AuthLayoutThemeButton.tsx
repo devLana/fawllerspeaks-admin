@@ -38,6 +38,7 @@ const AuthLayoutThemeButton = () => {
         startIcon={<ThemeIcon />}
         endIcon={<KeyboardArrowDownIcon />}
         onClick={e => setAnchor(e.currentTarget)}
+        sx={{ mb: 2 }}
       >
         {themeName}
       </Button>

@@ -50,9 +50,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
                 "background-color",
                 "padding",
               ]),
-              "&:hover": {
-                bgcolor: "text.disabled",
-              },
+              "&:hover": { bgcolor: "action.hover" },
               [theme.breakpoints.up("sm")]: {
                 px: isOpen ? 2 : 1,
                 whiteSpace: "nowrap",

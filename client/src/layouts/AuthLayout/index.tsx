@@ -35,7 +35,7 @@ const AuthLayout = (props: AuthLayoutProps) => {
     <Container
       sx={{
         minHeight: "100vh",
-        pt: "9rem",
+        pt: "7rem",
         pb: "4rem",
         display: "flex",
         flexDirection: "column",
