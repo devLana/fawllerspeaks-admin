@@ -9,6 +9,7 @@ import Loader from "@components/Loader";
 import ErrorAlert from "@components/ErrorAlert";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
+import PageBreadcrumbs from "./components/PageBreadcrumbs";
 
 interface LayoutProps extends MetaInfo {
   children: React.ReactElement;
@@ -40,7 +41,7 @@ const Layout = (props: LayoutProps) => {
       sx={theme => ({
         minHeight: "100vh",
         pt: "4rem",
-        [theme.breakpoints.up("sm")]: { display: "flex", columnGap: "2rem" },
+        [theme.breakpoints.up("sm")]: { display: "flex", columnGap: 4 },
       })}
     >
       <Metadata {...metaProps} />
@@ -50,9 +51,10 @@ const Layout = (props: LayoutProps) => {
         onToggle={handleToggleNavbar}
         setNavBarIsOpen={setNavBarIsOpen}
       />
-      <main>
-        <Box>{content}</Box>
-      </main>
+      <Box sx={{ pt: 4, flexGrow: { sm: 1 } }}>
+        <PageBreadcrumbs />
+        <main>{content}</main>
+      </Box>
     </Container>
   );
 };

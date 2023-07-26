@@ -48,7 +48,7 @@ const Navbar = ({ isOpen, onToggle, setNavBarIsOpen }: NavbarProps) => {
       }}
     >
       <NavbarToggleButton isOpen={isOpen} onClick={onToggle} />
-      <nav>
+      <nav aria-label="Main">
         <List>
           {topLinks.map(({ primary, ...link }) => (
             <React.Fragment key={link.label}>
