@@ -35,7 +35,7 @@ export const generateTheme = (appTheme: AppTheme): MuiThemeOptions => {
       palette: sunsetPalette,
       typography,
       shape,
-      shadows: shadows("4,35,47"),
+      shadows: shadows("140,140,140"),
       components,
     };
   }
@@ -45,7 +45,7 @@ export const generateTheme = (appTheme: AppTheme): MuiThemeOptions => {
     palette: pitchBlackPalette,
     typography,
     shape,
-    shadows: shadows("15,121,163"),
+    shadows: shadows("20,156,210"),
     components,
   };
 };
