@@ -17,7 +17,13 @@ const PageBreadcrumbs = () => {
     const href = `/${pathnamesArr.slice(0, index + 1).join("/")}`;
     const label = path
       .split(/[\s_-]/)
-      .map(str => `${str.charAt(0).toUpperCase()}${str.substring(1)}`)
+      .map(str => {
+        const checkFirstCharacter = /[a-z]/i.test(str.charAt(0));
+
+        if (!checkFirstCharacter) return str;
+
+        return `${str.charAt(0).toUpperCase()}${str.substring(1)}`;
+      })
       .join(" ");
 
     return index === pathnamesArr.length - 1 ? (
