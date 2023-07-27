@@ -9,12 +9,17 @@ interface NavbarToggleButtonProps {
 
 const NavbarToggleButton = ({ isOpen, onClick }: NavbarToggleButtonProps) => (
   <Box
-    sx={{ display: "flex", justifyContent: "flex-end", mt: 3, mb: 2, mr: 3 }}
+    sx={theme => ({
+      display: "flex",
+      m: 3,
+      [theme.breakpoints.up("sm")]: { ml: 0 },
+    })}
   >
     <IconButton
       aria-label="Toggle navbar"
       onClick={onClick}
       sx={{
+        m: "auto",
         color: ({ appTheme }) => {
           return appTheme === "sunny" ? "primary.dark" : "primary.main";
         },

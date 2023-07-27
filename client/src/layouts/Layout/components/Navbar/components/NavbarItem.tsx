@@ -27,19 +27,9 @@ const NavbarItem = (props: NavbarItemProps) => {
 
   return (
     <Tooltip title={!isOpen && smMatches ? label : null} placement="right">
-      <ListItem
-        sx={theme => ({
-          py: 1,
-          pr: 0,
-          pl: { xs: 3, sm: 0 },
-          transition: { sm: transition(theme, isOpen, "padding-left") },
-        })}
-      >
+      <ListItem sx={{ py: 1, pr: 0, pl: { xs: 3, sm: 0 } }}>
         <ListItemButton
           sx={theme => ({
-            py: 1,
-            pl: 2,
-            pr: 0,
             borderRadius: "1.5rem 0 0 1.5rem",
             bgcolor: isActive ? "primary.main" : "transparent",
             color: isActive ? "primary.dark" : "inherit",
@@ -52,7 +42,7 @@ const NavbarItem = (props: NavbarItemProps) => {
               color: isActive ? "primary.dark" : "inherit",
             },
             [theme.breakpoints.up("sm")]: {
-              px: isOpen ? 2 : 1,
+              px: isOpen ? 2 : 1.5,
               whiteSpace: "nowrap",
               overflow: "hidden",
             },
@@ -60,18 +50,24 @@ const NavbarItem = (props: NavbarItemProps) => {
           component={NextLink}
           href={href}
         >
-          <ListItemIcon sx={{ color: "inherit" }}>
+          <ListItemIcon sx={{ color: "inherit", minWidth: 0 }}>
             <Icon />
           </ListItemIcon>
           <ListItemText
             primary={label}
-            sx={{
-              m: 0,
-              "& > .MuiTypography-root": {
+            sx={theme => ({
+              ml: "0.5rem",
+              [theme.breakpoints.up("sm")]: {
+                ml: isOpen ? "0.5rem" : 0,
+                overflowX: isOpen ? "visible" : "hidden",
+              },
+              "&>.MuiTypography-root": {
                 fontWeight: isActive ? 700 : 400,
                 letterSpacing: isActive ? 0.5 : "normal",
+                lineHeight: isOpen ? 1 : 0,
+                width: isOpen ? "auto" : 0,
               },
-            }}
+            })}
           />
         </ListItemButton>
       </ListItem>

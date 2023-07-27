@@ -40,14 +40,16 @@ const Navbar = ({ isOpen, onToggle, setNavBarIsOpen }: NavbarProps) => {
       sx={{
         "& .MuiDrawer-paper": {
           [theme.breakpoints.up("sm")]: {
-            width: isOpen ? "12rem" : "4rem",
+            width: isOpen ? "12rem" : "4.7rem",
             transition: transition(theme, isOpen, "width"),
             position: "static",
+            overflowY: "inherit",
           },
         },
       }}
     >
       <NavbarToggleButton isOpen={isOpen} onClick={onToggle} />
+      <Divider sx={{ mb: 2.5, mr: { sm: 3 } }} />
       <nav aria-label="Main">
         <List>
           {topLinks.map(({ primary, ...link }) => (

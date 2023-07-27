@@ -35,16 +35,10 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
   return (
     <>
       <Tooltip title={!isOpen && smMatches ? label : null} placement="right">
-        <ListItem
-          sx={{
-            py: 1,
-            px: 3,
-            pl: { sm: 0 },
-            transition: theme => ({ sm: transition(theme, isOpen, "padding") }),
-          }}
-        >
+        <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
           <ListItemButton
             sx={theme => ({
+              flexGrow: 0,
               borderRadius: 1,
               transition: transition(theme, isOpen, [
                 "background-color",
@@ -52,7 +46,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
               ]),
               "&:hover": { bgcolor: "action.hover" },
               [theme.breakpoints.up("sm")]: {
-                px: isOpen ? 2 : 1,
+                px: isOpen ? 2 : 1.5,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
               },
@@ -63,10 +57,23 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
             aria-controls={modalIsOpen ? "logout-dialog" : undefined}
             aria-expanded={modalIsOpen || undefined}
           >
-            <ListItemIcon sx={{ color: "inherit" }}>
+            <ListItemIcon sx={{ color: "inherit", minWidth: 0 }}>
               <Icon />
             </ListItemIcon>
-            <ListItemText primary={label} sx={{ m: 0 }} />
+            <ListItemText
+              primary={label}
+              sx={theme => ({
+                ml: "0.5rem",
+                [theme.breakpoints.up("sm")]: {
+                  ml: isOpen ? "0.5rem" : 0,
+                  overflowX: isOpen ? "visible" : "hidden",
+                },
+                "&>.MuiTypography-root": {
+                  width: isOpen ? "auto" : 0,
+                  lineHeight: isOpen ? 1 : 0,
+                },
+              })}
+            />
           </ListItemButton>
         </ListItem>
       </Tooltip>

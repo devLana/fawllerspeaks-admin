@@ -21,25 +21,19 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
 
   return (
     <Tooltip title={!isOpen && smMatches ? label : null} placement="right">
-      <ListItem
-        sx={{
-          py: 1,
-          px: 3,
-          pl: { sm: 0 },
-          transition: theme => ({ sm: transition(theme, isOpen, "padding") }),
-        }}
-      >
+      <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
         <ListItemButton
           sx={theme => ({
+            flexGrow: 0,
             borderRadius: 1,
             border: 1,
             borderColor: "primary.main",
             color: "primary.main",
             boxShadow: 3,
-            transition: transition(theme, isOpen, ["padding"]),
+            transition: transition(theme, isOpen, "padding"),
             "&:hover": { color: "primary.main", bgcolor: "inherit" },
             [theme.breakpoints.up("sm")]: {
-              px: isOpen ? 2 : 1,
+              px: isOpen ? 2 : 1.5,
               whiteSpace: "nowrap",
               overflow: "hidden",
             },
@@ -47,10 +41,23 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
           component={NextLink}
           href={href}
         >
-          <ListItemIcon sx={{ color: "inherit" }}>
+          <ListItemIcon sx={{ color: "inherit", minWidth: 0 }}>
             <Icon />
           </ListItemIcon>
-          <ListItemText primary={label} sx={{ lineHeight: 0, m: 0 }} />
+          <ListItemText
+            primary={label}
+            sx={theme => ({
+              ml: "0.5rem",
+              [theme.breakpoints.up("sm")]: {
+                ml: isOpen ? "0.5rem" : 0,
+                overflowX: isOpen ? "visible" : "hidden",
+              },
+              "&>.MuiTypography-root": {
+                width: isOpen ? "auto" : 0,
+                lineHeight: isOpen ? 1 : 0,
+              },
+            })}
+          />
         </ListItemButton>
       </ListItem>
     </Tooltip>
