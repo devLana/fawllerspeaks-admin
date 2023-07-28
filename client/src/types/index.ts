@@ -5,6 +5,8 @@ import { type EmotionCache } from "@emotion/react";
 import type { OverridableComponent } from "@mui/material/OverridableComponent";
 import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
 
+import { type MetaInfo } from "@components/Metadata";
+
 export type AppTheme = "sunny" | "sunset" | "pitch black";
 export type CapitalizeAppTheme = "Sunny" | "Sunset" | "Pitch Black";
 
@@ -28,3 +30,9 @@ export interface NextAppProps extends AppProps {
 export type MuiIconType = OverridableComponent<SvgIconTypeMap> & {
   muiName: string;
 };
+
+export interface RootLayoutProps extends MetaInfo {
+  errorMessage: string | null;
+  clientHasRendered: boolean;
+  children: React.ReactElement;
+}

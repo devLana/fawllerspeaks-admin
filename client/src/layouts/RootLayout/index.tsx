@@ -4,20 +4,15 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
 import useCheckAuth from "@hooks/useCheckAuth";
-import Metadata, { type MetaInfo } from "@components/Metadata";
+import Metadata from "@components/Metadata";
 import Loader from "@components/Loader";
 import ErrorAlert from "@components/ErrorAlert";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import PageBreadcrumbs from "./components/PageBreadcrumbs";
+import { type RootLayoutProps } from "@types";
 
-interface LayoutProps extends MetaInfo {
-  children: React.ReactElement;
-  clientHasRendered: boolean;
-  errorMessage: string | null;
-}
-
-const Layout = (props: LayoutProps) => {
+const RootLayout = (props: RootLayoutProps) => {
   const [navBarIsOpen, setNavBarIsOpen] = React.useState(false);
 
   useCheckAuth();
@@ -59,4 +54,4 @@ const Layout = (props: LayoutProps) => {
   );
 };
 
-export default Layout;
+export default RootLayout;

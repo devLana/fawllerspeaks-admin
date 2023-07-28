@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { screen, waitFor, within } from "@testing-library/react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-import Layout from "..";
+import RootLayout from "..";
 import {
   LOGOUT_SESSION_ID,
   avatar,
@@ -13,7 +13,7 @@ import {
 import { renderTestUI, stopRefreshTokenTimer } from "@utils/renderTestUI";
 import { DEFAULT_THEME, SESSION_ID } from "@utils/constants";
 
-describe("Protected Pages Layout", () => {
+describe("Protected Pages Root Layout", () => {
   const page = <div>Page Element UI</div>;
   const props = {
     clientHasRendered: true,
@@ -21,16 +21,16 @@ describe("Protected Pages Layout", () => {
     title: "Page Title",
   };
 
-  describe("Layout page ui", () => {
+  describe("Root Layout page ui", () => {
     it("Should render the Loader ui", () => {
       renderTestUI(
-        <Layout
+        <RootLayout
           clientHasRendered={false}
           errorMessage={null}
           title="Page Title"
         >
           {page}
-        </Layout>
+        </RootLayout>
       );
 
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -40,13 +40,13 @@ describe("Protected Pages Layout", () => {
 
     it("Should render an Error ui", () => {
       renderTestUI(
-        <Layout
+        <RootLayout
           clientHasRendered={true}
           errorMessage="An error has occurred"
           title="Page Title"
         >
           {page}
-        </Layout>
+        </RootLayout>
       );
 
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
@@ -58,7 +58,7 @@ describe("Protected Pages Layout", () => {
     });
 
     it("Should render the Page ui", () => {
-      renderTestUI(<Layout {...props}>{page}</Layout>);
+      renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
 
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -66,10 +66,12 @@ describe("Protected Pages Layout", () => {
     });
   });
 
-  describe("Layout header", () => {
+  describe("Root Layout header", () => {
     describe("Header theme button", () => {
       it("Click theme button to change app theme", async () => {
-        const { user } = renderTestUI(<Layout {...props}>{page}</Layout>);
+        const { user } = renderTestUI(
+          <RootLayout {...props}>{page}</RootLayout>
+        );
 
         const name = { name: /^change app theme$/i };
         const button = screen.getByRole("button", name);
@@ -89,7 +91,7 @@ describe("Protected Pages Layout", () => {
 
     describe("Header user avatar", () => {
       it("User information is not available, Render an icon avatar", () => {
-        renderTestUI(<Layout {...props}>{page}</Layout>);
+        renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
 
         expect(
           screen.getByRole("img", { name: /^unknown user avatar$/i })
@@ -98,7 +100,7 @@ describe("Protected Pages Layout", () => {
 
       it("User information has an image link, Render an image avatar", () => {
         avatar(true);
-        renderTestUI(<Layout {...props}>{page}</Layout>);
+        renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
 
         expect(
           screen.getByRole("img", { name: /^john doe avatar$/i })
@@ -107,14 +109,14 @@ describe("Protected Pages Layout", () => {
 
       it("User information does not have an image link, Display user initials", () => {
         avatar(false);
-        renderTestUI(<Layout {...props}>{page}</Layout>);
+        renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
 
         expect(screen.getByText("JD")).toBeInTheDocument();
       });
     });
   });
 
-  describe("Layout navbar", () => {
+  describe("Root Layout navbar", () => {
     const mock = useMediaQuery as jest.MockedFunction<() => boolean>;
     mock.mockReturnValue(true);
 
@@ -132,7 +134,9 @@ describe("Protected Pages Layout", () => {
 
     describe("Navbar logout button", () => {
       it("Open and close the logout modal", async () => {
-        const { user } = renderTestUI(<Layout {...props}>{page}</Layout>);
+        const { user } = renderTestUI(
+          <RootLayout {...props}>{page}</RootLayout>
+        );
 
         await user.click(screen.getByRole("button", btnName));
 
@@ -149,7 +153,7 @@ describe("Protected Pages Layout", () => {
       describe("Logout request receives an error/unsupported object response", () => {
         it.each(errorsTable)("%s", async (_, gql, message) => {
           const { user } = renderTestUI(
-            <Layout {...props}>{page}</Layout>,
+            <RootLayout {...props}>{page}</RootLayout>,
             gql
           );
 
@@ -175,7 +179,7 @@ describe("Protected Pages Layout", () => {
         it.each(logoutTable)("%s", async (_, gql, path) => {
           const { replace } = useRouter();
           const { user } = renderTestUI(
-            <Layout {...props}>{page}</Layout>,
+            <RootLayout {...props}>{page}</RootLayout>,
             gql
           );
 

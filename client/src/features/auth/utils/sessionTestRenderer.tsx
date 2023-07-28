@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { ApolloContext } from "@context/ApolloContext";
 import SessionProvider from "../components/SessionProvider";
 import { TEXT_NODE } from "./verifySession.mocks";
-import testLayout from "@utils/testLayout";
+import testLayout from "./testLayout";
 
 export const mockFn = jest.fn().mockName("apolloAuthHeaderHandler");
 

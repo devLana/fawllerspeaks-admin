@@ -1,3 +1,6 @@
+import React from "react";
+import { useRouter } from "next/router";
+
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -5,10 +8,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
+import transition from "../utils/transition";
 import type { MuiIconType } from "@types";
-import transition from "@layouts/Layout/components/Navbar/utils/transition";
 
-interface NavbarNewLinkProps {
+interface NavbarItemProps {
   label: string;
   href: string;
   Icon: MuiIconType;
@@ -16,22 +19,28 @@ interface NavbarNewLinkProps {
   smMatches: boolean;
 }
 
-const NavbarNewLink = (props: NavbarNewLinkProps) => {
+const NavbarItem = (props: NavbarItemProps) => {
+  const { pathname } = useRouter();
+
   const { label, href, Icon, isOpen, smMatches } = props;
+  const isActive = pathname === href;
 
   return (
     <Tooltip title={!isOpen && smMatches ? label : null} placement="right">
-      <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
+      <ListItem sx={{ py: 1, pr: 0, pl: { xs: 3, sm: 0 } }}>
         <ListItemButton
           sx={theme => ({
-            flexGrow: 0,
-            borderRadius: 1,
-            border: 1,
-            borderColor: "primary.main",
-            color: "primary.main",
-            boxShadow: 3,
-            transition: transition(theme, isOpen, "padding"),
-            "&:hover": { color: "primary.main", bgcolor: "inherit" },
+            borderRadius: "1.5rem 0 0 1.5rem",
+            bgcolor: isActive ? "primary.main" : "transparent",
+            color: isActive ? "primary.dark" : "inherit",
+            transition: transition(theme, isOpen, [
+              "background-color",
+              "padding",
+            ]),
+            "&:hover": {
+              bgcolor: isActive ? "primary.main" : "action.hover",
+              color: isActive ? "primary.dark" : "inherit",
+            },
             [theme.breakpoints.up("sm")]: {
               px: isOpen ? 2 : 1.5,
               whiteSpace: "nowrap",
@@ -53,8 +62,10 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
                 overflowX: isOpen ? "visible" : "hidden",
               },
               "&>.MuiTypography-root": {
-                width: isOpen ? "auto" : 0,
+                fontWeight: isActive ? 700 : 400,
+                letterSpacing: isActive ? 0.5 : "normal",
                 lineHeight: isOpen ? 1 : 0,
+                width: isOpen ? "auto" : 0,
               },
             })}
           />
@@ -64,4 +75,4 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
   );
 };
 
-export default NavbarNewLink;
+export default NavbarItem;

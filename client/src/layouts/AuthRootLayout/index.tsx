@@ -2,17 +2,12 @@ import Container from "@mui/material/Container";
 
 import useCheckAuth from "@hooks/useCheckAuth";
 import Loader from "@components/Loader";
-import Metadata, { type MetaInfo } from "@components/Metadata";
+import Metadata from "@components/Metadata";
 import ErrorAlert from "@components/ErrorAlert";
-import AuthLayoutThemeButton from "./components/AuthLayoutThemeButton";
+import AuthLayoutThemeButton from "./components/AuthRootLayoutThemeButton";
+import { type RootLayoutProps } from "@types";
 
-interface AuthLayoutProps extends MetaInfo {
-  clientHasRendered: boolean;
-  errorMessage: string | null;
-  children: React.ReactElement;
-}
-
-const AuthLayout = (props: AuthLayoutProps) => {
+const AuthRootLayout = (props: RootLayoutProps) => {
   useCheckAuth();
 
   const { children, clientHasRendered, errorMessage, ...metaProps } = props;
@@ -50,4 +45,4 @@ const AuthLayout = (props: AuthLayoutProps) => {
   );
 };
 
-export default AuthLayout;
+export default AuthRootLayout;

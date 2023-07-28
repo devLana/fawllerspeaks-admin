@@ -1,17 +1,9 @@
-import type { MetaInfo } from "@components/Metadata";
-import type { PageLayout } from "@types";
-
-type Keys = "children" | "clientHasRendered" | "errorMessage";
-
-interface UILayoutProps extends MetaInfo {
-  errorMessage: string | null;
-  clientHasRendered: boolean;
-  children: React.ReactElement;
-}
+import { type MetaInfo } from "@components/Metadata";
+import type { PageLayout, RootLayoutProps } from "@types";
 
 const uiLayout = (
-  UILayout: React.FC<UILayoutProps>,
-  uiLayoutProps: Omit<UILayoutProps, Keys>
+  UILayout: React.FC<RootLayoutProps>,
+  uiLayoutProps: MetaInfo
 ): PageLayout => {
   return function layout(page, clientHasRendered, errorMessage) {
     return (

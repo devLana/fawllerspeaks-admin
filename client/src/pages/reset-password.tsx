@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import AuthLayout from "@layouts/AuthLayout";
+import AuthRootLayout from "@layouts/AuthRootLayout";
 import Card from "@components/Card";
 import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
 import ResetPasswordForm from "@features/resetPassword/components/ResetPasswordForm";
@@ -138,7 +138,7 @@ const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
   );
 };
 
-ResetPassword.layout = uiLayout(AuthLayout, {
+ResetPassword.layout = uiLayout(AuthRootLayout, {
   title: "Reset Password - Reset Your FawllerSpeaks Admin Password",
 });
 

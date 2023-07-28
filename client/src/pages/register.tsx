@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Typography from "@mui/material/Typography";
 
-import AuthLayout from "@layouts/AuthLayout";
+import AuthRootLayout from "@layouts/AuthRootLayout";
 import Toast from "@components/Toast";
 import Card from "@components/Card";
 import RegisterUserForm from "@features/register/components/RegisterUserForm";
@@ -137,7 +137,7 @@ const RegisterUser: NextPageWithLayout = () => {
   );
 };
 
-RegisterUser.layout = uiLayout(AuthLayout, {
+RegisterUser.layout = uiLayout(AuthRootLayout, {
   title: "Register Your FawllerSpeaks Admin Account",
 });
 

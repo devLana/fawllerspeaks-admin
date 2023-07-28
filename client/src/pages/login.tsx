@@ -10,7 +10,7 @@ import Typography from "@mui/material/Typography";
 import { useSession } from "@context/SessionContext";
 import { useAuthHeaderHandler } from "@context/ApolloContext";
 import Toast from "@components/Toast";
-import AuthLayout from "@layouts/AuthLayout";
+import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
 import Card from "@components/Card";
 import LoginForm from "@features/login/components/LoginForm";
@@ -158,6 +158,8 @@ const Login: NextPageWithLayout = () => {
   );
 };
 
-Login.layout = uiLayout(AuthLayout, { title: "Log In To FawllerSpeaks Admin" });
+Login.layout = uiLayout(AuthRootLayout, {
+  title: "Log In To FawllerSpeaks Admin",
+});
 
 export default Login;

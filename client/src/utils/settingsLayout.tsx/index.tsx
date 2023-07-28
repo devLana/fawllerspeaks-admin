@@ -1,4 +1,4 @@
-import RootLayout from "@layouts/Layout";
+import RootLayout from "@layouts/RootLayout";
 import SettingsLayout from "@layouts/SettingsLayout";
 import { type MetaInfo } from "@components/Metadata";
 import type { PageLayout } from "@types";

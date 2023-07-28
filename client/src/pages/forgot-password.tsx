@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import useStatusAlert from "@features/forgotPassword/hooks/useStatusAlert";
-import AuthLayout from "@layouts/AuthLayout";
+import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
 import Toast from "@components/Toast";
 import Card from "@components/Card";
@@ -146,7 +146,7 @@ const ForgotPassword: NextPageWithLayout = () => {
   );
 };
 
-ForgotPassword.layout = uiLayout(AuthLayout, {
+ForgotPassword.layout = uiLayout(AuthRootLayout, {
   title: "Forgot Password - Request For Password Reset Link",
 });
 

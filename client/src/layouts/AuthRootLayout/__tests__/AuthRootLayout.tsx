@@ -1,16 +1,20 @@
 import { screen } from "@testing-library/react";
 
-import Layout from "..";
+import AuthRootLayout from "..";
 import { renderTestUI } from "@utils/renderTestUI";
 
-describe("Authentication Pages Layout", () => {
+describe("Authentication Pages Root Layout", () => {
   const page = <div>Page Element UI</div>;
 
   it("Should render the Loader ui", () => {
     renderTestUI(
-      <Layout clientHasRendered={false} errorMessage={null} title="Page Title">
+      <AuthRootLayout
+        clientHasRendered={false}
+        errorMessage={null}
+        title="Page Title"
+      >
         {page}
-      </Layout>
+      </AuthRootLayout>
     );
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -20,13 +24,13 @@ describe("Authentication Pages Layout", () => {
 
   it("Should render an Error ui", () => {
     renderTestUI(
-      <Layout
+      <AuthRootLayout
         clientHasRendered={true}
         errorMessage="An error has occurred"
         title="Page Title"
       >
         {page}
-      </Layout>
+      </AuthRootLayout>
     );
 
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
@@ -39,9 +43,13 @@ describe("Authentication Pages Layout", () => {
 
   it("Should render the Page ui", () => {
     renderTestUI(
-      <Layout clientHasRendered={true} errorMessage={null} title="Page Title">
+      <AuthRootLayout
+        clientHasRendered={true}
+        errorMessage={null}
+        title="Page Title"
+      >
         {page}
-      </Layout>
+      </AuthRootLayout>
     );
 
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
