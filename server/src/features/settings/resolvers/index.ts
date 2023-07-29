@@ -1,9 +1,9 @@
 import changePassword from "./changePassword";
 import editProfile from "./editProfile";
 
-import { EditedProfileResolver } from "./editProfile/EditedProfile";
-import { ChangePasswordValidationErrorResolver } from "./changePassword/ChangePasswordValidationError";
-import { EditProfileValidationErrorResolver } from "./editProfile/EditProfileValidationError";
+import { EditedProfileResolvers } from "./editProfile/EditedProfile";
+import { ChangePasswordValidationErrorResolvers } from "./changePassword/ChangePasswordValidationError";
+import { EditProfileValidationErrorResolvers } from "./editProfile/EditProfileValidationError";
 
 import type { MutationResolvers, Resolvers } from "@resolverTypes";
 import type { ResolversMapper, ObjectMapper } from "@types";
@@ -23,14 +23,11 @@ interface SettingsResolvers {
 }
 
 export const settingsResolvers: SettingsResolvers = {
-  Mutations: {
-    changePassword,
-    editProfile,
-  },
+  Mutations: { changePassword, editProfile },
 
   Types: {
-    EditedProfile: EditedProfileResolver,
-    ChangePasswordValidationError: ChangePasswordValidationErrorResolver,
-    EditProfileValidationError: EditProfileValidationErrorResolver,
+    EditedProfile: EditedProfileResolvers,
+    ChangePasswordValidationError: ChangePasswordValidationErrorResolvers,
+    EditProfileValidationError: EditProfileValidationErrorResolvers,
   },
 };

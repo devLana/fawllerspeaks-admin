@@ -15,6 +15,6 @@ export class EditProfileValidationError implements Errors {
   }
 }
 
-export const EditProfileValidationErrorResolver: Resolvers = {
+export const EditProfileValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof EditProfileValidationError,
 };

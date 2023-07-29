@@ -1,5 +1,5 @@
 import {
-  type EditedProfileResolvers,
+  type EditedProfileResolvers as Resolvers,
   type EditedProfile as EditedUserProfile,
   Status,
 } from "@resolverTypes";
@@ -16,6 +16,6 @@ export class EditedProfile implements EditedUserProfile {
   }
 }
 
-export const EditedProfileResolver: EditedProfileResolvers = {
+export const EditedProfileResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof EditedProfile,
 };

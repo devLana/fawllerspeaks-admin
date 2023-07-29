@@ -16,6 +16,6 @@ export class ChangePasswordValidationError implements Errors {
   }
 }
 
-export const ChangePasswordValidationErrorResolver: Resolvers = {
+export const ChangePasswordValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof ChangePasswordValidationError,
 };
