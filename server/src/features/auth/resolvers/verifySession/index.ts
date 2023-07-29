@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
-import { VerifiedSession } from "./VerifiedSession";
+import { VerifiedSession } from "./types";
 import { SessionIdValidationError } from "../types";
 import {
   clearCookies,

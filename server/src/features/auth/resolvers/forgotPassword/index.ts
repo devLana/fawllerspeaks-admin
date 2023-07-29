@@ -1,8 +1,8 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import forgotPasswordMail from "./forgotPasswordMail";
 import { EmailValidationError } from "../types";
+import { forgotPasswordMail } from "./utils";
 import { generateBytes } from "@features/auth/utils";
 import {
   MailError,

@@ -12,13 +12,14 @@ import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 import { response } from "express";
 
 import resolver from "..";
+import { verify } from "@lib/tokenPromise";
+
 import {
   clearCookies,
   sessionMail,
   setCookies,
   JWT_REGEX,
 } from "@features/auth/utils";
-
 import {
   cookies,
   expiredJwt,
@@ -29,10 +30,9 @@ import {
   validJwt,
   validateCookie,
   validateSession,
-} from "../refreshTokenTestUtils";
-import { verify } from "@lib/tokenPromise";
-import { mockContext, info, spyDb } from "@tests";
+} from "../utils";
 import { MailError } from "@utils";
+import { mockContext, info, spyDb } from "@tests";
 
 type Module = typeof import("");
 

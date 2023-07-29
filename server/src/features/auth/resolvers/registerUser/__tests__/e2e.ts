@@ -5,11 +5,7 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@services/db";
 
-import {
-  gqlValidation,
-  userInput,
-  validations,
-} from "../registerUserTestUtils";
+import { gqlValidation, userInput, validations } from "../utils";
 import {
   post,
   REGISTER_USER,

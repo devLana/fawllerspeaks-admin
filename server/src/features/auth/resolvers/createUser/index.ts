@@ -1,10 +1,11 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import createUserMail from "./createUserMail";
 import { EmailValidationError } from "../types";
-import { bytesHash } from "@features/auth/utils";
+
 import { MailError, Response, NotAllowedError, ServerError } from "@utils";
+import { createUserMail } from "./utils";
+import { bytesHash } from "@features/auth/utils";
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";

@@ -9,15 +9,24 @@ import resetPassword from "./resetPassword";
 import generatePassword from "./generatePassword";
 import verifyResetToken from "./verifyResetToken";
 
-import { LoggedInUserResolvers } from "./login/LoggedInUser";
-import { RegisteredUserResolvers } from "./registerUser/RegisteredUser";
-import { VerifiedSessionResolvers } from "./verifySession/VerifiedSession";
-import { AccessTokenResolvers } from "./refreshToken/AccessToken";
-import { VerifiedResetTokenResolvers } from "./verifyResetToken/VerifiedResetToken";
-import { LoginValidationErrorResolvers } from "./login/LoginValidationError";
-import { ResetPasswordValidationErrorResolvers } from "./resetPassword/ResetPasswordValidationError";
-import { RegisterUserValidationErrorResolvers } from "./registerUser/RegisterUserValidationError";
-import { VerifyResetTokenValidationErrorResolvers } from "./verifyResetToken/VerifyResetTokenValidationError";
+import { VerifiedSessionResolvers } from "./verifySession/types";
+import { AccessTokenResolvers } from "./refreshToken/types";
+import { ResetPasswordValidationErrorResolvers } from "./resetPassword/types";
+
+import {
+  LoggedInUserResolvers,
+  LoginValidationErrorResolvers,
+} from "./login/types";
+
+import {
+  RegisteredUserResolvers,
+  RegisterUserValidationErrorResolvers,
+} from "./registerUser/types";
+
+import {
+  VerifiedResetTokenResolvers,
+  VerifyResetTokenValidationErrorResolvers,
+} from "./verifyResetToken/types";
 
 import {
   EmailValidationErrorResolvers,

@@ -2,8 +2,7 @@ import { GraphQLError } from "graphql";
 import bcrypt from "bcrypt";
 import Joi, { ValidationError } from "joi";
 
-import { RegisteredUser } from "./RegisteredUser";
-import { RegisterUserValidationError } from "./RegisterUserValidationError";
+import { RegisterUserValidationError, RegisteredUser } from "./types";
 
 import {
   AuthenticationError,

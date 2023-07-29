@@ -3,15 +3,9 @@ import { test, expect, describe, jest, afterEach } from "@jest/globals";
 import bcrypt from "bcrypt";
 
 import login from "..";
-import { setCookies, JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
 
-import {
-  args,
-  cookies,
-  mockDate,
-  mockUser,
-  validations,
-} from "../loginTestUtils";
+import { setCookies, JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
+import { args, cookies, mockDate, mockUser, validations } from "../utils";
 import { mockContext, info, spyDb } from "@tests";
 
 type Module = typeof import("@features/auth/utils");

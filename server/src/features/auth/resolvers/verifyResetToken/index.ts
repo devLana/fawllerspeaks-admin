@@ -1,8 +1,7 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import { VerifiedResetToken } from "./VerifiedResetToken";
-import { VerifyResetTokenValidationError } from "./VerifyResetTokenValidationError";
+import { VerifyResetTokenValidationError, VerifiedResetToken } from "./types";
 import { NotAllowedError, RegistrationError } from "@utils";
 
 import { type MutationResolvers } from "@resolverTypes";

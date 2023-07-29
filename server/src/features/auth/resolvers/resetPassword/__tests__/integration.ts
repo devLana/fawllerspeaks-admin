@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { describe, test, expect, jest, afterAll } from "@jest/globals";
 
 import resetPassword from "..";
-import resetPasswordMail from "../resetPasswordMail";
 
-import { validations } from "../resetPasswordTestUtils";
+import { validations, resetPasswordMail } from "../utils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
+
+type Module = typeof import("../utils");
 
 const email = "test.email@example.com";
 const args = {
@@ -17,8 +19,13 @@ const args = {
 jest.useFakeTimers();
 jest.spyOn(global, "clearTimeout");
 
-jest.mock("../resetPasswordMail", () => {
-  return jest.fn().mockName("resetPasswordMail");
+jest.mock("../utils", () => {
+  const mod = jest.requireActual<Module>("../utils");
+  return {
+    __esModule: true,
+    ...mod,
+    resetPasswordMail: jest.fn().mockName("resetPasswordMail"),
+  };
 });
 
 describe("Test reset password resolver", () => {

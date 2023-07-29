@@ -12,9 +12,9 @@ import { response } from "express";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
 import resolver from "..";
-import { clearCookies, sessionMail, JWT_REGEX } from "@features/auth/utils";
 import { verify } from "@lib/tokenPromise";
 
+import { clearCookies, sessionMail, JWT_REGEX } from "@features/auth/utils";
 import {
   cookies,
   data,
@@ -29,7 +29,7 @@ import {
   validateCookies,
   validateSession,
   validations,
-} from "../verifySessionTestUtils";
+} from "../utils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

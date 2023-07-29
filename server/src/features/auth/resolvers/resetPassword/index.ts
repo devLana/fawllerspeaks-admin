@@ -2,8 +2,8 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import resetPasswordMail from "./resetPasswordMail";
-import { ResetPasswordValidationError } from "./ResetPasswordValidationError";
+import { resetPasswordMail } from "./utils";
+import { ResetPasswordValidationError } from "./types";
 
 import {
   MailError,

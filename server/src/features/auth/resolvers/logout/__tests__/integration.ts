@@ -9,9 +9,9 @@ import {
 } from "@jest/globals";
 
 import logout from "..";
-import { clearCookies } from "@features/auth/utils";
 
-import { validateCookie, validations } from "../logoutTestUtils";
+import { clearCookies } from "@features/auth/utils";
+import { validateCookie, validations } from "../utils";
 import { mockContext, info, spyDb } from "@tests";
 
 type Module = typeof import("@features/auth/utils");

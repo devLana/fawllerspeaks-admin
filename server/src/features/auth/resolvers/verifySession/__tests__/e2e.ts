@@ -12,7 +12,7 @@ import {
   gqlValidations,
   validations,
   verifyE2eCookie,
-} from "../verifySessionTestUtils";
+} from "../utils";
 
 import {
   VERIFY_SESSION,

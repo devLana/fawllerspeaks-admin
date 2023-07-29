@@ -5,11 +5,7 @@ import { test, expect, describe, beforeAll, afterAll } from "@jest/globals";
 import { db } from "@services/db";
 import { startServer } from "@server";
 
-import {
-  gqlValidations,
-  validations,
-  verifyToken,
-} from "../verifyResetTokenTestUtils";
+import { gqlValidations, validations, verifyToken } from "../utils";
 import {
   registeredUser,
   post,

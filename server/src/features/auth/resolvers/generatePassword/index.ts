@@ -1,8 +1,6 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import { bytesHash } from "@features/auth/utils";
-import generatePasswordMail from "./generatePasswordMail";
 import { EmailValidationError } from "../types";
 
 import {
@@ -12,6 +10,8 @@ import {
   Response,
   ServerError,
 } from "@utils";
+import { bytesHash } from "@features/auth/utils";
+import { generatePasswordMail } from "./utils";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";

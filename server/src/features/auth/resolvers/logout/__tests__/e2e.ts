@@ -5,11 +5,7 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@services/db";
 
-import {
-  gqlValidations,
-  validations,
-  verifyE2eCookie,
-} from "../logoutTestUtils";
+import { gqlValidations, validations, verifyE2eCookie } from "../utils";
 import { LOGOUT, testUsers, loginTestUser, post, testSession } from "@tests";
 
 import type { APIContext, DbTestUser, TestData } from "@types";

@@ -10,8 +10,9 @@ import {
 } from "@features/auth/utils";
 
 import { verify } from "@lib/tokenPromise";
-import { AccessToken } from "./AccessToken";
+import { AccessToken } from "./types";
 import { SessionIdValidationError } from "../types";
+
 import {
   AuthenticationError,
   MailError,

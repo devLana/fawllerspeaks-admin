@@ -2,8 +2,8 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import { LoggedInUser } from "./LoggedInUser";
-import { LoginValidationError } from "./LoginValidationError";
+import { LoggedInUser, LoginValidationError } from "./types";
+
 import { NotAllowedError, dateToISOString, generateErrorsObject } from "@utils";
 import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
 
