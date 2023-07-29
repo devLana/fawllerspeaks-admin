@@ -2,9 +2,10 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import changePasswordMail from "./changePasswordMail";
-import { ChangePasswordValidationError } from "./ChangePasswordValidationError";
+import { changePasswordMail } from "./utils";
+import { ChangePasswordValidationError } from "./types";
 import {
+  AuthenticationError,
   MailError,
   NotAllowedError,
   RegistrationError,
@@ -41,7 +42,7 @@ const changePassword: ChangePassword = async (_, args, { db, user }) => {
         "string.empty": "Enter new password",
         "string.pattern.base":
           "New password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol",
-        "string.min": "Password must be at least 8 characters long",
+        "string.min": "New Password must be at least 8 characters long",
       }),
     confirmNewPassword: Joi.any()
       .valid(Joi.ref("newPassword"))
@@ -52,7 +53,7 @@ const changePassword: ChangePassword = async (_, args, { db, user }) => {
   let currentPassword: string | null = null;
 
   try {
-    if (!user) return new NotAllowedError("Unable to change password");
+    if (!user) return new AuthenticationError("Unable to change password");
 
     const validate = await schema.validateAsync(args, { abortEarly: false });
     const { newPassword } = validate;
@@ -63,9 +64,7 @@ const changePassword: ChangePassword = async (_, args, { db, user }) => {
       [user]
     );
 
-    if (rows.length === 0) {
-      return new NotAllowedError("Unable to change password");
-    }
+    if (rows.length === 0) return new UnknownError("Unable to change password");
 
     if (!rows[0].isRegistered) {
       return new RegistrationError("Unable to change password");
@@ -77,7 +76,7 @@ const changePassword: ChangePassword = async (_, args, { db, user }) => {
     const [match, hash] = await Promise.all([matchPromise, hashPromise]);
 
     if (!match) {
-      return new UnknownError(
+      return new NotAllowedError(
         "Unable to change password. 'current password' does not match"
       );
     }

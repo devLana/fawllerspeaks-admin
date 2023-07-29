@@ -2,7 +2,7 @@ import changePassword from "./changePassword";
 import editProfile from "./editProfile";
 
 import { EditedProfileResolvers } from "./editProfile/EditedProfile";
-import { ChangePasswordValidationErrorResolvers } from "./changePassword/ChangePasswordValidationError";
+import { ChangePasswordValidationErrorResolvers } from "./changePassword/types";
 import { EditProfileValidationErrorResolvers } from "./editProfile/EditProfileValidationError";
 
 import type { MutationResolvers, Resolvers } from "@resolverTypes";
