@@ -19,7 +19,7 @@ export const settingsTypeDefs = `#graphql
     status: Status!
   }
 
-  union ChangePassword = Response | ChangePasswordValidationError | NotAllowedError | RegistrationError | UnknownError | ServerError
+  union ChangePassword = Response | ChangePasswordValidationError | AuthenticationError | NotAllowedError | RegistrationError | UnknownError | ServerError
 
   union EditProfile = EditedProfile | EditProfileValidationError | NotAllowedError | RegistrationError
 `;

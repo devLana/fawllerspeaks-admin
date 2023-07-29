@@ -34,7 +34,7 @@ export type BaseResponse = {
 
 export type Bin_UnBin_Delete = NotAllowedError | PostIdsValidationError | Posts | PostsWarning | UnauthorizedAuthorError | UnknownError;
 
-export type ChangePassword = ChangePasswordValidationError | NotAllowedError | RegistrationError | Response | ServerError | UnknownError;
+export type ChangePassword = AuthenticationError | ChangePasswordValidationError | NotAllowedError | RegistrationError | Response | ServerError | UnknownError;
 
 export type ChangePasswordValidationError = {
   __typename?: 'ChangePasswordValidationError';
@@ -674,7 +674,7 @@ export type ResolversTypes = ResolversObject<{
   BaseResponse: ResolversTypes['AuthenticationError'] | ResolversTypes['DuplicatePostTagError'] | ResolversTypes['DuplicatePostTitleError'] | ResolversTypes['EmptyBinWarning'] | ResolversTypes['NotAllowedError'] | ResolversTypes['NotAllowedPostActionError'] | ResolversTypes['PostTagsWarning'] | ResolversTypes['PostsWarning'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'];
   Bin_UnBin_Delete: ResolversTypes['NotAllowedError'] | ResolversTypes['PostIdsValidationError'] | ResolversTypes['Posts'] | ResolversTypes['PostsWarning'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'];
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  ChangePassword: ResolversTypes['ChangePasswordValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnknownError'];
+  ChangePassword: ResolversTypes['AuthenticationError'] | ResolversTypes['ChangePasswordValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnknownError'];
   ChangePasswordValidationError: ResolverTypeWrapper<ChangePasswordValidationError>;
   CreatePost: ResolversTypes['CreatePostValidationError'] | ResolversTypes['DuplicatePostTitleError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['SinglePost'] | ResolversTypes['UnknownError'];
   CreatePostInput: CreatePostInput;
@@ -755,7 +755,7 @@ export type ResolversParentTypes = ResolversObject<{
   BaseResponse: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['DuplicatePostTitleError'] | ResolversParentTypes['EmptyBinWarning'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['NotAllowedPostActionError'] | ResolversParentTypes['PostTagsWarning'] | ResolversParentTypes['PostsWarning'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'];
   Bin_UnBin_Delete: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostIdsValidationError'] | ResolversParentTypes['Posts'] | ResolversParentTypes['PostsWarning'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'];
   Boolean: Scalars['Boolean'];
-  ChangePassword: ResolversParentTypes['ChangePasswordValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnknownError'];
+  ChangePassword: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['ChangePasswordValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnknownError'];
   ChangePasswordValidationError: ChangePasswordValidationError;
   CreatePost: ResolversParentTypes['CreatePostValidationError'] | ResolversParentTypes['DuplicatePostTitleError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['SinglePost'] | ResolversParentTypes['UnknownError'];
   CreatePostInput: CreatePostInput;
@@ -850,7 +850,7 @@ export type Bin_UnBin_DeleteResolvers<ContextType = APIContext, ParentType exten
 }>;
 
 export type ChangePasswordResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['ChangePassword'] = ResolversParentTypes['ChangePassword']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'ChangePasswordValidationError' | 'NotAllowedError' | 'RegistrationError' | 'Response' | 'ServerError' | 'UnknownError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'ChangePasswordValidationError' | 'NotAllowedError' | 'RegistrationError' | 'Response' | 'ServerError' | 'UnknownError', ParentType, ContextType>;
 }>;
 
 export type ChangePasswordValidationErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['ChangePasswordValidationError'] = ResolversParentTypes['ChangePasswordValidationError']> = ResolversObject<{
