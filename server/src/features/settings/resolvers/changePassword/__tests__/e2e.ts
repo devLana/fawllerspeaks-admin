@@ -138,7 +138,7 @@ describe("Change password - E2E", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
         __typename: "NotAllowedError",
-        message: "Unable to change password. 'current password' does not match",
+        message: "Unable to change password",
         status: Status.Error,
       });
     });

@@ -102,10 +102,7 @@ describe("Test change password resolver", () => {
         rows: [{ isRegistered: true, password: hashed }],
       });
 
-      expect(result).toHaveProperty(
-        "message",
-        "Unable to change password. 'current password' does not match"
-      );
+      expect(result).toHaveProperty("message", "Unable to change password");
       expect(result).toHaveProperty("status", "ERROR");
     });
   });

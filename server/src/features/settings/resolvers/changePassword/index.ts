@@ -75,11 +75,7 @@ const changePassword: ChangePassword = async (_, args, { db, user }) => {
 
     const [match, hash] = await Promise.all([matchPromise, hashPromise]);
 
-    if (!match) {
-      return new NotAllowedError(
-        "Unable to change password. 'current password' does not match"
-      );
-    }
+    if (!match) return new NotAllowedError("Unable to change password");
 
     await db.query(`UPDATE users SET password = $1 WHERE user_id = $2`, [
       hash,

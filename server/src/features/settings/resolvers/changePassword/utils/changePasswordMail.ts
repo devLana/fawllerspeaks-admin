@@ -2,8 +2,7 @@ import sgMail from "@sendgrid/mail";
 import { MailError } from "@utils";
 
 const changePasswordMail = async (email: string) => {
-  const errorMsg =
-    "Unable to send password change confirmation mail. Please try again later";
+  const errorMsg = "Unable to change password. Please try again later";
 
   if (!process.env.SEND_GRID_API_KEY) {
     throw new MailError(errorMsg);
