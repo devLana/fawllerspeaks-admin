@@ -1,23 +1,16 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { describe, test, expect, jest, afterEach } from "@jest/globals";
 
 import createUser from "..";
 
-import { createUserMail, validations } from "../utils";
+import createUserMail from "../utils/createUserMail";
+import { validations } from "../utils/createUserTestUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 
-type Module = typeof import("../utils");
-
 const msg = "A confirmation mail has been sent to the email address provided";
 
-jest.mock("../utils", () => {
-  const mod = jest.requireActual<Module>("../utils");
-  return {
-    __esModule: true,
-    ...mod,
-    createUserMail: jest.fn().mockName("createUserMail"),
-  };
+jest.mock("../utils/createUserMail", () => {
+  return jest.fn().mockName("createUserMail");
 });
 
 describe("Test create user resolver", () => {

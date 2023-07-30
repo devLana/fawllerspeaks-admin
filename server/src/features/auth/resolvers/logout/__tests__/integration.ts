@@ -11,7 +11,7 @@ import {
 import logout from "..";
 
 import { clearCookies } from "@features/auth/utils";
-import { validateCookie, validations } from "../utils";
+import { validateCookie, validations } from "../utils/logoutTestUtils";
 import { mockContext, info, spyDb } from "@tests";
 
 type Module = typeof import("@features/auth/utils");

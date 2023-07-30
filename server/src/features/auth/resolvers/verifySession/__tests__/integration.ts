@@ -29,7 +29,7 @@ import {
   validateCookies,
   validateSession,
   validations,
-} from "../utils";
+} from "../utils/verifySessionTestUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

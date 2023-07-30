@@ -12,7 +12,7 @@ import {
   gqlValidations,
   validateSession,
   verifyE2eCookie,
-} from "../utils";
+} from "../utils/refreshTokenTestUtils";
 import {
   REFRESH_TOKEN,
   authUsers,

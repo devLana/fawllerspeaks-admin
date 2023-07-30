@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import { changePasswordMail } from "./utils";
+import changePasswordMail from "./utils/changePasswordMail";
 import { ChangePasswordValidationError } from "./types";
 import {
   AuthenticationError,

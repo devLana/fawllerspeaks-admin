@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import {
   describe,
   test,
@@ -14,7 +13,8 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@services/db";
 
-import { forgotPasswordMail, gqlValidations, validations } from "../utils";
+import forgotPasswordMail from "../utils/forgotPasswordMail";
+import { gqlValidations, validations } from "../utils/forgotPasswordTestUtils";
 import { MailError } from "@utils";
 import {
   unRegisteredUser,
@@ -31,17 +31,11 @@ type ForgotPassword = TestData<{ forgotPassword: Record<string, unknown> }>;
 type SetTimeOut = () => Pick<NodeJS.Timeout, typeof Symbol.toPrimitive>;
 type Timeout = jest.Spied<SetTimeOut>;
 type ClearTimeout = jest.Spied<() => void>;
-type Module = typeof import("../utils");
 
 jest.useFakeTimers({ legacyFakeTimers: true });
 
-jest.mock("../utils", () => {
-  const mod = jest.requireActual<Module>("../utils");
-  return {
-    __esModule: true,
-    ...mod,
-    forgotPasswordMail: jest.fn().mockName("forgotPasswordMail"),
-  };
+jest.mock("../utils/forgotPasswordMail", () => {
+  return jest.fn().mockName("forgotPasswordMail");
 });
 
 const spy1 = jest.spyOn(global, "setTimeout") as unknown as Timeout;

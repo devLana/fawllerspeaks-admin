@@ -4,8 +4,14 @@ import bcrypt from "bcrypt";
 
 import login from "..";
 
+import {
+  args,
+  cookies,
+  mockDate,
+  mockUser,
+  validations,
+} from "../utils/loginTestUtils";
 import { setCookies, JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
-import { args, cookies, mockDate, mockUser, validations } from "../utils";
 import { mockContext, info, spyDb } from "@tests";
 
 type Module = typeof import("@features/auth/utils");

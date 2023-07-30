@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { ApolloServer } from "@apollo/server";
 
 import {
@@ -13,12 +12,12 @@ import {
 import { startServer } from "@server";
 import { db } from "@services/db";
 
+import generatePasswordMail from "../utils/generatePasswordMail";
 import {
-  generatePasswordMail,
   gqlValidations,
   validations,
   verifyMailE2E,
-} from "../utils";
+} from "../utils/generatePasswordTestUtils";
 import { MailError } from "@utils";
 import { unRegisteredUser, post, GENERATE_PASSWORD, testUsers } from "@tests";
 
@@ -26,15 +25,9 @@ import type { APIContext, TestData } from "@types";
 import { Status } from "@resolverTypes";
 
 type GeneratePassword = TestData<{ generatePassword: Record<string, unknown> }>;
-type Module = typeof import("../utils");
 
-jest.mock("../utils", () => {
-  const mod = jest.requireActual<Module>("../utils");
-  return {
-    __esModule: true,
-    ...mod,
-    generatePasswordMail: jest.fn().mockName("generatePasswordMail"),
-  };
+jest.mock("../utils/generatePasswordMail", () => {
+  return jest.fn().mockName("generatePasswordMail");
 });
 
 describe("Generate password - E2E", () => {

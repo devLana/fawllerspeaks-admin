@@ -3,6 +3,7 @@ import Joi, { ValidationError } from "joi";
 
 import { EmailValidationError } from "../types";
 
+import generatePasswordMail from "./utils/generatePasswordMail";
 import {
   MailError,
   NotAllowedError,
@@ -11,7 +12,6 @@ import {
   ServerError,
 } from "@utils";
 import { bytesHash } from "@features/auth/utils";
-import { generatePasswordMail } from "./utils";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import {
   describe,
   test,
@@ -10,11 +9,10 @@ import {
 
 import resolver from "..";
 
-import { forgotPasswordMail, validations } from "../utils";
+import forgotPasswordMail from "../utils/forgotPasswordMail";
+import { validations } from "../utils/forgotPasswordTestUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
-
-type Module = typeof import("../utils");
 
 const email = "test_mail@example.com";
 
@@ -22,13 +20,8 @@ jest.useFakeTimers();
 jest.spyOn(global, "setTimeout");
 jest.spyOn(global, "clearTimeout");
 
-jest.mock("../utils", () => {
-  const mod = jest.requireActual<Module>("../utils");
-  return {
-    __esModule: true,
-    ...mod,
-    forgotPasswordMail: jest.fn().mockName("forgotPasswordMail"),
-  };
+jest.mock("../utils/forgotPasswordMail", () => {
+  return jest.fn().mockName("forgotPasswordMail");
 });
 
 describe("Test forgot password resolver", () => {

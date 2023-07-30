@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { ApolloServer } from "@apollo/server";
 
 import {
@@ -14,14 +13,14 @@ import { db } from "@services/db";
 import { startServer } from "@server";
 
 import { MailError } from "@utils";
+import changePasswordMail from "../utils/changePasswordMail";
 import {
   authCheck,
-  changePasswordMail,
   gqlValidation,
   errorInput,
   validations,
   PASSWORD,
-} from "../utils";
+} from "../utils/changePasswordTestUtils";
 import {
   CHANGE_PASSWORD,
   testUsers,
@@ -34,15 +33,9 @@ import type { APIContext, TestData } from "@types";
 import { Status } from "@resolverTypes";
 
 type ChangePassword = TestData<{ changePassword: Record<string, unknown> }>;
-type Module = typeof import("../utils");
 
-jest.mock("../utils", () => {
-  const mod = jest.requireActual<Module>("../utils");
-  return {
-    __esModule: true,
-    ...mod,
-    changePasswordMail: jest.fn().mockName("changePasswordMail"),
-  };
+jest.mock("../utils/changePasswordMail", () => {
+  return jest.fn().mockName("changePasswordMail");
 });
 
 describe("Change password - E2E", () => {

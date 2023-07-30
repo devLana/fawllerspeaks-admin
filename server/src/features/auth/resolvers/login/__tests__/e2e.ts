@@ -7,7 +7,11 @@ import { JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
 import { startServer } from "@server";
 import { db } from "@services/db";
 
-import { gqlValidation, validations, verifyInputs } from "../utils";
+import {
+  gqlValidation,
+  validations,
+  verifyInputs,
+} from "../utils/loginTestUtils";
 import { registeredUser, post, LOGIN, testUsers } from "@tests";
 
 import type { APIContext, DbTestUser, TestData } from "@types";

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import {
   describe,
   test,
@@ -13,7 +12,8 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@services/db";
 
-import { createUserMail, gqlValidations, validations } from "../utils";
+import createUserMail from "../utils/createUserMail";
+import { gqlValidations, validations } from "../utils/createUserTestUtils";
 import { MailError } from "@utils";
 import { CREATE_USER, post } from "@tests";
 
@@ -21,15 +21,9 @@ import type { APIContext, TestData } from "@types";
 import { Status } from "@resolverTypes";
 
 type CreateUser = TestData<{ createUser: Record<string, unknown> }>;
-type Module = typeof import("../utils");
 
-jest.mock("../utils", () => {
-  const mod = jest.requireActual<Module>("../utils");
-  return {
-    __esModule: true,
-    ...mod,
-    createUserMail: jest.fn().mockName("createUserMail"),
-  };
+jest.mock("../utils/createUserMail", () => {
+  return jest.fn().mockName("createUserMail");
 });
 
 describe("Create user - E2E", () => {

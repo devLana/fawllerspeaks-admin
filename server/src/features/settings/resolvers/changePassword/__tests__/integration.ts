@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import bcrypt from "bcrypt";
 import {
   describe,
@@ -11,21 +10,19 @@ import {
 
 import changePassword from "..";
 
-import { args, changePasswordMail, validations, verifyUser } from "../utils";
+import changePasswordMail from "../utils/changePasswordMail";
+import {
+  args,
+  validations,
+  verifyUser,
+} from "../utils/changePasswordTestUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 
-type Module = typeof import("../utils");
-
 let hash = "";
 
-jest.mock("../utils", () => {
-  const mod = jest.requireActual<Module>("../utils");
-  return {
-    __esModule: true,
-    ...mod,
-    changePasswordMail: jest.fn().mockName("changePasswordMail"),
-  };
+jest.mock("../utils/changePasswordMail", () => {
+  return jest.fn().mockName("changePasswordMail");
 });
 
 beforeAll(async () => {

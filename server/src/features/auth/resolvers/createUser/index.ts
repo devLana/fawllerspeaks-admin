@@ -4,7 +4,7 @@ import Joi, { ValidationError } from "joi";
 import { EmailValidationError } from "../types";
 
 import { MailError, Response, NotAllowedError, ServerError } from "@utils";
-import { createUserMail } from "./utils";
+import createUserMail from "./utils/createUserMail";
 import { bytesHash } from "@features/auth/utils";
 
 import type { MutationResolvers } from "@resolverTypes";

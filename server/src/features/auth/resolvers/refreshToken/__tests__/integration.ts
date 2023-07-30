@@ -30,7 +30,7 @@ import {
   validJwt,
   validateCookie,
   validateSession,
-} from "../utils";
+} from "../utils/refreshTokenTestUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 
