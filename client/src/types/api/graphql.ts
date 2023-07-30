@@ -32,7 +32,7 @@ export type BaseResponse = {
 
 export type Bin_UnBin_Delete = NotAllowedError | PostIdsValidationError | Posts | PostsWarning | UnauthorizedAuthorError | UnknownError;
 
-export type ChangePassword = ChangePasswordValidationError | NotAllowedError | RegistrationError | Response | ServerError | UnknownError;
+export type ChangePassword = AuthenticationError | ChangePasswordValidationError | NotAllowedError | RegistrationError | Response | ServerError | UnknownError;
 
 export type ChangePasswordValidationError = {
   __typename?: 'ChangePasswordValidationError';
