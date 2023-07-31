@@ -19,7 +19,6 @@ const ChangePasswordForm = (props: ChangePasswordFormProps) => {
       <PasswordInput
         id="current-password"
         autoComplete="current-password"
-        autoFocus
         label="Current Password"
         register={register("currentPassword")}
         fieldError={fieldErrors.currentPassword}
@@ -28,7 +27,6 @@ const ChangePasswordForm = (props: ChangePasswordFormProps) => {
       <PasswordInput
         id="new-password"
         autoComplete="new-password"
-        autoFocus
         label="New Password"
         register={register("newPassword")}
         fieldError={fieldErrors.newPassword}
@@ -37,7 +35,6 @@ const ChangePasswordForm = (props: ChangePasswordFormProps) => {
       <PasswordInput
         id="confirm-new-password"
         autoComplete="new-password"
-        autoFocus
         label="Confirm New Password"
         register={register("confirmNewPassword")}
         fieldError={fieldErrors.confirmNewPassword}

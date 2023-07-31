@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 const message =
-  "New Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
+  "New password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
 
 export const changePasswordValidator = yup
   .object({
@@ -17,6 +17,6 @@ export const changePasswordValidator = yup
     confirmNewPassword: yup
       .string()
       .required("Enter confirm password")
-      .oneOf([yup.ref("password")], "Passwords do not match"),
+      .oneOf([yup.ref("newPassword")], "Passwords do not match"),
   })
   .required("Provide password details");

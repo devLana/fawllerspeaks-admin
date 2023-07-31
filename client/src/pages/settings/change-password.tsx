@@ -31,6 +31,7 @@ const ChangePassword: NextPageWithLayout = () => {
     handleSubmit,
     formState: { errors },
     setError,
+    reset,
   } = useForm<MutationChangePasswordArgs>({
     resolver: yupResolver(changePasswordValidator),
   });
@@ -46,9 +47,9 @@ const ChangePassword: NextPageWithLayout = () => {
           const fieldErrors = response.changePassword;
           const focus = { shouldFocus: true };
 
-          if (fieldErrors.currentPasswordError) {
-            const message = fieldErrors.currentPasswordError;
-            setError("currentPassword", { message }, focus);
+          if (fieldErrors.confirmNewPasswordError) {
+            const message = fieldErrors.confirmNewPasswordError;
+            setError("confirmNewPassword", { message }, focus);
           }
 
           if (fieldErrors.newPasswordError) {
@@ -56,9 +57,9 @@ const ChangePassword: NextPageWithLayout = () => {
             setError("newPassword", { message }, focus);
           }
 
-          if (fieldErrors.confirmNewPasswordError) {
-            const message = fieldErrors.confirmNewPasswordError;
-            setError("newPassword", { message }, focus);
+          if (fieldErrors.currentPasswordError) {
+            const message = fieldErrors.currentPasswordError;
+            setError("currentPassword", { message }, focus);
           }
 
           setFormStatus("idle");
@@ -90,6 +91,7 @@ const ChangePassword: NextPageWithLayout = () => {
 
         case "Response":
           setFormStatus("success");
+          reset();
       }
     }
   };
@@ -110,7 +112,7 @@ const ChangePassword: NextPageWithLayout = () => {
   }
 
   return (
-    <div>
+    <>
       {(formStatus === "error" || formStatus === "success") && (
         <Snackbar
           message={msg}
@@ -118,6 +120,9 @@ const ChangePassword: NextPageWithLayout = () => {
           autoHideDuration={2000}
           onClose={() => setFormStatus("idle")}
           TransitionComponent={RightTransition}
+          ContentProps={{
+            sx: { flexGrow: 0, justifyContent: "center", minWidth: "11rem" },
+          }}
         />
       )}
       <ChangePasswordForm
@@ -126,7 +131,7 @@ const ChangePassword: NextPageWithLayout = () => {
         onSubmit={handleSubmit(submitHandler)}
         register={register}
       />
-    </div>
+    </>
   );
 };
 
