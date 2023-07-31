@@ -4,10 +4,10 @@ import { useRouter } from "next/router";
 import { useApolloClient, useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import LoadingButton from "@mui/lab/LoadingButton";
-import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 
-import PasswordInput from "@components/PasswordInput";
+import ChangePasswordForm from "@features/settings/changePassword/components/ChangePasswordForm";
+import { RightTransition } from "@components/SlideTransitions";
 import { changePasswordValidator } from "@features/settings/changePassword/utils/changePasswordValidator";
 import { CHANGE_PASSWORD } from "@features/settings/changePassword/operations/CHANGE_PASSWORD";
 import { SESSION_ID } from "@utils/constants";
@@ -19,10 +19,9 @@ type Status = "idle" | "submitting" | "error" | "success";
 
 const ChangePassword: NextPageWithLayout = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
-
   const { replace } = useRouter();
-
   const client = useApolloClient();
+
   const [changePassword, { data, error }] = useMutation(CHANGE_PASSWORD, {
     onError: () => setFormStatus("error"),
   });
@@ -113,47 +112,20 @@ const ChangePassword: NextPageWithLayout = () => {
   return (
     <div>
       {(formStatus === "error" || formStatus === "success") && (
-        <Alert severity={formStatus}>{msg}</Alert>
+        <Snackbar
+          message={msg}
+          open={true}
+          autoHideDuration={2000}
+          onClose={() => setFormStatus("idle")}
+          TransitionComponent={RightTransition}
+        />
       )}
-      <form onSubmit={handleSubmit(submitHandler)} noValidate>
-        <PasswordInput
-          id="current-password"
-          autoComplete="current-password"
-          autoFocus
-          label="Current Password"
-          register={register("currentPassword")}
-          fieldError={errors.currentPassword}
-          margin={errors.currentPassword ? "dense" : "normal"}
-        />
-        <PasswordInput
-          id="new-password"
-          autoComplete="new-password"
-          autoFocus
-          label="New Password"
-          register={register("newPassword")}
-          fieldError={errors.newPassword}
-          margin={errors.newPassword ? "dense" : "normal"}
-        />
-        <PasswordInput
-          id="confirm-new-password"
-          autoComplete="new-password"
-          autoFocus
-          label="Confirm New Password"
-          register={register("confirmNewPassword")}
-          fieldError={errors.confirmNewPassword}
-          margin={errors.confirmNewPassword ? "dense" : "normal"}
-        />
-        <LoadingButton
-          loading={formStatus === "submitting"}
-          variant="contained"
-          size="large"
-          type="submit"
-          fullWidth
-          sx={{ textTransform: "uppercase", mt: 3 }}
-        >
-          <span>Change Password</span>
-        </LoadingButton>
-      </form>
+      <ChangePasswordForm
+        isLoading={formStatus === "submitting"}
+        fieldErrors={errors}
+        onSubmit={handleSubmit(submitHandler)}
+        register={register}
+      />
     </div>
   );
 };
