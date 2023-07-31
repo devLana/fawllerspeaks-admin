@@ -9,7 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import useStatusAlert from "@features/forgotPassword/hooks/useStatusAlert";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
-import Toast from "@components/Toast";
+import AlertToast from "@components/AlertToast";
 import Card from "@components/Card";
 import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
 import ForgotPasswordForm from "@features/forgotPassword/components/ForgotPasswordForm";
@@ -101,7 +101,7 @@ const ForgotPassword: NextPageWithLayout = () => {
   return (
     <>
       {status === "error" && (
-        <Toast
+        <AlertToast
           horizontal="center"
           vertical="top"
           isOpen={true}
@@ -112,7 +112,7 @@ const ForgotPassword: NextPageWithLayout = () => {
         />
       )}
       {statusMessage && (
-        <Toast
+        <AlertToast
           horizontal="center"
           vertical="top"
           isOpen={true}

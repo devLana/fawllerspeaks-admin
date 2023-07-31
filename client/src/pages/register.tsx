@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Typography from "@mui/material/Typography";
 
 import AuthRootLayout from "@layouts/AuthRootLayout";
-import Toast from "@components/Toast";
+import AlertToast from "@components/AlertToast";
 import Card from "@components/Card";
 import RegisterUserForm from "@features/register/components/RegisterUserForm";
 import { REGISTER_USER } from "@features/register/operations/REGISTER_USER";
@@ -112,7 +112,7 @@ const RegisterUser: NextPageWithLayout = () => {
   return (
     <>
       {status === "error" && (
-        <Toast
+        <AlertToast
           horizontal="center"
           vertical="top"
           isOpen={true}

@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 
 import { useSession } from "@context/SessionContext";
 import { useAuthHeaderHandler } from "@context/ApolloContext";
-import Toast from "@components/Toast";
+import AlertToast from "@components/AlertToast";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
 import Card from "@components/Card";
@@ -118,7 +118,7 @@ const Login: NextPageWithLayout = () => {
   return (
     <>
       {status === "error" && (
-        <Toast
+        <AlertToast
           horizontal="center"
           vertical="top"
           isOpen={true}
@@ -129,7 +129,7 @@ const Login: NextPageWithLayout = () => {
         />
       )}
       {statusMessage && (
-        <Toast
+        <AlertToast
           horizontal="center"
           vertical="top"
           isOpen={!!statusMessage}

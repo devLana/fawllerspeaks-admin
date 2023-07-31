@@ -3,12 +3,18 @@ import Snackbar, {
   type SnackbarProps,
 } from "@mui/material/Snackbar";
 import Alert, { type AlertColor, type AlertProps } from "@mui/material/Alert";
-import Slide, { type SlideProps } from "@mui/material/Slide";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import { type SlideProps } from "@mui/material/Slide";
 
-type TransitionProps = Omit<SlideProps, "direction">;
+import {
+  DownTransition,
+  LeftTransition,
+  RightTransition,
+  UpTransition,
+  type TransitionProps,
+} from "./SlideTransitions";
 
-interface ToastProps {
+interface AlertToastProps {
   horizontal?: SnackbarOrigin["horizontal"];
   vertical?: SnackbarOrigin["vertical"];
   isOpen: boolean;
@@ -19,23 +25,7 @@ interface ToastProps {
   content: string;
 }
 
-const DownTransition = (props: TransitionProps) => (
-  <Slide {...props} direction="down" />
-);
-
-const UpTransition = (props: TransitionProps) => (
-  <Slide {...props} direction="up" />
-);
-
-const LeftTransition = (props: TransitionProps) => (
-  <Slide {...props} direction="left" />
-);
-
-const RightTransition = (props: TransitionProps) => (
-  <Slide {...props} direction="right" />
-);
-
-const Toast = ({
+const AlertToast = ({
   horizontal = "right",
   vertical = "bottom",
   isOpen,
@@ -44,7 +34,7 @@ const Toast = ({
   severity,
   variant,
   content,
-}: ToastProps) => {
+}: AlertToastProps) => {
   let transition: React.FC<TransitionProps>;
 
   switch (direction) {
@@ -69,7 +59,6 @@ const Toast = ({
       onClose={onClose}
       autoHideDuration={2000}
       TransitionComponent={transition}
-      key={transition.name}
     >
       <Alert
         severity={severity}
@@ -83,4 +72,4 @@ const Toast = ({
   );
 };
 
-export default Toast;
+export default AlertToast;

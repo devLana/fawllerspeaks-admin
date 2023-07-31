@@ -7,7 +7,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Tooltip from "@mui/material/Tooltip";
 
-import Toast from "@components/Toast";
+import AlertToast from "@components/AlertToast";
 import LogoutModal from "./LogoutModal";
 import transition from "../utils/transition";
 import type { MuiIconType } from "@types";
@@ -85,7 +85,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
         />
       )}
       {toastMessage && (
-        <Toast
+        <AlertToast
           horizontal="center"
           vertical="bottom"
           isOpen={!!toastMessage}
