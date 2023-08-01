@@ -8,7 +8,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Snackbar from "@mui/material/Snackbar";
 import Tooltip from "@mui/material/Tooltip";
 
-import { RightTransition } from "@components/SlideTransitions";
 import LogoutModal from "./LogoutModal";
 import transition from "../utils/transition";
 import type { MuiIconType } from "@types";
@@ -90,10 +89,6 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
           message={toastMessage}
           open={true}
           onClose={() => setToastMessage(null)}
-          TransitionComponent={RightTransition}
-          ContentProps={{
-            sx: { flexGrow: 0, justifyContent: "center", minWidth: "11rem" },
-          }}
         />
       )}
     </>

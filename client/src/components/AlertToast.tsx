@@ -57,7 +57,6 @@ const AlertToast = ({
       anchorOrigin={{ horizontal, vertical }}
       open={isOpen}
       onClose={onClose}
-      autoHideDuration={2000}
       TransitionComponent={transition}
     >
       <Alert

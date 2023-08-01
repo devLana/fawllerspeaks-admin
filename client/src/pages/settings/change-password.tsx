@@ -7,7 +7,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Snackbar from "@mui/material/Snackbar";
 
 import ChangePasswordForm from "@features/settings/changePassword/components/ChangePasswordForm";
-import { RightTransition } from "@components/SlideTransitions";
 import { changePasswordValidator } from "@features/settings/changePassword/utils/changePasswordValidator";
 import { CHANGE_PASSWORD } from "@features/settings/changePassword/operations/CHANGE_PASSWORD";
 import { SESSION_ID } from "@utils/constants";
@@ -117,12 +116,7 @@ const ChangePassword: NextPageWithLayout = () => {
         <Snackbar
           message={msg}
           open={true}
-          autoHideDuration={2000}
           onClose={() => setFormStatus("idle")}
-          TransitionComponent={RightTransition}
-          ContentProps={{
-            sx: { flexGrow: 0, justifyContent: "center", minWidth: "11rem" },
-          }}
         />
       )}
       <ChangePasswordForm
