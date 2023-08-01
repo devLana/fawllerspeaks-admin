@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import { useMutation } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Typography from "@mui/material/Typography";
@@ -25,6 +25,7 @@ const RegisterUser: NextPageWithLayout = () => {
 
   const router = useRouter();
 
+  const client = useApolloClient();
   const [registerUser, { error }] = useMutation(REGISTER_USER, {
     onError: () => setStatus("error"),
   });
@@ -79,11 +80,13 @@ const RegisterUser: NextPageWithLayout = () => {
 
         case "AuthenticationError":
           localStorage.removeItem(SESSION_ID);
+          void client.clearStore();
           void router.replace("/login?status=unauthenticated");
           break;
 
         case "UnknownError":
           localStorage.removeItem(SESSION_ID);
+          void client.clearStore();
           void router.replace("/login?status=unauthorized");
           break;
 

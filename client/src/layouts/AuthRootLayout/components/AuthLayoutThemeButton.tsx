@@ -11,7 +11,7 @@ import { DEFAULT_THEME } from "@utils/constants";
 import { normalizedThemes, themes } from "@utils/appThemes";
 import type { AppTheme } from "@types";
 
-const AuthRootLayoutThemeButton = () => {
+const AuthLayoutThemeButton = () => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
   const { appTheme } = useTheme();
 
@@ -65,4 +65,4 @@ const AuthRootLayoutThemeButton = () => {
   );
 };
 
-export default AuthRootLayoutThemeButton;
+export default AuthLayoutThemeButton;
