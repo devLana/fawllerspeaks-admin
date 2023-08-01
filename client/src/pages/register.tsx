@@ -21,6 +21,7 @@ type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
 type Status = "idle" | "loading" | "error";
 
 const RegisterUser: NextPageWithLayout = () => {
+  const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<Status>("idle");
 
   const router = useRouter();
@@ -38,6 +39,23 @@ const RegisterUser: NextPageWithLayout = () => {
   } = useForm<RegisterUserArgs>({
     resolver: yupResolver(registerUserValidator),
   });
+
+  React.useEffect(() => {
+    if (router.isReady) {
+      if (router.query.status && !Array.isArray(router.query.status)) {
+        switch (router.query.status) {
+          case "unregistered":
+            setStatusMessage(
+              "You need to register your account before you can perform that action"
+            );
+            break;
+
+          default:
+            setStatusMessage(null);
+        }
+      }
+    }
+  }, [router.isReady, router.query.status]);
 
   const submitHandler = async (values: RegisterUserArgs) => {
     setStatus("loading");
@@ -123,6 +141,17 @@ const RegisterUser: NextPageWithLayout = () => {
           direction="down"
           severity="error"
           content={alertMessage}
+        />
+      )}
+      {statusMessage && (
+        <AlertToast
+          horizontal="center"
+          vertical="top"
+          isOpen={!!statusMessage}
+          onClose={() => setStatusMessage(null)}
+          direction="down"
+          severity="info"
+          content={statusMessage}
         />
       )}
       <Typography align="center" variant="h1">

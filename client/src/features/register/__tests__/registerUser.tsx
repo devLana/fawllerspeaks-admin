@@ -45,6 +45,22 @@ describe("Register User Page", () => {
     expect(screen.getByRole("button", { name: /^register$/i })).toBeDisabled();
   };
 
+  describe("App is redirected to the register page with a status token", () => {
+    it("Display an alert message if status token is 'unregistered'", () => {
+      const router = useRouter();
+      router.query = { status: "unregistered" };
+
+      renderTestUI(<RegisterUser />);
+
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "You need to register your account before you can perform that action"
+      );
+
+      router.query = {};
+    });
+  });
+
   describe("Client side form validation", () => {
     it("Display error messages for empty input fields", async () => {
       const { user } = renderTestUI(<RegisterUser />);
