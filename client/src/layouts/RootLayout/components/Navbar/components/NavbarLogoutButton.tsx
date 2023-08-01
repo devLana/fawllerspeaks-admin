@@ -5,9 +5,10 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import Snackbar from "@mui/material/Snackbar";
 import Tooltip from "@mui/material/Tooltip";
 
-import AlertToast from "@components/AlertToast";
+import { RightTransition } from "@components/SlideTransitions";
 import LogoutModal from "./LogoutModal";
 import transition from "../utils/transition";
 import type { MuiIconType } from "@types";
@@ -85,14 +86,14 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
         />
       )}
       {toastMessage && (
-        <AlertToast
-          horizontal="center"
-          vertical="bottom"
-          isOpen={!!toastMessage}
+        <Snackbar
+          message={toastMessage}
+          open={true}
           onClose={() => setToastMessage(null)}
-          direction="up"
-          severity="error"
-          content={toastMessage}
+          TransitionComponent={RightTransition}
+          ContentProps={{
+            sx: { flexGrow: 0, justifyContent: "center", minWidth: "11rem" },
+          }}
         />
       )}
     </>
