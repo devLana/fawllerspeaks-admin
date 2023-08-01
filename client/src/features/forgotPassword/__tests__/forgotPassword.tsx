@@ -15,11 +15,6 @@ import {
 } from "../utils/forgotPassword.mocks";
 
 describe("Forgot Password Page", () => {
-  beforeAll(() => {
-    const router = useRouter();
-    router.pathname = "/forgot-password";
-  });
-
   const textBox = { name: /e-?mail/i };
   const name = "Send Reset Link";
 

@@ -123,11 +123,6 @@ describe("Reset Password", () => {
   });
 
   describe("ResetPassword Page", () => {
-    beforeAll(() => {
-      const router = useRouter();
-      router.pathname = "/reset-password";
-    });
-
     const resetButton = { name: /^reset password$/i };
     const msg =
       "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";

@@ -20,11 +20,6 @@ import {
 } from "../utils/login.mocks";
 
 describe("Login Page", () => {
-  beforeAll(() => {
-    const router = useRouter();
-    router.pathname = "/login";
-  });
-
   const emailLabel = { name: /e-?mail/i };
 
   describe("Redirect from other pages, get status param url query", () => {

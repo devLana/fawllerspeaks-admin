@@ -23,11 +23,6 @@ import { renderTestUI } from "@utils/renderTestUI";
 import { SESSION_ID } from "@utils/constants";
 
 describe("Register User Page", () => {
-  beforeAll(() => {
-    const router = useRouter();
-    router.pathname = "/register";
-  });
-
   beforeEach(() => {
     localStorage.setItem(SESSION_ID, SESSIONID);
   });

@@ -1,7 +1,9 @@
-import { renderTestUI } from "@utils/renderTestUI";
 import { useRouter } from "next/router";
-import PageBreadcrumbs from ".";
+
 import { screen, within } from "@testing-library/react";
+
+import PageBreadcrumbs from ".";
+import { renderTestUI } from "@utils/renderTestUI";
 
 describe("Page Breadcrumbs", () => {
   const name = { name: /^breadcrumb$/i };
