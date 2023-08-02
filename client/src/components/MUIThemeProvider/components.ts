@@ -23,33 +23,24 @@ export const components: Components = {
   },
   MuiTypography: {
     styleOverrides: {
-      gutterBottom: ({ ownerState }) => ({
-        ...(ownerState.variant === "body1" &&
-          ownerState.gutterBottom && { marginBottom: "0.7rem" }),
+      gutterBottom: ({ ownerState: { variant, gutterBottom } }) => ({
+        ...(variant === "body1" && gutterBottom && { marginBottom: "0.7rem" }),
       }),
     },
   },
   MuiButton: { styleOverrides: { root: { textTransform: "capitalize" } } },
   MuiCard: {
     styleOverrides: {
-      root: ({ ownerState, theme }) => {
-        let styles: Record<string, unknown> = {};
-
-        if (ownerState.variant === "outlined") {
-          styles = { [theme.breakpoints.down("sm")]: { border: 0 } };
-        }
-
-        if (ownerState.raised) {
-          styles = {
-            [theme.breakpoints.down("sm")]: {
-              boxShadow: "none",
-              backgroundImage: "none",
-            },
-          };
-        }
-
-        return { ...styles, transition: "none" };
-      },
+      root: ({ ownerState, theme }) => ({
+        [theme.breakpoints.down("sm")]: {
+          ...(ownerState.variant === "outlined" && { border: 0 }),
+          ...(ownerState.raised && {
+            boxShadow: "none",
+            backgroundImage: "none",
+          }),
+        },
+        transition: "none",
+      }),
     },
   },
   MuiCardContent: {
@@ -68,8 +59,8 @@ export const components: Components = {
   MuiSnackbarContent: {
     styleOverrides: {
       root: ({ ownerState }) => ({
+        ...(!ownerState.action && { justifyContent: "center" }),
         flexGrow: 0,
-        justifyContent: !ownerState.action ? "center" : "normal",
         minWidth: "11rem",
       }),
     },
