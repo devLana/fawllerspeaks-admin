@@ -56,16 +56,16 @@ const NavbarItem = (props: NavbarItemProps) => {
           <ListItemText
             primary={label}
             sx={theme => ({
-              ml: "0.5rem",
+              ml: "1rem",
               [theme.breakpoints.up("sm")]: {
-                ml: isOpen ? "0.5rem" : 0,
+                ml: isOpen ? "1rem" : 0,
                 overflowX: isOpen ? "visible" : "hidden",
-              },
-              "&>.MuiTypography-root": {
-                fontWeight: isActive ? 700 : 400,
-                letterSpacing: isActive ? 0.5 : "normal",
-                lineHeight: isOpen ? 1 : 0,
-                width: isOpen ? "auto" : 0,
+                "&>.MuiTypography-root": {
+                  fontWeight: isActive ? 700 : 400,
+                  letterSpacing: isActive ? 0.5 : "normal",
+                  lineHeight: isOpen ? 1 : 0,
+                  width: isOpen ? "auto" : 0,
+                },
               },
             })}
           />

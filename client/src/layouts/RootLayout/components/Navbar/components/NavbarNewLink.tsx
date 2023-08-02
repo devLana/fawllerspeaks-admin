@@ -47,14 +47,14 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
           <ListItemText
             primary={label}
             sx={theme => ({
-              ml: "0.5rem",
+              ml: "1rem",
               [theme.breakpoints.up("sm")]: {
-                ml: isOpen ? "0.5rem" : 0,
+                ml: isOpen ? "1rem" : 0,
                 overflowX: isOpen ? "visible" : "hidden",
-              },
-              "&>.MuiTypography-root": {
-                width: isOpen ? "auto" : 0,
-                lineHeight: isOpen ? 1 : 0,
+                "&>.MuiTypography-root": {
+                  width: isOpen ? "auto" : 0,
+                  lineHeight: isOpen ? 1 : 0,
+                },
               },
             })}
           />
