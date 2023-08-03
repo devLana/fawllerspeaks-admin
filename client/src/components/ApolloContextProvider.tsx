@@ -1,9 +1,11 @@
 import * as React from "react";
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import { ApolloContext } from "@context/ApolloContext";
 
-const cache = new InMemoryCache();
+import { ApolloContext } from "@context/ApolloContext";
+import { BaseResponse } from "@utils/cachePossibleTypes";
+
+const cache = new InMemoryCache({ possibleTypes: { BaseResponse } });
 
 const ApolloContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [jwt, setJwt] = React.useState("");

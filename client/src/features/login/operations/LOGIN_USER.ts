@@ -13,7 +13,7 @@ export const LOGIN_USER: Login = gql`
         status
       }
 
-      ... on NotAllowedError {
+      ... on BaseResponse {
         message
         status
       }

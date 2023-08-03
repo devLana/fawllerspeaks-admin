@@ -12,22 +12,7 @@ export const LOGOUT: Logout = gql`
         status
       }
 
-      ... on AuthenticationError {
-        message
-        status
-      }
-
-      ... on NotAllowedError {
-        message
-        status
-      }
-
-      ... on UnknownError {
-        message
-        status
-      }
-
-      ... on Response {
+      ... on BaseResponse {
         message
         status
       }

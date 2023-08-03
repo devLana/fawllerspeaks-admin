@@ -12,22 +12,7 @@ export const REFRESH_TOKEN: RefreshToken = gql`
         status
       }
 
-      ... on AuthenticationError {
-        message
-        status
-      }
-
-      ... on NotAllowedError {
-        message
-        status
-      }
-
-      ... on UnknownError {
-        message
-        status
-      }
-
-      ... on UserSessionError {
+      ... on BaseResponse {
         message
         status
       }

@@ -22,17 +22,7 @@ export const RESET_PASSWORD: ResetPassword = gql`
         status
       }
 
-      ... on NotAllowedError {
-        message
-        status
-      }
-
-      ... on RegistrationError {
-        message
-        status
-      }
-
-      ... on Response {
+      ... on BaseResponse {
         message
         status
       }

@@ -15,17 +15,7 @@ export const REGISTER_USER: RegisterUser = gql`
         status
       }
 
-      ... on AuthenticationError {
-        message
-        status
-      }
-
-      ... on RegistrationError {
-        message
-        status
-      }
-
-      ... on UnknownError {
+      ... on BaseResponse {
         message
         status
       }

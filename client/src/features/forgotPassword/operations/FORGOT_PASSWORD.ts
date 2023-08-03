@@ -12,22 +12,7 @@ export const FORGOT_PASSWORD: ForgotPassword = gql`
         status
       }
 
-      ... on NotAllowedError {
-        message
-        status
-      }
-
-      ... on RegistrationError {
-        message
-        status
-      }
-
-      ... on ServerError {
-        message
-        status
-      }
-
-      ... on Response {
+      ... on BaseResponse {
         message
         status
       }

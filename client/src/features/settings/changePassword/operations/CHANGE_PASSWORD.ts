@@ -22,32 +22,7 @@ export const CHANGE_PASSWORD: ChangePassword = gql`
         status
       }
 
-      ... on AuthenticationError {
-        message
-        status
-      }
-
-      ... on NotAllowedError {
-        message
-        status
-      }
-
-      ... on RegistrationError {
-        message
-        status
-      }
-
-      ... on ServerError {
-        message
-        status
-      }
-
-      ... on UnknownError {
-        message
-        status
-      }
-
-      ... on Response {
+      ... on BaseResponse {
         message
         status
       }

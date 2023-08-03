@@ -12,19 +12,8 @@ export const VERIFY_PASSWORD_RESET_TOKEN: VerifyResetToken = gql`
         status
       }
 
-      ... on NotAllowedError {
+      ... on BaseResponse {
         message
-        status
-      }
-
-      ... on RegistrationError {
-        message
-        status
-      }
-
-      ... on VerifiedResetToken {
-        email
-        resetToken
         status
       }
     }

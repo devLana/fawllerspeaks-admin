@@ -1,0 +1,16 @@
+export const BaseResponse = [
+  "NotAllowedError",
+  "UnknownError",
+  "ServerError",
+  "RegistrationError",
+  "AuthenticationError",
+  "UserSessionError",
+  "Response",
+  "PostsWarning",
+  "EmptyBinWarning",
+  "DuplicatePostTitleError",
+  "NotAllowedPostActionError",
+  "UnauthorizedAuthorError",
+  "PostTagsWarning",
+  "DuplicatePostTagError",
+];
