@@ -5,10 +5,7 @@ import type { UserEvent } from "@testing-library/user-event/dist/types/setup/set
 
 import RegisterUser from "@pages/register";
 import {
-  FIRST_NAME,
-  LAST_NAME,
-  PASSWORD,
-  SESSIONID,
+  type Input,
   invalidFirstName,
   invalidLastName,
   invalidPassword,
@@ -16,30 +13,26 @@ import {
   success,
   table1,
   table2,
-  validationOne,
-  validationTwo,
+  validation1,
+  validation2,
 } from "../utils/registerUser.mocks";
 import { renderTestUI } from "@utils/renderTestUI";
-import { SESSION_ID } from "@utils/constants";
 
 describe("Register User Page", () => {
-  beforeEach(() => {
-    localStorage.setItem(SESSION_ID, SESSIONID);
-  });
-
-  const dryEvents = async (user: UserEvent) => {
+  const dryEvents = async (user: UserEvent, input: Input) => {
     await user.type(
       screen.getByRole("textbox", { name: /^first name$/i }),
-      FIRST_NAME
+      input.firstName
     );
-
     await user.type(
       screen.getByRole("textbox", { name: /^last name$/i }),
-      LAST_NAME
+      input.lastName
     );
-
-    await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
-    await user.type(screen.getByLabelText(/^confirm password$/i), PASSWORD);
+    await user.type(screen.getByLabelText(/^password$/i), input.password);
+    await user.type(
+      screen.getByLabelText(/^confirm password$/i),
+      input.password
+    );
     await user.click(screen.getByRole("button", { name: /^register$/i }));
 
     expect(screen.getByRole("button", { name: /^register$/i })).toBeDisabled();
@@ -117,7 +110,7 @@ describe("Register User Page", () => {
       const { user } = renderTestUI(<RegisterUser />);
       const confirmPassword = screen.getByLabelText(/^confirm password$/i);
 
-      await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+      await user.type(screen.getByLabelText(/^password$/i), "PaS$W0RD");
       await user.type(confirmPassword, "PASSWORD");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
 
@@ -141,10 +134,10 @@ describe("Register User Page", () => {
   describe("Server responds with an error/unsupported object response", () => {
     describe("Validation errors", () => {
       it("Show input error messages for empty fields validation error", async () => {
-        const { user } = renderTestUI(<RegisterUser />, validationOne.gql());
+        const { user } = renderTestUI(<RegisterUser />, validation1.gql());
         const fName = screen.getByRole("textbox", { name: /^first name$/i });
 
-        await dryEvents(user);
+        await dryEvents(user, validation1.input);
 
         await waitFor(() => {
           expect(fName).toHaveErrorMessage("Enter first name");
@@ -166,10 +159,10 @@ describe("Register User Page", () => {
       });
 
       it("Show input error messages for invalid fields validation error", async () => {
-        const { user } = renderTestUI(<RegisterUser />, validationTwo.gql());
+        const { user } = renderTestUI(<RegisterUser />, validation2.gql());
         const fName = screen.getByRole("textbox", { name: /^first name$/i });
 
-        await dryEvents(user);
+        await dryEvents(user, validation2.input);
 
         await waitFor(() => {
           expect(fName).toHaveErrorMessage(invalidFirstName);
@@ -199,7 +192,7 @@ describe("Register User Page", () => {
       it.each(table1)("%s", async (_, expected) => {
         const { user } = renderTestUI(<RegisterUser />, expected.gql());
 
-        await dryEvents(user);
+        await dryEvents(user, expected.input);
 
         expect(await screen.findByRole("alert")).toBeInTheDocument();
         expect(screen.getByRole("alert")).toHaveTextContent(expected.message);
@@ -210,18 +203,15 @@ describe("Register User Page", () => {
     });
 
     describe("Redirect the user to another page", () => {
-      it.each(table2)(
-        "Redirect to the %s page if the user %s",
-        async (_, __, { path, expected }) => {
-          const router = useRouter();
-          const { user } = renderTestUI(<RegisterUser />, expected.gql());
+      it.each(table2)("%s", async (_, { path, expected }) => {
+        const router = useRouter();
+        const { user } = renderTestUI(<RegisterUser />, expected.gql());
 
-          await dryEvents(user);
+        await dryEvents(user, expected.input);
 
-          await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
-          expect(router.replace).toHaveBeenCalledWith(path);
-        }
-      );
+        await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+        expect(router.replace).toHaveBeenCalledWith(path);
+      });
     });
   });
 
@@ -230,14 +220,10 @@ describe("Register User Page", () => {
       const router = useRouter();
       const { user } = renderTestUI(<RegisterUser />, success.gql());
 
-      await dryEvents(user);
+      await dryEvents(user, success.input);
 
       await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
       expect(router.replace).toHaveBeenCalledWith("/");
     });
-  });
-
-  afterAll(() => {
-    localStorage.removeItem(SESSION_ID);
   });
 });

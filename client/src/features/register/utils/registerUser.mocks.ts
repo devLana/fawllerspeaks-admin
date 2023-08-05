@@ -5,6 +5,13 @@ import { REGISTER_USER } from "../operations/REGISTER_USER";
 
 type SorN = string | null;
 
+export interface Input {
+  firstName: string;
+  lastName: string;
+  password: string;
+  confirmPassword: string;
+}
+
 interface Errors<T, U, V, X> {
   firstNameError: T;
   lastNameError: U;
@@ -15,41 +22,44 @@ interface Errors<T, U, V, X> {
 interface Expected {
   message: string;
   gql: () => MockedResponse[];
+  input: Input;
 }
 
-export const SESSIONID = "USER_SESSION_ID";
-export const FIRST_NAME = "FIRST_NAME";
-export const LAST_NAME = "LAST_NAME";
-export const PASSWORD = "Pass#W0rd";
 export const invalidFirstName = "First name cannot contain numbers";
 export const invalidLastName = "Last name cannot contain numbers";
 export const shortPassword = "Password must be at least 8 characters long";
 export const invalidPassword =
   "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
 
+const FIRST_NAME = "FIRST_NAME";
+const LAST_NAME = "LAST_NAME";
 const USER_ID = "SOME_RANDOM_USER_ID";
 const E_MAIL = "user_mail@example.com";
 const MESSAGE =
   "You are unable to register your account. Please try again later";
-const request = {
-  query: REGISTER_USER,
-  variables: {
-    userInput: {
-      firstName: FIRST_NAME,
-      lastName: LAST_NAME,
-      password: PASSWORD,
-      confirmPassword: PASSWORD,
-    },
-  },
+
+const request = (input: Input): MockedResponse["request"] => {
+  return { query: REGISTER_USER, variables: { userInput: input } };
 };
 
+const inputs = (name: string): Input => ({
+  firstName: `${name}_${FIRST_NAME}`,
+  lastName: `${name}_${LAST_NAME}`,
+  password: `${name}_Pass#W0rd`,
+  confirmPassword: `${name}_Pass#W0rd`,
+});
+
 class ErrorMock {
-  constructor(readonly message: string, readonly typename: string) {}
+  constructor(
+    readonly input: Input,
+    readonly message: string,
+    readonly typename: string
+  ) {}
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.input),
         result: {
           data: {
             registerUser: {
@@ -70,12 +80,12 @@ class ValidationMock<
   V extends SorN,
   X extends SorN
 > {
-  constructor(readonly errors: Errors<T, U, V, X>) {}
+  constructor(readonly input: Input, readonly errors: Errors<T, U, V, X>) {}
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.input),
         result: {
           data: {
             registerUser: {
@@ -93,19 +103,38 @@ class ValidationMock<
   }
 }
 
-const auth = new ErrorMock("User is not logged in", "AuthenticationError");
-const unknown = new ErrorMock("User session unknown", "UnknownError");
-const registered = new ErrorMock("User is registered", "RegistrationError");
-const unsupported = new ErrorMock(MESSAGE, "UnsupportedObjectType");
+const auth = new ErrorMock(
+  inputs("auth"),
+  "User is not logged in",
+  "AuthenticationError"
+);
 
-export const validationOne = new ValidationMock({
+const unknown = new ErrorMock(
+  inputs("unknown"),
+  "User session unknown",
+  "UnknownError"
+);
+
+const registered = new ErrorMock(
+  inputs("registered"),
+  "User is registered",
+  "RegistrationError"
+);
+
+const unsupported = new ErrorMock(
+  inputs("unsupported"),
+  MESSAGE,
+  "UnsupportedObjectType"
+);
+
+export const validation1 = new ValidationMock(inputs("validationOne"), {
   firstNameError: "Enter first name",
   lastNameError: "Enter last name",
   passwordError: "Enter password",
   confirmPasswordError: null,
 });
 
-export const validationTwo = new ValidationMock({
+export const validation2 = new ValidationMock(inputs("validationTwo"), {
   firstNameError: "First name cannot contain numbers",
   lastNameError: "Last name cannot contain numbers",
   passwordError: "Password must be at least 8 characters long",
@@ -113,10 +142,11 @@ export const validationTwo = new ValidationMock({
 });
 
 export const success = {
+  input: inputs("success"),
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.input),
         result: {
           data: {
             registerUser: {
@@ -142,17 +172,27 @@ export const success = {
 
 const network = {
   message: MESSAGE,
+  input: inputs("network"),
   gql(): MockedResponse[] {
     return [
-      { request, error: new Error("Server responded with a network error") },
+      {
+        request: request(this.input),
+        error: new Error("Server responded with a network error"),
+      },
     ];
   },
 };
 
 const graphql = {
   message: MESSAGE,
+  input: inputs("graphql"),
   gql(): MockedResponse[] {
-    return [{ request, result: { errors: [new GraphQLError(this.message)] } }];
+    return [
+      {
+        request: request(this.input),
+        result: { errors: [new GraphQLError(this.message)] },
+      },
+    ];
   },
 };
 
@@ -167,20 +207,17 @@ interface ErrorTests {
   expected: ErrorMock;
 }
 
-export const table2: [string, string, ErrorTests][] = [
+export const table2: [string, ErrorTests][] = [
   [
-    "login",
-    "is not logged in",
+    "Redirect the user to the login page if the user is not logged in",
     { path: "/login?status=unauthenticated", expected: auth },
   ],
   [
-    "login",
-    "credentials and user session could not be verified",
+    "Redirect the user to the login page if the user's credentials could not be verified",
     { path: "/login?status=unauthorized", expected: unknown },
   ],
   [
-    "home(dashboard)",
-    "has already registered their account",
+    "Redirect the user to the home(dashboard) page if the user has already registered their account",
     { path: "/?status=registered", expected: registered },
   ],
 ];
