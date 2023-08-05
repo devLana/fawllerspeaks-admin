@@ -11,12 +11,10 @@ import {
 } from "@utils/renderTestUI";
 import { SESSION_ID } from "@utils/constants";
 import {
-  validationError,
-  loginErrorTable,
-  loginSuccessTable,
+  validation,
+  errorTable,
+  successTable,
   redirectStatus,
-  EMAIL,
-  PASSWORD,
 } from "../utils/login.mocks";
 
 describe("Login Page", () => {
@@ -75,11 +73,11 @@ describe("Login Page", () => {
 
   describe("If server responds with an error object type or an unsupported object type after login request", () => {
     it("Set error messages on appropriate form input fields", async () => {
-      const { user } = renderTestUI(<Login />, validationError.gql());
-      const { emailError, passwordError } = validationError;
+      const { user } = renderTestUI(<Login />, validation.gql());
+      const { emailError, passwordError, email, password } = validation;
 
-      await user.type(screen.getByRole("textbox", emailLabel), EMAIL);
-      await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
+      await user.type(screen.getByRole("textbox", emailLabel), email);
+      await user.type(screen.getByLabelText(/^password$/i), password);
       await user.click(screen.getByRole("button", { name: /login/i }));
 
       expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
@@ -98,22 +96,19 @@ describe("Login Page", () => {
       expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
     });
 
-    it.each(loginErrorTable)(
-      "Show an alert message if %s",
-      async (_, error) => {
-        const { user } = renderTestUI(<Login />, error.gql());
-        const { message } = error;
+    it.each(errorTable)("Show an alert message if %s", async (_, error) => {
+      const { user } = renderTestUI(<Login />, error.gql());
+      const { message, email, password } = error;
 
-        await user.type(screen.getByRole("textbox", emailLabel), EMAIL);
-        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
-        await user.click(screen.getByRole("button", { name: /login/i }));
+      await user.type(screen.getByRole("textbox", emailLabel), email);
+      await user.type(screen.getByLabelText(/^password$/i), password);
+      await user.click(screen.getByRole("button", { name: /login/i }));
 
-        expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
 
-        expect(await screen.findByRole("alert")).toHaveTextContent(message);
-        expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
-      }
-    );
+      expect(await screen.findByRole("alert")).toHaveTextContent(message);
+      expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
+    });
   });
 
   describe("If login request is successful", () => {
@@ -121,30 +116,27 @@ describe("Login Page", () => {
       localStorage.removeItem(SESSION_ID);
     });
 
-    it.each(loginSuccessTable)(
-      "Redirect %s user to the %s page",
-      async (_, __, { mock, page }) => {
-        const { user } = renderTestUI(<Login />, mock.gql());
-        const { replace } = useRouter();
+    it.each(successTable)("%s", async (_, { mock, page }) => {
+      const { user } = renderTestUI(<Login />, mock.gql());
+      const { replace } = useRouter();
 
-        await user.type(screen.getByRole("textbox", emailLabel), EMAIL);
-        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
-        await user.click(screen.getByRole("button", { name: /login/i }));
+      await user.type(screen.getByRole("textbox", emailLabel), mock.email);
+      await user.type(screen.getByLabelText(/^password$/i), mock.password);
+      await user.click(screen.getByRole("button", { name: /login/i }));
 
-        expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
 
-        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-        expect(replace).toHaveBeenCalledWith(page);
+      await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+      expect(replace).toHaveBeenCalledWith(page);
 
-        expect(localStorage.getItem(SESSION_ID)).toBe(mock.sessionId);
-        expect(authHeaderHandler).toHaveBeenCalledTimes(1);
-        expect(authHeaderHandler).toHaveBeenCalledWith("accessToken");
-        expect(userIdHandler).toHaveBeenCalledTimes(1);
-        expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
-        expect(refreshTokenHandler).toHaveBeenCalledTimes(1);
-        expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
-        expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
-      }
-    );
+      expect(localStorage.getItem(SESSION_ID)).toBe(mock.sessionId);
+      expect(authHeaderHandler).toHaveBeenCalledTimes(1);
+      expect(authHeaderHandler).toHaveBeenCalledWith("accessToken");
+      expect(userIdHandler).toHaveBeenCalledTimes(1);
+      expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
+      expect(refreshTokenHandler).toHaveBeenCalledTimes(1);
+      expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
+      expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
+    });
   });
 });

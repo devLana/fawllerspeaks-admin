@@ -3,26 +3,36 @@ import type { MockedResponse } from "@apollo/client/testing";
 
 import { LOGIN_USER } from "../operations/LOGIN_USER";
 
-interface ExpectedError {
+interface Input {
+  email: string;
+  password: string;
+}
+
+interface ExpectedError extends Input {
   message: string;
   gql: () => MockedResponse[];
 }
 
-export const EMAIL = "login_test@mail.com";
-export const PASSWORD = "testPassword";
+const EMAIL = "login_test@mail.com";
+const PASSWORD = "testPassword";
 const msg = "You are unable to login at the moment. Please try again later";
-const request: MockedResponse["request"] = {
-  query: LOGIN_USER,
-  variables: { email: EMAIL, password: PASSWORD },
+
+const request = (
+  email: string,
+  password: string
+): MockedResponse["request"] => {
+  return { query: LOGIN_USER, variables: { email, password } };
 };
 
-export const validationError = {
+export const validation = {
+  email: `validation_${EMAIL}`,
+  password: `validation_${PASSWORD}`,
   emailError: "Invalid e-mail address",
   passwordError: "Enter Password",
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.email, this.password),
         result: {
           data: {
             login: {
@@ -39,12 +49,22 @@ export const validationError = {
 };
 
 class ErrorMock {
-  constructor(readonly typename: string, readonly message: string) {}
+  email: string;
+  password: string;
+
+  constructor(
+    input: Input,
+    readonly typename: string,
+    readonly message: string
+  ) {
+    this.email = `${input.email}_${EMAIL}`;
+    this.password = `${input.password}_${PASSWORD}`;
+  }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.email, this.password),
         result: {
           data: {
             login: {
@@ -59,29 +79,39 @@ class ErrorMock {
   }
 }
 
-const unrecognizedEmailError = new ErrorMock(
+const unrecognized = new ErrorMock(
+  { email: "unrecognized", password: "unrecognized" },
   "NotAllowedError",
   "Invalid email or password"
 );
 
 const emailPasswordError = new ErrorMock(
+  { email: "email_password", password: "email_password" },
   "NotAllowedError",
   "Invalid email or password"
 );
 
-const unsupportedObjectType = new ErrorMock("UnknownGraphqlObjectType", msg);
+const unsupported = new ErrorMock(
+  { email: "unsupported", password: "unsupported" },
+  "UnknownGraphqlObjectType",
+  msg
+);
 
 class SuccessMock {
   sessionId: string;
+  email: string;
+  password: string;
 
-  constructor(readonly isRegistered: boolean) {
+  constructor(input: Input, readonly isRegistered: boolean) {
     this.sessionId = "USER_DATA_SESSION_ID";
+    this.email = `${input.email}_${EMAIL}`;
+    this.password = `${input.password}_${PASSWORD}`;
   }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.email, this.password),
         result: {
           data: {
             login: {
@@ -107,29 +137,49 @@ class SuccessMock {
   }
 }
 
-const registeredUser = new SuccessMock(true);
-const unRegisteredUser = new SuccessMock(false);
+const registered = new SuccessMock(
+  { email: "registered", password: "registered" },
+  true
+);
+const unRegistered = new SuccessMock(
+  { email: "unregistered", password: "unregistered" },
+  false
+);
 
-const graphqlError = {
+const graphql = {
   message: "Server responded with a graphql error",
+  email: `graphql_${EMAIL}`,
+  password: `graphql_${PASSWORD}`,
   gql(): MockedResponse[] {
-    return [{ request, result: { errors: [new GraphQLError(this.message)] } }];
+    return [
+      {
+        request: request(this.email, this.password),
+        result: { errors: [new GraphQLError(this.message)] },
+      },
+    ];
   },
 };
 
-const networkError = {
+const network = {
   message: msg,
+  email: `network_${EMAIL}`,
+  password: `network_${PASSWORD}`,
   gql(): MockedResponse[] {
-    return [{ request, error: new Error(this.message) }];
+    return [
+      {
+        request: request(this.email, this.password),
+        error: new Error(this.message),
+      },
+    ];
   },
 };
 
-export const loginErrorTable: [string, ExpectedError][] = [
-  ["email is unrecognized by the server", unrecognizedEmailError],
+export const errorTable: [string, ExpectedError][] = [
+  ["email is unrecognized by the server", unrecognized],
   ["email and password do not match", emailPasswordError],
-  ["server responds with a network error", networkError],
-  ["server responds with a graphql error", graphqlError],
-  ["server response is an unsupported object type", unsupportedObjectType],
+  ["server responds with a network error", network],
+  ["server responds with a graphql error", graphql],
+  ["server response is an unsupported object type", unsupported],
 ];
 
 interface ExpectedSuccess {
@@ -137,9 +187,15 @@ interface ExpectedSuccess {
   page: string;
 }
 
-export const loginSuccessTable: [string, string, ExpectedSuccess][] = [
-  ["unregistered", "register", { mock: unRegisteredUser, page: "/register" }],
-  ["registered", "dashboard/home", { mock: registeredUser, page: "/" }],
+export const successTable: [string, ExpectedSuccess][] = [
+  [
+    "Redirect unregistered user to the register page",
+    { mock: unRegistered, page: "/register" },
+  ],
+  [
+    "Redirect registered user to the dashboard/home page",
+    { mock: registered, page: "/" },
+  ],
 ];
 
 export const redirectStatus: [string, string][] = [
