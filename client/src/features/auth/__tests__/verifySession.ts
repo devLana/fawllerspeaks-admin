@@ -5,7 +5,6 @@ import jwtDecode, { InvalidTokenError } from "jwt-decode";
 
 import {
   decode,
-  LOGGED_IN_SESSION_ID,
   msg,
   notAllowed,
   tableOne,
@@ -50,10 +49,6 @@ describe("Verify user session on initial app render", () => {
   });
 
   describe("User is logged in, Session verification request is sent to the server", () => {
-    beforeEach(() => {
-      localStorage.setItem(SESSION_ID, LOGGED_IN_SESSION_ID);
-    });
-
     afterAll(() => {
       const router = useRouter();
       router.pathname = "/";
@@ -64,6 +59,7 @@ describe("Verify user session on initial app render", () => {
     describe("Session verification responds with an error or an unsupported object type", () => {
       it("Redirect to the login page if the response is a NotAllowedError", async () => {
         const { replace } = useRouter();
+        localStorage.setItem(SESSION_ID, notAllowed.sessionId);
 
         sessionTestRenderer(notAllowed.gql());
 
@@ -80,6 +76,7 @@ describe("Verify user session on initial app render", () => {
       it("Render the page at the current route if the response is a NotAllowedError", async () => {
         const router = useRouter();
         router.pathname = "/login";
+        localStorage.setItem(SESSION_ID, notAllowed.sessionId);
 
         sessionTestRenderer(notAllowed.gql());
 
@@ -92,9 +89,11 @@ describe("Verify user session on initial app render", () => {
         expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
       });
 
-      it.each(tableOne)("Render an error alert if %s", async (_, expected) => {
-        const { user } = sessionTestRenderer(expected.gql);
+      it.each(tableOne)("%s", async (_, expected) => {
         const { reload, replace } = useRouter();
+        localStorage.setItem(SESSION_ID, expected.sessionId);
+
+        const { user } = sessionTestRenderer(expected.gql());
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
         expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
@@ -103,7 +102,7 @@ describe("Verify user session on initial app render", () => {
 
         expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
         expect(replace).not.toHaveBeenCalled();
-        expect(alert).toHaveTextContent(expected.msg);
+        expect(alert).toHaveTextContent(expected.message);
         expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
 
         await user.click(screen.getByRole("button", { name: /reload page/i }));
@@ -115,8 +114,10 @@ describe("Verify user session on initial app render", () => {
           throw new InvalidTokenError("Invalid access token provided");
         });
 
-        const { user } = sessionTestRenderer(decode.gql());
         const { reload } = useRouter();
+        localStorage.setItem(SESSION_ID, decode.sessionId);
+
+        const { user } = sessionTestRenderer(decode.gql());
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
         expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
@@ -143,52 +144,48 @@ describe("Verify user session on initial app render", () => {
       });
 
       describe("User is redirected to the appropriate page", () => {
-        it.each(tableTwo)(
-          "Redirect to the %s page if user is %s",
-          async (_, __, expected) => {
-            const router = useRouter();
+        it.each(tableTwo)("%s", async (_, expected) => {
+          const router = useRouter();
+          localStorage.setItem(SESSION_ID, expected.mock.sessionId);
 
-            router.pathname = expected.from;
-            sessionTestRenderer(expected.mock.gql());
+          router.pathname = expected.from;
+          sessionTestRenderer(expected.mock.gql());
 
-            expect(screen.getByRole("progressbar")).toBeInTheDocument();
-            expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
+          expect(screen.getByRole("progressbar")).toBeInTheDocument();
+          expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
 
-            await waitFor(() => {
-              expect(router.replace).toHaveBeenCalledTimes(1);
-            });
-            expect(router.replace).toHaveBeenCalledWith(expected.to);
+          await waitFor(() => {
+            expect(router.replace).toHaveBeenCalledTimes(1);
+          });
+          expect(router.replace).toHaveBeenCalledWith(expected.to);
 
-            expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-            expect(screen.getByText(TEXT_NODE)).toBeInTheDocument();
+          expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+          expect(screen.getByText(TEXT_NODE)).toBeInTheDocument();
 
-            expect(mockFn).toHaveBeenCalled();
-            expect(mockFn).toHaveBeenCalledWith("accessToken");
-          }
-        );
+          expect(mockFn).toHaveBeenCalled();
+          expect(mockFn).toHaveBeenCalledWith("accessToken");
+        });
       });
 
       describe("The current page is rendered", () => {
-        it.each(tableThree)(
-          "Render the %s if user is %s",
-          async (_, __, expected) => {
-            const router = useRouter();
+        it.each(tableThree)("%s", async (_, expected) => {
+          const router = useRouter();
+          localStorage.setItem(SESSION_ID, expected.mock.sessionId);
 
-            router.pathname = expected.pathname;
-            sessionTestRenderer(expected.mock.gql());
+          router.pathname = expected.pathname;
+          sessionTestRenderer(expected.mock.gql());
 
-            expect(screen.getByRole("progressbar")).toBeInTheDocument();
-            expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
+          expect(screen.getByRole("progressbar")).toBeInTheDocument();
+          expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
 
-            expect(await screen.findByText(TEXT_NODE)).toBeInTheDocument();
+          expect(await screen.findByText(TEXT_NODE)).toBeInTheDocument();
 
-            expect(router.replace).not.toHaveBeenCalled();
-            expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+          expect(router.replace).not.toHaveBeenCalled();
+          expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
 
-            expect(mockFn).toHaveBeenCalled();
-            expect(mockFn).toHaveBeenCalledWith("accessToken");
-          }
-        );
+          expect(mockFn).toHaveBeenCalled();
+          expect(mockFn).toHaveBeenCalledWith("accessToken");
+        });
       });
     });
   });

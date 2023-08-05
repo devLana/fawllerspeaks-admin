@@ -12,17 +12,7 @@ export const VERIFY_SESSION: VerifySession = gql`
         status
       }
 
-      ... on NotAllowedError {
-        message
-        status
-      }
-
-      ... on UnknownError {
-        message
-        status
-      }
-
-      ... on UserSessionError {
+      ... on BaseResponse {
         message
         status
       }

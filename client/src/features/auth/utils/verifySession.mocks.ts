@@ -5,17 +5,16 @@ import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 
 export const TEXT_NODE = "Testing User Authentication";
-export const LOGGED_IN_SESSION_ID = "LOGGED_IN_SESSION_ID";
 export const msg =
   "An unexpected error has occurred while trying to verify your current session";
 
 const refresh = {
-  gql(): MockedResponse[] {
+  gql(sessionId: string): MockedResponse[] {
     return [
       {
         request: {
           query: REFRESH_TOKEN,
-          variables: { sessionId: LOGGED_IN_SESSION_ID },
+          variables: { sessionId },
         },
         result: {
           data: {
@@ -31,18 +30,20 @@ const refresh = {
   },
 };
 
-const request: MockedResponse["request"] = {
-  query: VERIFY_SESSION,
-  variables: { sessionId: LOGGED_IN_SESSION_ID },
+const request = (sessionId: string): MockedResponse["request"] => {
+  return { query: VERIFY_SESSION, variables: { sessionId } };
 };
 
 class MocksOne {
-  constructor(readonly typename: string, readonly message: string) {}
+  sessionId: string;
+  constructor(readonly typename: string, readonly message: string, id: string) {
+    this.sessionId = `${id}_SESSION_ID`;
+  }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.sessionId),
         result: {
           data: {
             verifySession: {
@@ -58,12 +59,20 @@ class MocksOne {
 }
 
 class MocksTwo {
-  constructor(readonly isRegistered: boolean, readonly userId: string) {}
+  sessionId: string;
+
+  constructor(
+    readonly isRegistered: boolean,
+    readonly userId: string,
+    id: string
+  ) {
+    this.sessionId = `${id}_SESSION_ID`;
+  }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.sessionId),
         result: {
           data: {
             verifySession: {
@@ -84,34 +93,38 @@ class MocksTwo {
           },
         },
       },
-      ...refresh.gql(),
+      ...refresh.gql(this.sessionId),
     ];
   }
 }
 
 export const notAllowed = new MocksOne(
   "NotAllowedError",
-  "Failed to Authenticate User"
+  "Failed to Authenticate User",
+  "NOT_ALLOWED"
 );
 
 const unknown = new MocksOne(
   "UnknownError",
-  "Unknown session id. Authentication failed"
+  "Unknown session id. Authentication failed",
+  "UNKNOWN"
 );
 
-const unsupported = new MocksOne("UnsupportedObjectType", msg);
+const unsupported = new MocksOne("UnsupportedObjectType", msg, "UNSUPPORTED");
 
 const userSession = new MocksOne(
   "UserSessionError",
-  "Current logged in session could not be verified"
+  "Current logged in session could not be verified",
+  "USER_SESSION"
 );
 
 const validation = {
   message: "Current logged in session could not be verified",
+  sessionId: "VALIDATION_SESSION_ID",
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.sessionId),
         result: {
           data: {
             verifySession: {
@@ -128,46 +141,51 @@ const validation = {
 
 const graphql = {
   message: "Mock graphql error response. Authentication failed",
+  sessionId: "GRAPHQL_ERROR_SESSION_ID",
   gql(): MockedResponse[] {
-    return [{ request, result: { errors: [new GraphQLError(this.message)] } }];
+    return [
+      {
+        request: request(this.sessionId),
+        result: { errors: [new GraphQLError(this.message)] },
+      },
+    ];
   },
 };
 
 const network = {
   message: "Server is currently unreachable. Please try again later",
+  sessionId: "NETWORK_ERROR_SESSION_ID",
   gql(): MockedResponse[] {
-    return [{ request, error: new Error(this.message) }];
+    return [
+      { request: request(this.sessionId), error: new Error(this.message) },
+    ];
   },
 };
 
-const registered = new MocksTwo(true, "registered_user_id");
-const unregistered = new MocksTwo(false, "unregistered_user_id");
-export const decode = new MocksTwo(true, "registered_user_id");
+export const decode = new MocksTwo(true, "registered_user_id", "DECODE");
+const registered = new MocksTwo(true, "registered_user_id", "REGISTERED");
+const unregistered = new MocksTwo(
+  false,
+  "unregistered_user_id",
+  "UNREGISTERED"
+);
 
 interface TableOne {
-  msg: string;
-  gql: MockedResponse[];
+  message: string;
+  gql: () => MockedResponse[];
+  sessionId: string;
 }
 
 export const tableOne: [string, TableOne][] = [
-  ["session id is unknown", { msg: unknown.message, gql: unknown.gql() }],
-  ["session id is invalid", { msg: validation.message, gql: validation.gql() }],
+  ["Render an error alert if session id is invalid", validation],
+  ["Render an error alert if session id is unknown", unknown],
   [
-    "verification response is an unsupported object type",
-    { msg: unsupported.message, gql: unsupported.gql() },
+    "Render an error alert if verification response is an unsupported object type",
+    unsupported,
   ],
-  [
-    "user session could not be verified",
-    { msg: userSession.message, gql: userSession.gql() },
-  ],
-  [
-    "verification fails with a GraphQL error",
-    { msg: graphql.message, gql: graphql.gql() },
-  ],
-  [
-    "verification fails with a Network error",
-    { msg: network.message, gql: network.gql() },
-  ],
+  ["Render an error alert if user session could not be verified", userSession],
+  ["Render an error alert if verification fails with a GraphQL error", graphql],
+  ["Render an error alert if verification fails with a Network error", network],
 ];
 
 interface TableTwo {
@@ -176,15 +194,13 @@ interface TableTwo {
   mock: MocksTwo;
 }
 
-export const tableTwo: [string, string, TableTwo][] = [
+export const tableTwo: [string, TableTwo][] = [
   [
-    "home(dashboard)",
-    "registered",
+    "Redirect to the home(dashboard) page if user is registered",
     { from: "/login", to: "/", mock: registered },
   ],
   [
-    "register",
-    "unregistered",
+    "Redirect to the register page if user is unregistered",
     { from: "/", to: "/register", mock: unregistered },
   ],
 ];
@@ -194,15 +210,13 @@ interface TableThree {
   mock: MocksTwo;
 }
 
-export const tableThree: [string, string, TableThree][] = [
+export const tableThree: [string, TableThree][] = [
   [
-    "page at the current route",
-    "registered",
+    "Render the page at the current route if user is registered",
     { pathname: "/", mock: registered },
   ],
   [
-    "register page",
-    "unregistered",
+    "Render the register page if user is unregistered",
     { pathname: "/register", mock: unregistered },
   ],
 ];
