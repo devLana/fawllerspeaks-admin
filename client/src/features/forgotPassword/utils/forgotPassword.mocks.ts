@@ -5,22 +5,30 @@ import { FORGOT_PASSWORD } from "../operations/FORGOT_PASSWORD";
 
 interface Expected {
   message: string;
-  gql: MockedResponse[];
+  gql: () => MockedResponse[];
+  email: string;
 }
 
-export const EMAIL = "forgot_password@example.org";
-const request: MockedResponse["request"] = {
-  query: FORGOT_PASSWORD,
-  variables: { email: EMAIL },
+const EMAIL = "forgot_password_email@example.org";
+const request = (email: string): MockedResponse["request"] => {
+  return { query: FORGOT_PASSWORD, variables: { email } };
 };
 
 class Mocks {
-  constructor(readonly typename: string, readonly message: string) {}
+  email: string;
+
+  constructor(
+    mail: string,
+    readonly typename: string,
+    readonly message: string
+  ) {
+    this.email = `${mail}_${EMAIL}`;
+  }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.email),
         result: {
           data: {
             forgotPassword: {
@@ -36,31 +44,36 @@ class Mocks {
 }
 
 const notAllowed = new Mocks(
+  "not_allowed",
   "NotAllowedError",
   "Unknown email address provided"
 );
 
 const server = new Mocks(
+  "server",
   "ServerError",
   "Unable to send password reset link at this time"
 );
 
 export const registration = new Mocks(
+  "registration",
   "RegistrationError",
   "Cant rest password for unregistered account"
 );
 
 export const unsupported = new Mocks(
+  "unsupported",
   "UnsupportedObjectType",
   "You are unable to reset your password at the moment. Please try again later"
 );
 
 export const validation = {
+  email: `validation_${EMAIL}`,
   emailError: "Invalid e-mail address server response",
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.email),
         result: {
           data: {
             forgotPassword: {
@@ -77,25 +90,33 @@ export const validation = {
 
 const graphql = {
   message: "Server responded with a graphql error",
+  email: `graphql_${EMAIL}`,
   gql(): MockedResponse[] {
-    return [{ request, result: { errors: [new GraphQLError(this.message)] } }];
+    return [
+      {
+        request: request(this.email),
+        result: { errors: [new GraphQLError(this.message)] },
+      },
+    ];
   },
 };
 
 const network = {
   message:
     "You are unable to reset your password at the moment. Please try again later",
+  email: `network_${EMAIL}`,
   gql(): MockedResponse[] {
-    return [{ request, error: new Error(this.message) }];
+    return [{ request: request(this.email), error: new Error(this.message) }];
   },
 };
 
 export const success = {
   message: "Password request link has been sent to the email address provided",
+  email: `success_${EMAIL}`,
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.email),
         result: {
           data: {
             forgotPassword: {
@@ -111,55 +132,47 @@ export const success = {
 };
 
 export const testTable: [string, Expected][] = [
-  [
-    "email does not match a valid account on the server",
-    { message: notAllowed.message, gql: notAllowed.gql() },
-  ],
-  [
-    "server response is a server error object",
-    { message: server.message, gql: server.gql() },
-  ],
-  [
-    "server responds with a network error",
-    { message: network.message, gql: network.gql() },
-  ],
-  [
-    "server responds with a graphql error",
-    { message: graphql.message, gql: graphql.gql() },
-  ],
+  ["email does not match a valid account on the server", notAllowed],
+  ["server response is a server error object", server],
+  ["server responds with a network error", network],
+  ["server responds with a graphql error", graphql],
 ];
 
 const message = "Unable to verify password reset token";
 
 export const statusTable: [string, string, string][] = [
   [
-    "an empty password reset token string is provided",
+    "Display an alert message if an empty password reset token string is provided",
     "empty",
     "No password reset token provided",
   ],
   [
-    "a malformed password reset token string is provided",
+    "Display an alert message if a malformed password reset token string is provided",
     "invalid",
     "Wrong password reset token format provided",
   ],
   [
-    "a password reset token validation error occurs",
+    "Display an alert message if a password reset token validation error occurs",
     "validation",
     "Invalid password reset token provided",
   ],
-  ["the password reset token is unknown or has expired", "fail", message],
   [
-    "password reset token verification response is an unsupported object",
+    "Display an alert message if the password reset token is unknown or has expired",
+    "fail",
+    message,
+  ],
+  [
+    "Display an alert message if password reset token verification response is an unsupported object",
     "unsupported",
     message,
   ],
   [
-    "a graphql error occurs while verifying the password reset token ",
+    "Display an alert message if a graphql error occurs while verifying the password reset token ",
     "api",
     message,
   ],
   [
-    "a network error prevents the password reset token verification",
+    "Display an alert message if a network error prevents the password reset token verification",
     "network",
     `${message}. Please try again later`,
   ],

@@ -5,7 +5,6 @@ import { screen, waitFor } from "@testing-library/react";
 import ForgotPassword from "@pages/forgot-password";
 import { renderTestUI } from "@utils/renderTestUI";
 import {
-  EMAIL,
   registration,
   statusTable,
   success,
@@ -24,18 +23,15 @@ describe("Forgot Password Page", () => {
       router.query = {};
     });
 
-    it.each(statusTable)(
-      "Display an alert message if %s",
-      (_, status, message) => {
-        const router = useRouter();
-        router.query = { status };
+    it.each(statusTable)("%s", (_, status, message) => {
+      const router = useRouter();
+      router.query = { status };
 
-        renderTestUI(<ForgotPassword />);
+      renderTestUI(<ForgotPassword />);
 
-        expect(screen.getByRole("alert")).toBeInTheDocument();
-        expect(screen.getByRole("alert")).toHaveTextContent(message);
-      }
-    );
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(message);
+    });
   });
 
   describe("On client side validation of the forgot password form", () => {
@@ -66,7 +62,7 @@ describe("Forgot Password Page", () => {
       const { user } = renderTestUI(<ForgotPassword />, validation.gql());
       const { emailError } = validation;
 
-      await user.type(screen.getByRole("textbox", textBox), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), validation.email);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
@@ -82,10 +78,10 @@ describe("Forgot Password Page", () => {
     });
 
     it.each(testTable)("Show an alert message if %s", async (_, expected) => {
-      const { user } = renderTestUI(<ForgotPassword />, expected.gql);
+      const { user } = renderTestUI(<ForgotPassword />, expected.gql());
       const { message } = expected;
 
-      await user.type(screen.getByRole("textbox", textBox), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), expected.email);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
@@ -99,7 +95,7 @@ describe("Forgot Password Page", () => {
     it("Show an info dialog box if email is for an unregistered account", async () => {
       const { user } = renderTestUI(<ForgotPassword />, registration.gql());
 
-      await user.type(screen.getByRole("textbox", textBox), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), registration.email);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
@@ -116,7 +112,7 @@ describe("Forgot Password Page", () => {
       const { user } = renderTestUI(<ForgotPassword />, success.gql());
       const alertMessage = "Request Link Sent";
 
-      await user.type(screen.getByRole("textbox", textBox), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), success.email);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
@@ -131,7 +127,7 @@ describe("Forgot Password Page", () => {
       const { user } = renderTestUI(<ForgotPassword />, unsupported.gql());
       const { message } = unsupported;
 
-      await user.type(screen.getByRole("textbox", textBox), EMAIL);
+      await user.type(screen.getByRole("textbox", textBox), unsupported.email);
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
