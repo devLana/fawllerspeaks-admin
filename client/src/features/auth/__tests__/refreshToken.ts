@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { screen, waitFor } from "@testing-library/react";
 
 import {
-  LOGGED_IN_SESSION_ID,
   newAccessToken,
   refresh,
   table1,
@@ -16,20 +15,17 @@ jest.useFakeTimers();
 jest.spyOn(window, "setTimeout").mockName("setTimeout");
 
 describe("Refresh expired user access token", () => {
-  beforeEach(() => {
-    localStorage.setItem(SESSION_ID, LOGGED_IN_SESSION_ID);
-  });
-
   afterAll(() => {
     localStorage.removeItem(SESSION_ID);
     jest.useRealTimers();
   });
 
   describe("Redirect to the login page", () => {
-    it.each(table1)("%s", async (_, mock, status) => {
+    it.each(table1)("%s", async (_, status, mock) => {
       const { replace } = useRouter();
+      localStorage.setItem(SESSION_ID, mock.sessionId);
 
-      sessionTestRenderer(mock);
+      sessionTestRenderer(mock.gql());
 
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());
       await waitFor(() => expect(replace).toHaveBeenCalledTimes(2));
@@ -39,6 +35,8 @@ describe("Refresh expired user access token", () => {
 
   describe("Render an error alert UI", () => {
     it.each(table2)("%s", async (_, expected) => {
+      localStorage.setItem(SESSION_ID, expected.sessionId);
+
       sessionTestRenderer(expected.gql());
 
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());
@@ -49,6 +47,8 @@ describe("Refresh expired user access token", () => {
 
   describe("Refresh token request is successful", () => {
     it("Update application with refreshed access token", async () => {
+      localStorage.setItem(SESSION_ID, refresh.sessionId);
+
       sessionTestRenderer(refresh.gql());
 
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());

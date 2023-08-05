@@ -7,25 +7,21 @@ import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 interface Expected {
   message: string;
   gql: () => MockedResponse[];
+  sessionId: string;
 }
 
 const testUserId = "New_Authenticated_User_Id";
 export const newAccessToken = "new_access_token";
-export const LOGGED_IN_SESSION_ID = "LOGGED_IN_SESSION_ID";
 
-const request: MockedResponse["request"] = {
-  query: REFRESH_TOKEN,
-  variables: { sessionId: LOGGED_IN_SESSION_ID },
+const request = (sessionId: string): MockedResponse["request"] => {
+  return { query: REFRESH_TOKEN, variables: { sessionId } };
 };
 
 const verify = {
-  gql(): MockedResponse[] {
+  gql(sessionId: string): MockedResponse[] {
     return [
       {
-        request: {
-          query: VERIFY_SESSION,
-          variables: { sessionId: LOGGED_IN_SESSION_ID },
-        },
+        request: { query: VERIFY_SESSION, variables: { sessionId } },
         result: {
           data: {
             verifySession: {
@@ -51,15 +47,20 @@ const verify = {
 };
 
 class Mocks {
+  sessionId: string;
+
   constructor(
+    id: string,
     readonly typename: string,
     readonly message = "Your access token could not be refreshed"
-  ) {}
+  ) {
+    this.sessionId = `${id}_SESSION_ID`;
+  }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.sessionId),
         result: {
           data: {
             refreshToken: {
@@ -70,26 +71,28 @@ class Mocks {
           },
         },
       },
-      ...verify.gql(),
+      ...verify.gql(this.sessionId),
     ];
   }
 }
 
-const unknown = new Mocks("UnknownError");
-const session = new Mocks("UserSessionError");
-const auth = new Mocks("AuthenticationError");
-const notAllowed = new Mocks("NotAllowedError");
+const unknown = new Mocks("UNKNOWN", "UnknownError");
+const session = new Mocks("SESSION", "UserSessionError");
+const auth = new Mocks("AUTH", "AuthenticationError");
+const notAllowed = new Mocks("NOT_ALLOWED", "NotAllowedError");
 const unsupported = new Mocks(
+  "UNSUPPORTED",
   "UnrecognisedObject",
   "An unexpected error has occurred while trying to refresh your access token"
 );
 
 const validate = {
   message: "Your access token could not be refreshed",
+  sessionId: "VALIDATE_SESSION_ID",
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.sessionId),
         result: {
           data: {
             refreshToken: {
@@ -100,33 +103,42 @@ const validate = {
           },
         },
       },
-      ...verify.gql(),
+      ...verify.gql(this.sessionId),
     ];
   },
 };
 
 const graphql = {
   message: "Mock graphql error response",
+  sessionId: "GRAPHQL_ERROR_SESSION_ID",
   gql(): MockedResponse[] {
     return [
-      { request, result: { errors: [new GraphQLError(this.message)] } },
-      ...verify.gql(),
+      {
+        request: request(this.sessionId),
+        result: { errors: [new GraphQLError(this.message)] },
+      },
+      ...verify.gql(this.sessionId),
     ];
   },
 };
 
 const network = {
   message: "Server is currently unreachable. Please try again later",
+  sessionId: "NETWORK_ERROR_SESSION_ID",
   gql(): MockedResponse[] {
-    return [{ request, error: new Error(this.message) }, ...verify.gql()];
+    return [
+      { request: request(this.sessionId), error: new Error(this.message) },
+      ...verify.gql(this.sessionId),
+    ];
   },
 };
 
 export const refresh = {
+  sessionId: "REFRESH_SESSION_ID",
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.sessionId),
         result: {
           data: {
             refreshToken: {
@@ -137,14 +149,14 @@ export const refresh = {
           },
         },
       },
-      ...verify.gql(),
+      ...verify.gql(this.sessionId),
     ];
   },
 };
 
-export const table1: [string, MockedResponse[], string][] = [
-  ["User is not logged in", auth.gql(), "unauthenticated"],
-  ["User session could not be verified", notAllowed.gql(), "unauthorized"],
+export const table1: [string, string, Mocks][] = [
+  ["User is not logged in", "unauthenticated", auth],
+  ["User session could not be verified", "unauthorized", notAllowed],
 ];
 
 export const table2: [string, Expected][] = [
