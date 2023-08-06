@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import type { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext as GssPContext } from "next";
 
 import { screen, waitFor } from "@testing-library/react";
 
@@ -7,17 +7,18 @@ import ResetPassword, { getServerSideProps } from "@pages/reset-password";
 import apolloClient from "@lib/apolloClient";
 import { renderTestUI } from "@utils/renderTestUI";
 import {
-  PASSWORD,
+  type MutateResult,
   resetTableOne,
   resetTableThree,
   resetTableTwo,
   resetUnregistered as rUnregistered,
-  resetValidationOne as rValidation,
+  resetValidation1 as rValidation,
   verified,
   verifyErrorObjects,
   verifyErrors,
   verifyProps,
   verifyValidate,
+  msg,
 } from "../utils/resetPassword.mocks";
 
 jest.mock("@lib/apolloClient");
@@ -26,9 +27,7 @@ describe("Reset Password", () => {
   describe("ResetPassword page - getServerSideProps", () => {
     describe("Validate password reset token", () => {
       it.each(verifyValidate)("%s", async (_, tId, status) => {
-        const context = {
-          query: { tId },
-        } as unknown as GetServerSidePropsContext;
+        const context = { query: { tId } } as unknown as GssPContext;
 
         const result = await getServerSideProps(context);
 
@@ -41,25 +40,14 @@ describe("Reset Password", () => {
     });
 
     describe("Verify password reset token", () => {
-      const context = {
-        query: { tId: "password_reset_token" },
-      } as unknown as GetServerSidePropsContext;
-
-      interface MutateResult {
-        data?: { verifyResetToken: Record<string, string> };
-        errors?: unknown[];
-      }
-
       type Mutate = jest.MockedObject<{ mutate: () => Promise<MutateResult> }>;
 
+      const context = { query: { tId: "userToken" } } as unknown as GssPContext;
       const mockClient = apolloClient() as unknown as Mutate;
 
       describe("Verification resolves with an error/unsupported object type", () => {
         it.each(verifyErrorObjects)("%s", async (_, data, destination) => {
-          mockClient.mutate.mockResolvedValue({
-            data: { verifyResetToken: data },
-            errors: undefined,
-          });
+          mockClient.mutate.mockResolvedValue({ data, errors: undefined });
 
           const result = await getServerSideProps(context);
 
@@ -69,11 +57,8 @@ describe("Reset Password", () => {
       });
 
       describe("Verification rejects with an error", () => {
-        it.each(verifyErrors)("%s", async (_, data, status) => {
-          mockClient.mutate.mockResolvedValue({
-            data: undefined,
-            errors: data,
-          });
+        it.each(verifyErrors)("%s", async (_, errors, status) => {
+          mockClient.mutate.mockResolvedValue({ data: undefined, errors });
 
           const result = await getServerSideProps(context);
 
@@ -87,10 +72,7 @@ describe("Reset Password", () => {
 
       describe.each(verifyProps)("%s", (_, title, { data, props }) => {
         it(`${title}`, async () => {
-          mockClient.mutate.mockResolvedValue({
-            data: { verifyResetToken: data },
-            errors: undefined,
-          });
+          mockClient.mutate.mockResolvedValue({ data, errors: undefined });
 
           const result = await getServerSideProps(context);
 
@@ -116,7 +98,7 @@ describe("Reset Password", () => {
     it("Display the e-mail address of the account in a readonly textbox", async () => {
       renderTestUI(<ResetPassword verified={verified} />);
 
-      const textbox = await screen.findByLabelText("E-Mail");
+      const textbox = await screen.findByRole("textbox", { name: /e-?mail/i });
 
       expect(textbox).toHaveDisplayValue(verified.email);
     });
@@ -124,8 +106,6 @@ describe("Reset Password", () => {
 
   describe("ResetPassword Page", () => {
     const resetButton = { name: /^reset password$/i };
-    const msg =
-      "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
 
     describe("Client-side form validation, Show input field error messages", () => {
       it("If all input fields are empty", async () => {
@@ -174,7 +154,7 @@ describe("Reset Password", () => {
 
       it("If passwords do not match", async () => {
         const { user } = renderTestUI(<ResetPassword verified={verified} />);
-        const confirmPassword = screen.getByLabelText(/^confirm Password$/i);
+        const confirmPassword = screen.getByLabelText(/^confirm password$/i);
 
         await user.type(screen.getByLabelText(/^password$/i), "PassW0!rd");
         await user.type(confirmPassword, "password");
@@ -195,8 +175,8 @@ describe("Reset Password", () => {
         const confirmPassword = screen.getByLabelText(/^confirm Password$/i);
         const { confirmPasswordError, passwordError } = rValidation;
 
-        await user.type(password, PASSWORD);
-        await user.type(confirmPassword, PASSWORD);
+        await user.type(password, rValidation.password);
+        await user.type(confirmPassword, rValidation.password);
         await user.click(screen.getByRole("button", resetButton));
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
@@ -208,16 +188,17 @@ describe("Reset Password", () => {
         expect(screen.getByRole("button", resetButton)).toBeEnabled();
       });
 
-      it.each(resetTableOne)("%s", async (_, status, gql) => {
+      it.each(resetTableOne)("%s", async (_, status, mock) => {
         const { push } = useRouter();
+        const { password } = mock;
 
         const { user } = renderTestUI(
           <ResetPassword verified={verified} />,
-          gql
+          mock.gql()
         );
 
-        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), PASSWORD);
+        await user.type(screen.getByLabelText(/^password$/i), password);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
         await user.click(screen.getByRole("button", resetButton));
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
@@ -226,16 +207,17 @@ describe("Reset Password", () => {
         expect(push).toHaveBeenCalledWith(`/forgot-password?status=${status}`);
       });
 
-      it.each(resetTableTwo)("%s", async (_, status, gql) => {
+      it.each(resetTableTwo)("%s", async (_, status, mock) => {
         const { push } = useRouter();
+        const { password } = mock;
 
         const { user } = renderTestUI(
           <ResetPassword verified={verified} />,
-          gql
+          mock.gql()
         );
 
-        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), PASSWORD);
+        await user.type(screen.getByLabelText(/^password$/i), password);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
         await user.click(screen.getByRole("button", resetButton));
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
@@ -247,13 +229,15 @@ describe("Reset Password", () => {
 
     describe("Reset password request responds with an unregistered error", () => {
       it("Display an information dialog box", async () => {
+        const { password } = rUnregistered;
+
         const { user } = renderTestUI(
           <ResetPassword verified={verified} />,
           rUnregistered.gql()
         );
 
-        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), PASSWORD);
+        await user.type(screen.getByLabelText(/^password$/i), password);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
         await user.click(screen.getByRole("button", resetButton));
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
@@ -268,14 +252,16 @@ describe("Reset Password", () => {
     });
 
     describe("User password is successfully reset", () => {
-      it.each(resetTableThree)("Display %s", async (_, status, gql) => {
+      it.each(resetTableThree)("Display %s", async (_, status, mock) => {
+        const { password } = mock;
+
         const { user } = renderTestUI(
           <ResetPassword verified={verified} />,
-          gql
+          mock.gql()
         );
 
-        await user.type(screen.getByLabelText(/^password$/i), PASSWORD);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), PASSWORD);
+        await user.type(screen.getByLabelText(/^password$/i), password);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
         await user.click(screen.getByRole("button", resetButton));
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();

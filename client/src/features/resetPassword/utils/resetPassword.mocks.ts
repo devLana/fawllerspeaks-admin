@@ -6,6 +6,15 @@ import { RESET_PASSWORD } from "../operations/RESET_PASSWORD";
 const VERIFIED_PASSWORD_RESET_TOKEN = "VERIFIED_PASSWORD_RESET_TOKEN";
 
 /* GetServerSideProps Verify Password Reset Token Mocks */
+export interface MutateResult {
+  data?: { verifyResetToken: Record<string, string> };
+  errors?: unknown[];
+}
+
+interface VerifyErrorObjects {
+  verifyResetToken: { __typename: string };
+}
+
 export const verifyValidate: [string, string | string[], string][] = [
   [
     "Return a redirect object if there is no password reset token in the query params object",
@@ -19,20 +28,20 @@ export const verifyValidate: [string, string | string[], string][] = [
   ],
 ];
 
-export const verifyErrorObjects: [string, { __typename: string }, string][] = [
+export const verifyErrorObjects: [string, VerifyErrorObjects, string][] = [
   [
     "Password reset token is invalid",
-    { __typename: "VerifyResetTokenValidationError" },
+    { verifyResetToken: { __typename: "VerifyResetTokenValidationError" } },
     "/forgot-password?status=validation",
   ],
   [
     "Password reset token is unknown or has expired",
-    { __typename: "NotAllowedError" },
+    { verifyResetToken: { __typename: "NotAllowedError" } },
     "/forgot-password?status=fail",
   ],
   [
     "Verification returned an unsupported object type",
-    { __typename: "UnsupportedObjectType" },
+    { verifyResetToken: { __typename: "UnsupportedObjectType" } },
     "/forgot-password?status=unsupported",
   ],
 ];
@@ -72,7 +81,7 @@ interface VerifiedProps {
 }
 
 interface Dict {
-  data: UnregisteredData | VerifiedData;
+  data: { verifyResetToken: UnregisteredData | VerifiedData };
   props: UnRegisteredProps | VerifiedProps;
 }
 
@@ -81,7 +90,7 @@ export const verifyProps: [string, string, Dict][] = [
     "Verification fails for an unregistered user",
     "Return an 'isUnregistered' props",
     {
-      data: { __typename: "RegistrationError" },
+      data: { verifyResetToken: { __typename: "RegistrationError" } },
       props: { isUnregistered: true },
     },
   ],
@@ -89,7 +98,9 @@ export const verifyProps: [string, string, Dict][] = [
     "Password reset token is verified",
     "Return a 'verified' props",
     {
-      data: { __typename: "VerifiedResetToken", ...verified },
+      data: {
+        verifyResetToken: { __typename: "VerifiedResetToken", ...verified },
+      },
       props: { verified },
     },
   ],
@@ -98,28 +109,56 @@ export const verifyProps: [string, string, Dict][] = [
 /* Reset Password Mocks */
 type SorN = string | null;
 
+interface ValidationErrors<T extends SorN, U extends SorN, V extends SorN> {
+  tokenError: T;
+  passwordError: U;
+  confirmPasswordError: V;
+}
+
+interface Data {
+  message: string;
+  typename: string;
+  status?: "ERROR" | "SUCCESS" | "WARN";
+}
+
+interface Tables {
+  gql: () => MockedResponse[];
+  password: string;
+}
+
+export const msg =
+  "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
+
+const PASSWORD = "Pass!W0rd";
 const errorMessage = "Unable to verify password reset token";
-export const PASSWORD = "Pass!W0rd";
-const request: MockedResponse["request"] = {
-  query: RESET_PASSWORD,
-  variables: {
-    token: VERIFIED_PASSWORD_RESET_TOKEN,
-    password: PASSWORD,
-    confirmPassword: PASSWORD,
-  },
+const request = (password: string): MockedResponse["request"] => {
+  return {
+    query: RESET_PASSWORD,
+    variables: {
+      token: VERIFIED_PASSWORD_RESET_TOKEN,
+      password,
+      confirmPassword: password,
+    },
+  };
 };
 
 class ResetValidationMocks<T extends SorN, U extends SorN, V extends SorN> {
-  constructor(
-    readonly tokenError: T,
-    readonly passwordError: U,
-    readonly confirmPasswordError: V
-  ) {}
+  password: string;
+  tokenError: T;
+  passwordError: U;
+  confirmPasswordError: V;
+
+  constructor(name: string, errors: ValidationErrors<T, U, V>) {
+    this.password = `${name}_${PASSWORD}`;
+    this.tokenError = errors.tokenError;
+    this.passwordError = errors.passwordError;
+    this.confirmPasswordError = errors.confirmPasswordError;
+  }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.password),
         result: {
           data: {
             resetPassword: {
@@ -137,16 +176,22 @@ class ResetValidationMocks<T extends SorN, U extends SorN, V extends SorN> {
 }
 
 class ResetMocks {
-  constructor(
-    readonly message: string,
-    readonly typename: string,
-    readonly status = "ERROR"
-  ) {}
+  password: string;
+  message: string;
+  typename: string;
+  status: "ERROR" | "SUCCESS" | "WARN";
+
+  constructor(name: string, data: Data) {
+    this.password = `${name}_${PASSWORD}`;
+    this.message = data.message;
+    this.typename = data.typename;
+    this.status = data.status ?? "ERROR";
+  }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.password),
         result: {
           data: {
             resetPassword: {
@@ -161,96 +206,109 @@ class ResetMocks {
   }
 }
 
-export const resetValidationOne = new ResetValidationMocks(
-  null,
-  "Password must be at least 8 characters long",
-  "Passwords do not match"
-);
+export const resetValidation1 = new ResetValidationMocks("validationOne", {
+  tokenError: null,
+  passwordError: "Password must be at least 8 characters long",
+  confirmPasswordError: "Passwords do not match",
+});
 
-const resetValidationTwo = new ResetValidationMocks(
-  "Provide password reset token",
-  null,
-  null
-);
+const resetValidation2 = new ResetValidationMocks("validationTwo", {
+  tokenError: "Provide password reset token",
+  passwordError: null,
+  confirmPasswordError: null,
+});
 
-const resetUnsupported = new ResetMocks(
-  "Unsupported object type",
-  "UnsupportedObjectType"
-);
+const resetUnsupported = new ResetMocks("unsupported", {
+  message: "Unsupported object type",
+  typename: "UnsupportedObjectType",
+});
 
-const resetNotAllowed = new ResetMocks(errorMessage, "NotAllowedError");
+const resetNotAllowed = new ResetMocks("notAllowed", {
+  message: errorMessage,
+  typename: "NotAllowedError",
+});
 
-export const resetUnregistered = new ResetMocks(
-  errorMessage,
-  "RegistrationError"
-);
+export const resetUnregistered = new ResetMocks("unregistered", {
+  message: errorMessage,
+  typename: "RegistrationError",
+});
 
-const resetSuccess = new ResetMocks(
-  "Password Reset SuccessFul",
-  "Response",
-  "SUCCESS"
-);
+const resetSuccess = new ResetMocks("success", {
+  message: "Password Reset SuccessFul",
+  typename: "Response",
+  status: "SUCCESS",
+});
 
-const resetWarn = new ResetMocks(
-  "Password reset successFul but mail not sent",
-  "Response",
-  "WARN"
-);
+const resetWarn = new ResetMocks("resetWarn", {
+  message: "Password reset successFul but mail not sent",
+  typename: "Response",
+  status: "WARN",
+});
 
 const resetNetwork = {
+  password: `network_${PASSWORD}`,
   gql(): MockedResponse[] {
     return [
-      { request, error: new Error("Server responded with a network error") },
+      {
+        request: request(this.password),
+        error: new Error("Server responded with a network error"),
+      },
     ];
   },
 };
 
 const resetGraphql = {
+  password: `graphql_${PASSWORD}`,
   gql(): MockedResponse[] {
-    return [{ request, result: { errors: [new GraphQLError(errorMessage)] } }];
+    return [
+      {
+        request: request(this.password),
+        result: { errors: [new GraphQLError(errorMessage)] },
+      },
+    ];
   },
 };
 
-export const resetTableOne: [string, string, MockedResponse[]][] = [
+export const resetTableOne: [string, string, Tables][] = [
   [
     "Redirect to forgot password page if sever responds with a token validation error",
     "validation",
-    resetValidationTwo.gql(),
+    resetValidation2,
   ],
   [
     "Redirect to forgot password page if sever responds with a network error",
     "network",
-    resetNetwork.gql(),
+    resetNetwork,
   ],
   [
     "Redirect to forgot password page if sever responds with an unsupported object type",
     "unsupported",
-    resetUnsupported.gql(),
+    resetUnsupported,
   ],
 ];
 
-export const resetTableTwo: [string, string, MockedResponse[]][] = [
+export const resetTableTwo: [string, string, Tables][] = [
   [
     "Redirect to forgot password page if password reset token is unknown or has expired",
     "fail",
-    resetNotAllowed.gql(),
+    resetNotAllowed,
   ],
   [
     "Redirect to forgot password page if server responds with a graphql error",
     "api",
-    resetGraphql.gql(),
+    resetGraphql,
   ],
 ];
 
-export const resetTableThree: [string, string, MockedResponse[]][] = [
+export const resetTableThree: [string, string, Tables][] = [
   [
     "a success dialog box if status is 'SUCCESS'",
     "MuiAlert-standardSuccess",
-    resetSuccess.gql(),
+    resetSuccess,
   ],
   [
     "an information dialog box if status is 'WARN'",
     "MuiAlert-standardInfo",
-    resetWarn.gql(),
+    resetWarn,
   ],
 ];

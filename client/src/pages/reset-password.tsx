@@ -25,10 +25,10 @@ import verifyPasswordResetToken, {
 
 type OmitToken = Omit<MutationResetPasswordArgs, "token">;
 type View = "form" | "unregistered error" | "success";
-type Gssp = GetServerSideProps<ResetPasswordPageData>;
-type ResetPasswordPage = NextPageWithLayout<InferGetServerSidePropsType<Gssp>>;
+type GssP = GetServerSideProps<ResetPasswordPageData>;
+type ResetPasswordPage = NextPageWithLayout<InferGetServerSidePropsType<GssP>>;
 
-export const getServerSideProps: Gssp = async ({ query }) => {
+export const getServerSideProps: GssP = async ({ query }) => {
   return verifyPasswordResetToken(query);
 };
 
