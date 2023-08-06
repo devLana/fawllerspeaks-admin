@@ -27,29 +27,43 @@ export const avatar = (hasImage: boolean) => {
   });
 };
 
-export const LOGOUT_SESSION_ID = "Logout_Session_Id";
+const SESSION_ID = "Logout_Session_Id";
 const msg = "You are unable to logout at the moment. Please try again later";
 
-const request: MockedResponse["request"] = {
-  query: LOGOUT,
-  variables: { sessionId: LOGOUT_SESSION_ID },
+const request = (sessionId: string): MockedResponse["request"] => {
+  return { query: LOGOUT, variables: { sessionId } };
 };
 
-class Mock {
-  readonly status: string;
+interface Data {
+  typename: string;
+  message: string;
+  status?: "ERROR" | "SUCCESS" | "WARN";
+}
 
-  constructor(
-    readonly typename: string,
-    readonly message: string,
-    status = "ERROR"
-  ) {
-    this.status = status;
+interface LogoutTable {
+  gql: () => MockedResponse[];
+  sessionId: string;
+}
+
+interface ErrorsTable extends LogoutTable {
+  message: string;
+}
+
+class Mock {
+  typename: string;
+  message: string;
+  status: "ERROR" | "SUCCESS" | "WARN";
+
+  constructor(readonly sessionId: string, data: Data) {
+    this.typename = data.typename;
+    this.message = data.message;
+    this.status = data.status ?? "ERROR";
   }
 
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.sessionId),
         result: {
           data: {
             logout: {
@@ -64,26 +78,40 @@ class Mock {
   }
 }
 
-const auth = new Mock("AuthenticationError", "You are not logged in");
-const response = new Mock("Response", "User logged out", "SUCCESS");
-const unsupported = new Mock("Unsupported", msg, "WARN");
+const auth = new Mock(`auth_${SESSION_ID}`, {
+  typename: "AuthenticationError",
+  message: "You are not logged in",
+});
 
-const unknown = new Mock(
-  "UnknownError",
-  "The current session could not be verified"
-);
+const response = new Mock(`response_${SESSION_ID}`, {
+  typename: "Response",
+  message: "User logged out",
+  status: "SUCCESS",
+});
 
-const notAllowed = new Mock(
-  "NotAllowedError",
-  "You cannot perform that action right now"
-);
+const unsupported = new Mock(`unsupported_${SESSION_ID}`, {
+  typename: "Unsupported",
+  message: msg,
+  status: "WARN",
+});
+
+const unknown = new Mock(`unknown_${SESSION_ID}`, {
+  typename: "UnknownError",
+  message: "The current session could not be verified",
+});
+
+const notAllowed = new Mock(`notAllowed_${SESSION_ID}`, {
+  typename: "NotAllowedError",
+  message: "You cannot perform that action right now",
+});
 
 const validate = {
   message: "Invalid session id",
+  sessionId: `validate_${SESSION_ID}`,
   gql(): MockedResponse[] {
     return [
       {
-        request,
+        request: request(this.sessionId),
         result: {
           data: {
             logout: {
@@ -100,56 +128,44 @@ const validate = {
 
 const graphql = {
   message: "Unable to logout right now. Please try again later",
+  sessionId: `graphql_${SESSION_ID}`,
   gql(): MockedResponse[] {
-    return [{ request, result: { errors: [new GraphQLError(this.message)] } }];
+    return [
+      {
+        request: request(this.sessionId),
+        result: { errors: [new GraphQLError(this.message)] },
+      },
+    ];
   },
 };
 
 const network = {
   message: msg,
+  sessionId: `network_${SESSION_ID}`,
   gql(): MockedResponse[] {
-    return [{ request, error: new Error(this.message) }];
+    return [
+      { request: request(this.sessionId), error: new Error(this.message) },
+    ];
   },
 };
 
-export const errorsTable: [string, MockedResponse[], string][] = [
-  [
-    "Display an alert if user session id is invalid",
-    validate.gql(),
-    validate.message,
-  ],
-  [
-    "Display an alert if user session could not be found",
-    unknown.gql(),
-    unknown.message,
-  ],
-  [
-    "Display an alert if request had invalid cookies",
-    notAllowed.gql(),
-    notAllowed.message,
-  ],
-  [
-    "Display an alert if response throws a graphql error",
-    graphql.gql(),
-    graphql.message,
-  ],
-  [
-    "Display an alert if request resolves with a network error",
-    network.gql(),
-    network.message,
-  ],
+export const errorsTable: [string, ErrorsTable][] = [
+  ["Display an alert if user session id is invalid", validate],
+  ["Display an alert if user session could not be found", unknown],
+  ["Display an alert if request had invalid cookies", notAllowed],
+  ["Display an alert if response throws a graphql error", graphql],
+  ["Display an alert if request resolves with a network error", network],
   [
     "Display an alert if server responds with an unsupported object type",
-    unsupported.gql(),
-    unsupported.message,
+    unsupported,
   ],
 ];
 
-export const logoutTable: [string, MockedResponse[], string][] = [
+export const logoutTable: [string, LogoutTable, string][] = [
   [
     "Redirect user to the login page if the user is not logged in",
-    auth.gql(),
+    auth,
     "/login?status=unauthenticated",
   ],
-  ["Log user out and redirect to the login page", response.gql(), "/login"],
+  ["Log user out and redirect to the login page", response, "/login"],
 ];

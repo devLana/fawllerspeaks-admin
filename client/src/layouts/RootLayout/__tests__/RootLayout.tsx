@@ -4,12 +4,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import RootLayout from "..";
-import {
-  LOGOUT_SESSION_ID,
-  avatar,
-  errorsTable,
-  logoutTable,
-} from "../utils/Layout.mocks";
+import { avatar, errorsTable, logoutTable } from "../utils/Layout.mocks";
 import { renderTestUI, stopRefreshTokenTimer } from "@utils/renderTestUI";
 import { DEFAULT_THEME, SESSION_ID } from "@utils/constants";
 
@@ -124,10 +119,6 @@ describe("Protected Pages Root Layout", () => {
     const cancelName = { name: /^cancel$/i };
     const dialogName = { name: /logout of your account/i };
 
-    beforeEach(() => {
-      localStorage.setItem(SESSION_ID, LOGOUT_SESSION_ID);
-    });
-
     afterAll(() => {
       localStorage.removeItem(SESSION_ID);
     });
@@ -151,10 +142,12 @@ describe("Protected Pages Root Layout", () => {
       });
 
       describe("Logout request receives an error/unsupported object response", () => {
-        it.each(errorsTable)("%s", async (_, gql, message) => {
+        it.each(errorsTable)("%s", async (_, data) => {
+          localStorage.setItem(SESSION_ID, data.sessionId);
+
           const { user } = renderTestUI(
             <RootLayout {...props}>{page}</RootLayout>,
-            gql
+            data.gql()
           );
 
           await user.click(screen.getByRole("button", btnName));
@@ -170,17 +163,21 @@ describe("Protected Pages Root Layout", () => {
           expect(dialogLogout).toBeDisabled();
           expect(cancelBtn).toBeDisabled();
 
-          expect(await screen.findByRole("alert")).toHaveTextContent(message);
+          expect(await screen.findByRole("alert")).toHaveTextContent(
+            data.message
+          );
           expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
         });
       });
 
       describe("Send logout request, Redirect to the login page if user is not logged in", () => {
-        it.each(logoutTable)("%s", async (_, gql, path) => {
+        it.each(logoutTable)("%s", async (_, data, path) => {
+          localStorage.setItem(SESSION_ID, data.sessionId);
+
           const { replace } = useRouter();
           const { user } = renderTestUI(
             <RootLayout {...props}>{page}</RootLayout>,
-            gql
+            data.gql()
           );
 
           await user.click(screen.getByRole("button", btnName));
