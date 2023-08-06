@@ -5,8 +5,6 @@ import { screen, waitFor } from "@testing-library/react";
 import ChangePassword from "@pages/settings/change-password";
 import { renderTestUI } from "@utils/renderTestUI";
 import {
-  CURRENT_PASSWORD,
-  PASSWORD,
   alertTable,
   redirectTable,
   validation,
@@ -71,7 +69,7 @@ describe("Change Password", () => {
       const { user } = renderTestUI(<ChangePassword />);
       const confirmNewPwd = screen.getByLabelText(/^confirm new password$/i);
 
-      await user.type(screen.getByLabelText(/^new password$/i), PASSWORD);
+      await user.type(screen.getByLabelText(/^new password$/i), "Pass!W0rd");
       await user.type(confirmNewPwd, "password");
       await user.click(screen.getByRole("button", btnName));
 
@@ -87,9 +85,9 @@ describe("Change Password", () => {
         const newPassword = screen.getByLabelText(/^new password$/i);
         const confirmNewPwd = screen.getByLabelText(/^confirm new password$/i);
 
-        await user.type(currentPassword, CURRENT_PASSWORD);
-        await user.type(newPassword, PASSWORD);
-        await user.type(confirmNewPwd, PASSWORD);
+        await user.type(currentPassword, validation.currentPassword);
+        await user.type(newPassword, validation.password);
+        await user.type(confirmNewPwd, validation.password);
         await user.click(screen.getByRole("button", btnName));
 
         expect(screen.getByRole("button", btnName)).toBeDisabled();
@@ -114,14 +112,15 @@ describe("Change Password", () => {
     describe("Server responds with an error object type", () => {
       it.each(redirectTable)("%s", async (_, [pathname, status], mock) => {
         const { replace } = useRouter();
-        const { user } = renderTestUI(<ChangePassword />, mock);
+
+        const { user } = renderTestUI(<ChangePassword />, mock.gql());
         const currentPassword = screen.getByLabelText(/^current password$/i);
         const newPassword = screen.getByLabelText(/^new password$/i);
         const confirmNewPwd = screen.getByLabelText(/^confirm new password$/i);
 
-        await user.type(currentPassword, CURRENT_PASSWORD);
-        await user.type(newPassword, PASSWORD);
-        await user.type(confirmNewPwd, PASSWORD);
+        await user.type(currentPassword, mock.currentPassword);
+        await user.type(newPassword, mock.password);
+        await user.type(confirmNewPwd, mock.password);
         await user.click(screen.getByRole("button", btnName));
 
         expect(screen.getByRole("button", btnName)).toBeDisabled();
@@ -134,22 +133,22 @@ describe("Change Password", () => {
     });
 
     describe("Render an alert toast box", () => {
-      it.each(alertTable)("%s", async (_, message, mock) => {
-        const { user } = renderTestUI(<ChangePassword />, mock);
+      it.each(alertTable)("%s", async (_, mock) => {
+        const { user } = renderTestUI(<ChangePassword />, mock.gql());
         const currentPassword = screen.getByLabelText(/^current password$/i);
         const newPassword = screen.getByLabelText(/^new password$/i);
         const confirmNewPwd = screen.getByLabelText(/^confirm new password$/i);
 
-        await user.type(currentPassword, CURRENT_PASSWORD);
-        await user.type(newPassword, PASSWORD);
-        await user.type(confirmNewPwd, PASSWORD);
+        await user.type(currentPassword, mock.currentPassword);
+        await user.type(newPassword, mock.password);
+        await user.type(confirmNewPwd, mock.password);
         await user.click(screen.getByRole("button", btnName));
 
         expect(screen.getByRole("button", btnName)).toBeDisabled();
 
         await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
 
-        expect(screen.getByRole("alert")).toHaveTextContent(message);
+        expect(screen.getByRole("alert")).toHaveTextContent(mock.message);
         expect(screen.getByRole("button", btnName)).toBeEnabled();
       });
     });
