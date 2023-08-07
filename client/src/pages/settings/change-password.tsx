@@ -1,11 +1,12 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import { useApolloClient, useMutation } from "@apollo/client";
+import { useMutation, gql } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Snackbar from "@mui/material/Snackbar";
 
+import { useSession } from "@context/SessionContext";
 import ChangePasswordForm from "@features/settings/changePassword/components/ChangePasswordForm";
 import { changePasswordValidator } from "@features/settings/changePassword/utils/changePasswordValidator";
 import { CHANGE_PASSWORD } from "@features/settings/changePassword/operations/CHANGE_PASSWORD";
@@ -19,11 +20,11 @@ type Status = "idle" | "submitting" | "error" | "success";
 const ChangePassword: NextPageWithLayout = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const { replace } = useRouter();
-  const client = useApolloClient();
 
-  const [changePassword, { data, error }] = useMutation(CHANGE_PASSWORD, {
-    onError: () => setFormStatus("error"),
-  });
+  const [changePassword, { data, error, client }] = useMutation(
+    CHANGE_PASSWORD,
+    { onError: () => setFormStatus("error") }
+  );
 
   const {
     register,
@@ -33,6 +34,16 @@ const ChangePassword: NextPageWithLayout = () => {
     reset,
   } = useForm<MutationChangePasswordArgs>({
     resolver: yupResolver(changePasswordValidator),
+  });
+
+  const { userId } = useSession();
+  const user = client.readFragment<{ email: string }>({
+    id: userId ?? "",
+    fragment: gql`
+      fragment GetChangePasswordUser on User {
+        email
+      }
+    `,
   });
 
   const submitHandler = async (values: MutationChangePasswordArgs) => {
@@ -120,6 +131,7 @@ const ChangePassword: NextPageWithLayout = () => {
         />
       )}
       <ChangePasswordForm
+        email={user?.email ?? ""}
         isLoading={formStatus === "submitting"}
         fieldErrors={errors}
         onSubmit={handleSubmit(submitHandler)}

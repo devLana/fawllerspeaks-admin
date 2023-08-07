@@ -1,10 +1,12 @@
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import LoadingButton from "@mui/lab/LoadingButton";
+import TextField from "@mui/material/TextField";
 
 import PasswordInput from "@components/PasswordInput";
 import { type MutationChangePasswordArgs } from "@apiTypes";
 
 interface ChangePasswordFormProps {
+  email: string;
   isLoading: boolean;
   fieldErrors: FieldErrors<MutationChangePasswordArgs>;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
@@ -12,10 +14,17 @@ interface ChangePasswordFormProps {
 }
 
 const ChangePasswordForm = (props: ChangePasswordFormProps) => {
-  const { fieldErrors, isLoading, onSubmit, register } = props;
+  const { fieldErrors, isLoading, email, onSubmit, register } = props;
 
   return (
     <form onSubmit={onSubmit} noValidate>
+      <TextField
+        id="email"
+        autoComplete="email"
+        value={email}
+        inputProps={{ readOnly: true }}
+        sx={{ display: "none" }}
+      />
       <PasswordInput
         id="current-password"
         autoComplete="current-password"

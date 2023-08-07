@@ -20,7 +20,7 @@ const useCheckAuth = () => {
         const storeUser = client.readFragment<User>({
           id: userId,
           fragment: gql`
-            fragment GetUser on User {
+            fragment GetAuthUser on User {
               isRegistered
             }
           `,

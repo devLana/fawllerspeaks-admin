@@ -20,7 +20,7 @@ const HeaderAvatar = () => {
   const user = client.readFragment<User>({
     id: userId ?? "",
     fragment: gql`
-      fragment GetAuthUser on User {
+      fragment GetHeaderUser on User {
         firstName
         lastName
         image
