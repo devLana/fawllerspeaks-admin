@@ -1,11 +1,12 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import { useApolloClient, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Typography from "@mui/material/Typography";
 
+import useStatusAlert from "@features/register/hooks/useStatusAlert";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import AlertToast from "@components/AlertToast";
 import Card from "@components/Card";
@@ -21,13 +22,11 @@ type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
 type Status = "idle" | "loading" | "error";
 
 const RegisterUser: NextPageWithLayout = () => {
-  const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<Status>("idle");
 
   const router = useRouter();
 
-  const client = useApolloClient();
-  const [registerUser, { error }] = useMutation(REGISTER_USER, {
+  const [registerUser, { error, client }] = useMutation(REGISTER_USER, {
     onError: () => setStatus("error"),
   });
 
@@ -40,22 +39,7 @@ const RegisterUser: NextPageWithLayout = () => {
     resolver: yupResolver(registerUserValidator),
   });
 
-  React.useEffect(() => {
-    if (router.isReady) {
-      if (router.query.status && !Array.isArray(router.query.status)) {
-        switch (router.query.status) {
-          case "unregistered":
-            setStatusMessage(
-              "You need to register your account before you can perform that action"
-            );
-            break;
-
-          default:
-            setStatusMessage(null);
-        }
-      }
-    }
-  }, [router.isReady, router.query.status]);
+  const [statusMessage, setStatusMessage] = useStatusAlert();
 
   const submitHandler = async (values: RegisterUserArgs) => {
     setStatus("loading");

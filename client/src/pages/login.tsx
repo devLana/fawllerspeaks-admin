@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 
 import { useSession } from "@context/SessionContext";
 import { useAuthHeaderHandler } from "@context/ApolloContext";
+import useStatusAlert from "@features/login/hooks/useStatusAlert";
 import AlertToast from "@components/AlertToast";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
@@ -24,10 +25,9 @@ import type { MutationLoginArgs } from "@apiTypes";
 type Status = "idle" | "submitting" | "error" | "success";
 
 const Login: NextPageWithLayout = () => {
-  const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<Status>("idle");
 
-  const { replace, isReady, query } = useRouter();
+  const { replace } = useRouter();
 
   const [login, { data, error }] = useMutation(LOGIN_USER, {
     onError: () => setStatus("error"),
@@ -43,23 +43,7 @@ const Login: NextPageWithLayout = () => {
   const { handleUserId, handleRefreshToken } = useSession();
   const handleAuthHeader = useAuthHeaderHandler();
 
-  React.useEffect(() => {
-    if (isReady) {
-      if (query.status && !Array.isArray(query.status)) {
-        switch (query.status) {
-          case "unauthorized":
-          case "unauthenticated":
-            setStatusMessage(
-              "You are unable to perform that action. Please log in"
-            );
-            break;
-
-          default:
-            setStatusMessage(null);
-        }
-      }
-    }
-  }, [isReady, query.status]);
+  const [statusMessage, setStatusMessage] = useStatusAlert();
 
   const submitHandler = async (values: MutationLoginArgs) => {
     setStatus("submitting");

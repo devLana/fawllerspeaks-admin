@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import { useApolloClient, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -27,8 +27,7 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
 
   const { replace } = useRouter();
 
-  const client = useApolloClient();
-  const [logout] = useMutation(LOGOUT, {
+  const [logout, { client }] = useMutation(LOGOUT, {
     onError(err) {
       const message = err.graphQLErrors[0] ? err.graphQLErrors[0].message : msg;
       onApiError(message);
