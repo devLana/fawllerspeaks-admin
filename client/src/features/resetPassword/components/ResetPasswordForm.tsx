@@ -29,8 +29,8 @@ const ResetPasswordForm = ({
       autoComplete="email"
       label="E-Mail"
       fullWidth
-      defaultValue={email}
-      InputProps={{ readOnly: true }}
+      value={email}
+      inputProps={{ readOnly: true }}
     />
     <Typography align="center" sx={{ mt: 3, mb: 1 }}>
       Enter your new password below

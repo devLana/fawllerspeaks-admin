@@ -16,6 +16,12 @@ export const VERIFY_PASSWORD_RESET_TOKEN: VerifyResetToken = gql`
         message
         status
       }
+
+      ... on VerifiedResetToken {
+        email
+        resetToken
+        status
+      }
     }
   }
 `;
