@@ -1,12 +1,19 @@
 import Typography from "@mui/material/Typography";
 
-import settingsLayout from "@utils/settingsLayout.tsx";
+import RootLayout from "@layouts/RootLayout";
+import SettingsMenu from "@components/SettingsMenu";
+import uiLayout from "@utils/uiLayout";
 import { type NextPageWithLayout } from "@types";
 
 const Settings: NextPageWithLayout = () => (
-  <Typography variant="h2">Manage Your Account Settings</Typography>
+  <>
+    <Typography variant="h1" gutterBottom>
+      Manage Your Account Settings
+    </Typography>
+    <SettingsMenu />
+  </>
 );
 
-Settings.layout = settingsLayout("Settings", { title: "Account Settings" });
+Settings.layout = uiLayout(RootLayout, { title: "Account Settings" });
 
 export default Settings;
