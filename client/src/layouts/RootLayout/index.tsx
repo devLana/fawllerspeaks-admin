@@ -36,6 +36,7 @@ const RootLayout = (props: RootLayoutProps) => {
       sx={theme => ({
         minHeight: "100vh",
         pt: "4rem",
+        pb: "3.5rem",
         [theme.breakpoints.up("sm")]: { display: "flex", columnGap: 4 },
       })}
     >

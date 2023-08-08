@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 
-import SettingsNavLinks from "./components/SettingsNavLinks";
+import SettingsMenu from "@components/SettingsMenu";
 
 export interface SettingsLayoutProps {
   pageHeading: string;
@@ -18,13 +18,13 @@ const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => {
           mt: 3,
           [theme.breakpoints.up("md")]: {
             display: "flex",
-            columnGap: 3,
-            mt: 5,
+            columnGap: 5,
+            mt: 6,
           },
         })}
       >
-        <SettingsNavLinks />
-        <Divider sx={{ mt: 1, mb: 5, display: { md: "none" } }} />
+        <SettingsMenu />
+        {/* <Divider sx={{ mt: 1, mb: 5, display: { md: "none" } }} /> */}
         <Box
           sx={{
             display: { md: "flex" },
@@ -32,7 +32,7 @@ const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => {
             justifyContent: { md: "center" },
             borderLeft: { md: 1 },
             borderColor: { md: "divider" },
-            pl: 3,
+            pl: { md: 6 },
           }}
         >
           {children}
