@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 
 import { screen, waitFor } from "@testing-library/react";
 
-import ChangePassword from "@pages/settings/change-password";
+import ChangePassword from "@pages/settings/password";
 import { renderTestUI } from "@utils/renderTestUI";
 import {
   alertTable,

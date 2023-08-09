@@ -4,9 +4,9 @@ import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
 
 export const settingsLinks = [
   {
-    to: "/settings/change-password",
+    to: "/settings/password",
     Icon: VpnKeyOutlinedIcon,
-    label: "Change your password",
+    label: "Change password",
   },
   {
     to: "/settings/me",
