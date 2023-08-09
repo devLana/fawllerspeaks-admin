@@ -35,9 +35,12 @@ const RootLayout = (props: RootLayoutProps) => {
     <Container
       sx={theme => ({
         minHeight: "100vh",
-        pt: "4rem",
-        pb: "3.5rem",
-        [theme.breakpoints.up("sm")]: { display: "flex", columnGap: 4 },
+        pt: "56px",
+        [theme.breakpoints.up("sm")]: {
+          pt: "64px",
+          display: "flex",
+          columnGap: 4,
+        },
       })}
     >
       <Metadata {...metaProps} />
@@ -47,7 +50,7 @@ const RootLayout = (props: RootLayoutProps) => {
         onToggle={handleToggleNavbar}
         setNavBarIsOpen={setNavBarIsOpen}
       />
-      <Box sx={{ pt: 4, flexGrow: { sm: 1 } }}>
+      <Box sx={{ py: 4, flexGrow: { sm: 1 } }}>
         <PageBreadcrumbs />
         <main>{content}</main>
       </Box>
