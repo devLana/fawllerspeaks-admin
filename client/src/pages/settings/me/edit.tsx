@@ -1,4 +1,4 @@
-import settingsLayout from "@utils/settingsLayout.tsx";
+import settingsLayout from "@utils/settings/settingsLayout";
 import { type NextPageWithLayout } from "@types";
 
 const EditMe: NextPageWithLayout = () => {

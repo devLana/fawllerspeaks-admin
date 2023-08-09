@@ -11,7 +11,7 @@ import ChangePasswordForm from "@features/settings/changePassword/components/Cha
 import { changePasswordValidator } from "@features/settings/changePassword/utils/changePasswordValidator";
 import { CHANGE_PASSWORD } from "@features/settings/changePassword/operations/CHANGE_PASSWORD";
 import { SESSION_ID } from "@utils/constants";
-import settingsLayout from "@utils/settingsLayout.tsx";
+import settingsLayout from "@utils/settings/settingsLayout";
 import { type NextPageWithLayout } from "@types";
 import { type MutationChangePasswordArgs } from "@apiTypes";
 
