@@ -20,8 +20,9 @@ const SettingsMenuItem = ({ to, label, Icon }: SettingsMenuItemProps) => {
 
   return (
     <MenuItem
+      disableGutters
       sx={{
-        p: 0,
+        py: 0,
         minHeight: 0,
         bgcolor: isActive ? "action.hover" : "inherit",
       }}
@@ -29,10 +30,9 @@ const SettingsMenuItem = ({ to, label, Icon }: SettingsMenuItemProps) => {
       <NextLink
         href={to}
         sx={{
-          minWidth: "18.75rem",
+          width: "100%",
           display: "flex",
           alignItems: "center",
-          width: "100%",
           p: 2,
           color: isActive ? "text.primary" : "primary.main",
           "&:hover": { color: isActive ? "text.primary" : "primary.main" },

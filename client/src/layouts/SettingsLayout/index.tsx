@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 
 import SettingsLayoutMenu from "./components/SettingsLayoutMenu";
@@ -19,6 +20,12 @@ const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => {
       })}
     >
       <SettingsLayoutMenu />
+      <Divider
+        orientation="vertical"
+        flexItem
+        light
+        sx={theme => ({ [theme.breakpoints.down("md")]: { display: "none" } })}
+      />
       <div>
         <Typography variant="h1" gutterBottom>
           {pageHeading}
