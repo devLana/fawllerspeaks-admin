@@ -68,7 +68,7 @@ export const components: Components = {
   MuiContainer: {
     styleOverrides: {
       root: ({ theme }) => ({
-        [theme.breakpoints.up("lg")]: { maxWidth: "1000px" },
+        [theme.breakpoints.up("lg")]: { maxWidth: 1000 },
       }),
     },
   },

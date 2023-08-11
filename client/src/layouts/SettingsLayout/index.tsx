@@ -26,12 +26,16 @@ const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => {
         light
         sx={theme => ({ [theme.breakpoints.down("md")]: { display: "none" } })}
       />
-      <div>
+      <Box
+        sx={theme => ({
+          [theme.breakpoints.up("md")]: { maxWidth: 550, mx: "auto" },
+        })}
+      >
         <Typography variant="h1" gutterBottom>
           {pageHeading}
         </Typography>
         {children}
-      </div>
+      </Box>
     </Box>
   );
 };

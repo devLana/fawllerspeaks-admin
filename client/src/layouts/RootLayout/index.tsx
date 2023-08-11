@@ -50,7 +50,14 @@ const RootLayout = (props: RootLayoutProps) => {
         onToggle={handleToggleNavbar}
         setNavBarIsOpen={setNavBarIsOpen}
       />
-      <Box sx={{ py: 4, flexGrow: { sm: 1 } }}>
+      <Box
+        sx={{
+          mx: "auto",
+          py: 4,
+          flexGrow: { sm: 1 },
+          maxWidth: { xs: 500, md: "none" },
+        }}
+      >
         <PageBreadcrumbs />
         <main>{content}</main>
       </Box>
