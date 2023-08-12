@@ -33,7 +33,11 @@ const SettingsMenu = () => {
         onClose={() => setAnchor(null)}
       >
         {settingsLinks.map(link => (
-          <SettingsMenuItem key={link.label} {...link} />
+          <SettingsMenuItem
+            onClick={() => setAnchor(null)}
+            key={link.label}
+            {...link}
+          />
         ))}
       </Menu>
     </>

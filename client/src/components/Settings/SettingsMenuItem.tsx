@@ -12,14 +12,18 @@ interface SettingsMenuItemProps {
   to: string;
   label: string;
   Icon: MuiIconType;
+  onClick?: () => void;
 }
 
-const SettingsMenuItem = ({ to, label, Icon }: SettingsMenuItemProps) => {
+const SettingsMenuItem = (props: SettingsMenuItemProps) => {
   const { pathname } = useRouter();
+
+  const { to, label, Icon, onClick } = props;
   const isActive = pathname === to;
 
   return (
     <MenuItem
+      onClick={onClick}
       disableGutters
       sx={{
         py: 0,
