@@ -1,35 +1,15 @@
-import { gql, useApolloClient } from "@apollo/client";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import { useSession } from "@context/SessionContext";
+import useGetUserInfo from "@hooks/useGetUserInfo";
 import UserAvatar from "@components/UserAvatar";
 import settingsLayout from "@utils/settings/settingsLayout";
 import NextLink from "@components/NextLink";
 import { type NextPageWithLayout } from "@types";
 
-interface User {
-  email: string;
-  image: string;
-  firstName: string;
-  lastName: string;
-}
-
 const Me: NextPageWithLayout = () => {
-  const client = useApolloClient();
-
-  const { userId } = useSession();
-  const user = client.readFragment<User>({
-    id: userId ?? "",
-    fragment: gql`
-      fragment GetUserProfile on User {
-        image
-        firstName
-        lastName
-      }
-    `,
-  });
+  const user = useGetUserInfo();
 
   return (
     <>
