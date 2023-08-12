@@ -45,11 +45,7 @@ const RootLayout = (props: RootLayoutProps) => {
     >
       <Metadata {...metaProps} />
       <Header onClick={handleOpenNavbar} />
-      <Navbar
-        isOpen={navBarIsOpen}
-        onToggle={handleToggleNavbar}
-        setNavBarIsOpen={setNavBarIsOpen}
-      />
+      <Navbar isOpen={navBarIsOpen} onClick={handleToggleNavbar} />
       <Box
         sx={{
           mx: "auto",

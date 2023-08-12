@@ -16,11 +16,10 @@ interface NavbarLogoutButtonProps {
   label: string;
   Icon: MuiIconType;
   isOpen: boolean;
-  smMatches: boolean;
 }
 
 const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
-  const { Icon, label, isOpen, smMatches } = props;
+  const { Icon, label, isOpen } = props;
 
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
@@ -34,11 +33,11 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
 
   return (
     <>
-      <Tooltip title={!isOpen && smMatches ? label : null} placement="right">
+      <Tooltip title={isOpen ? null : label} placement="right">
         <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
           <ListItemButton
             sx={theme => ({
-              flexGrow: 0,
+              px: 1.5,
               borderRadius: 1,
               transition: transition(theme, isOpen, [
                 "background-color",
@@ -46,7 +45,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
               ]),
               "&:hover": { bgcolor: "action.hover" },
               [theme.breakpoints.up("sm")]: {
-                px: isOpen ? 2 : 1.5,
+                flexGrow: 0,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
               },
@@ -63,14 +62,15 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
             <ListItemText
               primary={label}
               sx={theme => ({
-                ml: "1rem",
+                ml: 1,
+                my: 0,
+                transition: transition(theme, isOpen, [
+                  "margin-left",
+                  "opacity",
+                ]),
+                "&>.MuiTypography-root": { lineHeight: 1 },
                 [theme.breakpoints.up("sm")]: {
-                  ml: isOpen ? "1rem" : 0,
-                  overflowX: isOpen ? "visible" : "hidden",
-                  "&>.MuiTypography-root": {
-                    width: isOpen ? "auto" : 0,
-                    lineHeight: isOpen ? 1 : 0,
-                  },
+                  ...(isOpen ? { ml: 1, opacity: 1 } : { ml: 0, opacity: 0 }),
                 },
               })}
             />

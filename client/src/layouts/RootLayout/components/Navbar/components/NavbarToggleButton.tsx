@@ -12,7 +12,7 @@ const NavbarToggleButton = ({ isOpen, onClick }: NavbarToggleButtonProps) => (
     sx={theme => ({
       display: "flex",
       m: 3,
-      [theme.breakpoints.up("sm")]: { ml: 0 },
+      [theme.breakpoints.up("sm")]: { ml: 0, mt: 0 },
     })}
   >
     <IconButton

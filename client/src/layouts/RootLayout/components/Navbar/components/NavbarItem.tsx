@@ -16,33 +16,30 @@ interface NavbarItemProps {
   href: string;
   Icon: MuiIconType;
   isOpen: boolean;
-  smMatches: boolean;
 }
 
 const NavbarItem = (props: NavbarItemProps) => {
   const { pathname } = useRouter();
 
-  const { label, href, Icon, isOpen, smMatches } = props;
+  const { label, href, Icon, isOpen } = props;
   const isActive = pathname === href;
 
   return (
-    <Tooltip title={!isOpen && smMatches ? label : null} placement="right">
+    <Tooltip title={isOpen ? null : label} placement="right">
       <ListItem sx={{ py: 1, pr: 0, pl: { xs: 3, sm: 0 } }}>
         <ListItemButton
           sx={theme => ({
+            pl: 1.5,
+            pr: 0,
             borderRadius: "1.5rem 0 0 1.5rem",
             bgcolor: isActive ? "primary.main" : "transparent",
             color: isActive ? "primary.dark" : "inherit",
-            transition: transition(theme, isOpen, [
-              "background-color",
-              "padding",
-            ]),
+            transition: transition(theme, isOpen, ["background-color"]),
             "&:hover": {
               bgcolor: isActive ? "primary.main" : "action.hover",
               color: isActive ? "primary.dark" : "inherit",
             },
             [theme.breakpoints.up("sm")]: {
-              px: isOpen ? 2 : 1.5,
               whiteSpace: "nowrap",
               overflow: "hidden",
             },
@@ -56,15 +53,15 @@ const NavbarItem = (props: NavbarItemProps) => {
           <ListItemText
             primary={label}
             sx={theme => ({
-              ml: "1rem",
+              ml: 1,
+              my: 0,
+              transition: transition(theme, isOpen, ["margin-left", "opacity"]),
+              "&>.MuiTypography-root": { lineHeight: 1 },
               [theme.breakpoints.up("sm")]: {
-                ml: isOpen ? "1rem" : 0,
-                overflowX: isOpen ? "visible" : "hidden",
+                ...(isOpen ? { ml: 1, opacity: 1 } : { ml: 0, opacity: 0 }),
                 "&>.MuiTypography-root": {
                   fontWeight: isActive ? 700 : 400,
                   letterSpacing: isActive ? 0.5 : "normal",
-                  lineHeight: isOpen ? 1 : 0,
-                  width: isOpen ? "auto" : 0,
                 },
               },
             })}

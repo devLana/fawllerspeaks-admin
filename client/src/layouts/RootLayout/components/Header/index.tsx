@@ -13,7 +13,7 @@ import HeaderAvatar from "./components/HeaderAvatar";
 import HeaderThemeButton from "./components/HeaderThemeButton";
 
 const Header = ({ onClick }: { onClick: () => void }) => (
-  <AppBar sx={{ backgroundColor: "transparent" }}>
+  <AppBar sx={{ backgroundColor: "background.default" }}>
     <Toolbar component={Container}>
       <IconButton
         size="large"
