@@ -66,7 +66,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
               backgroundImage:
                 "linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15))",
             }),
-            transform: isOpen ? "translateX(0)" : "translateX(-100%)",
+            transform: isOpen ? "translateX(0)" : "translateX(-150%)",
           },
           [theme.breakpoints.up("sm")]: {
             height: "100%",
