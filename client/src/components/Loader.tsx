@@ -30,6 +30,7 @@ const Loader = () => (
   <Box
     role="progressbar"
     sx={{
+      mx: "auto",
       height: "4rem",
       width: "6rem",
       display: "flex",
