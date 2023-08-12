@@ -44,7 +44,8 @@ interface ConfirmNewPasswordProps {
   register: Password<"confirmNewPassword">;
 }
 
-type PasswordInputProps = TextFieldProps &
+type Keys = "type" | "fullWidth" | "error" | "helperText";
+type PasswordInputProps = Omit<TextFieldProps, Keys> &
   (
     | PasswordProps
     | ConfirmPasswordProps
@@ -54,7 +55,16 @@ type PasswordInputProps = TextFieldProps &
   ) & { fieldError: FieldError | undefined };
 
 const PasswordInput = (props: PasswordInputProps) => {
-  const { id, label, register, fieldError, ...muiProps } = props;
+  const {
+    id,
+    label,
+    register,
+    fieldError,
+    FormHelperTextProps,
+    inputProps,
+    InputProps,
+    ...muiProps
+  } = props;
 
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -72,9 +82,17 @@ const PasswordInput = (props: PasswordInputProps) => {
       fullWidth
       error={!!fieldError}
       helperText={fieldError?.message ?? null}
-      FormHelperTextProps={{ id: `${id}-error-message` }}
-      inputProps={{ "aria-errormessage": ariaId, "aria-describedby": ariaId }}
+      FormHelperTextProps={{
+        ...(FormHelperTextProps && FormHelperTextProps),
+        id: `${id}-error-message`,
+      }}
+      inputProps={{
+        ...(inputProps && inputProps),
+        "aria-errormessage": ariaId,
+        "aria-describedby": ariaId,
+      }}
       InputProps={{
+        ...(InputProps && InputProps),
         endAdornment: (
           <PasswordAdornment isVisible={isVisible} onClick={handleClick} />
         ),

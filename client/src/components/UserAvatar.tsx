@@ -4,15 +4,13 @@ import Avatar, { type AvatarProps } from "@mui/material/Avatar";
 import PersonIcon from "@mui/icons-material/Person";
 
 import NextLink from "@components/NextLink";
+import type { SxPropsArray } from "@types";
 
 interface UserAvatarProps {
   sx?: AvatarProps["sx"];
   renderWithLink?: boolean;
   user: { firstName: string; lastName: string; image: string | null } | null;
 }
-
-type Keys = ((theme: never) => unknown) | Record<string, unknown>;
-type SxPropsArray = NonNullable<Exclude<AvatarProps["sx"], Keys>>;
 
 const UserAvatar = (props: UserAvatarProps) => {
   const { user, renderWithLink = false, sx = [] } = props;

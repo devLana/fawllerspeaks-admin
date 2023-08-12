@@ -4,6 +4,7 @@ import { type AppProps } from "next/app";
 import { type EmotionCache } from "@emotion/react";
 import type { OverridableComponent } from "@mui/material/OverridableComponent";
 import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
+import type { SxProps } from "@mui/material/styles";
 
 import { type MetaInfo } from "@components/Metadata";
 
@@ -36,3 +37,6 @@ export interface RootLayoutProps extends MetaInfo {
   clientHasRendered: boolean;
   children: React.ReactElement;
 }
+
+type Keys = ((theme: never) => unknown) | Record<string, unknown>;
+export type SxPropsArray = NonNullable<Exclude<SxProps, Keys>>;
