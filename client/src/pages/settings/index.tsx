@@ -8,7 +8,7 @@ import { type NextPageWithLayout } from "@types";
 const Settings: NextPageWithLayout = () => (
   <>
     <Typography variant="h1" gutterBottom>
-      Manage Your Account Settings
+      Manage your account settings
     </Typography>
     <SettingsMenuList />
   </>
