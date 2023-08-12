@@ -24,6 +24,7 @@ const config = {
     "^@apiTypes$": "<rootDir>/src/types/api/graphql",
     "^@utils/(.*)$": "<rootDir>/src/utils/$1",
     "^@lib/(.*)$": "<rootDir>/src/lib/$1",
+    "^@fragments/(.*)$": "<rootDir>/src/fragments/$1",
   },
   setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
   testEnvironment: "jest-environment-jsdom",

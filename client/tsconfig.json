@@ -25,7 +25,8 @@
       "@types": ["types"],
       "@apiTypes": ["types/api/graphql"],
       "@utils/*": ["utils/*"],
-      "@lib/*": ["lib/*"]
+      "@lib/*": ["lib/*"],
+      "@fragments/*": ["fragments/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".eslintrc.js"],
