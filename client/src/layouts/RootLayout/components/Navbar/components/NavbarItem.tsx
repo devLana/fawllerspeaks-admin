@@ -18,11 +18,19 @@ interface NavbarItemProps {
   isOpen: boolean;
 }
 
+const multiPageHrefs = ["/posts", "/settings"];
+
 const NavbarItem = (props: NavbarItemProps) => {
   const { pathname } = useRouter();
 
   const { label, href, Icon, isOpen } = props;
-  const isActive = pathname === href;
+  let isActive = false;
+
+  if (href === pathname) {
+    isActive = true;
+  } else if (multiPageHrefs.includes(href) && pathname.startsWith(href)) {
+    isActive = true;
+  }
 
   return (
     <Tooltip title={isOpen ? null : label} placement="right">
