@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useRouter } from "next/router";
 
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -14,6 +15,7 @@ import { type RootLayoutProps } from "@types";
 
 const RootLayout = (props: RootLayoutProps) => {
   const [navBarIsOpen, setNavBarIsOpen] = React.useState(false);
+  const { pathname } = useRouter();
 
   useCheckAuth();
 
@@ -48,10 +50,12 @@ const RootLayout = (props: RootLayoutProps) => {
       <Navbar isOpen={navBarIsOpen} onClick={handleToggleNavbar} />
       <Box
         sx={{
-          mx: "auto",
+          mx: { xs: "auto", sm: 0 },
           py: 4,
           flexGrow: { sm: 1 },
-          maxWidth: { xs: 500, md: "none" },
+          ...(pathname === "/settings/password" && {
+            maxWidth: { xs: 500, md: "none" },
+          }),
         }}
       >
         <PageBreadcrumbs />
