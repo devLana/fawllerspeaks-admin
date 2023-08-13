@@ -107,3 +107,7 @@ export type ValidationErrorObject<Type extends Record<string, unknown>> = {
 export type RemoveNull<T extends object> = {
   [Prop in keyof T]: NonNullable<T[Prop]>;
 };
+
+export type InputErrors<Type extends Record<string, unknown>> = {
+  [Prop in keyof Type as `${string & Prop}Error`]: string | null | undefined;
+};

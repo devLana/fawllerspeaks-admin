@@ -1,3 +1,5 @@
+import type { InputErrors } from "@types";
+
 interface GQL {
   [key: string]: unknown;
   currentPassword: number | null;
@@ -6,16 +8,13 @@ interface GQL {
 }
 
 interface Input {
+  [key: string]: unknown;
   currentPassword: string;
   newPassword: string;
   confirmNewPassword: string;
 }
 
-type InputErrors = {
-  [Prop in keyof Input as `${Prop}Error`]: string | null | undefined;
-};
-
-type Validations = [string, Input, InputErrors][];
+type Validations = [string, Input, InputErrors<Input>][];
 
 interface VerifyUser {
   [key: string]: unknown;

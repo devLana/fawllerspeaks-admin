@@ -2,79 +2,77 @@ import { describe, test, expect, beforeEach } from "@jest/globals";
 
 import editProfile from "..";
 import { mockContext, info, spyDb } from "@tests";
-
-const args = { firstName: "Ade", lastName: "Lana" };
+import {
+  args,
+  dateCreated,
+  editSuccess,
+  mockDate,
+  validations,
+  verify,
+} from "../utils/editProfileTestUtils";
 
 beforeEach(() => {
   mockContext.user = "insane_user_id";
 });
 
 describe("Test edit profile resolver", () => {
-  test("Returns error on logged out user", async () => {
-    mockContext.user = null;
+  describe("Verify user authentication", () => {
+    test("Return an error response if user is not logged in", async () => {
+      mockContext.user = null;
 
-    const arg = { firstName: "", lastName: "" };
+      const arg = { firstName: "", lastName: "" };
 
-    const result = await editProfile({}, arg, mockContext, info);
+      const result = await editProfile({}, arg, mockContext, info);
 
-    expect(result).toHaveProperty("message", "Unable to edit user profile");
-    expect(result).toHaveProperty("status", "ERROR");
+      expect(result).toHaveProperty("message", "Unable to edit user profile");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
-  test.each([
-    [
-      "empty input values",
-      { firstName: "", lastName: "" },
-      { firstNameError: "Enter first name", lastNameError: "Enter last name" },
-    ],
-    [
-      "empty whitespace input values",
-      { firstName: "    ", lastName: "   " },
-      { firstNameError: "Enter first name", lastNameError: "Enter last name" },
-    ],
-    [
-      "invalid first name and last name",
-      { firstName: "John3", lastName: "12sam" },
-      {
-        firstNameError: "First name cannot contain numbers",
-        lastNameError: "Last name cannot contain numbers",
-      },
-    ],
-  ])("Returns error on %s", async (_, data, errors) => {
-    const result = await editProfile({}, data, mockContext, info);
+  describe("Validate user input", () => {
+    test.each(validations(undefined))("%s", async (_, data, errors) => {
+      const result = await editProfile({}, data, mockContext, info);
 
-    expect(result).toHaveProperty("firstNameError", errors.firstNameError);
-    expect(result).toHaveProperty("lastNameError", errors.lastNameError);
-    expect(result).toHaveProperty("status", "ERROR");
+      expect(result).toHaveProperty("firstNameError", errors.firstNameError);
+      expect(result).toHaveProperty("lastNameError", errors.lastNameError);
+      expect(result).toHaveProperty("imageError", errors.imageError);
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
-  test.each([
-    ["unknown", []],
-    ["unregistered", [{ isRegistered: false }]],
-  ])("Returns error on %s user", async (_, data) => {
-    const spy = spyDb({ rows: data });
-    const result = await editProfile({}, args, mockContext, info);
+  describe("Verify user", () => {
+    test.each(verify)("%s", async (_, data) => {
+      const spy = spyDb({ rows: data });
+      const result = await editProfile({}, args, mockContext, info);
 
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveReturnedWith({ rows: data });
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveReturnedWith({ rows: data });
 
-    expect(result).toHaveProperty("message", "Unable to edit user profile");
-    expect(result).toHaveProperty("status", "ERROR");
+      expect(result).toHaveProperty("message", "Unable to edit user profile");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
-  test("Should edit profile and update user", async () => {
-    const spy = spyDb({ rows: [{ isRegistered: true }] });
-    spy.mockReturnValueOnce({ rows: [] });
+  describe("Edit user data, Respond with updated user object", () => {
+    test.each(editSuccess)("%s", async (_, input, image) => {
+      const mock = [{ email: "test@mail.com", dateCreated }];
+      const spy = spyDb({ rows: [{ isRegistered: true }] });
+      spy.mockReturnValueOnce({ rows: mock });
 
-    const result = await editProfile({}, args, mockContext, info);
+      const data = await editProfile({}, input, mockContext, info);
 
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-    expect(spy).toHaveNthReturnedWith(2, { rows: [] });
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
+      expect(spy).toHaveNthReturnedWith(2, { rows: mock });
 
-    expect(result).toHaveProperty("id", "insane_user_id");
-    expect(result).toHaveProperty("firstName", args.firstName);
-    expect(result).toHaveProperty("lastName", args.lastName);
-    expect(result).toHaveProperty("status", "SUCCESS");
+      expect(data).toHaveProperty("user.id", "insane_user_id");
+      expect(data).toHaveProperty("user.email", "test@mail.com");
+      expect(data).toHaveProperty("user.firstName", args.firstName);
+      expect(data).toHaveProperty("user.lastName", args.lastName);
+      expect(data).toHaveProperty("user.image", image);
+      expect(data).toHaveProperty("user.isRegistered", true);
+      expect(data).toHaveProperty("user.dateCreated", mockDate);
+      expect(data).toHaveProperty("status", "SUCCESS");
+    });
   });
 });

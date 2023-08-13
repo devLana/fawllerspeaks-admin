@@ -5,7 +5,19 @@ import type { ApolloServer } from "@apollo/server";
 import { db } from "@services/db";
 import { startServer } from "@server";
 
-import { EDIT_PROFILE, testUsers, loginTestUser, post } from "@tests";
+import {
+  EDIT_PROFILE,
+  testUsers,
+  registeredUser as mockUser,
+  loginTestUser,
+  post,
+} from "@tests";
+import {
+  args as variables,
+  gqlValidate,
+  validations,
+  edit,
+} from "../utils/editProfileTestUtils";
 
 import { Status } from "@resolverTypes";
 import type { APIContext, DbTestUser, TestData } from "@types";
@@ -13,10 +25,8 @@ import type { APIContext, DbTestUser, TestData } from "@types";
 type EditProfile = TestData<{ editProfile: Record<string, unknown> }>;
 
 describe("Edit user profile - E2E", () => {
-  const variables = { firstName: "Ádè", lastName: "Lana" };
-
   let server: ApolloServer<APIContext>, url: string, user: DbTestUser;
-  let registeredUserAccessToken: string, unRegisteredUserAccessToken: string;
+  let registeredJwt: string, unregisteredJwt: string;
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
@@ -26,8 +36,10 @@ describe("Edit user profile - E2E", () => {
     const registered = loginTestUser(registeredUser.userId);
     const unRegistered = loginTestUser(unregisteredUser.userId);
 
-    [registeredUserAccessToken, unRegisteredUserAccessToken] =
-      await Promise.all([registered, unRegistered]);
+    [registeredJwt, unregisteredJwt] = await Promise.all([
+      registered,
+      unRegistered,
+    ]);
   });
 
   afterAll(async () => {
@@ -37,109 +49,93 @@ describe("Edit user profile - E2E", () => {
     await db.end();
   });
 
-  test("Returns error on logged out user", async () => {
-    const payload = {
-      query: EDIT_PROFILE,
-      variables: { firstName: "", lastName: "" },
-    };
+  describe("Verify user authentication", () => {
+    test("Should return an error response if user is logged out", async () => {
+      const input = { firstName: "", lastName: "" };
+      const payload = { query: EDIT_PROFILE, variables: input };
 
-    const { data } = await post<EditProfile>(url, payload);
+      const { data } = await post<EditProfile>(url, payload);
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.editProfile).toStrictEqual({
-      __typename: "NotAllowedError",
-      message: "Unable to edit user profile",
-      status: Status.Error,
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.editProfile).toStrictEqual({
+        __typename: "AuthenticationError",
+        message: "Unable to edit user profile",
+        status: Status.Error,
+      });
     });
   });
 
-  test.each([
-    ["null and undefined", { firstName: null, lastName: undefined }],
-    ["number and boolean", { firstName: 754, lastName: false }],
-  ])(
-    "Should throw graphql validation error for %s input values",
-    async (_, args) => {
+  describe("Validate user input", () => {
+    test.each(gqlValidate)("%s", async (_, args) => {
       const payload = { query: EDIT_PROFILE, variables: args };
+      const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await post<EditProfile>(url, payload, {
-        authorization: `Bearer ${registeredUserAccessToken}`,
-      });
+      const { data } = await post<EditProfile>(url, payload, options);
 
       expect(data.errors).toBeDefined();
       expect(data.data).toBeUndefined();
-    }
-  );
-
-  test.each([
-    [
-      "empty input values",
-      { firstName: "", lastName: "" },
-      { firstNameError: "Enter first name", lastNameError: "Enter last name" },
-    ],
-    [
-      "empty password and password mismatch",
-      { firstName: "   ", lastName: "  " },
-      { firstNameError: "Enter first name", lastNameError: "Enter last name" },
-    ],
-    [
-      "invalid password and password mismatch",
-      { firstName: "Philip8", lastName: "Lana90" },
-      {
-        firstNameError: "First name cannot contain numbers",
-        lastNameError: "Last name cannot contain numbers",
-      },
-    ],
-  ])("Returns error for %s", async (_, args, errors) => {
-    const payload = { query: EDIT_PROFILE, variables: args };
-
-    const { data } = await post<EditProfile>(url, payload, {
-      authorization: `Bearer ${registeredUserAccessToken}`,
     });
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.editProfile).toStrictEqual({
-      __typename: "EditProfileValidationError",
-      ...errors,
-      status: Status.Error,
+    test.each(validations(null))("%s", async (_, args, errors) => {
+      const payload = { query: EDIT_PROFILE, variables: args };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<EditProfile>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.editProfile).toStrictEqual({
+        __typename: "EditProfileValidationError",
+        ...errors,
+        status: Status.Error,
+      });
     });
   });
 
-  test("Returns error on unregistered user", async () => {
-    const payload = { query: EDIT_PROFILE, variables };
+  describe("Verify user registration status", () => {
+    test("Respond with an error if the user is unregistered", async () => {
+      const payload = { query: EDIT_PROFILE, variables };
+      const options = { authorization: `Bearer ${unregisteredJwt}` };
 
-    const { data } = await post<EditProfile>(url, payload, {
-      authorization: `Bearer ${unRegisteredUserAccessToken}`,
-    });
+      const { data } = await post<EditProfile>(url, payload, options);
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.editProfile).toStrictEqual({
-      __typename: "RegistrationError",
-      message: "Unable to edit user profile",
-      status: Status.Error,
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.editProfile).toStrictEqual({
+        __typename: "RegistrationError",
+        message: "Unable to edit user profile",
+        status: Status.Error,
+      });
     });
   });
 
-  test("Edits profile and updates user", async () => {
-    const payload = { query: EDIT_PROFILE, variables };
+  describe("Edit user details", () => {
+    test.each(edit)("%s", async (_, args, image) => {
+      const payload = { query: EDIT_PROFILE, variables: args };
+      const options = { authorization: `Bearer ${registeredJwt}` };
 
-    const { data } = await post<EditProfile>(url, payload, {
-      authorization: `Bearer ${registeredUserAccessToken}`,
-    });
+      const { data } = await post<EditProfile>(url, payload, options);
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
 
-    expect(data.data).not.toHaveProperty("message");
+      expect(data.data).not.toHaveProperty("message");
 
-    expect(data.data?.editProfile).toStrictEqual({
-      __typename: "EditedProfile",
-      id: user.userId,
-      firstName: variables.firstName,
-      lastName: variables.lastName,
-      status: Status.Success,
+      expect(data.data?.editProfile).toStrictEqual({
+        __typename: "EditedProfile",
+        user: {
+          __typename: "User",
+          id: user.userId,
+          email: mockUser.email,
+          firstName: variables.firstName,
+          lastName: variables.lastName,
+          image,
+          isRegistered: mockUser.registered,
+          dateCreated: user.dateCreated,
+        },
+        status: Status.Success,
+      });
     });
   });
 });
