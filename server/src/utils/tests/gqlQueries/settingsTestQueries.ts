@@ -19,8 +19,8 @@ export const CHANGE_PASSWORD = `#graphql
 `;
 
 export const EDIT_PROFILE = `#graphql
-  mutation EditProfile($firstName: String!, $lastName: String!) {
-    editProfile(firstName: $firstName, lastName: $lastName) {
+  mutation EditProfile($firstName: String!, $lastName: String!, $image: String) {
+    editProfile(firstName: $firstName, lastName: $lastName, image: $image) {
       ... on BaseResponse {
         __typename
         message
@@ -31,14 +31,22 @@ export const EDIT_PROFILE = `#graphql
         __typename
         firstNameError
         lastNameError
+        imageError
         status
       }
 
       ... on EditedProfile {
         __typename
-        id
-        firstName
-        lastName
+        user {
+          __typename
+          id
+          email
+          firstName
+          lastName
+          image
+          isRegistered
+          dateCreated
+        }
         status
       }
     }

@@ -123,11 +123,12 @@ export type EditPostTagValidationError = {
   tagIdError?: Maybe<Scalars['String']>;
 };
 
-export type EditProfile = EditProfileValidationError | EditedProfile | NotAllowedError | RegistrationError;
+export type EditProfile = AuthenticationError | EditProfileValidationError | EditedProfile | RegistrationError | UnknownError;
 
 export type EditProfileValidationError = {
   __typename?: 'EditProfileValidationError';
   firstNameError?: Maybe<Scalars['String']>;
+  imageError?: Maybe<Scalars['String']>;
   lastNameError?: Maybe<Scalars['String']>;
   status: Status;
 };
@@ -138,12 +139,10 @@ export type EditedPostTag = {
   tag: PostTag;
 };
 
-export type EditedProfile = {
+export type EditedProfile = UserData & {
   __typename?: 'EditedProfile';
-  firstName: Scalars['String'];
-  id: Scalars['ID'];
-  lastName: Scalars['String'];
   status: Status;
+  user: User;
 };
 
 export type EmailValidationError = {
@@ -168,7 +167,7 @@ export type GetPostTags = NotAllowedError | PostTags;
 
 export type GetPosts = NotAllowedError | Posts;
 
-export type LoggedInUser = {
+export type LoggedInUser = UserData & {
   __typename?: 'LoggedInUser';
   accessToken: Scalars['String'];
   sessionId: Scalars['ID'];
@@ -293,6 +292,7 @@ export type MutationEditPostTagArgs = {
 
 export type MutationEditProfileArgs = {
   firstName: Scalars['String'];
+  image?: InputMaybe<Scalars['String']>;
   lastName: Scalars['String'];
 };
 
@@ -494,7 +494,7 @@ export type RegisterUserValidationError = {
   status: Status;
 };
 
-export type RegisteredUser = {
+export type RegisteredUser = UserData & {
   __typename?: 'RegisteredUser';
   status: Status;
   user: User;
@@ -569,6 +569,11 @@ export type User = {
   lastName?: Maybe<Scalars['String']>;
 };
 
+export type UserData = {
+  status: Status;
+  user: User;
+};
+
 export type UserSessionError = BaseResponse & {
   __typename?: 'UserSessionError';
   message: Scalars['String'];
@@ -582,7 +587,7 @@ export type VerifiedResetToken = {
   status: Status;
 };
 
-export type VerifiedSession = {
+export type VerifiedSession = UserData & {
   __typename?: 'VerifiedSession';
   accessToken: Scalars['String'];
   status: Status;
@@ -691,7 +696,7 @@ export type ResolversTypes = ResolversObject<{
   EditPostInput: EditPostInput;
   EditPostTag: ResolversTypes['DuplicatePostTagError'] | ResolversTypes['EditPostTagValidationError'] | ResolversTypes['EditedPostTag'] | ResolversTypes['NotAllowedError'] | ResolversTypes['UnknownError'];
   EditPostTagValidationError: ResolverTypeWrapper<EditPostTagValidationError>;
-  EditProfile: ResolversTypes['EditProfileValidationError'] | ResolversTypes['EditedProfile'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'];
+  EditProfile: ResolversTypes['AuthenticationError'] | ResolversTypes['EditProfileValidationError'] | ResolversTypes['EditedProfile'] | ResolversTypes['RegistrationError'] | ResolversTypes['UnknownError'];
   EditProfileValidationError: ResolverTypeWrapper<EditProfileValidationError>;
   EditedPostTag: ResolverTypeWrapper<EditedPostTag>;
   EditedProfile: ResolverTypeWrapper<EditedProfile>;
@@ -740,6 +745,7 @@ export type ResolversTypes = ResolversObject<{
   UnauthorizedAuthorError: ResolverTypeWrapper<UnauthorizedAuthorError>;
   UnknownError: ResolverTypeWrapper<UnknownError>;
   User: ResolverTypeWrapper<User>;
+  UserData: ResolversTypes['EditedProfile'] | ResolversTypes['LoggedInUser'] | ResolversTypes['RegisteredUser'] | ResolversTypes['VerifiedSession'];
   UserSessionError: ResolverTypeWrapper<UserSessionError>;
   VerifiedResetToken: ResolverTypeWrapper<VerifiedResetToken>;
   VerifiedSession: ResolverTypeWrapper<VerifiedSession>;
@@ -772,7 +778,7 @@ export type ResolversParentTypes = ResolversObject<{
   EditPostInput: EditPostInput;
   EditPostTag: ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['EditPostTagValidationError'] | ResolversParentTypes['EditedPostTag'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['UnknownError'];
   EditPostTagValidationError: EditPostTagValidationError;
-  EditProfile: ResolversParentTypes['EditProfileValidationError'] | ResolversParentTypes['EditedProfile'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'];
+  EditProfile: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['EditProfileValidationError'] | ResolversParentTypes['EditedProfile'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['UnknownError'];
   EditProfileValidationError: EditProfileValidationError;
   EditedPostTag: EditedPostTag;
   EditedProfile: EditedProfile;
@@ -819,6 +825,7 @@ export type ResolversParentTypes = ResolversObject<{
   UnauthorizedAuthorError: UnauthorizedAuthorError;
   UnknownError: UnknownError;
   User: User;
+  UserData: ResolversParentTypes['EditedProfile'] | ResolversParentTypes['LoggedInUser'] | ResolversParentTypes['RegisteredUser'] | ResolversParentTypes['VerifiedSession'];
   UserSessionError: UserSessionError;
   VerifiedResetToken: VerifiedResetToken;
   VerifiedSession: VerifiedSession;
@@ -927,11 +934,12 @@ export type EditPostTagValidationErrorResolvers<ContextType = APIContext, Parent
 }>;
 
 export type EditProfileResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['EditProfile'] = ResolversParentTypes['EditProfile']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'EditProfileValidationError' | 'EditedProfile' | 'NotAllowedError' | 'RegistrationError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'EditProfileValidationError' | 'EditedProfile' | 'RegistrationError' | 'UnknownError', ParentType, ContextType>;
 }>;
 
 export type EditProfileValidationErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['EditProfileValidationError'] = ResolversParentTypes['EditProfileValidationError']> = ResolversObject<{
   firstNameError?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  imageError?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   lastNameError?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -944,10 +952,8 @@ export type EditedPostTagResolvers<ContextType = APIContext, ParentType extends 
 }>;
 
 export type EditedProfileResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['EditedProfile'] = ResolversParentTypes['EditedProfile']> = ResolversObject<{
-  firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1221,6 +1227,12 @@ export type UserResolvers<ContextType = APIContext, ParentType extends Resolvers
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type UserDataResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['UserData'] = ResolversParentTypes['UserData']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'EditedProfile' | 'LoggedInUser' | 'RegisteredUser' | 'VerifiedSession', ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+}>;
+
 export type UserSessionErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['UserSessionError'] = ResolversParentTypes['UserSessionError']> = ResolversObject<{
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
@@ -1317,6 +1329,7 @@ export type Resolvers<ContextType = APIContext> = ResolversObject<{
   UnauthorizedAuthorError?: UnauthorizedAuthorErrorResolvers<ContextType>;
   UnknownError?: UnknownErrorResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserData?: UserDataResolvers<ContextType>;
   UserSessionError?: UserSessionErrorResolvers<ContextType>;
   VerifiedResetToken?: VerifiedResetTokenResolvers<ContextType>;
   VerifiedSession?: VerifiedSessionResolvers<ContextType>;

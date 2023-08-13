@@ -1,8 +1,6 @@
 export const settingsTypeDefs = `#graphql
-  type EditedProfile {
-    id: ID!
-    firstName: String!
-    lastName: String!
+  type EditedProfile implements UserData {
+    user: User!
     status: Status!
   }
 
@@ -16,10 +14,11 @@ export const settingsTypeDefs = `#graphql
   type EditProfileValidationError {
     firstNameError: String
     lastNameError: String
+    imageError: String
     status: Status!
   }
 
   union ChangePassword = Response | ChangePasswordValidationError | AuthenticationError | NotAllowedError | RegistrationError | UnknownError | ServerError
 
-  union EditProfile = EditedProfile | EditProfileValidationError | NotAllowedError | RegistrationError
+  union EditProfile = EditedProfile | EditProfileValidationError | AuthenticationError | UnknownError | RegistrationError
 `;

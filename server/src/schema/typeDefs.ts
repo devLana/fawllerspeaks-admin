@@ -45,7 +45,7 @@ const types = `#graphql
     "Change password of registered and signed in user"
     changePassword(currentPassword: String!, newPassword: String!, confirmNewPassword: String!): ChangePassword!
     "Edit user profile"
-    editProfile(firstName: String!, lastName: String!): EditProfile!
+    editProfile(firstName: String!, lastName: String!, image: String): EditProfile!
 
     ####POST TAGS####
     "Create a new post tag or multiple tags"
@@ -87,6 +87,11 @@ const types = `#graphql
     status: Status!
   }
 
+  interface UserData {
+    user: User!
+    status: Status!
+  }
+
   type NotAllowedError implements BaseResponse {
     message: String!
     status: Status!
@@ -120,6 +125,16 @@ const types = `#graphql
   type Response implements BaseResponse {
     message: String!
     status: Status!
+  }
+
+  type User {
+    id: ID!
+    email: String!
+    firstName: String
+    lastName: String
+    image: String
+    isRegistered: Boolean!
+    dateCreated: String!
   }
 `;
 

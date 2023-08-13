@@ -1,15 +1,5 @@
 export const authTypeDefs = `#graphql
-  type User {
-    id: ID!
-    email: String!
-    firstName: String
-    lastName: String
-    image: String
-    isRegistered: Boolean!
-    dateCreated: String!
-  }
-
-  type LoggedInUser {
+  type LoggedInUser implements UserData {
     accessToken: String!
     sessionId: ID!
     user: User!
@@ -27,12 +17,12 @@ export const authTypeDefs = `#graphql
     status: Status!
   }
 
-  type RegisteredUser {
+  type RegisteredUser implements UserData {
     user: User!
     status: Status!
   }
 
-  type VerifiedSession {
+  type VerifiedSession implements UserData {
     accessToken: String!
     user: User!
     status: Status!
