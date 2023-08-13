@@ -8,8 +8,9 @@ export class EditProfileValidationError implements Errors {
   readonly status: Status;
 
   constructor(
-    public readonly firstNameError?: string,
-    public readonly lastNameError?: string
+    readonly firstNameError?: string,
+    readonly lastNameError?: string,
+    readonly imageError?: string
   ) {
     this.status = Status.Error;
   }

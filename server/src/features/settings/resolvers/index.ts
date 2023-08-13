@@ -1,9 +1,11 @@
 import changePassword from "./changePassword";
 import editProfile from "./editProfile";
 
-import { EditedProfileResolvers } from "./editProfile/EditedProfile";
 import { ChangePasswordValidationErrorResolvers } from "./changePassword/types";
-import { EditProfileValidationErrorResolvers } from "./editProfile/EditProfileValidationError";
+import {
+  EditedProfileResolvers,
+  EditProfileValidationErrorResolvers,
+} from "./editProfile/types";
 
 import type { MutationResolvers, Resolvers } from "@resolverTypes";
 import type { ResolversMapper, ObjectMapper } from "@types";
