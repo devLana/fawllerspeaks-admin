@@ -121,11 +121,12 @@ export type EditPostTagValidationError = {
   tagIdError?: Maybe<Scalars['String']>;
 };
 
-export type EditProfile = EditProfileValidationError | EditedProfile | NotAllowedError | RegistrationError;
+export type EditProfile = AuthenticationError | EditProfileValidationError | EditedProfile | RegistrationError | UnknownError;
 
 export type EditProfileValidationError = {
   __typename?: 'EditProfileValidationError';
   firstNameError?: Maybe<Scalars['String']>;
+  imageError?: Maybe<Scalars['String']>;
   lastNameError?: Maybe<Scalars['String']>;
   status: Status;
 };
@@ -136,12 +137,10 @@ export type EditedPostTag = {
   tag: PostTag;
 };
 
-export type EditedProfile = {
+export type EditedProfile = UserData & {
   __typename?: 'EditedProfile';
-  firstName: Scalars['String'];
-  id: Scalars['ID'];
-  lastName: Scalars['String'];
   status: Status;
+  user: User;
 };
 
 export type EmailValidationError = {
@@ -166,7 +165,7 @@ export type GetPostTags = NotAllowedError | PostTags;
 
 export type GetPosts = NotAllowedError | Posts;
 
-export type LoggedInUser = {
+export type LoggedInUser = UserData & {
   __typename?: 'LoggedInUser';
   accessToken: Scalars['String'];
   sessionId: Scalars['ID'];
@@ -291,6 +290,7 @@ export type MutationEditPostTagArgs = {
 
 export type MutationEditProfileArgs = {
   firstName: Scalars['String'];
+  image?: InputMaybe<Scalars['String']>;
   lastName: Scalars['String'];
 };
 
@@ -492,7 +492,7 @@ export type RegisterUserValidationError = {
   status: Status;
 };
 
-export type RegisteredUser = {
+export type RegisteredUser = UserData & {
   __typename?: 'RegisteredUser';
   status: Status;
   user: User;
@@ -567,6 +567,11 @@ export type User = {
   lastName?: Maybe<Scalars['String']>;
 };
 
+export type UserData = {
+  status: Status;
+  user: User;
+};
+
 export type UserSessionError = BaseResponse & {
   __typename?: 'UserSessionError';
   message: Scalars['String'];
@@ -580,7 +585,7 @@ export type VerifiedResetToken = {
   status: Status;
 };
 
-export type VerifiedSession = {
+export type VerifiedSession = UserData & {
   __typename?: 'VerifiedSession';
   accessToken: Scalars['String'];
   status: Status;

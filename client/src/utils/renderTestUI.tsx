@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { ApolloContext } from "@context/ApolloContext";
 import { SessionContext } from "@context/SessionContext";
 import MUIThemeProvider from "@components/MUIThemeProvider";
-import { BaseResponse } from "./cachePossibleTypes";
+import { BaseResponse, UserData } from "./cachePossibleTypes";
 
 interface AppWrapperProps {
   children: React.ReactElement;
@@ -29,7 +29,9 @@ const sessionValue = {
   handleClearRefreshTokenTimer: stopRefreshTokenTimer,
 };
 
-export const testCache = new InMemoryCache({ possibleTypes: { BaseResponse } });
+export const testCache = new InMemoryCache({
+  possibleTypes: { BaseResponse, UserData },
+});
 
 const AppWrapper = ({ children, mocks }: AppWrapperProps) => (
   <ApolloContext.Provider value={authHeaderHandler}>

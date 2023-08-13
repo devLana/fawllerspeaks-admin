@@ -7,13 +7,15 @@ import { ApolloContext } from "@context/ApolloContext";
 import SessionProvider from "../components/SessionProvider";
 import { TEXT_NODE } from "./verifySession.mocks";
 import testLayout from "./testLayout";
-import { BaseResponse } from "@utils/cachePossibleTypes";
+import { BaseResponse, UserData } from "@utils/cachePossibleTypes";
 
 export const mockFn = jest.fn().mockName("apolloAuthHeaderHandler");
 
 const TestComponent = () => <span>{TEXT_NODE}</span>;
 
-const testCache = new InMemoryCache({ possibleTypes: { BaseResponse } });
+const testCache = new InMemoryCache({
+  possibleTypes: { BaseResponse, UserData },
+});
 
 const SessionProviderTestUI = ({ mocks }: { mocks: MockedResponse[] }) => (
   <ApolloContext.Provider value={mockFn}>

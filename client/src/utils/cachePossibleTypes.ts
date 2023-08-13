@@ -14,3 +14,10 @@ export const BaseResponse = [
   "DuplicatePostTagError",
   "PostTagsWarning",
 ];
+
+export const UserData = [
+  "EditedProfile",
+  "LoggedInUser",
+  "RegisteredUser",
+  "VerifiedSession",
+];
