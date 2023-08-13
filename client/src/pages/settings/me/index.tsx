@@ -1,4 +1,3 @@
-import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
@@ -12,22 +11,18 @@ const Me: NextPageWithLayout = () => {
   const user = useGetUserInfo();
 
   return (
-    <>
-      <Box>
-        <Stack direction="row" spacing={4} alignItems="center">
-          <UserAvatar
-            sx={{ width: { xs: 100, md: 150 }, height: { xs: 100, md: 150 } }}
-            user={user}
-          />
-          <Stack>
-            <Typography gutterBottom sx={{ wordBreak: "break-word" }}>
-              {user?.firstName ?? "Unknown"} {user?.lastName ?? "User"}
-            </Typography>
-            <NextLink href="/settings/me/edit">Edit Profile</NextLink>
-          </Stack>
-        </Stack>
-      </Box>
-    </>
+    <Stack direction="row" spacing={4} alignItems="center">
+      <UserAvatar
+        sx={{ width: { xs: 100, md: 115 }, height: { xs: 100, md: 115 } }}
+        user={user}
+      />
+      <Stack>
+        <Typography gutterBottom sx={{ wordBreak: "break-word" }}>
+          {user?.firstName ?? "Unknown"} {user?.lastName ?? "User"}
+        </Typography>
+        <NextLink href="/settings/me/edit">Edit Profile</NextLink>
+      </Stack>
+    </Stack>
   );
 };
 
