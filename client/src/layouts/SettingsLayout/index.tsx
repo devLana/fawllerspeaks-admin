@@ -1,3 +1,5 @@
+import { useRouter } from "next/router";
+
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
@@ -10,6 +12,8 @@ export interface SettingsLayoutProps {
 }
 
 const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => {
+  const { pathname } = useRouter();
+
   return (
     <Box
       sx={theme => ({
@@ -27,9 +31,12 @@ const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => {
         sx={theme => ({ [theme.breakpoints.down("md")]: { display: "none" } })}
       />
       <Box
-        sx={theme => ({
-          [theme.breakpoints.up("md")]: { maxWidth: 550, mx: "auto" },
-        })}
+        sx={{
+          ...(pathname === "/settings/password" && {
+            maxWidth: 500,
+            mx: { xs: "auto", md: 0 },
+          }),
+        }}
       >
         <Typography variant="h1" gutterBottom>
           {pageHeading}
