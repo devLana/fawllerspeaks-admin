@@ -1,11 +1,10 @@
 import * as React from "react";
 
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
-import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
+
+import EditProfileImagePreview from "./EditProfileImagePreview";
 
 export interface ImageFile {
   file: File | null;
@@ -23,13 +22,14 @@ const FileInput = styled("input")({
   height: "1px",
   width: "1px",
   overflow: "hidden",
-  clip: "rect(1px, 1px, 1px, 1px)",
+  opacity: 0,
 });
 
 const EditProfileFileInput = (props: EditProfileFileInputProps) => {
   const { image, setImage } = props;
 
   const [hasEnteredDropZone, setHasEnteredDropZone] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const handleRemoveImage = () => {
     if (image.fileUrl) window.URL.revokeObjectURL(image.fileUrl);
@@ -37,52 +37,45 @@ const EditProfileFileInput = (props: EditProfileFileInputProps) => {
   };
 
   const handleFile = (files: FileList | null) => {
-    if (files && files.length > 0) {
-      if (!files.item(0)?.type.startsWith("image/")) {
-        setImage({ ...image, error: "You can only upload an image file" });
-        return;
-      }
+    if (!files || files.length === 0) return;
 
-      if (image.fileUrl) window.URL.revokeObjectURL(image.fileUrl);
-
-      setImage({
-        error: "",
-        file: files.item(0),
-        fileUrl: window.URL.createObjectURL(files[0]),
-      });
+    if (!files.item(0)?.type.startsWith("image/")) {
+      setImage({ ...image, error: "You can only upload an image file" });
+      return;
     }
+
+    if (files.item(0)?.name === image.file?.name) return;
+
+    if (image.fileUrl) window.URL.revokeObjectURL(image.fileUrl);
+
+    setImage({
+      error: "",
+      file: files.item(0),
+      fileUrl: window.URL.createObjectURL(files[0]),
+    });
   };
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFile(e.target.files);
   };
 
-  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handleDragEvent = (value: boolean | null = null) => {
+    return (e: React.DragEvent<HTMLLabelElement>) => {
+      e.stopPropagation();
+      e.preventDefault();
 
-    setHasEnteredDropZone(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    setHasEnteredDropZone(false);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
+      if (value !== null) setHasEnteredDropZone(value);
+    };
   };
 
   const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-
+    handleDragEvent(false)(e);
     handleFile(e.dataTransfer.files);
     e.dataTransfer.clearData();
-    setHasEnteredDropZone(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLLabelElement>) => {
+    if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
   };
 
   return (
@@ -92,44 +85,28 @@ const EditProfileFileInput = (props: EditProfileFileInputProps) => {
         name="image"
         id="image-avatar"
         accept="image/*"
-        onChange={handleImage}
+        onChange={handleImageChange}
         aria-invalid={!!image.error}
+        tabIndex={-1}
+        ref={fileInputRef}
+        key={image.file?.name}
       />
       {image.file ? (
-        <div>
-          <Avatar
-            src={image.fileUrl}
-            alt="Profile Image upload preview"
-            sx={{ width: 200, height: 200, mb: 2, mx: "auto" }}
-          />
-          <Stack direction="row" justifyContent="center" spacing={2}>
-            <Button
-              size="small"
-              onClick={handleRemoveImage}
-              startIcon={<HideImageOutlinedIcon />}
-            >
-              Remove Image
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              component="label"
-              htmlFor="image-avatar"
-              startIcon={<AddPhotoAlternateOutlinedIcon />}
-            >
-              Change Image
-            </Button>
-          </Stack>
-        </div>
+        <EditProfileImagePreview
+          src={image.fileUrl}
+          onClick={handleRemoveImage}
+          onKeyDown={handleKeyDown}
+        />
       ) : (
         <Button
           size="large"
           component="label"
           htmlFor="image-avatar"
           onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
+          onDragOver={handleDragEvent()}
+          onDragEnter={handleDragEvent(true)}
+          onDragLeave={handleDragEvent(false)}
+          onKeyDown={handleKeyDown}
           startIcon={<AddPhotoAlternateOutlinedIcon />}
           sx={theme => ({
             [theme.breakpoints.up("md")]: {
