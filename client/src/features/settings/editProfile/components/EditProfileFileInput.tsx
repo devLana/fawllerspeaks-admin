@@ -5,6 +5,7 @@ import { styled } from "@mui/material/styles";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 
 import EditProfileImagePreview from "./EditProfileImagePreview";
+import type { User } from "@hooks/useGetUserInfo";
 
 export interface ImageFile {
   file: File | null;
@@ -13,8 +14,11 @@ export interface ImageFile {
 }
 
 interface EditProfileFileInputProps {
+  user: User | null;
   image: ImageFile;
   setImage: React.Dispatch<React.SetStateAction<ImageFile>>;
+  setRemoveCurrentImage: React.Dispatch<React.SetStateAction<boolean>>;
+  removeCurrentImage: boolean;
 }
 
 const FileInput = styled("input")({
@@ -25,9 +29,13 @@ const FileInput = styled("input")({
   opacity: 0,
 });
 
-const EditProfileFileInput = (props: EditProfileFileInputProps) => {
-  const { image, setImage } = props;
-
+const EditProfileFileInput = ({
+  image,
+  setImage,
+  user,
+  removeCurrentImage,
+  setRemoveCurrentImage,
+}: EditProfileFileInputProps) => {
   const [hasEnteredDropZone, setHasEnteredDropZone] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -48,6 +56,7 @@ const EditProfileFileInput = (props: EditProfileFileInputProps) => {
 
     if (image.fileUrl) window.URL.revokeObjectURL(image.fileUrl);
 
+    setRemoveCurrentImage(true);
     setImage({
       error: "",
       file: files.item(0),
@@ -78,51 +87,75 @@ const EditProfileFileInput = (props: EditProfileFileInputProps) => {
     if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
   };
 
-  return (
-    <>
-      <FileInput
-        type="file"
-        name="image"
-        id="image-avatar"
-        accept="image/*"
-        onChange={handleImageChange}
-        aria-invalid={!!image.error}
-        tabIndex={-1}
-        ref={fileInputRef}
-        key={image.file?.name}
-      />
-      {image.file ? (
+  const input = (
+    <FileInput
+      type="file"
+      name="image"
+      id="image-avatar"
+      accept="image/*"
+      onChange={handleImageChange}
+      aria-invalid={!!image.error}
+      tabIndex={-1}
+      ref={fileInputRef}
+      key={image.file?.name}
+    />
+  );
+
+  if (user?.image && !removeCurrentImage) {
+    return (
+      <>
+        {input}
+        <EditProfileImagePreview
+          src={image.fileUrl}
+          onClick={() => setRemoveCurrentImage(true)}
+          onKeyDown={handleKeyDown}
+          alt={`${user.firstName} ${user.lastName} profile image`}
+        />
+      </>
+    );
+  }
+
+  if (image.file) {
+    return (
+      <>
+        {input}
         <EditProfileImagePreview
           src={image.fileUrl}
           onClick={handleRemoveImage}
           onKeyDown={handleKeyDown}
+          alt="Profile Image upload preview"
         />
-      ) : (
-        <Button
-          size="large"
-          component="label"
-          htmlFor="image-avatar"
-          onDrop={handleDrop}
-          onDragOver={handleDragEvent()}
-          onDragEnter={handleDragEvent(true)}
-          onDragLeave={handleDragEvent(false)}
-          onKeyDown={handleKeyDown}
-          startIcon={<AddPhotoAlternateOutlinedIcon />}
-          sx={theme => ({
-            [theme.breakpoints.up("md")]: {
-              color: "text.primary",
-              width: "100%",
-              height: 180,
-              border: 1,
-              borderColor: hasEnteredDropZone ? "primary.main" : "divider",
-              ...(hasEnteredDropZone && { borderStyle: "dashed" }),
-              "&:hover": { borderColor: "text.primary" },
-            },
-          })}
-        >
-          Select Profile Image
-        </Button>
-      )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {input}
+      <Button
+        size="large"
+        component="label"
+        htmlFor="image-avatar"
+        onDrop={handleDrop}
+        onDragOver={handleDragEvent()}
+        onDragEnter={handleDragEvent(true)}
+        onDragLeave={handleDragEvent(false)}
+        onKeyDown={handleKeyDown}
+        startIcon={<AddPhotoAlternateOutlinedIcon />}
+        sx={theme => ({
+          [theme.breakpoints.up("md")]: {
+            color: "text.primary",
+            width: "100%",
+            height: 180,
+            border: 1,
+            borderColor: hasEnteredDropZone ? "primary.main" : "divider",
+            ...(hasEnteredDropZone && { borderStyle: "dashed" }),
+            "&:hover": { borderColor: "text.primary" },
+          },
+        })}
+      >
+        Select Profile Image
+      </Button>
     </>
   );
 };

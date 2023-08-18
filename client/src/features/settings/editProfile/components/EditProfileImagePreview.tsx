@@ -8,16 +8,17 @@ interface EditProfileImagePreviewProps {
   src: string;
   onClick: () => void;
   onKeyDown: React.KeyboardEventHandler<HTMLLabelElement>;
+  alt: string;
 }
 
 const EditProfileImagePreview = (props: EditProfileImagePreviewProps) => {
-  const { src, onClick, onKeyDown } = props;
+  const { src, onClick, onKeyDown, alt } = props;
 
   return (
     <div>
       <Avatar
         src={src}
-        alt="Profile Image upload preview"
+        alt={alt}
         sx={{ width: 200, height: 200, mb: 2, mx: "auto" }}
       />
       <Stack direction="row" justifyContent="center" spacing={2}>

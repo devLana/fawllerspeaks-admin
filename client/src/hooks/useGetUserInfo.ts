@@ -2,7 +2,7 @@ import { gql, useApolloClient } from "@apollo/client";
 
 import { useSession } from "@context/SessionContext";
 
-interface User {
+export interface User {
   firstName: string;
   lastName: string;
   image: string | null;

@@ -11,7 +11,6 @@ import EditProfileForm from "@features/settings/editProfile/components/EditProfi
 import EditProfileFileInput, {
   type ImageFile,
 } from "@features/settings/editProfile/components/EditProfileFileInput";
-// import { supabase } from "@lib/supabaseClient";
 import settingsLayout from "@utils/settings/settingsLayout";
 import { editProfileValidator } from "@features/settings/editProfile/utils/editProfileValidator";
 import { EDIT_PROFILE } from "@features/settings/editProfile/operations/EDIT_PROFILE";
@@ -23,6 +22,7 @@ type FormStatus = "idle" | "submitting" | "error" | "success";
 
 const EditMe: NextPageWithLayout = () => {
   const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
+  const [removeCurrentImage, setRemoveCurrentImage] = React.useState(false);
   const [image, setImage] = React.useState<ImageFile>({
     error: "",
     file: null,
@@ -48,17 +48,8 @@ const EditMe: NextPageWithLayout = () => {
     },
   });
 
-  const submitHandler = async (values: EditProfile) => {
-    // if (image.file) {
-    //   try {
-    //     const { data, error: err } = await supabase.storage
-    //       .from("images")
-    //       .upload("me", image.file);
-    //     console.log({ data, err });
-    //   } catch (err) {
-    //     console.log({ err });
-    //   }
-    // }
+  const submitHandler = (values: EditProfile) => {
+    // const formData = new FormData();
   };
 
   const isLoading = formStatus === "submitting";
@@ -71,7 +62,15 @@ const EditMe: NextPageWithLayout = () => {
         fieldErrors={errors}
         defaultValues={defaultValues}
         isLoading={isLoading}
-        fileInput={<EditProfileFileInput image={image} setImage={setImage} />}
+        fileInput={
+          <EditProfileFileInput
+            image={image}
+            setImage={setImage}
+            user={user}
+            setRemoveCurrentImage={setRemoveCurrentImage}
+            removeCurrentImage={removeCurrentImage}
+          />
+        }
       />
       {image.error && (
         <Snackbar
