@@ -55,7 +55,7 @@ describe("Test edit profile resolver", () => {
 
   describe("Edit user data, Respond with updated user object", () => {
     test.each(editSuccess)("%s", async (_, input, image) => {
-      const mock = [{ email: "test@mail.com", dateCreated }];
+      const mock = [{ email: "test@mail.com", dateCreated, image }];
       const spy = spyDb({ rows: [{ isRegistered: true }] });
       spy.mockReturnValueOnce({ rows: mock });
 

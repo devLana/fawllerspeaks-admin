@@ -4,7 +4,7 @@ interface Input {
   [key: string]: unknown;
   firstName: string;
   lastName: string;
-  image?: string;
+  image?: string | null;
 }
 
 type Validations = [string, Input, InputErrors<Input>][];
@@ -42,12 +42,21 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
       imageError: nullOrUndefined,
     },
   ],
+  [
+    "Should return an error response if image string is not a valid uri string",
+    { firstName: "John", lastName: "Sam", image: "not_a_valid_uri_string" },
+    {
+      firstNameError: nullOrUndefined,
+      lastNameError: nullOrUndefined,
+      imageError: "Profile image url is not a valid link",
+    },
+  ],
 ];
 
 export const gqlValidate: [string, Record<string, unknown>][] = [
   [
-    "Should respond with a graphql validation error for null and undefined input values",
-    { firstName: null, lastName: undefined, image: null },
+    "Should respond with a graphql validation error for object and undefined input values",
+    { firstName: null, lastName: {}, image: [] },
   ],
   [
     "Should respond with a graphql validation error for number and boolean input values",
@@ -60,12 +69,22 @@ export const verify: [string, Record<string, boolean>[]][] = [
   ["Returns error on unregistered user", [{ isRegistered: false }]],
 ];
 
-export const editSuccess: [string, Input, string | undefined][] = [
-  ["Should edit user profile without an image", args, undefined],
+export const editSuccess: [string, Input, string | null][] = [
+  ["Should edit user profile without an image", args, null],
   ["Should edit user profile with an image", { ...args, image }, image],
+  [
+    "Edit's user profile and deletes image link",
+    { ...args, image: null },
+    null,
+  ],
 ];
 
 export const edit: [string, Input, string | null][] = [
   ["Edit user's profile without an image", args, null],
   ["Edit user's profile with an image", { ...args, image }, image],
+  [
+    "Should edit user's profile and remove image link",
+    { ...args, image: null },
+    null,
+  ],
 ];
