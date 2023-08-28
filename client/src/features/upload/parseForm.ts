@@ -1,16 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-
 import type { NextApiRequest } from "next";
 
-import formidable, { type Fields, type Files } from "formidable";
+import formidable, { type File } from "formidable";
+
+interface Fields {
+  avatar?: string[];
+  post?: string[];
+}
+
+interface Files {
+  image?: File[];
+}
+
+type ParsedForm = [Fields, Required<Files>];
 
 export class ParseFormError extends Error {}
 
-export const parseForm = (req: NextApiRequest) => {
-  return new Promise<[Fields, Files]>((resolve, reject) => {
+export const parseForm = async (req: NextApiRequest) => {
+  return new Promise<ParsedForm>((resolve, reject) => {
     const form = formidable({ maxFiles: 1 });
 
-    form.parse(req, (err, fields, files) => {
+    form.parse(req, (err, fields: Fields, files: Files) => {
       if (err) {
         reject(err);
         return;
@@ -21,7 +30,7 @@ export const parseForm = (req: NextApiRequest) => {
         return;
       }
 
-      if (files.image && files.image.length > 1) {
+      if (files.image.length > 1) {
         reject(
           new ParseFormError("Only one image file can be uploaded per request")
         );
@@ -54,7 +63,7 @@ export const parseForm = (req: NextApiRequest) => {
         return;
       }
 
-      resolve([fields, files]);
+      resolve([fields, { image: files.image }]);
     });
   });
 };

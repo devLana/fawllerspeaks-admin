@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-
 import { readFile } from "node:fs/promises";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -41,6 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         .from("images")
         .upload(supabaseFilePath, imageFile, {
           contentType: mimetype ?? undefined,
+          upsert: true,
         });
 
       upload.emit("removeFile", filepath);
