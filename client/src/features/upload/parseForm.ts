@@ -1,25 +1,17 @@
 import type { NextApiRequest } from "next";
 
-import formidable, { type File } from "formidable";
+import formidable, { type Files, type Fields } from "formidable";
 
-interface Fields {
-  avatar?: string[];
-  post?: string[];
-}
-
-interface Files {
-  image?: File[];
-}
-
-type ParsedForm = [Fields, Required<Files>];
+type FieldsKeys = "avatar" | "post";
+type ParsedForm = [Fields<FieldsKeys>, Required<Files<"image">>];
 
 export class ParseFormError extends Error {}
 
-export const parseForm = async (req: NextApiRequest) => {
+export const parseForm = (req: NextApiRequest) => {
   return new Promise<ParsedForm>((resolve, reject) => {
     const form = formidable({ maxFiles: 1 });
 
-    form.parse(req, (err, fields: Fields, files: Files) => {
+    form.parse<FieldsKeys, "image">(req, (err, fields, files) => {
       if (err) {
         reject(err);
         return;
