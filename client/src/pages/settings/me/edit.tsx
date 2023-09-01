@@ -136,7 +136,6 @@ const EditMe: NextPageWithLayout = () => {
     setImage({ ...image, error: "" });
   };
 
-  // "Your profile has been updated but there was an error uploading your new profile image. Please try again later";
   let msg =
     "You are unable to update your profile at the moment. Please try again later";
 
