@@ -106,7 +106,7 @@ const EditProfileFileInput = ({
       <>
         {input}
         <EditProfileImagePreview
-          src={image.fileUrl}
+          src={user.image}
           onClick={() => setRemoveCurrentImage(true)}
           onKeyDown={handleKeyDown}
           alt={`${user.firstName} ${user.lastName} profile image`}
@@ -123,7 +123,7 @@ const EditProfileFileInput = ({
           src={image.fileUrl}
           onClick={handleRemoveImage}
           onKeyDown={handleKeyDown}
-          alt="Profile Image upload preview"
+          alt="Profile image upload preview"
         />
       </>
     );
