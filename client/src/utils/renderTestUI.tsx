@@ -51,7 +51,7 @@ export const renderTestUI = (
   options?: RenderOptions
 ) => {
   return {
-    user: userEvent.setup(),
+    user: userEvent.setup({ applyAccept: false }),
     ...render(<AppWrapper mocks={mocks}>{ui}</AppWrapper>, options),
   };
 };

@@ -15,7 +15,7 @@ export const EDIT_PROFILE: EditProfile = gql`
   ) {
     editProfile(firstName: $firstName, lastName: $lastName, image: $image) {
       ... on EditProfileValidationError {
-        firstNamedError
+        firstNameError
         lastNameError
         imageError
         status
