@@ -23,23 +23,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
-      const [fields, files] = await parseForm(req);
-
-      const category = Object.entries(fields).flat(2) as [string, string];
-      const [{ mimetype, newFilename, filepath }] = files.image;
-      const supabaseFilePath = generateSupabasePath(
-        category,
-        newFilename,
+      const [imageCategory, file] = await parseForm(req);
+      const { mimetype, filepath } = file;
+      const supabaseFilePath = await generateSupabasePath(
+        imageCategory,
         mimetype ?? ""
       );
 
       const imageFile = await readFile(filepath);
-
       const { error: err } = await supabase.storage
         .from("images")
         .upload(supabaseFilePath, imageFile, {
           contentType: mimetype ?? undefined,
-          upsert: true,
         });
 
       upload.emit("removeFile", filepath);
@@ -55,7 +50,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     } catch (err) {
       if (err instanceof ParseFormError) {
         res.status(400).send(err.message);
-        return;
       } else {
         res
           .status(500)

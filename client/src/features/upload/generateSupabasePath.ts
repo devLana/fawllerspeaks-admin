@@ -1,3 +1,6 @@
+import crypto from "node:crypto";
+import util from "node:util";
+
 const mimeTypeDict: Record<string, string | undefined> = {
   "image/avif": ".avif",
   "image/bmp": ".bmp",
@@ -10,14 +13,16 @@ const mimeTypeDict: Record<string, string | undefined> = {
   "image/webp": ".webp",
 };
 
-export const generateSupabasePath = (
-  category: [string, string],
-  filename: string,
+export const generateSupabasePath = async (
+  imageCategory: string,
   mimeType: string
 ) => {
+  const randomBytes = util.promisify(crypto.randomBytes);
+
+  const filenameBuf = await randomBytes(30);
+  const filename = filenameBuf.toString("base64url");
   const isDev = process.env.NODE_ENV === "development" ? "dev/" : "";
-  const categoryPathname = `${category[0]}/${category[1]}`;
   const extension = mimeTypeDict[mimeType] ?? "";
 
-  return `${isDev}${categoryPathname}/${filename}${extension}`;
+  return `${isDev}${imageCategory}/${filename}${extension}`;
 };

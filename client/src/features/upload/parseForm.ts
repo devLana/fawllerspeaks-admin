@@ -1,17 +1,14 @@
 import type { NextApiRequest } from "next";
 
-import formidable, { type Files, type Fields } from "formidable";
-
-type FieldsKeys = "avatar" | "post";
-type ParsedForm = [Fields<FieldsKeys>, Required<Files<"image">>];
+import formidable, { type File } from "formidable";
 
 export class ParseFormError extends Error {}
 
 export const parseForm = (req: NextApiRequest) => {
-  return new Promise<ParsedForm>((resolve, reject) => {
+  return new Promise<[string, File]>((resolve, reject) => {
     const form = formidable({ maxFiles: 1 });
 
-    form.parse<FieldsKeys, "image">(req, (err, fields, files) => {
+    form.parse<"type", "image">(req, (err, fields, files) => {
       if (err) {
         reject(err);
         return;
@@ -23,39 +20,30 @@ export const parseForm = (req: NextApiRequest) => {
       }
 
       if (files.image.length > 1) {
+        reject(new ParseFormError("Only one image file can be uploaded"));
+        return;
+      }
+
+      if (!fields.type) {
+        reject(new ParseFormError("Image category type was not provided"));
+        return;
+      }
+
+      if (fields.type.length > 1) {
         reject(
-          new ParseFormError("Only one image file can be uploaded per request")
+          new ParseFormError("Only one image category type should be provided")
         );
         return;
       }
 
-      if (!fields.avatar && !fields.post) {
-        reject(new ParseFormError("Image category was not provided"));
-        return;
-      }
-
-      if (fields.avatar && fields.post) {
+      if (fields.type[0] !== "avatar" && fields.type[0] !== "post") {
         reject(
-          new ParseFormError(
-            "Only one image category type should be provided per request"
-          )
+          new ParseFormError("Image category type must be 'avatar' or 'post'")
         );
         return;
       }
 
-      if (
-        (fields.avatar && fields.avatar.length > 1) ||
-        (fields.post && fields.post.length > 1)
-      ) {
-        reject(
-          new ParseFormError(
-            "Only one image category id should be provided per request"
-          )
-        );
-        return;
-      }
-
-      resolve([fields, { image: files.image }]);
+      resolve([fields.type[0], files.image[0]]);
     });
   });
 };

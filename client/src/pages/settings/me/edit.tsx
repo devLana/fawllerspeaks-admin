@@ -60,7 +60,7 @@ const EditMe: NextPageWithLayout = () => {
     if (image.file) {
       const body = new FormData();
       body.append("image", image.file);
-      body.append("avatar", user?.id ?? "");
+      body.append("type", "avatar");
 
       try {
         const request = new Request("/api/upload", { method: "POST", body });

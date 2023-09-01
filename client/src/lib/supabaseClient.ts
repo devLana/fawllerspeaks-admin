@@ -8,4 +8,4 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 export const storageUrl =
-  "https://lbrstclnygndsfdempuj.supabase.co/storage/v1/object/public/images/";
+  "https://soeoohvasnrkaxvjduim.supabase.co/storage/v1/object/public/images/";
