@@ -9,7 +9,7 @@ import {
   jest,
 } from "@jest/globals";
 
-import { db } from "@services/db";
+import { db } from "@lib/db";
 import { startServer } from "@server";
 
 import { MailError } from "@utils";

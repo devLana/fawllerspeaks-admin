@@ -5,7 +5,7 @@ import type { ApolloServer } from "@apollo/server";
 import { JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
 
 import { startServer } from "@server";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 import {
   gqlValidation,

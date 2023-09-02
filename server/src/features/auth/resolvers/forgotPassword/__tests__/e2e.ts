@@ -11,7 +11,7 @@ import {
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 import forgotPasswordMail from "../utils/forgotPasswordMail";
 import { gqlValidations, validations } from "../utils/forgotPasswordTestUtils";

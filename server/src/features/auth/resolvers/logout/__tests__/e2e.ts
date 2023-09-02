@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 import {
   gqlValidations,

@@ -2,7 +2,7 @@
 // import path from "node:path";
 import { parentPort } from "node:worker_threads";
 
-import { db } from "@services/db";
+import { db } from "@lib/db";
 import type { PostTag } from "@resolverTypes";
 
 interface Post {

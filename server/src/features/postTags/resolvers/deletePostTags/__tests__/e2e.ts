@@ -7,7 +7,7 @@ import type { ApolloServer } from "@apollo/server";
 
 // import deletePostTagsWorker from "../deletePostTagsWorker";
 
-import { db } from "@services/db";
+import { db } from "@lib/db";
 import { startServer } from "@server";
 
 import {

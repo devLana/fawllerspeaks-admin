@@ -1,7 +1,7 @@
 import { request, response } from "express";
 import type { GraphQLResolveInfo } from "graphql";
 
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 import type { APIContext } from "@types";
 

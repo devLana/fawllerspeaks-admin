@@ -3,7 +3,7 @@ import type { ApolloServer } from "@apollo/server";
 import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 
 import { startServer } from "@server";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 import {
   post,

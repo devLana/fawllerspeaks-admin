@@ -8,7 +8,6 @@
       "@features/*": ["features/*"],
       "@lib/*": ["lib/*"],
       "@schema": ["schema"],
-      "@services/*": ["services/*"],
       "@types": ["types"],
       "@resolverTypes": ["types/resolverTypes"],
       "@utils": ["utils"],

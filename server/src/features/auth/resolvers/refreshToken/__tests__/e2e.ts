@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 import { JWT_REGEX, sessionMail } from "@features/auth/utils";
 import {

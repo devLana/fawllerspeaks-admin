@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 interface Res {
   rows: Record<string, unknown>[];

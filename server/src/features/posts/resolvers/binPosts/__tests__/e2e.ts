@@ -12,7 +12,7 @@ import {
 
 import type { ApolloServer } from "@apollo/server";
 
-import { db } from "@services/db";
+import { db } from "@lib/db";
 import { startServer } from "@server";
 
 // import binPostsWorker from "../binPostsWorker";

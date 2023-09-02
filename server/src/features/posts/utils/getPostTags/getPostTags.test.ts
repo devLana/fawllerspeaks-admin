@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 import { spyDb } from "@tests";
 import getPostTags from ".";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 const tags1 = ["1", "2", "3", "4", "5"];
 const tags2 = ["7", "8", "9", "10", "11"];

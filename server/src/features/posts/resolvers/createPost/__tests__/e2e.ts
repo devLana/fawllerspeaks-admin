@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, test, expect } from "@jest/globals";
 import { type ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 import { validationTestsTable } from "../testsData";
 import { DATE_REGEX, UUID_REGEX, urls } from "@utils";

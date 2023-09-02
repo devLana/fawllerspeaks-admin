@@ -2,7 +2,7 @@ import type { ApolloServer } from "@apollo/server";
 
 import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 
-import { db } from "@services/db";
+import { db } from "@lib/db";
 import { startServer } from "@server";
 
 import { DATE_REGEX, UUID_REGEX } from "@utils";

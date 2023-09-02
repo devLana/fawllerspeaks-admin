@@ -16,7 +16,7 @@ import helmet from "helmet";
 import * as dotenv from "dotenv";
 
 import { typeDefs, resolvers } from "@schema";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 import { nodeEnv, getServerUrl, getUser, type CustomError } from "@utils";
 
 import type { APIContext } from "@types";

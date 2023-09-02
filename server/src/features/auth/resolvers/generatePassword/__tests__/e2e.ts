@@ -10,7 +10,7 @@ import {
 } from "@jest/globals";
 
 import { startServer } from "@server";
-import { db } from "@services/db";
+import { db } from "@lib/db";
 
 import generatePasswordMail from "../utils/generatePasswordMail";
 import {
