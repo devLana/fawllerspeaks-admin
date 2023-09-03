@@ -1,8 +1,17 @@
-import { test, expect, describe, beforeAll, afterAll } from "@jest/globals";
+import {
+  test,
+  expect,
+  describe,
+  beforeAll,
+  jest,
+  afterEach,
+  afterAll,
+} from "@jest/globals";
 
 import type { ApolloServer } from "@apollo/server";
 
 import { db } from "@lib/db";
+import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import { startServer } from "@server";
 
 import {
@@ -24,6 +33,11 @@ import type { APIContext, DbTestUser, TestData } from "@types";
 
 type EditProfile = TestData<{ editProfile: Record<string, unknown> }>;
 
+jest.mock("@lib/supabase/supabaseEvent");
+
+const mockEvent = jest.spyOn(supabaseEvent, "emit");
+mockEvent.mockImplementation(() => true);
+
 describe("Edit user profile - E2E", () => {
   let server: ApolloServer<APIContext>, url: string, user: DbTestUser;
   let registeredJwt: string, unregisteredJwt: string;
@@ -40,6 +54,10 @@ describe("Edit user profile - E2E", () => {
       registered,
       unRegistered,
     ]);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   afterAll(async () => {

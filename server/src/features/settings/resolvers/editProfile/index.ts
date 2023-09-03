@@ -1,6 +1,7 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
+import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import { EditedProfile, EditProfileValidationError } from "./types";
 import {
   AuthenticationError,
@@ -14,6 +15,11 @@ import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";
 
 type EditProfile = ResolverFunc<MutationResolvers["editProfile"]>;
+
+interface SelectUSerInfo {
+  isRegistered: boolean;
+  image: string | null;
+}
 
 interface UserInfo {
   dateCreated: string;
@@ -46,21 +52,28 @@ const editProfile: EditProfile = async (_, args, { db, user }) => {
   });
 
   try {
-    if (!user) return new AuthenticationError("Unable to edit user profile");
+    if (!user) {
+      if (args.image) supabaseEvent.emit("removeImage", args.image);
+      return new AuthenticationError("Unable to edit user profile");
+    }
 
     const validated = await schema.validateAsync(args, { abortEarly: false });
     const { firstName, lastName, image } = validated;
 
-    const { rows } = await db.query<{ isRegistered: boolean }>(
-      `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
+    const { rows } = await db.query<SelectUSerInfo>(
+      `SELECT is_registered "isRegistered", image FROM users WHERE user_id = $1`,
       [user]
     );
 
     if (rows.length === 0) {
+      if (image) supabaseEvent.emit("removeImage", image);
       return new UnknownError("Unable to edit user profile");
     }
 
-    if (!rows[0].isRegistered) {
+    const [{ isRegistered, image: userImage }] = rows;
+
+    if (!isRegistered) {
+      if (image) supabaseEvent.emit("removeImage", image);
       return new RegistrationError("Unable to edit user profile");
     }
 
@@ -89,19 +102,25 @@ const editProfile: EditProfile = async (_, args, { db, user }) => {
 
     const { rows: userInfo } = await db.query<UserInfo>(query, params);
 
+    if (image !== undefined && userImage) {
+      supabaseEvent.emit("removeImage", userImage);
+    }
+
     return new EditedProfile({
       id: user,
       email: userInfo[0].email,
       firstName,
       lastName,
       image: userInfo[0].image,
-      isRegistered: rows[0].isRegistered,
+      isRegistered,
       dateCreated: dateToISOString(userInfo[0].dateCreated),
     });
   } catch (err) {
     if (err instanceof ValidationError) {
       const { firstNameError, lastNameError, imageError } =
         generateErrorsObject(err.details) as ValidationErrorObject<typeof args>;
+
+      if (args.image) supabaseEvent.emit("removeImage", args.image);
 
       return new EditProfileValidationError(
         firstNameError,

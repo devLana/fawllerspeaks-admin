@@ -1,6 +1,14 @@
-import { describe, test, expect, beforeEach } from "@jest/globals";
+import {
+  describe,
+  test,
+  expect,
+  beforeEach,
+  jest,
+  afterEach,
+} from "@jest/globals";
 
 import editProfile from "..";
+import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import { mockContext, info, spyDb } from "@tests";
 import {
   args,
@@ -11,11 +19,20 @@ import {
   verify,
 } from "../utils/editProfileTestUtils";
 
-beforeEach(() => {
-  mockContext.user = "insane_user_id";
-});
+jest.mock("@lib/supabase/supabaseEvent");
+
+const mockEvent = jest.spyOn(supabaseEvent, "emit");
+mockEvent.mockImplementation(() => true);
 
 describe("Test edit profile resolver", () => {
+  beforeEach(() => {
+    mockContext.user = "insane_user_id";
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   describe("Verify user authentication", () => {
     test("Return an error response if user is not logged in", async () => {
       mockContext.user = null;
