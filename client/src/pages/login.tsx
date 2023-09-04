@@ -90,6 +90,11 @@ const Login: NextPageWithLayout = () => {
     }
   };
 
+  const handleClose = () => {
+    setStatus("idle");
+    setStatusMessage(null);
+  };
+
   let alertMessage =
     "You are unable to login at the moment. Please try again later";
 
@@ -97,30 +102,21 @@ const Login: NextPageWithLayout = () => {
     alertMessage = data.login.message;
   } else if (error?.graphQLErrors[0]) {
     alertMessage = error.graphQLErrors[0].message;
+  } else if (statusMessage) {
+    alertMessage = statusMessage;
   }
 
   return (
     <>
-      {status === "error" && (
+      {(status === "error" || statusMessage) && (
         <AlertToast
           horizontal="center"
           vertical="top"
           isOpen={true}
-          onClose={() => setStatus("idle")}
+          onClose={handleClose}
           direction="down"
-          severity="error"
+          severity={statusMessage ? "info" : "error"}
           content={alertMessage}
-        />
-      )}
-      {statusMessage && (
-        <AlertToast
-          horizontal="center"
-          vertical="top"
-          isOpen={!!statusMessage}
-          onClose={() => setStatusMessage(null)}
-          direction="down"
-          severity="info"
-          content={statusMessage}
         />
       )}
       <Typography variant="h1">Sign In</Typography>

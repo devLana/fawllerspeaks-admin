@@ -8,7 +8,6 @@ import NextLink from "@components/NextLink";
 
 const PageBreadcrumbs = () => {
   const { pathname } = useRouter();
-
   const pathnames = pathname.split("/").filter(Boolean);
 
   if (pathnames.length < 2) return null;
@@ -38,7 +37,7 @@ const PageBreadcrumbs = () => {
   return (
     <Breadcrumbs
       separator={<ChevronRightIcon fontSize="small" />}
-      maxItems={2}
+      maxItems={3}
       aria-label="Breadcrumb"
       sx={{ mb: 4 }}
     >

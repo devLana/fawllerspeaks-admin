@@ -3,7 +3,6 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
-import useCheckAuth from "@hooks/useCheckAuth";
 import Metadata from "@components/Metadata";
 import Loader from "@components/Loader";
 import ErrorAlert from "@components/ErrorAlert";
@@ -14,8 +13,6 @@ import { type RootLayoutProps } from "@types";
 
 const RootLayout = (props: RootLayoutProps) => {
   const [navBarIsOpen, setNavBarIsOpen] = React.useState(false);
-
-  useCheckAuth();
 
   const { children, clientHasRendered, errorMessage, ...metaProps } = props;
   let content: React.ReactElement;

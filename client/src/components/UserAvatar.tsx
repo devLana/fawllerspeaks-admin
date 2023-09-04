@@ -1,5 +1,3 @@
-// import Image from "next/image";
-
 import Avatar, { type AvatarProps } from "@mui/material/Avatar";
 import PersonIcon from "@mui/icons-material/Person";
 
@@ -37,7 +35,6 @@ const UserAvatar = (props: UserAvatarProps) => {
         aria-label={`${firstName} ${lastName} profile page`}
       >
         <Avatar
-          // component={Image}
           src={image}
           alt={`${firstName} ${lastName} avatar`}
           sx={[...sxProp]}
@@ -45,7 +42,6 @@ const UserAvatar = (props: UserAvatarProps) => {
       </NextLink>
     ) : (
       <Avatar
-        // component={Image}
         src={image}
         alt={`${firstName} ${lastName} avatar`}
         sx={[...sxProp]}

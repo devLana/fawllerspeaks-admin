@@ -33,6 +33,7 @@ const Header = ({ onClick }: { onClick: () => void }) => (
             width={465}
             height={88}
             style={{ maxWidth: "100%", height: "auto" }}
+            priority
           />
         </NextLink>
       </Box>

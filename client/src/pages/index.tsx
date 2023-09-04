@@ -34,7 +34,7 @@ const Home: NextPageWithLayout = () => {
         <AlertToast
           horizontal="center"
           vertical="top"
-          isOpen={!!statusMessage}
+          isOpen={true}
           onClose={() => setStatusMessage(null)}
           direction="down"
           severity="info"

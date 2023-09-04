@@ -75,6 +75,11 @@ const ForgotPassword: NextPageWithLayout = () => {
     }
   };
 
+  const handleClose = () => {
+    setStatus("idle");
+    setStatusMessage(null);
+  };
+
   let alertMessage =
     "You are unable to reset your password at the moment. Please try again later";
 
@@ -85,6 +90,8 @@ const ForgotPassword: NextPageWithLayout = () => {
     alertMessage = data.forgotPassword.message;
   } else if (error?.graphQLErrors[0]) {
     alertMessage = error.graphQLErrors[0].message;
+  } else if (statusMessage) {
+    alertMessage = statusMessage;
   }
 
   if (view === "success") return <ForgotPasswordSuccess />;
@@ -100,26 +107,15 @@ const ForgotPassword: NextPageWithLayout = () => {
 
   return (
     <>
-      {status === "error" && (
+      {(status === "error" || statusMessage) && (
         <AlertToast
           horizontal="center"
           vertical="top"
           isOpen={true}
-          onClose={() => setStatus("idle")}
+          onClose={handleClose}
           direction="down"
-          severity="error"
+          severity={statusMessage ? "info" : "error"}
           content={alertMessage}
-        />
-      )}
-      {statusMessage && (
-        <AlertToast
-          horizontal="center"
-          vertical="top"
-          isOpen={true}
-          onClose={() => setStatusMessage(null)}
-          direction="down"
-          severity="info"
-          content={statusMessage}
         />
       )}
       <Typography variant="h1" align="center">

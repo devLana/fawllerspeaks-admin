@@ -1,6 +1,5 @@
 import Container from "@mui/material/Container";
 
-import useCheckAuth from "@hooks/useCheckAuth";
 import Loader from "@components/Loader";
 import Metadata from "@components/Metadata";
 import ErrorAlert from "@components/ErrorAlert";
@@ -8,8 +7,6 @@ import AuthLayoutThemeButton from "./components/AuthLayoutThemeButton";
 import { type RootLayoutProps } from "@types";
 
 const AuthRootLayout = (props: RootLayoutProps) => {
-  useCheckAuth();
-
   const { children, clientHasRendered, errorMessage, ...metaProps } = props;
   let content: React.ReactElement;
 

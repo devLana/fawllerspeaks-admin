@@ -39,7 +39,7 @@ describe("Page Breadcrumbs", () => {
       expect(crumbs[1]).toHaveTextContent("Profile");
 
       router.pathname =
-        "/posts_page/post-preview/new 123-post-title-by-@john-öleg";
+        "/posts_page/post-preview/post/new 123-post-title-by-@john-öleg";
       rerender(<PageBreadcrumbs />);
 
       await user.click(screen.getByRole("button", { name: /^show path$/i }));
@@ -48,10 +48,11 @@ describe("Page Breadcrumbs", () => {
       const newCrumbs = within(newBreadcrumbs).getAllByRole("listitem");
 
       expect(newBreadcrumbs).toBeInTheDocument();
-      expect(newCrumbs).toHaveLength(3);
+      expect(newCrumbs).toHaveLength(4);
       expect(newCrumbs[0]).toHaveTextContent("Posts Page");
       expect(newCrumbs[1]).toHaveTextContent("Post Preview");
-      expect(newCrumbs[2]).toHaveTextContent(
+      expect(newCrumbs[1]).toHaveTextContent("Post");
+      expect(newCrumbs[3]).toHaveTextContent(
         "New 123 Post Title By @john öleg"
       );
     });
