@@ -72,4 +72,17 @@ export const components: Components = {
       }),
     },
   },
+  MuiSkeleton: {
+    defaultProps: { animation: "wave" },
+    styleOverrides: {
+      wave: ({ theme }) => ({
+        ...(theme.appTheme === "sunny" && {
+          "&::after": {
+            background:
+              "linear-gradient(90deg, transparent, rgba(4,35,47,0.08), transparent)",
+          },
+        }),
+      }),
+    },
+  },
 };
