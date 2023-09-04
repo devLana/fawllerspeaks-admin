@@ -19,7 +19,13 @@ const SettingsMenuItem = (props: SettingsMenuItemProps) => {
   const { pathname } = useRouter();
 
   const { to, label, Icon, onClick } = props;
-  const isActive = pathname === to;
+  let isActive = false;
+
+  if (to === pathname) {
+    isActive = true;
+  } else if (pathname === "/settings/me/edit" && to === "/settings/me") {
+    isActive = true;
+  }
 
   return (
     <MenuItem
@@ -41,7 +47,9 @@ const SettingsMenuItem = (props: SettingsMenuItemProps) => {
           color: isActive ? "text.primary" : "primary.main",
           "&:hover": { color: isActive ? "text.primary" : "primary.main" },
         }}
-        aria-current={isActive || undefined}
+        aria-current={
+          pathname === "/settings/me/edit" ? undefined : isActive || undefined
+        }
       >
         <ListItemIcon sx={{ color: "inherit" }}>
           <Icon fontSize="small" />
