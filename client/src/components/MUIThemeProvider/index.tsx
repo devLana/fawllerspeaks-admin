@@ -5,25 +5,36 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import { MUIThemeContext } from "@context/MUIThemeContext";
 import { generateTheme } from "./generateTheme";
-import { DEFAULT_THEME } from "@utils/constants";
+import { storage } from "@utils/storage";
 import type { AppTheme } from "@types";
 
 const MUIThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [appTheme, setAppTheme] = React.useState<AppTheme>("sunny");
+  const [appTheme, setAppTheme] = React.useState<AppTheme>({
+    themeMode: "sunny",
+    fontSize: 16,
+    color: "#7dd1f3",
+  });
 
-  const theme = React.useMemo(() => {
-    return createTheme(generateTheme(appTheme));
-  }, [appTheme]);
+  const handleAppTheme = <T extends keyof AppTheme>(
+    key: T,
+    value: AppTheme[T]
+  ) => {
+    setAppTheme({ ...appTheme, [key]: value });
+    storage.setAppTheme(appTheme, key, value);
+  };
+
+  const theme = React.useMemo(
+    () => createTheme(generateTheme(appTheme)),
+    [appTheme]
+  );
 
   React.useEffect(() => {
-    const defaultTheme = localStorage.getItem(DEFAULT_THEME) as AppTheme | null;
+    const defaultTheme = storage.getAppTheme();
 
-    if (defaultTheme) {
-      setAppTheme(defaultTheme);
-    }
+    console.log(defaultTheme);
+
+    if (defaultTheme) setAppTheme(defaultTheme);
   }, []);
-
-  const handleAppTheme = (newTheme: AppTheme) => setAppTheme(newTheme);
 
   return (
     <MUIThemeContext.Provider value={handleAppTheme}>

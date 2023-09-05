@@ -7,9 +7,8 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import { useAppTheme } from "@context/MUIThemeContext";
-import { DEFAULT_THEME } from "@utils/constants";
 import { normalizedThemes, themes } from "@utils/appThemes";
-import type { AppTheme } from "@types";
+import type { ThemeMode } from "@types";
 
 const AuthLayoutThemeButton = () => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
@@ -17,14 +16,13 @@ const AuthLayoutThemeButton = () => {
 
   const handleAppTheme = useAppTheme();
 
-  const handleThemeChange = (id: AppTheme) => {
+  const handleThemeChange = (id: ThemeMode) => {
     setAnchor(null);
-    handleAppTheme(id);
-    localStorage.setItem(DEFAULT_THEME, id);
+    handleAppTheme("themeMode", id);
   };
 
   const isOpen = !!anchor;
-  const { name: themeName, Icon: ThemeIcon } = normalizedThemes[appTheme];
+  const { name: theme, Icon: ThemeIcon } = normalizedThemes[appTheme.themeMode];
 
   return (
     <>
@@ -40,7 +38,7 @@ const AuthLayoutThemeButton = () => {
         onClick={e => setAnchor(e.currentTarget)}
         sx={{ mb: 2 }}
       >
-        {themeName}
+        {theme}
       </Button>
       <Menu
         id="app-theme-menu"
@@ -54,7 +52,7 @@ const AuthLayoutThemeButton = () => {
         {themes.map(({ Icon, name, id }) => (
           <MenuItem
             key={id}
-            selected={id === appTheme}
+            selected={id === appTheme.themeMode}
             onClick={() => handleThemeChange(id)}
           >
             <Icon /> &nbsp; {name}

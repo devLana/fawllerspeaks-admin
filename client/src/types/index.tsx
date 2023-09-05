@@ -8,8 +8,15 @@ import type { SxProps } from "@mui/material/styles";
 
 import { type MetaInfo } from "@components/Metadata";
 
-export type AppTheme = "sunny" | "sunset" | "pitch black";
-export type CapitalizeAppTheme = "Sunny" | "Sunset" | "Pitch Black";
+export type ThemeMode = "sunny" | "sunset" | "pitch black";
+export type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";
+export type ThemeColors = "#7dd1f3" | "#6a6a6a";
+
+export interface AppTheme {
+  themeMode: ThemeMode;
+  fontSize: number;
+  color: ThemeColors;
+}
 
 export type PageLayout = (
   page: React.ReactElement,

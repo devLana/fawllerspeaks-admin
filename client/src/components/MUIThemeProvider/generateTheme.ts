@@ -1,6 +1,6 @@
 import type { ThemeOptions as MuiThemeOptions } from "@mui/material/styles";
 
-import { pitchBlackPalette, sunnyPalette, sunsetPalette } from "./palette";
+import { palette } from "./palette";
 import { typography } from "./typography";
 import { shape } from "./shape";
 import { shadows } from "./shadows";
@@ -18,22 +18,22 @@ declare module "@mui/material/styles" {
 }
 
 export const generateTheme = (appTheme: AppTheme): MuiThemeOptions => {
-  if (appTheme === "sunny") {
+  if (appTheme.themeMode === "sunny") {
     return {
       appTheme,
-      palette: sunnyPalette,
-      typography,
+      palette: palette(appTheme.themeMode, appTheme.color),
+      typography: typography(appTheme.fontSize),
       shape,
       shadows: shadows("4,35,47"),
       components,
     };
   }
 
-  if (appTheme === "sunset") {
+  if (appTheme.themeMode === "sunset") {
     return {
       appTheme,
-      palette: sunsetPalette,
-      typography,
+      palette: palette(appTheme.themeMode, appTheme.color),
+      typography: typography(appTheme.fontSize),
       shape,
       shadows: shadows("140,140,140"),
       components,
@@ -42,8 +42,8 @@ export const generateTheme = (appTheme: AppTheme): MuiThemeOptions => {
 
   return {
     appTheme,
-    palette: pitchBlackPalette,
-    typography,
+    palette: palette(appTheme.themeMode, appTheme.color),
+    typography: typography(appTheme.fontSize),
     shape,
     shadows: shadows("20,156,210"),
     components,
