@@ -12,9 +12,9 @@ export const components: Components = {
         fontStyle: "oblique",
         ":hover": {
           color:
-            appTheme === "sunny"
+            appTheme.themeMode === "sunny"
               ? palette.primary.dark
-              : appTheme === "sunset"
+              : appTheme.themeMode === "sunset"
               ? palette.primary.light
               : palette.primary.light,
         },
@@ -76,7 +76,7 @@ export const components: Components = {
     defaultProps: { animation: "wave" },
     styleOverrides: {
       wave: ({ theme }) => ({
-        ...(theme.appTheme === "sunny" && {
+        ...(theme.appTheme.themeMode === "sunny" && {
           "&::after": {
             background:
               "linear-gradient(90deg, transparent, rgba(4,35,47,0.08), transparent)",

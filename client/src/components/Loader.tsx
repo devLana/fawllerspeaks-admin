@@ -4,7 +4,8 @@ import type { Palette } from "@mui/material/styles";
 import type { AppTheme } from "@types";
 
 const stylesOne = (theme: AppTheme, secondary: Palette["secondary"]) => ({
-  backgroundColor: theme === "sunny" ? secondary.main : secondary.dark,
+  backgroundColor:
+    theme.themeMode === "sunny" ? secondary.main : secondary.dark,
   width: "0.3rem",
   height: "100%",
   "@keyframes pulsateOne": {
@@ -15,7 +16,8 @@ const stylesOne = (theme: AppTheme, secondary: Palette["secondary"]) => ({
 });
 
 const stylesTwo = (theme: AppTheme, secondary: Palette["secondary"]) => ({
-  backgroundColor: theme === "sunny" ? secondary.light : secondary.main,
+  backgroundColor:
+    theme.themeMode === "sunny" ? secondary.light : secondary.main,
   width: "0.3rem",
   height: "100%",
   "@keyframes pulsateTwo": {

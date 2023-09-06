@@ -15,7 +15,9 @@ const Card = ({ sx, children }: CardProps) => {
         {
           padding: { sm: "2rem" },
           borderRadius: { sm: 1 },
-          boxShadow: theme => ({ sm: theme.appTheme === "sunny" ? 3 : 5 }),
+          boxShadow: theme => ({
+            sm: theme.appTheme.themeMode === "sunny" ? 3 : 5,
+          }),
         },
         ...sxProp,
       ]}
