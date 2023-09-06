@@ -31,8 +31,6 @@ const MUIThemeProvider = ({ children }: { children: React.ReactNode }) => {
   React.useEffect(() => {
     const defaultTheme = storage.getAppTheme();
 
-    console.log(defaultTheme);
-
     if (defaultTheme) setAppTheme(defaultTheme);
   }, []);
 
