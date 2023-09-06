@@ -8,7 +8,13 @@ const HeaderAvatar = () => {
 
   const avatar = <UserAvatar user={user} renderWithLink />;
 
-  if (!user) return <Skeleton variant="circular">{avatar}</Skeleton>;
+  if (!user) {
+    return (
+      <Skeleton variant="circular" aria-label="Authenticating user profile">
+        {avatar}
+      </Skeleton>
+    );
+  }
 
   return avatar;
 };

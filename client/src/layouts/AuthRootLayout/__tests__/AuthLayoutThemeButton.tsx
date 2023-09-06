@@ -4,6 +4,14 @@ import AuthLayoutThemeButton from "../components/AuthLayoutThemeButton";
 import { renderTestUI } from "@utils/renderTestUI";
 import { DEFAULT_THEME } from "@utils/constants";
 
+const storageTheme = (theme: string) => {
+  return JSON.stringify({
+    themeMode: theme,
+    fontSize: 16,
+    color: "#7dd1f3",
+  });
+};
+
 describe("Auth Root Layout Theme Button", () => {
   afterEach(() => {
     localStorage.removeItem(DEFAULT_THEME);
@@ -29,7 +37,9 @@ describe("Auth Root Layout Theme Button", () => {
     expect(
       screen.getByRole("button", { name: /^pitch black$/i })
     ).toBeInTheDocument();
-    expect(localStorage.getItem(DEFAULT_THEME)).toBe("pitch black");
+    expect(localStorage.getItem(DEFAULT_THEME)).toBe(
+      storageTheme("pitch black")
+    );
 
     await user.click(screen.getByRole("button", { name: /^pitch black$/i }));
 
@@ -39,7 +49,7 @@ describe("Auth Root Layout Theme Button", () => {
   });
 
   it("On initial render read default theme from local storage", async () => {
-    localStorage.setItem(DEFAULT_THEME, "sunset");
+    localStorage.setItem(DEFAULT_THEME, storageTheme("sunset"));
     const { user } = renderTestUI(<AuthLayoutThemeButton />);
 
     expect(

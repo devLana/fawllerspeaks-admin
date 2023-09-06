@@ -4,7 +4,12 @@ import { screen, waitFor, within } from "@testing-library/react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import RootLayout from "..";
-import { avatar, errorsTable, logoutTable } from "../utils/Layout.mocks";
+import {
+  avatar,
+  errorsTable,
+  logoutTable,
+  storageTheme,
+} from "../utils/Layout.mocks";
 import { renderTestUI, stopRefreshTokenTimer } from "@utils/renderTestUI";
 import { DEFAULT_THEME, SESSION_ID } from "@utils/constants";
 
@@ -72,13 +77,17 @@ describe("Protected Pages Root Layout", () => {
         const button = screen.getByRole("button", name);
 
         await user.click(button);
-        expect(localStorage.getItem(DEFAULT_THEME)).toBe("sunset");
+        expect(localStorage.getItem(DEFAULT_THEME)).toBe(
+          storageTheme("sunset")
+        );
 
         await user.click(button);
-        expect(localStorage.getItem(DEFAULT_THEME)).toBe("pitch black");
+        expect(localStorage.getItem(DEFAULT_THEME)).toBe(
+          storageTheme("pitch black")
+        );
 
         await user.click(button);
-        expect(localStorage.getItem(DEFAULT_THEME)).toBe("sunny");
+        expect(localStorage.getItem(DEFAULT_THEME)).toBe(storageTheme("sunny"));
 
         localStorage.removeItem(DEFAULT_THEME);
       });
@@ -89,7 +98,7 @@ describe("Protected Pages Root Layout", () => {
         renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
 
         expect(
-          screen.getByRole("img", { name: /^unknown user avatar$/i })
+          screen.getByLabelText(/^authenticating user profile$/i)
         ).toBeInTheDocument();
       });
 

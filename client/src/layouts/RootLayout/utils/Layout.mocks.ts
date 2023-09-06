@@ -27,6 +27,14 @@ export const avatar = (hasImage: boolean) => {
   });
 };
 
+export const storageTheme = (theme: string) => {
+  return JSON.stringify({
+    themeMode: theme,
+    fontSize: 16,
+    color: "#7dd1f3",
+  });
+};
+
 const SESSION_ID = "Logout_Session_Id";
 const msg = "You are unable to logout at the moment. Please try again later";
 

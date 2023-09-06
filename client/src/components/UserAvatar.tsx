@@ -16,11 +16,7 @@ const UserAvatar = (props: UserAvatarProps) => {
 
   if (!user) {
     return (
-      <Avatar
-        sx={[{ bgcolor: "text.disabled" }, ...sxProp]}
-        role="img"
-        aria-label="Unknown user avatar"
-      >
+      <Avatar sx={[{ bgcolor: "text.disabled" }, ...sxProp]}>
         <PersonIcon />
       </Avatar>
     );
@@ -61,7 +57,9 @@ const UserAvatar = (props: UserAvatarProps) => {
         sx={[
           ({ appTheme }) => ({
             bgcolor:
-              appTheme === "sunny" ? "secondary.light" : "secondary.dark",
+              appTheme.themeMode === "sunny"
+                ? "secondary.light"
+                : "secondary.dark",
             color: "primary.main",
             fontSize: 17,
           }),
@@ -76,7 +74,10 @@ const UserAvatar = (props: UserAvatarProps) => {
       aria-label={`${firstName} ${lastName} initials`}
       sx={[
         ({ appTheme }) => ({
-          bgcolor: appTheme === "sunny" ? "secondary.light" : "secondary.dark",
+          bgcolor:
+            appTheme.themeMode === "sunny"
+              ? "secondary.light"
+              : "secondary.dark",
           color: "primary.main",
           fontSize: 17,
         }),

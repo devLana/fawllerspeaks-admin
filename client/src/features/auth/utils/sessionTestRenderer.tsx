@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 
 import { ApolloContext } from "@context/ApolloContext";
 import SessionProvider from "../components/SessionProvider";
+import MUIThemeProvider from "@components/MUIThemeProvider";
 import { TEXT_NODE } from "./verifySession.mocks";
 import testLayout from "./testLayout";
 import { BaseResponse, UserData } from "@utils/cachePossibleTypes";
@@ -20,7 +21,9 @@ const testCache = new InMemoryCache({
 const SessionProviderTestUI = ({ mocks }: { mocks: MockedResponse[] }) => (
   <ApolloContext.Provider value={mockFn}>
     <MockedProvider mocks={mocks} cache={testCache}>
-      <SessionProvider layout={testLayout} page={<TestComponent />} />
+      <MUIThemeProvider>
+        <SessionProvider layout={testLayout} page={<TestComponent />} />
+      </MUIThemeProvider>
     </MockedProvider>
   </ApolloContext.Provider>
 );
