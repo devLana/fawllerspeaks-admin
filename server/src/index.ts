@@ -17,7 +17,9 @@ import * as dotenv from "dotenv";
 
 import { typeDefs, resolvers } from "@schema";
 import { db } from "@lib/db";
-import { nodeEnv, getServerUrl, getUser, type CustomError } from "@utils";
+import { authenticateUser, parseMultipartRequest } from "@middleware";
+import { uploadImage } from "@controllers/uploadImage";
+import { nodeEnv, getServerUrl, getUser, type ApiError } from "@utils";
 
 import type { APIContext } from "@types";
 
@@ -36,9 +38,6 @@ export const startServer = async (port: number) => {
 
   const app = express();
 
-  app.use(cookieParser());
-  app.use(express.json());
-
   app.use(
     cors({
       origin:
@@ -52,7 +51,7 @@ export const startServer = async (port: number) => {
               "http://localhost:4040",
               "https://sandbox.embed.apollographql.com",
             ],
-      methods: "POST",
+      methods: "GET,POST",
       credentials: true,
     })
   );
@@ -64,8 +63,20 @@ export const startServer = async (port: number) => {
     })
   );
 
+  app.post(
+    "/upload-image",
+    [authenticateUser, parseMultipartRequest],
+    uploadImage
+  );
+
+  app.get("/health-check", (_req, res) => {
+    res.setHeader("content-type", "text/plain");
+    res.status(200).send("Ok");
+  });
+
   app.use(
     /^\/$/,
+    [cookieParser(), express.json()],
     expressMiddleware(server, {
       context: async ({ req, res }) => {
         const user = await getUser(req.headers.authorization);
@@ -74,20 +85,14 @@ export const startServer = async (port: number) => {
     })
   );
 
-  app.get("/health-check", (_req, res) => {
-    res.status(200).send("Ok");
-  });
-
-  app.use("*", (_, res: Response) => {
+  app.use("*", (_, res) => {
     res.setHeader("content-type", "text/plain");
     res.status(403).send("Forbidden Request");
   });
 
   app.use(
-    (err: CustomError, _req: Request, res: Response, _next: NextFunction) => {
-      const statusCode = err.statusCode || 500;
-      const message = err.message || "Something went wrong. Try again later";
-
+    (err: ApiError, _: Request, res: Response, __: NextFunction): void => {
+      const { message, statusCode = 500 } = err;
       res.status(statusCode).json({ message, status: "ERROR" });
     }
   );

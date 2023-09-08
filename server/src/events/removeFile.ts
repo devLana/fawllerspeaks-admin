@@ -1,20 +1,20 @@
 import { EventEmitter } from "node:events";
 import { stat, unlink } from "node:fs";
 
-export const upload = new EventEmitter();
+export const removeFile = new EventEmitter();
 
-upload.on("removeFile", (filepath: string) => {
+removeFile.on("remove", (filepath: string) => {
   stat(filepath, err => {
     if (err) {
-      upload.emit("error", err);
+      removeFile.emit("error", err);
     } else {
       unlink(filepath, error => {
-        if (error) upload.emit("error", error);
+        if (error) removeFile.emit("error", error);
       });
     }
   });
 });
 
-upload.on("error", (error: Error) => {
+removeFile.on("error", (error: Error) => {
   console.error(error.message);
 });

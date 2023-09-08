@@ -2,27 +2,42 @@ import { type BaseResponse, Status } from "@resolverTypes";
 
 export class MailError extends Error {}
 
-export class CustomError extends Error {
-  constructor(
-    public readonly message: string,
-    public readonly statusCode: number
-  ) {
+export class ApiError extends Error {
+  constructor(readonly message: string, readonly statusCode = 500) {
     super(message);
+  }
+}
+
+export class UnauthenticatedError extends ApiError {
+  constructor(readonly message: string) {
+    super(message, 401);
+  }
+}
+
+export class UnauthorizedError extends ApiError {
+  constructor(readonly message: string) {
+    super(message, 403);
+  }
+}
+
+export class BadRequestError extends ApiError {
+  constructor(readonly message: string) {
+    super(message, 400);
   }
 }
 
 class ErrorResponse implements BaseResponse {
   readonly status: Status;
 
-  constructor(public readonly message: string) {
+  constructor(readonly message: string) {
     this.status = Status.Error;
   }
 }
 
 export class Response implements BaseResponse {
   constructor(
-    public readonly message: string,
-    public readonly status: Status = Status.Success
+    readonly message: string,
+    readonly status: Status = Status.Success
   ) {}
 }
 

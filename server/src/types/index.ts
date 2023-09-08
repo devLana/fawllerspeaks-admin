@@ -111,3 +111,12 @@ export type RemoveNull<T extends object> = {
 export type InputErrors<Type extends Record<string, unknown>> = {
   [Prop in keyof Type as `${string & Prop}Error`]: string | null | undefined;
 };
+
+interface UploadedFile {
+  filepath: string;
+  mimetype: string;
+}
+
+export interface UploadRequest extends Request {
+  upload?: { file: UploadedFile; imageCategory: "avatar" | "post" };
+}

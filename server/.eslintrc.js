@@ -72,6 +72,10 @@ module.exports = {
     "@typescript-eslint/method-signature-style": 1,
     "@typescript-eslint/no-floating-promises": [1, { ignoreIIFE: true }],
     "@typescript-eslint/no-inferrable-types": 1,
+    "@typescript-eslint/no-misused-promises": [
+      1,
+      { checksVoidReturn: { arguments: false } },
+    ],
     "@typescript-eslint/no-redundant-type-constituents": 1,
     "@typescript-eslint/no-unnecessary-qualifier": 1,
 
