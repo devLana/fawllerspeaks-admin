@@ -10,7 +10,7 @@ import { TEXT_NODE } from "./verifySession.mocks";
 import testLayout from "./testLayout";
 import { BaseResponse, UserData } from "@utils/cachePossibleTypes";
 
-export const mockFn = jest.fn().mockName("apolloAuthHeaderHandler");
+export const handleAuthHeader = jest.fn().mockName("handleAuthHeader");
 
 const TestComponent = () => <span>{TEXT_NODE}</span>;
 
@@ -19,7 +19,7 @@ const testCache = new InMemoryCache({
 });
 
 const SessionProviderTestUI = ({ mocks }: { mocks: MockedResponse[] }) => (
-  <ApolloContext.Provider value={mockFn}>
+  <ApolloContext.Provider value={{ handleAuthHeader, jwt: "auth-token" }}>
     <MockedProvider mocks={mocks} cache={testCache}>
       <MUIThemeProvider>
         <SessionProvider layout={testLayout} page={<TestComponent />} />

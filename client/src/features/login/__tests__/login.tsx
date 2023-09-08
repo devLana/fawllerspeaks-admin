@@ -4,7 +4,7 @@ import { screen, waitFor } from "@testing-library/react";
 
 import Login from "@pages/login";
 import {
-  authHeaderHandler,
+  handleAuthHeader,
   refreshTokenHandler,
   userIdHandler,
   renderTestUI,
@@ -130,8 +130,8 @@ describe("Login Page", () => {
       expect(replace).toHaveBeenCalledWith(page);
 
       expect(localStorage.getItem(SESSION_ID)).toBe(mock.sessionId);
-      expect(authHeaderHandler).toHaveBeenCalledTimes(1);
-      expect(authHeaderHandler).toHaveBeenCalledWith("accessToken");
+      expect(handleAuthHeader).toHaveBeenCalledTimes(1);
+      expect(handleAuthHeader).toHaveBeenCalledWith("accessToken");
       expect(userIdHandler).toHaveBeenCalledTimes(1);
       expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
       expect(refreshTokenHandler).toHaveBeenCalledTimes(1);

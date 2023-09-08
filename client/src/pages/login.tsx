@@ -41,7 +41,7 @@ const Login: NextPageWithLayout = () => {
   } = useForm<MutationLoginArgs>({ resolver: yupResolver(loginValidator) });
 
   const { handleUserId, handleRefreshToken } = useSession();
-  const handleAuthHeader = useAuthHeaderHandler();
+  const { handleAuthHeader } = useAuthHeaderHandler();
 
   const [statusMessage, setStatusMessage] = useStatusAlert();
 

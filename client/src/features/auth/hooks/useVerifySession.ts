@@ -29,7 +29,7 @@ const useVerifySession = (
   const client = useApolloClient();
   const { pathname, replace } = useRouter();
 
-  const handleAuthHeader = useAuthHeaderHandler();
+  const { handleAuthHeader } = useAuthHeaderHandler();
 
   React.useEffect(() => {
     const sessionId = localStorage.getItem(SESSION_ID);

@@ -12,7 +12,10 @@ import {
   tableTwo,
   TEXT_NODE,
 } from "../utils/verifySession.mocks";
-import { mockFn, sessionTestRenderer } from "../utils/sessionTestRenderer";
+import {
+  handleAuthHeader,
+  sessionTestRenderer,
+} from "../utils/sessionTestRenderer";
 import { SESSION_ID } from "@utils/constants";
 
 const mock = jwtDecode as jest.MockedFunction<() => never>;
@@ -162,8 +165,8 @@ describe("Verify user session on initial app render", () => {
           expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
           expect(screen.getByText(TEXT_NODE)).toBeInTheDocument();
 
-          expect(mockFn).toHaveBeenCalled();
-          expect(mockFn).toHaveBeenCalledWith("accessToken");
+          expect(handleAuthHeader).toHaveBeenCalled();
+          expect(handleAuthHeader).toHaveBeenCalledWith("accessToken");
         });
       });
 
@@ -183,8 +186,8 @@ describe("Verify user session on initial app render", () => {
           expect(router.replace).not.toHaveBeenCalled();
           expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
 
-          expect(mockFn).toHaveBeenCalled();
-          expect(mockFn).toHaveBeenCalledWith("accessToken");
+          expect(handleAuthHeader).toHaveBeenCalled();
+          expect(handleAuthHeader).toHaveBeenCalledWith("accessToken");
         });
       });
     });

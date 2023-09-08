@@ -8,7 +8,10 @@ import {
   table1,
   table2,
 } from "../utils/refreshToken.mocks";
-import { mockFn, sessionTestRenderer } from "../utils/sessionTestRenderer";
+import {
+  handleAuthHeader,
+  sessionTestRenderer,
+} from "../utils/sessionTestRenderer";
 import { SESSION_ID } from "@utils/constants";
 
 jest.useFakeTimers();
@@ -52,8 +55,8 @@ describe("Refresh expired user access token", () => {
       sessionTestRenderer(refresh.gql());
 
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());
-      await waitFor(() => expect(mockFn).toHaveBeenCalledTimes(2));
-      expect(mockFn).toHaveBeenCalledWith(newAccessToken);
+      await waitFor(() => expect(handleAuthHeader).toHaveBeenCalledTimes(2));
+      expect(handleAuthHeader).toHaveBeenCalledWith(newAccessToken);
     });
   });
 });

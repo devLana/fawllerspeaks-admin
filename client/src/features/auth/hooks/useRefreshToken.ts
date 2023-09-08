@@ -22,7 +22,7 @@ const useRefreshToken = (setErrorMessage: SetErrorMessage) => {
   const router = useRouter();
   const client = useApolloClient();
 
-  const handleAuthHeader = useAuthHeaderHandler();
+  const { handleAuthHeader } = useAuthHeaderHandler();
 
   const refreshToken = async (sessionId: string) => {
     try {

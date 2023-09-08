@@ -15,7 +15,7 @@ interface AppWrapperProps {
 
 export const testUserId = "Authenticated_User_Id";
 
-export const authHeaderHandler = jest.fn().mockName("handleAuthHeader");
+export const handleAuthHeader = jest.fn().mockName("handleAuthHeader");
 export const userIdHandler = jest.fn().mockName("handleUserId");
 export const refreshTokenHandler = jest.fn().mockName("handleRefreshToken");
 export const stopRefreshTokenTimer = jest
@@ -34,7 +34,7 @@ export const testCache = new InMemoryCache({
 });
 
 const AppWrapper = ({ children, mocks }: AppWrapperProps) => (
-  <ApolloContext.Provider value={authHeaderHandler}>
+  <ApolloContext.Provider value={{ handleAuthHeader, jwt: "auth-token" }}>
     <MockedProvider mocks={mocks} cache={testCache}>
       <MUIThemeProvider>
         <SessionContext.Provider value={sessionValue}>
