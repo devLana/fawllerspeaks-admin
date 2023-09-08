@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import Snackbar from "@mui/material/Snackbar";
 import { yupResolver } from "@hookform/resolvers/yup";
 
+import useUploadImage from "@hooks/useUploadImage";
 import useGetUserInfo from "@hooks/useGetUserInfo";
 import EditProfileForm from "@features/settings/editProfile/components/EditProfileForm";
 import EditProfileFileInput, {
@@ -51,6 +52,8 @@ const EditMe: NextPageWithLayout = () => {
     },
   });
 
+  const upload = useUploadImage();
+
   const submitHandler = async (values: EditProfile) => {
     setStatus("submitting");
 
@@ -58,22 +61,11 @@ const EditMe: NextPageWithLayout = () => {
     let uploadHasError = false;
 
     if (image.file) {
-      const body = new FormData();
-      body.append("image", image.file);
-      body.append("type", "avatar");
+      const data = await upload(image.file, "avatar");
+      ({ uploadHasError } = data);
 
-      try {
-        const request = new Request("/api/upload", { method: "POST", body });
-        const response = await fetch(request);
-        const imageUrl = await response.text();
-
-        if (!response.ok) {
-          uploadHasError = true;
-        } else {
-          variables = { ...values, image: imageUrl };
-        }
-      } catch {
-        uploadHasError = true;
+      if (data.imageLink) {
+        variables = { ...values, image: data.imageLink };
       }
     } else if (removeCurrentImage) {
       variables = { ...values, image: null };

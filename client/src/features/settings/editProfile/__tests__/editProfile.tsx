@@ -191,8 +191,8 @@ describe("Edit Profile", () => {
       it("Image upload failed, User profile is partially updated without an image", async () => {
         cacheSetup(imageFail.input);
         server.use(
-          rest.post("/api/upload", (_, res, ctx) => {
-            return res(ctx.status(500), ctx.text("Server Error"));
+          rest.post("http://localhost:7692/upload-image", (_, res, ctx) => {
+            return res(ctx.status(500), ctx.json({}));
           })
         );
 

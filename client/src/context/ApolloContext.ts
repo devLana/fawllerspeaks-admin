@@ -1,7 +1,10 @@
 import * as React from "react";
 
-type AuthHeaderHandler = (jwt: string) => void;
-type ApolloContextValue = AuthHeaderHandler | null;
+interface ApolloContextValues {
+  jwt: string;
+  handleAuthHeader: (jwt: string) => void;
+}
+type ApolloContextValue = ApolloContextValues | null;
 
 export const ApolloContext = React.createContext<ApolloContextValue>(null);
 

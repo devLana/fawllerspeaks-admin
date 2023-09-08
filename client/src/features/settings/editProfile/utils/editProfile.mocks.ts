@@ -22,8 +22,11 @@ interface ErrorsMock {
 const imageLink = "https://www.mock-image-link/image-name.jpg";
 
 export const server = setupServer(
-  rest.post("/api/upload", (_, res, ctx) => {
-    return res(ctx.status(201), ctx.text(imageLink));
+  rest.post("http://localhost:7692/upload-image", (_, res, ctx) => {
+    return res(
+      ctx.status(201),
+      ctx.json({ image: imageLink, status: "SUCCESS" })
+    );
   })
 );
 

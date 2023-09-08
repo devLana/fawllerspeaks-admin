@@ -31,8 +31,10 @@ const ApolloContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleAuthHeader = (token: string) => setJwt(token);
 
+  const value = { handleAuthHeader, jwt };
+
   return (
-    <ApolloContext.Provider value={handleAuthHeader}>
+    <ApolloContext.Provider value={value}>
       <ApolloProvider client={client}>{children}</ApolloProvider>
     </ApolloContext.Provider>
   );
