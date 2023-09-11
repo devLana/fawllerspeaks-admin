@@ -19,16 +19,14 @@ import type { NextPageWithLayout } from "@types";
 import type { MutationRegisterUserArgs } from "@apiTypes";
 
 type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
-type Status = "idle" | "loading" | "error";
 
 const RegisterUser: NextPageWithLayout = () => {
-  const [status, setStatus] = React.useState<Status>("idle");
+  const [status, setStatus] = React.useState<"idle" | "loading">("idle");
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const router = useRouter();
 
-  const [registerUser, { error, client }] = useMutation(REGISTER_USER, {
-    onError: () => setStatus("error"),
-  });
+  const [registerUser, { error, client }] = useMutation(REGISTER_USER);
 
   const {
     register,
@@ -39,13 +37,18 @@ const RegisterUser: NextPageWithLayout = () => {
     resolver: yupResolver(registerUserValidator),
   });
 
-  const [statusMessage, setStatusMessage] = useStatusAlert();
+  const [statusMessage, setStatusMessage] = useStatusAlert(setIsOpen);
 
   const submitHandler = async (values: RegisterUserArgs) => {
     setStatus("loading");
 
     const { data: registeredData } = await registerUser({
       variables: { userInput: values },
+      onError() {
+        setStatus("idle");
+        setIsOpen(true);
+        setStatusMessage(null);
+      },
     });
 
     if (registeredData) {
@@ -101,15 +104,12 @@ const RegisterUser: NextPageWithLayout = () => {
           break;
 
         default:
-          setStatus("error");
+          setStatus("idle");
+          setIsOpen(true);
+          setStatusMessage(null);
           break;
       }
     }
-  };
-
-  const handleClose = () => {
-    setStatus("idle");
-    setStatusMessage(null);
   };
 
   let alertMessage =
@@ -123,17 +123,15 @@ const RegisterUser: NextPageWithLayout = () => {
 
   return (
     <>
-      {(status === "error" || statusMessage) && (
-        <AlertToast
-          horizontal="center"
-          vertical="top"
-          isOpen={true}
-          onClose={handleClose}
-          direction="down"
-          severity={statusMessage ? "info" : "error"}
-          content={alertMessage}
-        />
-      )}
+      <AlertToast
+        horizontal="center"
+        vertical="top"
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        direction="down"
+        severity={statusMessage ? "info" : "error"}
+        content={alertMessage}
+      />
       <Typography align="center" variant="h1">
         Register Your Account
       </Typography>

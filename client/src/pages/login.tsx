@@ -22,16 +22,13 @@ import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 import type { MutationLoginArgs } from "@apiTypes";
 
-type Status = "idle" | "submitting" | "error" | "success";
-
 const Login: NextPageWithLayout = () => {
-  const [status, setStatus] = React.useState<Status>("idle");
+  const [status, setStatus] = React.useState<"idle" | "submitting">("idle");
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const { replace } = useRouter();
 
-  const [login, { data, error }] = useMutation(LOGIN_USER, {
-    onError: () => setStatus("error"),
-  });
+  const [login, { data, error }] = useMutation(LOGIN_USER);
 
   const {
     register,
@@ -40,15 +37,21 @@ const Login: NextPageWithLayout = () => {
     setError,
   } = useForm<MutationLoginArgs>({ resolver: yupResolver(loginValidator) });
 
+  const [statusMessage, setStatusMessage] = useStatusAlert(setIsOpen);
   const { handleUserId, handleRefreshToken } = useSession();
   const { handleAuthHeader } = useAuthHeaderHandler();
-
-  const [statusMessage, setStatusMessage] = useStatusAlert();
 
   const submitHandler = async (values: MutationLoginArgs) => {
     setStatus("submitting");
 
-    const { data: loginData } = await login({ variables: values });
+    const { data: loginData } = await login({
+      variables: values,
+      onError() {
+        setStatus("idle");
+        setIsOpen(true);
+        setStatusMessage(null);
+      },
+    });
 
     if (loginData) {
       switch (loginData.login.__typename) {
@@ -60,13 +63,14 @@ const Login: NextPageWithLayout = () => {
           if (emailError) setError("email", { message: emailError }, focus);
 
           setStatus("idle");
-
           break;
         }
 
         case "NotAllowedError":
         default:
-          setStatus("error");
+          setStatus("idle");
+          setIsOpen(true);
+          setStatusMessage(null);
           break;
 
         case "LoggedInUser": {
@@ -79,7 +83,6 @@ const Login: NextPageWithLayout = () => {
           }
 
           localStorage.setItem(SESSION_ID, loginData.login.sessionId);
-          setStatus("success");
           handleAuthHeader(loginData.login.accessToken);
           handleRefreshToken(loginData.login.accessToken);
           handleUserId(`${__typename}:${user.id}`);
@@ -88,11 +91,6 @@ const Login: NextPageWithLayout = () => {
         }
       }
     }
-  };
-
-  const handleClose = () => {
-    setStatus("idle");
-    setStatusMessage(null);
   };
 
   let alertMessage =
@@ -108,21 +106,19 @@ const Login: NextPageWithLayout = () => {
 
   return (
     <>
-      {(status === "error" || statusMessage) && (
-        <AlertToast
-          horizontal="center"
-          vertical="top"
-          isOpen={true}
-          onClose={handleClose}
-          direction="down"
-          severity={statusMessage ? "info" : "error"}
-          content={alertMessage}
-        />
-      )}
+      <AlertToast
+        horizontal="center"
+        vertical="top"
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        direction="down"
+        severity={statusMessage ? "info" : "error"}
+        content={alertMessage}
+      />
       <Typography variant="h1">Sign In</Typography>
       <Card sx={{ maxWidth: { xs: "21.875rem", sm: "25rem" } }}>
         <LoginForm
-          isLoading={status === "submitting" || status === "success"}
+          isLoading={status === "submitting"}
           onSubmit={handleSubmit(submitHandler)}
           register={register}
           fieldErrors={errors}

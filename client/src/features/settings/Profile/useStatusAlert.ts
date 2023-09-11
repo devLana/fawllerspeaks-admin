@@ -1,10 +1,9 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-const useStatusAlert = (): [
-  string | null,
-  React.Dispatch<React.SetStateAction<string | null>>
-] => {
+const useStatusAlert = (
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+) => {
   const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
   const { isReady, query } = useRouter();
 
@@ -13,10 +12,12 @@ const useStatusAlert = (): [
       if (query.status && !Array.isArray(query.status)) {
         switch (query.status) {
           case "upload":
+            setIsOpen(true);
             setStatusMessage("Profile updated");
             break;
 
           case "upload-error":
+            setIsOpen(true);
             setStatusMessage(
               "Profile updated. But there was an error uploading your new profile image. Please try again later"
             );
@@ -27,9 +28,9 @@ const useStatusAlert = (): [
         }
       }
     }
-  }, [isReady, query.status]);
+  }, [isReady, query.status, setIsOpen]);
 
-  return [statusMessage, setStatusMessage];
+  return statusMessage;
 };
 
 export default useStatusAlert;

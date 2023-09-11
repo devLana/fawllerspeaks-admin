@@ -12,6 +12,7 @@ import { changePasswordValidator } from "@features/settings/changePassword/utils
 import { CHANGE_PASSWORD } from "@features/settings/changePassword/operations/CHANGE_PASSWORD";
 import { SESSION_ID } from "@utils/constants";
 import settingsLayout from "@utils/settings/settingsLayout";
+import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { type NextPageWithLayout } from "@types";
 import { type MutationChangePasswordArgs } from "@apiTypes";
 
@@ -19,12 +20,10 @@ type Status = "idle" | "submitting" | "error" | "success";
 
 const ChangePassword: NextPageWithLayout = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
+
   const { replace } = useRouter();
 
-  const [changePassword, { data, error, client }] = useMutation(
-    CHANGE_PASSWORD,
-    { onError: () => setFormStatus("error") }
-  );
+  const [password, { data, error, client }] = useMutation(CHANGE_PASSWORD);
 
   const {
     register,
@@ -49,7 +48,10 @@ const ChangePassword: NextPageWithLayout = () => {
   const submitHandler = async (values: MutationChangePasswordArgs) => {
     setFormStatus("submitting");
 
-    const { data: response } = await changePassword({ variables: values });
+    const { data: response } = await password({
+      variables: values,
+      onError: () => setFormStatus("error"),
+    });
 
     if (response) {
       switch (response.changePassword.__typename) {
@@ -73,7 +75,6 @@ const ChangePassword: NextPageWithLayout = () => {
           }
 
           setFormStatus("idle");
-
           break;
         }
 
@@ -123,13 +124,11 @@ const ChangePassword: NextPageWithLayout = () => {
 
   return (
     <>
-      {(formStatus === "error" || formStatus === "success") && (
-        <Snackbar
-          message={msg}
-          open={true}
-          onClose={() => setFormStatus("idle")}
-        />
-      )}
+      <Snackbar
+        message={msg}
+        open={formStatus === "error" || formStatus === "success"}
+        onClose={handleCloseAlert<Status>("idle", setFormStatus)}
+      />
       <ChangePasswordForm
         email={user?.email ?? ""}
         isLoading={formStatus === "submitting"}

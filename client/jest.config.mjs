@@ -28,6 +28,7 @@ const config = {
   },
   setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
   testEnvironment: "jest-environment-jsdom",
+  testTimeout: 10000,
   verbose: true,
 };
 

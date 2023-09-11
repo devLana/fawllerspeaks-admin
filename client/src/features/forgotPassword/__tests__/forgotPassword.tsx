@@ -29,8 +29,8 @@ describe("Forgot Password Page", () => {
 
       renderTestUI(<ForgotPassword />);
 
-      expect(screen.getByRole("alert")).toBeInTheDocument();
       expect(screen.getByRole("alert")).toHaveTextContent(message);
+      expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardInfo");
     });
   });
 
@@ -86,9 +86,10 @@ describe("Forgot Password Page", () => {
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
 
-      await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
+      const alert = await screen.findByRole("alert");
 
-      expect(screen.getByRole("alert")).toHaveTextContent(message);
+      expect(alert).toHaveTextContent(message);
+      expect(alert).toHaveClass("MuiAlert-standardError");
       expect(screen.getByRole("button", { name })).toBeEnabled();
     });
 
@@ -99,7 +100,6 @@ describe("Forgot Password Page", () => {
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
-
       expect(await screen.findByRole("presentation")).toBeInTheDocument();
       expect(screen.getByRole("presentation")).toHaveTextContent(
         "It appears the account belonging to the e-mail address you provided has not been registered yet"
@@ -116,7 +116,6 @@ describe("Forgot Password Page", () => {
       await user.click(screen.getByRole("button", { name }));
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
-
       expect(await screen.findByRole("presentation")).toBeInTheDocument();
       expect(screen.getByRole("alert")).toHaveTextContent(alertMessage);
     });
@@ -132,9 +131,10 @@ describe("Forgot Password Page", () => {
 
       expect(screen.getByRole("button", { name })).toBeDisabled();
 
-      await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
+      const alert = await screen.findByRole("alert");
 
-      expect(screen.getByRole("alert")).toHaveTextContent(message);
+      expect(alert).toHaveTextContent(message);
+      expect(alert).toHaveClass("MuiAlert-standardError");
       expect(screen.getByRole("button", { name })).toBeEnabled();
     });
   });

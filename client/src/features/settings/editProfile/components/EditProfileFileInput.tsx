@@ -19,6 +19,7 @@ interface EditProfileFileInputProps {
   setImage: React.Dispatch<React.SetStateAction<ImageFile>>;
   setRemoveCurrentImage: React.Dispatch<React.SetStateAction<boolean>>;
   removeCurrentImage: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const FileInput = styled("input")({
@@ -35,6 +36,7 @@ const EditProfileFileInput = ({
   user,
   removeCurrentImage,
   setRemoveCurrentImage,
+  setIsOpen,
 }: EditProfileFileInputProps) => {
   const [hasEnteredDropZone, setHasEnteredDropZone] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -49,6 +51,7 @@ const EditProfileFileInput = ({
 
     if (!files.item(0)?.type.startsWith("image/")) {
       setImage({ ...image, error: "You can only upload an image file" });
+      setIsOpen(true);
       return;
     }
 

@@ -2,14 +2,16 @@ import * as React from "react";
 import { useRouter } from "next/router";
 
 import Typography from "@mui/material/Typography";
+import Snackbar from "@mui/material/Snackbar";
 
-import AlertToast from "@components/AlertToast";
 import RootLayout from "@layouts/RootLayout";
 import uiLayout from "@utils/uiLayout";
+import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 
 const Home: NextPageWithLayout = () => {
-  const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = React.useState("");
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const router = useRouter();
 
@@ -19,10 +21,11 @@ const Home: NextPageWithLayout = () => {
         switch (router.query.status) {
           case "registered":
             setStatusMessage("Your account has already been registered");
+            setIsOpen(true);
             break;
 
           default:
-            setStatusMessage(null);
+            setStatusMessage("");
         }
       }
     }
@@ -30,18 +33,12 @@ const Home: NextPageWithLayout = () => {
 
   return (
     <>
-      {statusMessage && (
-        <AlertToast
-          horizontal="center"
-          vertical="top"
-          isOpen={true}
-          onClose={() => setStatusMessage(null)}
-          direction="down"
-          severity="info"
-          content={statusMessage}
-        />
-      )}
-      <Typography variant="h1">Home page</Typography>{" "}
+      <Snackbar
+        open={isOpen}
+        onClose={handleCloseAlert<boolean>(false, setIsOpen)}
+        message={statusMessage}
+      />
+      <Typography variant="h1">Home page</Typography>
     </>
   );
 };

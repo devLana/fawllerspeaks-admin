@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -5,13 +7,16 @@ import Typography from "@mui/material/Typography";
 import useGetUserInfo from "@hooks/useGetUserInfo";
 import useStatusAlert from "@features/settings/Profile/useStatusAlert";
 import UserAvatar from "@components/UserAvatar";
-import settingsLayout from "@utils/settings/settingsLayout";
 import NextLink from "@components/NextLink";
+import settingsLayout from "@utils/settings/settingsLayout";
+import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { type NextPageWithLayout } from "@types";
 
 const Me: NextPageWithLayout = () => {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const statusMessage = useStatusAlert(setIsOpen);
   const user = useGetUserInfo();
-  const [statusMessage, setStatusMessage] = useStatusAlert();
 
   return (
     <>
@@ -31,13 +36,11 @@ const Me: NextPageWithLayout = () => {
           <NextLink href="/settings/me/edit">Edit Profile</NextLink>
         </Stack>
       </Stack>
-      {statusMessage && (
-        <Snackbar
-          message={statusMessage}
-          open={true}
-          onClose={() => setStatusMessage(null)}
-        />
-      )}
+      <Snackbar
+        message={statusMessage}
+        open={isOpen}
+        onClose={handleCloseAlert<boolean>(false, setIsOpen)}
+      />
     </>
   );
 };

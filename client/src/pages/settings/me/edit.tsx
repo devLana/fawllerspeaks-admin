@@ -16,26 +16,25 @@ import { editProfileValidator } from "@features/settings/editProfile/utils/editP
 import { EDIT_PROFILE } from "@features/settings/editProfile/operations/EDIT_PROFILE";
 import settingsLayout from "@utils/settings/settingsLayout";
 import { SESSION_ID } from "@utils/constants";
+import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 import type { MutationEditProfileArgs } from "@apiTypes";
 
 type EditProfile = Omit<MutationEditProfileArgs, "image">;
-type Status = "idle" | "submitting" | "error";
 
 const EditMe: NextPageWithLayout = () => {
-  const [status, setStatus] = React.useState<Status>("idle");
+  const [status, setStatus] = React.useState<"idle" | "submitting">("idle");
   const [removeCurrentImage, setRemoveCurrentImage] = React.useState(false);
   const [image, setImage] = React.useState<ImageFile>({
     error: "",
     file: null,
     fileUrl: "",
   });
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const router = useRouter();
 
-  const [editProfile, { error, client }] = useMutation(EDIT_PROFILE, {
-    onError: () => setStatus("error"),
-  });
+  const [editProfile, { error, client }] = useMutation(EDIT_PROFILE);
 
   const user = useGetUserInfo();
 
@@ -71,7 +70,14 @@ const EditMe: NextPageWithLayout = () => {
       variables = { ...values, image: null };
     }
 
-    const { data } = await editProfile({ variables });
+    const { data } = await editProfile({
+      variables,
+      onError() {
+        setStatus("idle");
+        setIsOpen(true);
+        setImage({ ...image, error: "" });
+      },
+    });
 
     if (data) {
       switch (data.editProfile.__typename) {
@@ -80,7 +86,10 @@ const EditMe: NextPageWithLayout = () => {
           const { firstNameError, imageError, lastNameError } =
             data.editProfile;
 
-          if (imageError) setImage({ ...image, error: imageError });
+          if (imageError) {
+            setImage({ ...image, error: imageError });
+            setIsOpen(true);
+          }
 
           if (lastNameError) {
             setError("lastName", { message: lastNameError }, focus);
@@ -117,15 +126,12 @@ const EditMe: NextPageWithLayout = () => {
         }
 
         default:
-          setStatus("error");
+          setStatus("idle");
+          setIsOpen(true);
+          setImage({ ...image, error: "" });
           break;
       }
     }
-  };
-
-  const handleClose = () => {
-    setStatus("idle");
-    setImage({ ...image, error: "" });
   };
 
   let msg =
@@ -152,12 +158,15 @@ const EditMe: NextPageWithLayout = () => {
             user={user}
             setRemoveCurrentImage={setRemoveCurrentImage}
             removeCurrentImage={removeCurrentImage}
+            setIsOpen={setIsOpen}
           />
         }
       />
-      {(status === "error" || image.error) && (
-        <Snackbar message={msg} open={true} onClose={handleClose} />
-      )}
+      <Snackbar
+        message={msg}
+        open={isOpen}
+        onClose={handleCloseAlert<boolean>(false, setIsOpen)}
+      />
     </>
   );
 };

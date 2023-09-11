@@ -23,16 +23,11 @@ interface LogoutModalProps {
 const msg = "You are unable to logout at the moment. Please try again later";
 
 const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
-  const [status, setStatus] = React.useState<"idle" | "requesting">("idle");
+  const [status, setStatus] = React.useState<"idle" | "loading">("idle");
 
   const { replace } = useRouter();
 
-  const [logout, { client }] = useMutation(LOGOUT, {
-    onError(err) {
-      const message = err.graphQLErrors[0] ? err.graphQLErrors[0].message : msg;
-      onApiError(message);
-    },
-  });
+  const [logout, { client }] = useMutation(LOGOUT);
 
   const { handleClearRefreshTokenTimer } = useSession();
 
@@ -40,9 +35,12 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
     const sessionId = localStorage.getItem(SESSION_ID);
 
     if (sessionId) {
-      setStatus("requesting");
+      setStatus("loading");
 
-      const { data: response } = await logout({ variables: { sessionId } });
+      const { data: response } = await logout({
+        variables: { sessionId },
+        onError: err => onApiError(err.graphQLErrors[0]?.message ?? msg),
+      });
 
       if (response) {
         switch (response.logout.__typename) {
@@ -100,12 +98,12 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
       <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
         <LoadingButton
           onClick={handleLogout}
-          loading={status === "requesting"}
+          loading={status === "loading"}
           variant="contained"
         >
           <span>Logout</span>
         </LoadingButton>
-        <Button disabled={status === "requesting"} onClick={onClick}>
+        <Button disabled={status === "loading"} onClick={onClick}>
           Cancel
         </Button>
       </DialogActions>

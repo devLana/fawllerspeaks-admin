@@ -1,10 +1,9 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-const useStatusAlert = (): [
-  string | null,
-  React.Dispatch<React.SetStateAction<string | null>>
-] => {
+const useStatusAlert = (
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+): [string | null, React.Dispatch<React.SetStateAction<string | null>>] => {
   const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
   const { isReady, query } = useRouter();
 
@@ -14,6 +13,7 @@ const useStatusAlert = (): [
         switch (query.status) {
           case "unauthorized":
           case "unauthenticated":
+            setIsOpen(true);
             setStatusMessage(
               "You are unable to perform that action. Please log in"
             );
@@ -24,7 +24,7 @@ const useStatusAlert = (): [
         }
       }
     }
-  }, [isReady, query.status]);
+  }, [isReady, query.status, setIsOpen]);
 
   return [statusMessage, setStatusMessage];
 };

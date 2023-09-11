@@ -45,10 +45,10 @@ describe("Register User Page", () => {
 
       renderTestUI(<RegisterUser />);
 
-      expect(screen.getByRole("alert")).toBeInTheDocument();
       expect(screen.getByRole("alert")).toHaveTextContent(
         "You need to register your account before you can perform that action"
       );
+      expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardInfo");
 
       router.query = {};
     });
@@ -194,8 +194,10 @@ describe("Register User Page", () => {
 
         await dryEvents(user, expected.input);
 
-        expect(await screen.findByRole("alert")).toBeInTheDocument();
-        expect(screen.getByRole("alert")).toHaveTextContent(expected.message);
+        const alert = await screen.findByRole("alert");
+
+        expect(alert).toHaveTextContent(expected.message);
+        expect(alert).toHaveClass("MuiAlert-standardError");
         expect(
           screen.getByRole("button", { name: /^register$/i })
         ).toBeEnabled();

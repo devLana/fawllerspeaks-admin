@@ -10,6 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import LogoutModal from "./LogoutModal";
 import transition from "../utils/transition";
+import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { MuiIconType } from "@types";
 
 interface NavbarLogoutButtonProps {
@@ -22,13 +23,15 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
   const { Icon, label, isOpen } = props;
 
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
-  const [toastMessage, setToastMessage] = React.useState<string | null>(null);
+  const [toastMessage, setToastMessage] = React.useState("");
+  const [alertIsOpen, setAlertIsOpen] = React.useState(false);
 
   const handleCloseModal = () => setModalIsOpen(false);
 
   const handleToast = (msg: string) => {
     setModalIsOpen(false);
     setToastMessage(msg);
+    setAlertIsOpen(true);
   };
 
   return (
@@ -77,18 +80,16 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
           </ListItemButton>
         </ListItem>
       </Tooltip>
+      <Snackbar
+        message={toastMessage}
+        open={alertIsOpen}
+        onClose={handleCloseAlert<boolean>(false, setAlertIsOpen)}
+      />
       {modalIsOpen && (
         <LogoutModal
           isOpen={modalIsOpen}
           onClick={handleCloseModal}
           onApiError={handleToast}
-        />
-      )}
-      {toastMessage && (
-        <Snackbar
-          message={toastMessage}
-          open={true}
-          onClose={() => setToastMessage(null)}
         />
       )}
     </>

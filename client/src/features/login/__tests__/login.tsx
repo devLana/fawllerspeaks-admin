@@ -32,10 +32,10 @@ describe("Login Page", () => {
 
       renderTestUI(<Login />);
 
-      expect(screen.getByRole("alert")).toBeInTheDocument();
       expect(screen.getByRole("alert")).toHaveTextContent(
         "You are unable to perform that action. Please log in"
       );
+      expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardInfo");
     });
   });
 
@@ -106,7 +106,10 @@ describe("Login Page", () => {
 
       expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
 
-      expect(await screen.findByRole("alert")).toHaveTextContent(message);
+      const alert = await screen.findByRole("alert");
+
+      expect(alert).toHaveTextContent(message);
+      expect(alert).toHaveClass("MuiAlert-standardError");
       expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
     });
   });

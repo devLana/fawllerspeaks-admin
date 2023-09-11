@@ -1,6 +1,6 @@
 import Snackbar, {
   type SnackbarOrigin,
-  type SnackbarProps,
+  type SnackbarCloseReason,
 } from "@mui/material/Snackbar";
 import Alert, { type AlertColor, type AlertProps } from "@mui/material/Alert";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
@@ -18,7 +18,7 @@ interface AlertToastProps {
   horizontal?: SnackbarOrigin["horizontal"];
   vertical?: SnackbarOrigin["vertical"];
   isOpen: boolean;
-  onClose: SnackbarProps["onClose"];
+  onClose: () => void;
   direction?: SlideProps["direction"];
   severity: AlertColor;
   variant?: AlertProps["variant"];
@@ -52,11 +52,19 @@ const AlertToast = ({
       transition = RightTransition;
   }
 
+  const handleClose = (
+    _: React.SyntheticEvent | Event,
+    reason: SnackbarCloseReason
+  ) => {
+    if (reason === "clickaway") return;
+    onClose();
+  };
+
   return (
     <Snackbar
       anchorOrigin={{ horizontal, vertical }}
       open={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       TransitionComponent={transition}
     >
       <Alert
