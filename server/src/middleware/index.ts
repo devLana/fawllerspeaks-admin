@@ -1,2 +1,3 @@
 export * from "./authenticateUser";
-export * from "./parseMultipartRequest";
+export * from "./multipartParser";
+export * from "./errorMiddleware";

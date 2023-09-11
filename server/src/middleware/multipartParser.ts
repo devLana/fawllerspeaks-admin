@@ -4,7 +4,7 @@ import type { Response, NextFunction } from "express";
 import { ApiError, BadRequestError } from "@utils";
 import type { UploadRequest } from "@types";
 
-export const parseMultipartRequest = async (
+export const multipartParser = async (
   req: UploadRequest,
   _: Response,
   next: NextFunction

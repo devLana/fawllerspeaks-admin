@@ -5,7 +5,7 @@ export default {
   moduleFileExtensions: ["ts", "js"],
   moduleNameMapper: {
     "^@server$": "<rootDir>/src",
-    "^@controllers/(.*)$": "<rootDir>/src/controllers/$1",
+    "^@controllers$": "<rootDir>/src/controllers",
     "^@events/(.*)$": "<rootDir>/src/events/$1",
     "^@features/(.*)$": "<rootDir>/src/features/$1",
     "^@lib/(.*)$": "<rootDir>/src/lib/$1",

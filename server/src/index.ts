@@ -2,24 +2,22 @@ import { createServer } from "node:http";
 import process from "node:process";
 
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 
-import express, {
-  type Response,
-  type Request,
-  type NextFunction,
-} from "express";
+import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
 import * as dotenv from "dotenv";
 
 import { typeDefs, resolvers } from "@schema";
-import { db } from "@lib/db";
-import { authenticateUser, parseMultipartRequest } from "@middleware";
-import { uploadImage } from "@controllers/uploadImage";
-import { nodeEnv, getServerUrl, getUser, type ApiError } from "@utils";
+import {
+  authenticateUser,
+  errorMiddleware,
+  multipartParser,
+} from "@middleware";
+import { uploadImage, catchAll, healthCheck, graphqlApi } from "@controllers";
+import { nodeEnv, getServerUrl, corsOptions, startServerHandler } from "@utils";
 
 import type { APIContext } from "@types";
 
@@ -38,24 +36,7 @@ export const startServer = async (port: number) => {
 
   const app = express();
 
-  app.use(
-    cors({
-      origin:
-        nodeEnv === "production"
-          ? [
-              "https://https://app.fawllerspeaks.com",
-              "https://studio.apollographql.com",
-            ]
-          : [
-              "http://localhost:4000",
-              "http://localhost:4040",
-              "https://sandbox.embed.apollographql.com",
-            ],
-      methods: "GET,POST",
-      credentials: true,
-    })
-  );
-
+  app.use(cors(corsOptions));
   app.use(
     helmet({
       crossOriginEmbedderPolicy: nodeEnv === "production",
@@ -63,39 +44,11 @@ export const startServer = async (port: number) => {
     })
   );
 
-  app.post(
-    "/upload-image",
-    [authenticateUser, parseMultipartRequest],
-    uploadImage
-  );
-
-  app.get("/health-check", (_req, res) => {
-    res.setHeader("content-type", "text/plain");
-    res.status(200).send("Ok");
-  });
-
-  app.use(
-    /^\/$/,
-    [cookieParser(), express.json()],
-    expressMiddleware(server, {
-      context: async ({ req, res }) => {
-        const user = await getUser(req.headers.authorization);
-        return { db, user, req, res };
-      },
-    })
-  );
-
-  app.use("*", (_, res) => {
-    res.setHeader("content-type", "text/plain");
-    res.status(403).send("Forbidden Request");
-  });
-
-  app.use(
-    (err: ApiError, _: Request, res: Response, __: NextFunction): void => {
-      const { message, statusCode = 500 } = err;
-      res.status(statusCode).json({ message, status: "ERROR" });
-    }
-  );
+  app.use(/^\/$/, [cookieParser(), express.json()], graphqlApi(server));
+  app.post("/upload-image", [authenticateUser, multipartParser], uploadImage);
+  app.get("/health-check", healthCheck);
+  app.use("*", catchAll);
+  app.use(errorMiddleware);
 
   httpServer.on("request", app);
   httpServer.listen({ port });
@@ -108,31 +61,6 @@ if (nodeEnv !== "test") {
   const port = process.env.PORT ? +process.env.PORT : 7692;
 
   startServer(port)
-    .then(({ url, server }) => {
-      process.on("uncaughtException", (err, origin) => {
-        console.log("Uncaught Exception Error - ", err);
-        console.log("Uncaught Exception Origin - ", origin);
-        process.exit(1);
-      });
-
-      process.on("unhandledRejection", (reason, promise) => {
-        console.log("Unhandled Rejection Reason - ", reason);
-        console.log("Unhandled Rejection Promise - ", promise);
-        process.exit(1);
-      });
-
-      process.on("exit", () => {
-        server
-          .stop()
-          .then(() => console.log("Apollo GraphQL Server Successfully Stopped"))
-          .catch(() => console.error("Unable To Stop Apollo GraphQL Server"));
-
-        db.end(() => {
-          console.log("PG Database Pool Drained");
-        });
-      });
-
-      console.log(`🚀 Server ready${url ? ` at ${url}` : ""}`);
-    })
-    .catch(err => console.log("Error: Unable to start server", err));
+    .then(startServerHandler)
+    .catch(err => console.error("Error: Unable to start server", err));
 }
