@@ -56,17 +56,20 @@ const useRefreshToken = (setErrorMessage: SetErrorMessage) => {
           break;
 
         default:
-          throw new Error(
-            "An unexpected error has occurred while trying to refresh your access token"
-          );
+          throw new Error();
       }
     } catch (err) {
-      if (err instanceof ApolloError && err.networkError) {
+      if (err instanceof ApolloError) {
+        const msg =
+          err.graphQLErrors.length > 0
+            ? err.graphQLErrors[0].message
+            : "Server is currently unreachable. Please try again later";
+
+        setErrorMessage(msg);
+      } else {
         setErrorMessage(
-          "Server is currently unreachable. Please try again later"
+          "An unexpected error has occurred while trying to refresh your access token"
         );
-      } else if (err instanceof Error) {
-        setErrorMessage(err.message);
       }
     }
   };

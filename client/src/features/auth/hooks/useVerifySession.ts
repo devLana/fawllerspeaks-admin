@@ -108,16 +108,19 @@ const useVerifySession = (
           if (err instanceof InvalidTokenError && isMounted) {
             setClientHasRendered(true);
             setErrorMessage(msg);
-          } else if (err instanceof ApolloError && err.networkError) {
+          } else if (err instanceof ApolloError) {
+            const message =
+              err.graphQLErrors.length > 0
+                ? err.graphQLErrors[0].message
+                : "Server is currently unreachable. Please try again later";
+
             if (isMounted) {
               setClientHasRendered(true);
-              setErrorMessage(
-                "Server is currently unreachable. Please try again later"
-              );
+              setErrorMessage(message);
             }
           } else if (isMounted) {
-            setErrorMessage(err.message);
             setClientHasRendered(true);
+            setErrorMessage(msg);
           }
         });
     } else {
