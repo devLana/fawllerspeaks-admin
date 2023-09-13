@@ -36,6 +36,7 @@ const useStatusAlert = (
             break;
 
           case "network":
+          case "error":
             setStatusMessage(`${message}. Please try again later`);
             setIsOpen(true);
             break;

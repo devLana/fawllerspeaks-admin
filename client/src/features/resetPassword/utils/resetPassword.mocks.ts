@@ -1,4 +1,6 @@
 import { GraphQLError } from "graphql";
+import { graphql } from "msw";
+import { setupServer } from "msw/node";
 import type { MockedResponse } from "@apollo/client/testing";
 
 import { RESET_PASSWORD } from "../operations/RESET_PASSWORD";
@@ -6,14 +8,82 @@ import { RESET_PASSWORD } from "../operations/RESET_PASSWORD";
 const VERIFIED_PASSWORD_RESET_TOKEN = "VERIFIED_PASSWORD_RESET_TOKEN";
 
 /* GetServerSideProps Verify Password Reset Token Mocks */
-export interface MutateResult {
-  data?: { verifyResetToken: Record<string, string> };
-  errors?: unknown[];
-}
+const INVALID_RESET_TOKEN = "INVALID_RESET_TOKEN";
+const UNKNOWN_EXPIRED_RESET_TOKEN = "UNKNOWN_EXPIRED_RESET_TOKEN";
+const UNSUPPORTED_RESPONSE_RESET_TOKEN = "UNSUPPORTED_RESPONSE_RESET_TOKEN";
+const GRAPHQL_ERROR_RESET_TOKEN = "GRAPHQL_ERROR_RESET_TOKEN";
+const NETWORK_ERROR_RESET_TOKEN = "NETWORK_ERROR_RESET_TOKEN";
+const UNREGISTERED_RESET_TOKEN = "UNREGISTERED_RESET_TOKEN";
+const EMAIL = "reset_password_test@mail.org";
 
-interface VerifyErrorObjects {
-  verifyResetToken: { __typename: string };
-}
+export const server = setupServer(
+  graphql.mutation("VerifyResetToken", (req, res, ctx) => {
+    const { token } = req.variables;
+
+    if (token === INVALID_RESET_TOKEN) {
+      return res(
+        ctx.data({
+          verifyResetToken: {
+            __typename: "VerifyResetTokenValidationError",
+            tokenError: "Invalid token",
+            status: "ERROR",
+          },
+        })
+      );
+    }
+
+    if (token === UNKNOWN_EXPIRED_RESET_TOKEN) {
+      return res(
+        ctx.data({
+          verifyResetToken: {
+            __typename: "NotAllowedError",
+            message: "Unknown token",
+            status: "ERROR",
+          },
+        })
+      );
+    }
+
+    if (token === UNREGISTERED_RESET_TOKEN) {
+      return res(
+        ctx.data({
+          verifyResetToken: {
+            __typename: "RegistrationError",
+            message: "Unregistered account",
+            status: "ERROR",
+          },
+        })
+      );
+    }
+
+    if (token === VERIFIED_PASSWORD_RESET_TOKEN) {
+      return res(
+        ctx.data({
+          verifyResetToken: {
+            __typename: "VerifiedResetToken",
+            email: EMAIL,
+            resetToken: VERIFIED_PASSWORD_RESET_TOKEN,
+            status: "SUCCESS",
+          },
+        })
+      );
+    }
+
+    if (token === UNSUPPORTED_RESPONSE_RESET_TOKEN) {
+      return res(
+        ctx.data({ verifyResetToken: { __typename: "UnsupportedObjectType" } })
+      );
+    }
+
+    if (token === GRAPHQL_ERROR_RESET_TOKEN) {
+      return res(
+        ctx.errors([new GraphQLError("Unable to verify reset token")])
+      );
+    }
+
+    return res.networkError("Network error");
+  })
+);
 
 export const verifyValidate: [string, string | string[], string][] = [
   [
@@ -28,49 +98,41 @@ export const verifyValidate: [string, string | string[], string][] = [
   ],
 ];
 
-export const verifyErrorObjects: [string, VerifyErrorObjects, string][] = [
+export const verifyErrorObjects: [string, string, string][] = [
   [
     "Password reset token is invalid",
-    { verifyResetToken: { __typename: "VerifyResetTokenValidationError" } },
     "/forgot-password?status=validation",
+    INVALID_RESET_TOKEN,
   ],
   [
     "Password reset token is unknown or has expired",
-    { verifyResetToken: { __typename: "NotAllowedError" } },
     "/forgot-password?status=fail",
+    UNKNOWN_EXPIRED_RESET_TOKEN,
   ],
   [
     "Verification returned an unsupported object type",
-    { verifyResetToken: { __typename: "UnsupportedObjectType" } },
     "/forgot-password?status=unsupported",
+    UNSUPPORTED_RESPONSE_RESET_TOKEN,
   ],
 ];
 
-export const verifyErrors: [string, undefined | GraphQLError[], string][] = [
-  ["Verification request returns a network error", undefined, "network"],
+export const verifyErrors: [string, string, string][] = [
+  [
+    "Verification request returns a network error",
+    NETWORK_ERROR_RESET_TOKEN,
+    "network",
+  ],
   [
     "Verification request returns a graphql error",
-    [new GraphQLError("GraphQL error")],
+    GRAPHQL_ERROR_RESET_TOKEN,
     "api",
   ],
 ];
 
 export const verified = {
-  email: "reset_password_test@mail.org",
+  email: EMAIL,
   resetToken: VERIFIED_PASSWORD_RESET_TOKEN,
 };
-
-interface UnregisteredData {
-  [key: string]: string;
-  __typename: "RegistrationError";
-}
-
-interface VerifiedData {
-  [key: string]: string;
-  __typename: "VerifiedResetToken";
-  email: string;
-  resetToken: string;
-}
 
 interface UnRegisteredProps {
   isUnregistered: true;
@@ -81,7 +143,7 @@ interface VerifiedProps {
 }
 
 interface Dict {
-  data: { verifyResetToken: UnregisteredData | VerifiedData };
+  token: string;
   props: UnRegisteredProps | VerifiedProps;
 }
 
@@ -89,20 +151,12 @@ export const verifyProps: [string, string, Dict][] = [
   [
     "Verification fails for an unregistered user",
     "Return an 'isUnregistered' props",
-    {
-      data: { verifyResetToken: { __typename: "RegistrationError" } },
-      props: { isUnregistered: true },
-    },
+    { token: UNREGISTERED_RESET_TOKEN, props: { isUnregistered: true } },
   ],
   [
     "Password reset token is verified",
     "Return a 'verified' props",
-    {
-      data: {
-        verifyResetToken: { __typename: "VerifiedResetToken", ...verified },
-      },
-      props: { verified },
-    },
+    { token: VERIFIED_PASSWORD_RESET_TOKEN, props: { verified } },
   ],
 ];
 

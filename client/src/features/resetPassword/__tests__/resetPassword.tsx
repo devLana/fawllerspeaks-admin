@@ -2,12 +2,11 @@ import { useRouter } from "next/router";
 import type { GetServerSidePropsContext as GssPContext } from "next";
 
 import { screen, waitFor } from "@testing-library/react";
+import "cross-fetch/polyfill";
 
 import ResetPassword, { getServerSideProps } from "@pages/reset-password";
-import apolloClient from "@lib/apolloClient";
 import { renderTestUI } from "@utils/renderTestUI";
 import {
-  type MutateResult,
   resetTableOne,
   resetTableThree,
   resetTableTwo,
@@ -19,9 +18,8 @@ import {
   verifyProps,
   verifyValidate,
   msg,
+  server,
 } from "../utils/resetPassword.mocks";
-
-jest.mock("@lib/apolloClient");
 
 describe("Reset Password", () => {
   describe("ResetPassword page - getServerSideProps", () => {
@@ -40,25 +38,32 @@ describe("Reset Password", () => {
     });
 
     describe("Verify password reset token", () => {
-      type Mutate = jest.MockedObject<{ mutate: () => Promise<MutateResult> }>;
+      beforeAll(() => {
+        server.listen();
+      });
 
-      const context = { query: { tId: "userToken" } } as unknown as GssPContext;
-      const mockClient = apolloClient() as unknown as Mutate;
+      afterEach(() => {
+        server.resetHandlers();
+      });
+
+      afterAll(() => {
+        server.close();
+      });
 
       describe("Verification resolves with an error/unsupported object type", () => {
-        it.each(verifyErrorObjects)("%s", async (_, data, destination) => {
-          mockClient.mutate.mockResolvedValue({ data, errors: undefined });
+        it.each(verifyErrorObjects)("%s", async (_, path, token) => {
+          const context = { query: { tId: token } } as unknown as GssPContext;
 
           const result = await getServerSideProps(context);
 
           expect(result).not.toHaveProperty("props");
-          expect(result).toHaveProperty("redirect.destination", destination);
+          expect(result).toHaveProperty("redirect.destination", path);
         });
       });
 
       describe("Verification rejects with an error", () => {
-        it.each(verifyErrors)("%s", async (_, errors, status) => {
-          mockClient.mutate.mockResolvedValue({ data: undefined, errors });
+        it.each(verifyErrors)("%s", async (_, token, status) => {
+          const context = { query: { tId: token } } as unknown as GssPContext;
 
           const result = await getServerSideProps(context);
 
@@ -70,9 +75,9 @@ describe("Reset Password", () => {
         });
       });
 
-      describe.each(verifyProps)("%s", (_, title, { data, props }) => {
+      describe.each(verifyProps)("%s", (_, title, { token, props }) => {
         it(`${title}`, async () => {
-          mockClient.mutate.mockResolvedValue({ data, errors: undefined });
+          const context = { query: { tId: token } } as unknown as GssPContext;
 
           const result = await getServerSideProps(context);
 

@@ -1,15 +1,12 @@
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 
-import apolloClient from "@lib/apolloClient";
+import { ApolloError } from "@apollo/client";
+
+import { client } from "@lib/apolloClient";
 import { VERIFY_PASSWORD_RESET_TOKEN } from "../operations/VERIFY_PASSWORD_RESET_TOKEN";
 
-interface VerifiedData {
-  email: string;
-  resetToken: string;
-}
-
 interface Verified {
-  verified: VerifiedData;
+  verified: { email: string; resetToken: string };
   isUnregistered?: never;
 }
 
@@ -38,44 +35,24 @@ const verifyPasswordResetToken = async (query: Query): Promise<ReturnData> => {
     };
   }
 
-  const client = apolloClient();
-  const { data, errors } = await client.mutate({
-    mutation: VERIFY_PASSWORD_RESET_TOKEN,
-    variables: { token: query.tId },
-  });
+  try {
+    const { data } = await client.mutate({
+      mutation: VERIFY_PASSWORD_RESET_TOKEN,
+      variables: { token: query.tId },
+    });
 
-  if (errors?.[0]) {
-    return {
-      redirect: { destination: "/forgot-password?status=api", permanent },
-    };
-  }
-
-  if (data) {
-    switch (data.verifyResetToken.__typename) {
-      case "VerifiedResetToken":
-        return {
-          props: {
-            verified: {
-              email: data.verifyResetToken.email,
-              resetToken: data.verifyResetToken.resetToken,
-            },
-          },
-        };
-
-      case "RegistrationError":
-        return { props: { isUnregistered: true } };
-
-      case "NotAllowedError":
-        return {
-          redirect: { destination: "/forgot-password?status=fail", permanent },
-        };
-
+    switch (data?.verifyResetToken.__typename) {
       case "VerifyResetTokenValidationError":
         return {
           redirect: {
             destination: "/forgot-password?status=validation",
             permanent,
           },
+        };
+
+      case "NotAllowedError":
+        return {
+          redirect: { destination: "/forgot-password?status=fail", permanent },
         };
 
       default:
@@ -85,12 +62,36 @@ const verifyPasswordResetToken = async (query: Query): Promise<ReturnData> => {
             permanent,
           },
         };
-    }
-  }
 
-  return {
-    redirect: { destination: "/forgot-password?status=network", permanent },
-  };
+      case "RegistrationError":
+        return { props: { isUnregistered: true } };
+
+      case "VerifiedResetToken":
+        return {
+          props: {
+            verified: {
+              email: data.verifyResetToken.email,
+              resetToken: data.verifyResetToken.resetToken,
+            },
+          },
+        };
+    }
+  } catch (err) {
+    if (err instanceof ApolloError) {
+      const status = err.graphQLErrors.length > 0 ? "api" : "network";
+
+      return {
+        redirect: {
+          destination: `/forgot-password?status=${status}`,
+          permanent,
+        },
+      };
+    }
+
+    return {
+      redirect: { destination: "/forgot-password?status=error", permanent },
+    };
+  }
 };
 
 export default verifyPasswordResetToken;

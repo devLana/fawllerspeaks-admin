@@ -28,10 +28,6 @@ type View = "form" | "unregistered error" | "success";
 type GssP = GetServerSideProps<ResetPasswordPageData>;
 type ResetPasswordPage = NextPageWithLayout<InferGetServerSidePropsType<GssP>>;
 
-export const getServerSideProps: GssP = async ({ query }) => {
-  return verifyPasswordResetToken(query);
-};
-
 const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
   const [view, setView] = React.useState<View>("form");
 
@@ -136,6 +132,10 @@ const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
       </Card>
     </>
   );
+};
+
+export const getServerSideProps: GssP = async ({ query }) => {
+  return verifyPasswordResetToken(query);
 };
 
 ResetPassword.layout = uiLayout(AuthRootLayout, {
