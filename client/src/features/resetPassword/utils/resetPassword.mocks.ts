@@ -23,36 +23,20 @@ export const server = setupServer(
     if (token === INVALID_RESET_TOKEN) {
       return res(
         ctx.data({
-          verifyResetToken: {
-            __typename: "VerifyResetTokenValidationError",
-            tokenError: "Invalid token",
-            status: "ERROR",
-          },
+          verifyResetToken: { __typename: "VerifyResetTokenValidationError" },
         })
       );
     }
 
     if (token === UNKNOWN_EXPIRED_RESET_TOKEN) {
       return res(
-        ctx.data({
-          verifyResetToken: {
-            __typename: "NotAllowedError",
-            message: "Unknown token",
-            status: "ERROR",
-          },
-        })
+        ctx.data({ verifyResetToken: { __typename: "NotAllowedError" } })
       );
     }
 
     if (token === UNREGISTERED_RESET_TOKEN) {
       return res(
-        ctx.data({
-          verifyResetToken: {
-            __typename: "RegistrationError",
-            message: "Unregistered account",
-            status: "ERROR",
-          },
-        })
+        ctx.data({ verifyResetToken: { __typename: "RegistrationError" } })
       );
     }
 
@@ -63,7 +47,6 @@ export const server = setupServer(
             __typename: "VerifiedResetToken",
             email: EMAIL,
             resetToken: VERIFIED_PASSWORD_RESET_TOKEN,
-            status: "SUCCESS",
           },
         })
       );
@@ -81,7 +64,7 @@ export const server = setupServer(
       );
     }
 
-    return res.networkError("Network error");
+    return res(ctx.status(404));
   })
 );
 
@@ -170,7 +153,6 @@ interface ValidationErrors<T extends SorN, U extends SorN, V extends SorN> {
 }
 
 interface Data {
-  message: string;
   typename: string;
   status?: "ERROR" | "SUCCESS" | "WARN";
 }
@@ -220,7 +202,6 @@ class ResetValidationMocks<T extends SorN, U extends SorN, V extends SorN> {
               tokenError: this.tokenError,
               passwordError: this.passwordError,
               confirmPasswordError: this.confirmPasswordError,
-              status: "ERROR",
             },
           },
         },
@@ -231,13 +212,11 @@ class ResetValidationMocks<T extends SorN, U extends SorN, V extends SorN> {
 
 class ResetMocks {
   password: string;
-  message: string;
   typename: string;
   status: "ERROR" | "SUCCESS" | "WARN";
 
   constructor(name: string, data: Data) {
     this.password = `${name}_${PASSWORD}`;
-    this.message = data.message;
     this.typename = data.typename;
     this.status = data.status ?? "ERROR";
   }
@@ -248,11 +227,7 @@ class ResetMocks {
         request: request(this.password),
         result: {
           data: {
-            resetPassword: {
-              __typename: this.typename,
-              message: this.message,
-              status: this.status,
-            },
+            resetPassword: { __typename: this.typename, status: this.status },
           },
         },
       },
@@ -273,28 +248,23 @@ const resetValidation2 = new ResetValidationMocks("validationTwo", {
 });
 
 const resetUnsupported = new ResetMocks("unsupported", {
-  message: "Unsupported object type",
   typename: "UnsupportedObjectType",
 });
 
 const resetNotAllowed = new ResetMocks("notAllowed", {
-  message: errorMessage,
   typename: "NotAllowedError",
 });
 
 export const resetUnregistered = new ResetMocks("unregistered", {
-  message: errorMessage,
   typename: "RegistrationError",
 });
 
 const resetSuccess = new ResetMocks("success", {
-  message: "Password Reset SuccessFul",
   typename: "Response",
   status: "SUCCESS",
 });
 
 const resetWarn = new ResetMocks("resetWarn", {
-  message: "Password reset successFul but mail not sent",
   typename: "Response",
   status: "WARN",
 });

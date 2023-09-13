@@ -9,12 +9,15 @@ export const FORGOT_PASSWORD: ForgotPassword = gql`
     forgotPassword(email: $email) {
       ... on EmailValidationError {
         emailError
-        status
       }
-
       ... on BaseResponse {
+        __typename
+      }
+      ... on NotAllowedError {
         message
-        status
+      }
+      ... on ServerError {
+        message
       }
     }
   }

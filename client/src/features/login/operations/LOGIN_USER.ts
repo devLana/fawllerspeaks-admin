@@ -13,21 +13,19 @@ export const LOGIN_USER: Login = gql`
       ... on LoginValidationError {
         emailError
         passwordError
-        status
       }
-
       ... on BaseResponse {
         message
-        status
       }
-
+      ... on NotAllowedError {
+        message
+      }
       ... on LoggedInUser {
         accessToken
         sessionId
         user {
           ...UserFields
         }
-        status
       }
     }
   }

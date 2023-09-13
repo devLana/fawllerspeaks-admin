@@ -15,19 +15,14 @@ export const REGISTER_USER: RegisterUser = gql`
         lastNameError
         passwordError
         confirmPasswordError
-        status
       }
-
       ... on BaseResponse {
-        message
-        status
+        __typename
       }
-
       ... on RegisteredUser {
         user {
           ...UserFields
         }
-        status
       }
     }
   }

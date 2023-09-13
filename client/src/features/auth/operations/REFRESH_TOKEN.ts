@@ -8,18 +8,13 @@ export const REFRESH_TOKEN: RefreshToken = gql`
   mutation RefreshToken($sessionId: String!) {
     refreshToken(sessionId: $sessionId) {
       ... on SessionIdValidationError {
-        sessionIdError
-        status
+        __typename
       }
-
       ... on BaseResponse {
-        message
-        status
+        __typename
       }
-
       ... on AccessToken {
         accessToken
-        status
       }
     }
   }

@@ -39,7 +39,6 @@ export const validation = {
               __typename: "LoginValidationError",
               emailError: this.emailError,
               passwordError: this.passwordError,
-              status: "ERROR",
             },
           },
         },
@@ -66,13 +65,7 @@ class ErrorMock {
       {
         request: request(this.email, this.password),
         result: {
-          data: {
-            login: {
-              __typename: this.typename,
-              message: this.message,
-              status: "ERROR",
-            },
-          },
+          data: { login: { __typename: this.typename, message: this.message } },
         },
       },
     ];
@@ -91,11 +84,19 @@ const emailPasswordError = new ErrorMock(
   "Invalid email or password"
 );
 
-const unsupported = new ErrorMock(
-  { email: "unsupported", password: "unsupported" },
-  "UnknownGraphqlObjectType",
-  msg
-);
+const unsupported = {
+  email: `unsupported_${EMAIL}`,
+  password: `unsupported_${PASSWORD}`,
+  message: msg,
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.email, this.password),
+        result: { data: { login: { __typename: "UnknownGraphqlObjectType" } } },
+      },
+    ];
+  },
+};
 
 class SuccessMock {
   sessionId: string;
@@ -127,7 +128,6 @@ class SuccessMock {
                 image: null,
                 isRegistered: this.isRegistered,
               },
-              status: "SUCCESS",
             },
           },
         },

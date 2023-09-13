@@ -9,12 +9,9 @@ export const LOGOUT: Logout = gql`
     logout(sessionId: $sessionId) {
       ... on SessionIdValidationError {
         sessionIdError
-        status
       }
-
       ... on BaseResponse {
-        message
-        status
+        __typename
       }
     }
   }

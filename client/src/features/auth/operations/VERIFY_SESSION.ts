@@ -11,21 +11,19 @@ export const VERIFY_SESSION: VerifySession = gql`
   query VerifySession($sessionId: String!) {
     verifySession(sessionId: $sessionId) {
       ... on SessionIdValidationError {
-        sessionIdError
-        status
+        __typename
       }
-
       ... on BaseResponse {
-        message
-        status
+        __typename
       }
-
+      ... on UnknownError {
+        message
+      }
       ... on VerifiedSession {
         accessToken
         user {
           ...UserFields
         }
-        status
       }
     }
   }

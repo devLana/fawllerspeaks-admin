@@ -40,19 +40,59 @@ const request = (
   };
 };
 
-class Mock {
+class MockOne {
+  currentPassword: string;
+  password: string;
+
+  constructor(name: string, readonly typename: string) {
+    this.currentPassword = `${name}_${CURRENT_PASSWORD}`;
+    this.password = `${name}_${PASSWORD}`;
+  }
+
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.currentPassword, this.password),
+        result: { data: { changePassword: { __typename: this.typename } } },
+      },
+    ];
+  }
+}
+
+class MockTwo {
   currentPassword: string;
   password: string;
   message: string;
   typename: string;
-  status: "ERROR" | "SUCCESS" | "WARN";
 
   constructor(name: string, data: Data) {
     this.currentPassword = `${name}_${CURRENT_PASSWORD}`;
     this.password = `${name}_${PASSWORD}`;
     this.message = data.message;
     this.typename = data.typename;
-    this.status = data.status ?? "ERROR";
+  }
+
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.currentPassword, this.password),
+        result: { data: { changePassword: { __typename: this.typename } } },
+      },
+    ];
+  }
+}
+
+class MockThree {
+  currentPassword: string;
+  password: string;
+  message: string;
+  typename: string;
+
+  constructor(name: string, data: Data) {
+    this.currentPassword = `${name}_${CURRENT_PASSWORD}`;
+    this.password = `${name}_${PASSWORD}`;
+    this.message = data.message;
+    this.typename = data.typename;
   }
 
   gql(): MockedResponse[] {
@@ -64,7 +104,6 @@ class Mock {
             changePassword: {
               __typename: this.typename,
               message: this.message,
-              status: this.status,
             },
           },
         },
@@ -73,41 +112,28 @@ class Mock {
   }
 }
 
-const auth = new Mock("auth", {
-  message: "User not logged in",
-  typename: "AuthenticationError",
-});
+const auth = new MockOne("auth", "AuthenticationError");
+const unknown = new MockOne("unknown", "UnknownError");
+const register = new MockOne("register", "RegistrationError");
 
-const unknown = new Mock("unknown", {
-  message: "User does not exist",
-  typename: "UnknownError",
-});
-
-const register = new Mock("register", {
-  message: "User is not registered",
-  typename: "RegistrationError",
-});
-
-const notAllowed = new Mock("notAllowed", {
+const notAllowed = new MockTwo("notAllowed", {
   message: notAllowedMsg,
   typename: "NotAllowedError",
 });
 
-const server = new Mock("server", {
+const unsupported = new MockTwo("unsupported", {
+  message: msg,
+  typename: "UnsupportedType",
+});
+
+const server = new MockThree("server", {
   message: "Unable to change password",
   typename: "ServerError",
 });
 
-const unsupported = new Mock("unsupported", {
-  message: msg,
-  typename: "UnsupportedType",
-  status: "SUCCESS",
-});
-
-const response = new Mock("response", {
+const response = new MockThree("response", {
   message: "Password changed",
   typename: "Response",
-  status: "SUCCESS",
 });
 
 export const validation = {
@@ -127,7 +153,6 @@ export const validation = {
               currentPasswordError: this.currentPasswordError,
               newPasswordError: this.newPasswordError,
               confirmNewPasswordError: this.confirmNewPasswordError,
-              status: "ERROR",
             },
           },
         },

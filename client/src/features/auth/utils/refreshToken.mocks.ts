@@ -5,8 +5,8 @@ import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 
 interface Expected {
-  message: string;
   gql: () => MockedResponse[];
+  message: string;
   sessionId: string;
 }
 
@@ -36,7 +36,6 @@ const verify = {
                 image: null,
                 isRegistered: false,
               },
-              status: "SUCCESS",
             },
           },
         },
@@ -60,15 +59,7 @@ class Mocks {
     return [
       {
         request: request(this.sessionId),
-        result: {
-          data: {
-            refreshToken: {
-              __typename: this.typename,
-              message: this.message,
-              status: "ERROR",
-            },
-          },
-        },
+        result: { data: { refreshToken: { __typename: this.typename } } },
       },
       ...verify.gql(this.sessionId),
     ];
@@ -93,13 +84,7 @@ const validate = {
       {
         request: request(this.sessionId),
         result: {
-          data: {
-            refreshToken: {
-              __typename: "SessionIdValidationError",
-              sessionIdError: "Invalid session id",
-              status: "ERROR",
-            },
-          },
+          data: { refreshToken: { __typename: "SessionIdValidationError" } },
         },
       },
       ...verify.gql(this.sessionId),
@@ -114,7 +99,7 @@ const graphql = {
     return [
       {
         request: request(this.sessionId),
-        result: { errors: [new GraphQLError(this.message)] },
+        result: { errors: [new GraphQLError("Mock graphql error response")] },
       },
       ...verify.gql(this.sessionId),
     ];
@@ -126,7 +111,12 @@ const network = {
   sessionId: "NETWORK_ERROR_SESSION_ID",
   gql(): MockedResponse[] {
     return [
-      { request: request(this.sessionId), error: new Error(this.message) },
+      {
+        request: request(this.sessionId),
+        error: new Error(
+          "Server is currently unreachable. Please try again later"
+        ),
+      },
       ...verify.gql(this.sessionId),
     ];
   },
@@ -143,7 +133,6 @@ export const refresh = {
             refreshToken: {
               __typename: "AccessToken",
               accessToken: newAccessToken,
-              status: "SUCCESS",
             },
           },
         },

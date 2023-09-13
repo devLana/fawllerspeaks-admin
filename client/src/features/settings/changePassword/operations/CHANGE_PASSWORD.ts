@@ -19,12 +19,15 @@ export const CHANGE_PASSWORD: ChangePassword = gql`
         currentPasswordError
         newPasswordError
         confirmNewPasswordError
-        status
       }
-
       ... on BaseResponse {
+        __typename
+      }
+      ... on ServerError {
         message
-        status
+      }
+      ... on Response {
+        message
       }
     }
   }

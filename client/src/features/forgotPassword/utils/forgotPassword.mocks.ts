@@ -14,7 +14,7 @@ const request = (email: string): MockedResponse["request"] => {
   return { query: FORGOT_PASSWORD, variables: { email } };
 };
 
-class Mocks {
+class MocksOne {
   email: string;
 
   constructor(
@@ -34,7 +34,6 @@ class Mocks {
             forgotPassword: {
               __typename: this.typename,
               message: this.message,
-              status: "ERROR",
             },
           },
         },
@@ -43,25 +42,38 @@ class Mocks {
   }
 }
 
-const notAllowed = new Mocks(
+class MocksTwo {
+  email: string;
+
+  constructor(mail: string, readonly typename: string, readonly message = "") {
+    this.email = `${mail}_${EMAIL}`;
+  }
+
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.email),
+        result: { data: { forgotPassword: { __typename: this.typename } } },
+      },
+    ];
+  }
+}
+
+const notAllowed = new MocksOne(
   "not_allowed",
   "NotAllowedError",
   "Unknown email address provided"
 );
 
-const server = new Mocks(
+const server = new MocksOne(
   "server",
   "ServerError",
   "Unable to send password reset link at this time"
 );
 
-export const registration = new Mocks(
-  "registration",
-  "RegistrationError",
-  "Cant rest password for unregistered account"
-);
+export const registration = new MocksTwo("registration", "RegistrationError");
 
-export const unsupported = new Mocks(
+export const unsupported = new MocksTwo(
   "unsupported",
   "UnsupportedObjectType",
   "You are unable to reset your password at the moment. Please try again later"
@@ -79,7 +91,6 @@ export const validation = {
             forgotPassword: {
               __typename: "EmailValidationError",
               emailError: this.emailError,
-              status: "ERROR",
             },
           },
         },
@@ -117,15 +128,7 @@ export const success = {
     return [
       {
         request: request(this.email),
-        result: {
-          data: {
-            forgotPassword: {
-              __typename: "Response",
-              message: this.message,
-              status: "SUCCESS",
-            },
-          },
-        },
+        result: { data: { forgotPassword: { __typename: "Response" } } },
       },
     ];
   },

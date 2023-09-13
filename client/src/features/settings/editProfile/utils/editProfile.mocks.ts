@@ -78,25 +78,13 @@ const inputs = (name: string, image: boolean | null = null): Input => {
 };
 
 class Mock {
-  constructor(
-    readonly input: Input,
-    readonly message: string,
-    readonly typename: string
-  ) {}
+  constructor(readonly input: Input, readonly typename: string) {}
 
   gql(): MockedResponse[] {
     return [
       {
         request: request(this.input),
-        result: {
-          data: {
-            editProfile: {
-              __typename: this.typename,
-              message: this.message,
-              status: "ERROR",
-            },
-          },
-        },
+        result: { data: { editProfile: { __typename: this.typename } } },
       },
     ];
   }
@@ -118,7 +106,6 @@ export const validation = {
               firstNameError: this.firstNameError,
               lastNameError: this.lastNameError,
               imageError: this.imageError,
-              status: "ERROR",
             },
           },
         },
@@ -151,7 +138,6 @@ class EditMock {
                   : imageLink,
                 isRegistered: true,
               },
-              status: "SUCCESS",
             },
           },
         },
@@ -164,11 +150,20 @@ export const imageFail = new EditMock(inputs("imageFail", false));
 export const newImage = new EditMock(inputs("newImage", true));
 export const removeImage = new EditMock(inputs("removeImage", null));
 
-const unsupported = new Mock(
-  inputs("unsupported", false),
-  msg,
-  "UnsupportedObjectResponse"
-);
+const unsupported = {
+  input: inputs("unsupported", false),
+  message: msg,
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.input),
+        result: {
+          data: { editProfile: { __typename: "UnsupportedObjectResponse" } },
+        },
+      },
+    ];
+  },
+};
 
 const network = {
   message: msg,
@@ -197,23 +192,9 @@ export const errors: [string, ErrorsMock][] = [
   ["Network error response", network],
 ];
 
-const auth = new Mock(
-  inputs("auth", false),
-  "You are not logged in",
-  "AuthenticationError"
-);
-
-const unknown = new Mock(
-  inputs("unknown", false),
-  "Unable to edit profile",
-  "UnknownError"
-);
-
-const unregistered = new Mock(
-  inputs("registered", false),
-  "User is not registered",
-  "RegistrationError"
-);
+const auth = new Mock(inputs("auth", false), "AuthenticationError");
+const unknown = new Mock(inputs("unknown", false), "UnknownError");
+const unregistered = new Mock(inputs("registered", false), "RegistrationError");
 
 export const redirects: [string, Mock, string][] = [
   [

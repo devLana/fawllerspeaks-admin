@@ -18,19 +18,14 @@ export const EDIT_PROFILE: EditProfile = gql`
         firstNameError
         lastNameError
         imageError
-        status
       }
-
       ... on BaseResponse {
-        message
-        status
+        __typename
       }
-
       ... on EditedProfile {
         user {
           ...UserFields
         }
-        status
       }
     }
   }

@@ -19,11 +19,8 @@ export const RESET_PASSWORD: ResetPassword = gql`
         tokenError
         passwordError
         confirmPasswordError
-        status
       }
-
       ... on BaseResponse {
-        message
         status
       }
     }

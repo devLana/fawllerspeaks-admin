@@ -12,16 +12,12 @@ const refresh = {
   gql(sessionId: string): MockedResponse[] {
     return [
       {
-        request: {
-          query: REFRESH_TOKEN,
-          variables: { sessionId },
-        },
+        request: { query: REFRESH_TOKEN, variables: { sessionId } },
         result: {
           data: {
             refreshToken: {
               __typename: "AccessToken",
               accessToken: "new_accessToken",
-              status: "SUCCESS",
             },
           },
         },
@@ -36,6 +32,7 @@ const request = (sessionId: string): MockedResponse["request"] => {
 
 class MocksOne {
   sessionId: string;
+
   constructor(readonly typename: string, readonly message: string, id: string) {
     this.sessionId = `${id}_SESSION_ID`;
   }
@@ -46,11 +43,7 @@ class MocksOne {
         request: request(this.sessionId),
         result: {
           data: {
-            verifySession: {
-              __typename: this.typename,
-              message: this.message,
-              status: "ERROR",
-            },
+            verifySession: { __typename: this.typename, message: this.message },
           },
         },
       },
@@ -87,7 +80,6 @@ class MocksTwo {
                 image: null,
                 isRegistered: this.isRegistered,
               },
-              status: "SUCCESS",
             },
           },
         },

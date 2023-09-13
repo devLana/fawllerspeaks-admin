@@ -45,7 +45,6 @@ const request = (sessionId: string): MockedResponse["request"] => {
 interface Data {
   typename: string;
   message: string;
-  status?: "ERROR" | "SUCCESS" | "WARN";
 }
 
 interface LogoutTable {
@@ -57,15 +56,13 @@ interface ErrorsTable extends LogoutTable {
   message: string;
 }
 
-class Mock {
+class MockOne {
   typename: string;
   message: string;
-  status: "ERROR" | "SUCCESS" | "WARN";
 
   constructor(readonly sessionId: string, data: Data) {
     this.typename = data.typename;
     this.message = data.message;
-    this.status = data.status ?? "ERROR";
   }
 
   gql(): MockedResponse[] {
@@ -74,11 +71,7 @@ class Mock {
         request: request(this.sessionId),
         result: {
           data: {
-            logout: {
-              __typename: this.typename,
-              message: this.message,
-              status: this.status,
-            },
+            logout: { __typename: this.typename, message: this.message },
           },
         },
       },
@@ -86,29 +79,33 @@ class Mock {
   }
 }
 
-const auth = new Mock(`auth_${SESSION_ID}`, {
-  typename: "AuthenticationError",
-  message: "You are not logged in",
-});
+class MockTwo {
+  constructor(readonly sessionId: string, readonly typename: string) {}
 
-const response = new Mock(`response_${SESSION_ID}`, {
-  typename: "Response",
-  message: "User logged out",
-  status: "SUCCESS",
-});
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.sessionId),
+        result: { data: { logout: { __typename: this.typename } } },
+      },
+    ];
+  }
+}
 
-const unsupported = new Mock(`unsupported_${SESSION_ID}`, {
-  typename: "Unsupported",
+const auth = new MockTwo(`auth_${SESSION_ID}`, "AuthenticationError");
+const response = new MockTwo(`response_${SESSION_ID}`, "Response");
+
+const unsupported = new MockOne(`unsupported_${SESSION_ID}`, {
+  typename: "UnsupportedObjectType",
   message: msg,
-  status: "WARN",
 });
 
-const unknown = new Mock(`unknown_${SESSION_ID}`, {
+const unknown = new MockOne(`unknown_${SESSION_ID}`, {
   typename: "UnknownError",
   message: "The current session could not be verified",
 });
 
-const notAllowed = new Mock(`notAllowed_${SESSION_ID}`, {
+const notAllowed = new MockOne(`notAllowed_${SESSION_ID}`, {
   typename: "NotAllowedError",
   message: "You cannot perform that action right now",
 });
@@ -125,7 +122,6 @@ const validate = {
             logout: {
               __typename: "SessionIdValidationError",
               sessionIdError: this.message,
-              status: "ERROR",
             },
           },
         },

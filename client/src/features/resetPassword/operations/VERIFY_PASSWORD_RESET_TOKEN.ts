@@ -8,19 +8,14 @@ export const VERIFY_PASSWORD_RESET_TOKEN: VerifyResetToken = gql`
   mutation VerifyResetToken($token: String!) {
     verifyResetToken(token: $token) {
       ... on VerifyResetTokenValidationError {
-        tokenError
-        status
+        __typename
       }
-
       ... on BaseResponse {
-        message
-        status
+        __typename
       }
-
       ... on VerifiedResetToken {
         email
         resetToken
-        status
       }
     }
   }

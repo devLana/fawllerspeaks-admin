@@ -79,7 +79,6 @@ describe("Forgot Password Page", () => {
 
     it.each(testTable)("Show an alert message if %s", async (_, expected) => {
       const { user } = renderTestUI(<ForgotPassword />, expected.gql());
-      const { message } = expected;
 
       await user.type(screen.getByRole("textbox", textBox), expected.email);
       await user.click(screen.getByRole("button", { name }));
@@ -88,7 +87,7 @@ describe("Forgot Password Page", () => {
 
       const alert = await screen.findByRole("alert");
 
-      expect(alert).toHaveTextContent(message);
+      expect(alert).toHaveTextContent(expected.message);
       expect(alert).toHaveClass("MuiAlert-standardError");
       expect(screen.getByRole("button", { name })).toBeEnabled();
     });
@@ -124,7 +123,6 @@ describe("Forgot Password Page", () => {
   describe("If server responds with an unsupported object type", () => {
     it("Show an error alert message", async () => {
       const { user } = renderTestUI(<ForgotPassword />, unsupported.gql());
-      const { message } = unsupported;
 
       await user.type(screen.getByRole("textbox", textBox), unsupported.email);
       await user.click(screen.getByRole("button", { name }));
@@ -133,7 +131,7 @@ describe("Forgot Password Page", () => {
 
       const alert = await screen.findByRole("alert");
 
-      expect(alert).toHaveTextContent(message);
+      expect(alert).toHaveTextContent(unsupported.message);
       expect(alert).toHaveClass("MuiAlert-standardError");
       expect(screen.getByRole("button", { name })).toBeEnabled();
     });

@@ -50,25 +50,13 @@ const inputs = (name: string): Input => ({
 });
 
 class ErrorMock {
-  constructor(
-    readonly input: Input,
-    readonly message: string,
-    readonly typename: string
-  ) {}
+  constructor(readonly input: Input, readonly typename: string) {}
 
   gql(): MockedResponse[] {
     return [
       {
         request: request(this.input),
-        result: {
-          data: {
-            registerUser: {
-              __typename: this.typename,
-              message: this.message,
-              status: "ERROR",
-            },
-          },
-        },
+        result: { data: { registerUser: { __typename: this.typename } } },
       },
     ];
   }
@@ -94,7 +82,6 @@ class ValidationMock<
               lastNameError: this.errors.lastNameError,
               passwordError: this.errors.passwordError,
               confirmPasswordError: this.errors.confirmPasswordError,
-              status: "ERROR",
             },
           },
         },
@@ -103,29 +90,23 @@ class ValidationMock<
   }
 }
 
-const auth = new ErrorMock(
-  inputs("auth"),
-  "User is not logged in",
-  "AuthenticationError"
-);
-
-const unknown = new ErrorMock(
-  inputs("unknown"),
-  "User session unknown",
-  "UnknownError"
-);
-
-const registered = new ErrorMock(
-  inputs("registered"),
-  "User is registered",
-  "RegistrationError"
-);
-
-const unsupported = new ErrorMock(
-  inputs("unsupported"),
-  MESSAGE,
-  "UnsupportedObjectType"
-);
+const auth = new ErrorMock(inputs("auth"), "AuthenticationError");
+const unknown = new ErrorMock(inputs("unknown"), "UnknownError");
+const registered = new ErrorMock(inputs("registered"), "RegistrationError");
+const unsupported = {
+  input: inputs("unsupported"),
+  message: MESSAGE,
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.input),
+        result: {
+          data: { registerUser: { __typename: "UnsupportedObjectType" } },
+        },
+      },
+    ];
+  },
+};
 
 export const validation1 = new ValidationMock(inputs("validationOne"), {
   firstNameError: "Enter first name",
@@ -160,7 +141,6 @@ export const success = {
                 image: null,
                 isRegistered: true,
               },
-              status: "SUCCESS",
             },
           },
         },
