@@ -159,6 +159,12 @@ export type EmptyBinWarning = BaseResponse & {
   status: Status;
 };
 
+export type ForbiddenError = BaseResponse & {
+  __typename?: 'ForbiddenError';
+  message: Scalars['String'];
+  status: Status;
+};
+
 export type ForgotGeneratePassword = EmailValidationError | NotAllowedError | RegistrationError | Response | ServerError;
 
 export type GetPost = NotAllowedError | PostIdValidationError | SinglePost | UnknownError;
@@ -234,6 +240,8 @@ export type Mutation = {
   unpublishPost: Publish_Unpublish;
   /** Verify password reset token */
   verifyResetToken: VerifyResetToken;
+  /** Verify user session */
+  verifySession: VerifySession;
 };
 
 
@@ -354,6 +362,11 @@ export type MutationVerifyResetTokenArgs = {
   token: Scalars['String'];
 };
 
+
+export type MutationVerifySessionArgs = {
+  sessionId: Scalars['String'];
+};
+
 export type NotAllowedError = BaseResponse & {
   __typename?: 'NotAllowedError';
   message: Scalars['String'];
@@ -460,8 +473,6 @@ export type Query = {
   getPostTags: GetPostTags;
   /** Get all posts */
   getPosts: GetPosts;
-  /** Verify user session */
-  verifySession: VerifySession;
 };
 
 
@@ -469,12 +480,7 @@ export type QueryGetPostArgs = {
   postId: Scalars['ID'];
 };
 
-
-export type QueryVerifySessionArgs = {
-  sessionId: Scalars['String'];
-};
-
-export type RefreshToken = AccessToken | AuthenticationError | NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError;
+export type RefreshToken = AccessToken | ForbiddenError | NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError;
 
 export type RegisterUser = AuthenticationError | RegisterUserValidationError | RegisteredUser | RegistrationError | UnknownError;
 
@@ -602,7 +608,7 @@ export type VerifyResetTokenValidationError = {
   tokenError: Scalars['String'];
 };
 
-export type VerifySession = NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError | VerifiedSession;
+export type VerifySession = ForbiddenError | NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError | VerifiedSession;
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
@@ -676,7 +682,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   AccessToken: ResolverTypeWrapper<AccessToken>;
   AuthenticationError: ResolverTypeWrapper<AuthenticationError>;
-  BaseResponse: ResolversTypes['AuthenticationError'] | ResolversTypes['DuplicatePostTagError'] | ResolversTypes['DuplicatePostTitleError'] | ResolversTypes['EmptyBinWarning'] | ResolversTypes['NotAllowedError'] | ResolversTypes['NotAllowedPostActionError'] | ResolversTypes['PostTagsWarning'] | ResolversTypes['PostsWarning'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'];
+  BaseResponse: ResolversTypes['AuthenticationError'] | ResolversTypes['DuplicatePostTagError'] | ResolversTypes['DuplicatePostTitleError'] | ResolversTypes['EmptyBinWarning'] | ResolversTypes['ForbiddenError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['NotAllowedPostActionError'] | ResolversTypes['PostTagsWarning'] | ResolversTypes['PostsWarning'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'];
   Bin_UnBin_Delete: ResolversTypes['NotAllowedError'] | ResolversTypes['PostIdsValidationError'] | ResolversTypes['Posts'] | ResolversTypes['PostsWarning'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'];
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   ChangePassword: ResolversTypes['AuthenticationError'] | ResolversTypes['ChangePasswordValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnknownError'];
@@ -703,6 +709,7 @@ export type ResolversTypes = ResolversObject<{
   EmailValidationError: ResolverTypeWrapper<EmailValidationError>;
   EmptyBin: ResolversTypes['EmptyBinWarning'] | ResolversTypes['NotAllowedError'] | ResolversTypes['Posts'];
   EmptyBinWarning: ResolverTypeWrapper<EmptyBinWarning>;
+  ForbiddenError: ResolverTypeWrapper<ForbiddenError>;
   ForgotGeneratePassword: ResolversTypes['EmailValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'];
   GetPost: ResolversTypes['NotAllowedError'] | ResolversTypes['PostIdValidationError'] | ResolversTypes['SinglePost'] | ResolversTypes['UnknownError'];
   GetPostTags: ResolversTypes['NotAllowedError'] | ResolversTypes['PostTags'];
@@ -728,7 +735,7 @@ export type ResolversTypes = ResolversObject<{
   PostsWarning: ResolverTypeWrapper<PostsWarning>;
   Publish_Unpublish: ResolversTypes['NotAllowedError'] | ResolversTypes['NotAllowedPostActionError'] | ResolversTypes['PostIdValidationError'] | ResolversTypes['SinglePost'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'];
   Query: ResolverTypeWrapper<{}>;
-  RefreshToken: ResolversTypes['AccessToken'] | ResolversTypes['AuthenticationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['SessionIdValidationError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'];
+  RefreshToken: ResolversTypes['AccessToken'] | ResolversTypes['ForbiddenError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['SessionIdValidationError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'];
   RegisterUser: ResolversTypes['AuthenticationError'] | ResolversTypes['RegisterUserValidationError'] | ResolversTypes['RegisteredUser'] | ResolversTypes['RegistrationError'] | ResolversTypes['UnknownError'];
   RegisterUserInput: RegisterUserInput;
   RegisterUserValidationError: ResolverTypeWrapper<RegisterUserValidationError>;
@@ -751,14 +758,14 @@ export type ResolversTypes = ResolversObject<{
   VerifiedSession: ResolverTypeWrapper<VerifiedSession>;
   VerifyResetToken: ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['VerifiedResetToken'] | ResolversTypes['VerifyResetTokenValidationError'];
   VerifyResetTokenValidationError: ResolverTypeWrapper<VerifyResetTokenValidationError>;
-  VerifySession: ResolversTypes['NotAllowedError'] | ResolversTypes['SessionIdValidationError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'] | ResolversTypes['VerifiedSession'];
+  VerifySession: ResolversTypes['ForbiddenError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['SessionIdValidationError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'] | ResolversTypes['VerifiedSession'];
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   AccessToken: AccessToken;
   AuthenticationError: AuthenticationError;
-  BaseResponse: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['DuplicatePostTitleError'] | ResolversParentTypes['EmptyBinWarning'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['NotAllowedPostActionError'] | ResolversParentTypes['PostTagsWarning'] | ResolversParentTypes['PostsWarning'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'];
+  BaseResponse: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['DuplicatePostTitleError'] | ResolversParentTypes['EmptyBinWarning'] | ResolversParentTypes['ForbiddenError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['NotAllowedPostActionError'] | ResolversParentTypes['PostTagsWarning'] | ResolversParentTypes['PostsWarning'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'];
   Bin_UnBin_Delete: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostIdsValidationError'] | ResolversParentTypes['Posts'] | ResolversParentTypes['PostsWarning'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'];
   Boolean: Scalars['Boolean'];
   ChangePassword: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['ChangePasswordValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnknownError'];
@@ -785,6 +792,7 @@ export type ResolversParentTypes = ResolversObject<{
   EmailValidationError: EmailValidationError;
   EmptyBin: ResolversParentTypes['EmptyBinWarning'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['Posts'];
   EmptyBinWarning: EmptyBinWarning;
+  ForbiddenError: ForbiddenError;
   ForgotGeneratePassword: ResolversParentTypes['EmailValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'];
   GetPost: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostIdValidationError'] | ResolversParentTypes['SinglePost'] | ResolversParentTypes['UnknownError'];
   GetPostTags: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostTags'];
@@ -809,7 +817,7 @@ export type ResolversParentTypes = ResolversObject<{
   PostsWarning: PostsWarning;
   Publish_Unpublish: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['NotAllowedPostActionError'] | ResolversParentTypes['PostIdValidationError'] | ResolversParentTypes['SinglePost'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'];
   Query: {};
-  RefreshToken: ResolversParentTypes['AccessToken'] | ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['SessionIdValidationError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'];
+  RefreshToken: ResolversParentTypes['AccessToken'] | ResolversParentTypes['ForbiddenError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['SessionIdValidationError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'];
   RegisterUser: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['RegisterUserValidationError'] | ResolversParentTypes['RegisteredUser'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['UnknownError'];
   RegisterUserInput: RegisterUserInput;
   RegisterUserValidationError: RegisterUserValidationError;
@@ -831,7 +839,7 @@ export type ResolversParentTypes = ResolversObject<{
   VerifiedSession: VerifiedSession;
   VerifyResetToken: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['VerifiedResetToken'] | ResolversParentTypes['VerifyResetTokenValidationError'];
   VerifyResetTokenValidationError: VerifyResetTokenValidationError;
-  VerifySession: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['SessionIdValidationError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'] | ResolversParentTypes['VerifiedSession'];
+  VerifySession: ResolversParentTypes['ForbiddenError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['SessionIdValidationError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'] | ResolversParentTypes['VerifiedSession'];
 }>;
 
 export type AccessTokenResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['AccessToken'] = ResolversParentTypes['AccessToken']> = ResolversObject<{
@@ -847,7 +855,7 @@ export type AuthenticationErrorResolvers<ContextType = APIContext, ParentType ex
 }>;
 
 export type BaseResponseResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['BaseResponse'] = ResolversParentTypes['BaseResponse']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthenticationError' | 'DuplicatePostTagError' | 'DuplicatePostTitleError' | 'EmptyBinWarning' | 'NotAllowedError' | 'NotAllowedPostActionError' | 'PostTagsWarning' | 'PostsWarning' | 'RegistrationError' | 'Response' | 'ServerError' | 'UnauthorizedAuthorError' | 'UnknownError' | 'UserSessionError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'DuplicatePostTagError' | 'DuplicatePostTitleError' | 'EmptyBinWarning' | 'ForbiddenError' | 'NotAllowedError' | 'NotAllowedPostActionError' | 'PostTagsWarning' | 'PostsWarning' | 'RegistrationError' | 'Response' | 'ServerError' | 'UnauthorizedAuthorError' | 'UnknownError' | 'UserSessionError', ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
 }>;
@@ -973,6 +981,12 @@ export type EmptyBinWarningResolvers<ContextType = APIContext, ParentType extend
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type ForbiddenErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['ForbiddenError'] = ResolversParentTypes['ForbiddenError']> = ResolversObject<{
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type ForgotGeneratePasswordResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['ForgotGeneratePassword'] = ResolversParentTypes['ForgotGeneratePassword']> = ResolversObject<{
   __resolveType: TypeResolveFn<'EmailValidationError' | 'NotAllowedError' | 'RegistrationError' | 'Response' | 'ServerError', ParentType, ContextType>;
 }>;
@@ -1036,6 +1050,7 @@ export type MutationResolvers<ContextType = APIContext, ParentType extends Resol
   unBinPosts?: Resolver<ResolversTypes['Bin_UnBin_Delete'], ParentType, ContextType, RequireFields<MutationUnBinPostsArgs, 'postIds'>>;
   unpublishPost?: Resolver<ResolversTypes['Publish_Unpublish'], ParentType, ContextType, RequireFields<MutationUnpublishPostArgs, 'postId'>>;
   verifyResetToken?: Resolver<ResolversTypes['VerifyResetToken'], ParentType, ContextType, RequireFields<MutationVerifyResetTokenArgs, 'token'>>;
+  verifySession?: Resolver<ResolversTypes['VerifySession'], ParentType, ContextType, RequireFields<MutationVerifySessionArgs, 'sessionId'>>;
 }>;
 
 export type NotAllowedErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['NotAllowedError'] = ResolversParentTypes['NotAllowedError']> = ResolversObject<{
@@ -1136,11 +1151,10 @@ export type QueryResolvers<ContextType = APIContext, ParentType extends Resolver
   getPost?: Resolver<ResolversTypes['GetPost'], ParentType, ContextType, RequireFields<QueryGetPostArgs, 'postId'>>;
   getPostTags?: Resolver<ResolversTypes['GetPostTags'], ParentType, ContextType>;
   getPosts?: Resolver<ResolversTypes['GetPosts'], ParentType, ContextType>;
-  verifySession?: Resolver<ResolversTypes['VerifySession'], ParentType, ContextType, RequireFields<QueryVerifySessionArgs, 'sessionId'>>;
 }>;
 
 export type RefreshTokenResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['RefreshToken'] = ResolversParentTypes['RefreshToken']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AccessToken' | 'AuthenticationError' | 'NotAllowedError' | 'SessionIdValidationError' | 'UnknownError' | 'UserSessionError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AccessToken' | 'ForbiddenError' | 'NotAllowedError' | 'SessionIdValidationError' | 'UnknownError' | 'UserSessionError', ParentType, ContextType>;
 }>;
 
 export type RegisterUserResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['RegisterUser'] = ResolversParentTypes['RegisterUser']> = ResolversObject<{
@@ -1264,7 +1278,7 @@ export type VerifyResetTokenValidationErrorResolvers<ContextType = APIContext, P
 }>;
 
 export type VerifySessionResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['VerifySession'] = ResolversParentTypes['VerifySession']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'NotAllowedError' | 'SessionIdValidationError' | 'UnknownError' | 'UserSessionError' | 'VerifiedSession', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'ForbiddenError' | 'NotAllowedError' | 'SessionIdValidationError' | 'UnknownError' | 'UserSessionError' | 'VerifiedSession', ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = APIContext> = ResolversObject<{
@@ -1293,6 +1307,7 @@ export type Resolvers<ContextType = APIContext> = ResolversObject<{
   EmailValidationError?: EmailValidationErrorResolvers<ContextType>;
   EmptyBin?: EmptyBinResolvers<ContextType>;
   EmptyBinWarning?: EmptyBinWarningResolvers<ContextType>;
+  ForbiddenError?: ForbiddenErrorResolvers<ContextType>;
   ForgotGeneratePassword?: ForgotGeneratePasswordResolvers<ContextType>;
   GetPost?: GetPostResolvers<ContextType>;
   GetPostTags?: GetPostTagsResolvers<ContextType>;

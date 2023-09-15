@@ -1,4 +1,3 @@
-import verifySession from "./verifySession";
 import createUser from "./createUser";
 import login from "./login";
 import logout from "./logout";
@@ -8,6 +7,7 @@ import forgotPassword from "./forgotPassword";
 import resetPassword from "./resetPassword";
 import generatePassword from "./generatePassword";
 import verifyResetToken from "./verifyResetToken";
+import verifySession from "./verifySession";
 
 import { VerifiedSessionResolvers } from "./verifySession/types";
 import { AccessTokenResolvers } from "./refreshToken/types";
@@ -33,11 +33,7 @@ import {
   SessionIdValidationErrorResolvers,
 } from "./types";
 
-import type {
-  MutationResolvers,
-  QueryResolvers,
-  Resolvers,
-} from "@resolverTypes";
+import type { MutationResolvers, Resolvers } from "@resolverTypes";
 import type { ResolversMapper, ObjectMapper } from "@types";
 
 type TypeKeys =
@@ -62,23 +58,18 @@ type MutationsKeys =
   | "registerUser"
   | "resetPassword"
   | "generatePassword"
-  | "verifyResetToken";
+  | "verifyResetToken"
+  | "verifySession";
 
-type AuthQuery = Pick<QueryResolvers, "verifySession">;
 type AuthMutations = Pick<MutationResolvers, MutationsKeys>;
 type AuthTypes = Pick<Resolvers, TypeKeys>;
 
 interface AuthResolvers {
-  Query: ResolversMapper<AuthQuery>;
   Mutations: ResolversMapper<AuthMutations>;
   Types: ObjectMapper<AuthTypes>;
 }
 
 export const authResolvers: AuthResolvers = {
-  Query: {
-    verifySession,
-  },
-
   Mutations: {
     createUser,
     login,
@@ -89,6 +80,7 @@ export const authResolvers: AuthResolvers = {
     resetPassword,
     generatePassword,
     verifyResetToken,
+    verifySession,
   },
 
   Types: {

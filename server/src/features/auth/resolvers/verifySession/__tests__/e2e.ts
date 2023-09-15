@@ -104,7 +104,7 @@ describe("Refresh TOken - E2E", () => {
 
   describe("Validate cookie request header", () => {
     it.each(verifyE2eCookie)(
-      "Request header has one or more %s, Return a NotAllowedError response",
+      "Request header has one or more %s, Return a ForbiddenError response",
       async (_, str) => {
         const variables = { sessionId: "session_id" };
         const payload = { query: VERIFY_SESSION, variables };
@@ -114,7 +114,7 @@ describe("Refresh TOken - E2E", () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.verifySession).toStrictEqual({
-          __typename: "NotAllowedError",
+          __typename: "ForbiddenError",
           message: "Unable to verify session",
           status: Status.Error,
         });
@@ -126,7 +126,7 @@ describe("Refresh TOken - E2E", () => {
 
   describe("Verify cookie refresh token", () => {
     describe("Invalid refresh token", () => {
-      it("Token verification throws a JsonWebTokenError, Return a NotAllowedError response", async () => {
+      it("Token verification throws a JsonWebTokenError, Return a ForbiddenError response", async () => {
         const variables = { sessionId: "session_id" };
         const payload = { query: VERIFY_SESSION, variables };
         const options = { cookie: cookieString };
@@ -136,7 +136,7 @@ describe("Refresh TOken - E2E", () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.verifySession).toStrictEqual({
-          __typename: "NotAllowedError",
+          __typename: "ForbiddenError",
           message: "Unable to verify session",
           status: Status.Error,
         });

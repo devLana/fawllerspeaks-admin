@@ -11,6 +11,7 @@ import {
   RegistrationError,
   AuthenticationError,
   UserSessionError,
+  ForbiddenError,
 } from "@utils";
 
 import type { ObjectMapper } from "@types";
@@ -25,6 +26,7 @@ type ResolverKeys =
   | "RegistrationError"
   | "AuthenticationError"
   | "UserSessionError"
+  | "ForbiddenError"
   | "Response";
 
 type ResolversDict = Pick<Resolvers, ResolverKeys>;
@@ -32,7 +34,6 @@ type RootResolvers = ObjectMapper<ResolversDict>;
 
 export const resolvers: RootResolvers = {
   Query: {
-    ...authResolvers.Query,
     ...postTagsResolvers.Query,
     ...postsResolvers.Queries,
   },
@@ -71,6 +72,10 @@ export const resolvers: RootResolvers = {
 
   UserSessionError: {
     __isTypeOf: parent => parent instanceof UserSessionError,
+  },
+
+  ForbiddenError: {
+    __isTypeOf: parent => parent instanceof ForbiddenError,
   },
 
   Response: {

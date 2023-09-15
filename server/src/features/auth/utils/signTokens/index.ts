@@ -1,5 +1,4 @@
 import { jwtExpires } from "../jwtExpires";
-import signAccessToken from "../signAccessToken";
 import { sign } from "@lib/tokenPromise";
 import type { Cookies } from "@types";
 
@@ -14,7 +13,9 @@ const signTokens = async (userId: string): Promise<ResultTuple> => {
     expiresIn: jwtExpires.refreshToken,
   });
 
-  const access = signAccessToken(userId);
+  const access = sign({ sub: userId }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: jwtExpires.accessToken,
+  });
 
   const [refreshToken, accessToken] = await Promise.all([refresh, access]);
 

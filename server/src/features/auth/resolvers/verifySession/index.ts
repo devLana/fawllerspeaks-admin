@@ -7,11 +7,13 @@ import { SessionIdValidationError } from "../types";
 import {
   clearCookies,
   sessionMail,
-  signAccessToken,
+  setCookies,
+  signTokens,
 } from "@features/auth/utils";
 
 import { verify } from "@lib/tokenPromise";
 import {
+  ForbiddenError,
   MailError,
   NotAllowedError,
   UnknownError,
@@ -19,15 +21,15 @@ import {
   dateToISOString,
 } from "@utils";
 
-import { type QueryResolvers } from "@resolverTypes";
+import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, Cookies } from "@types";
 
-type VerifySession = ResolverFunc<QueryResolvers["verifySession"]>;
+type VerifySession = ResolverFunc<MutationResolvers["verifySession"]>;
 
 interface DBResponse {
+  userId: string;
   refreshToken: string;
   email: string;
-  userId: string;
   firstName: string | null;
   lastName: string | null;
   image: string | null;
@@ -44,6 +46,20 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     "string.empty": "Invalid session id",
   });
 
+  const SELECT = `
+    SELECT
+      "user" "userId",
+      refresh_token "refreshToken",
+      email,
+      first_name "firstName",
+      last_name "lastName",
+      image,
+      is_Registered "isRegistered",
+      date_created "dateCreated"
+    FROM sessions LEFT JOIN users ON "user" = user_id
+    WHERE session_id = $1
+  `;
+
   let jwt: string | null = null;
   let validatedSession: string | null = null;
 
@@ -53,8 +69,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     const { auth, sig, token } = req.cookies as Cookies;
 
     if (!auth || !sig || !token) {
-      clearCookies(res);
-      return new NotAllowedError("Unable to verify session");
+      return new ForbiddenError("Unable to verify session");
     }
 
     jwt = `${sig}.${auth}.${token}`;
@@ -63,25 +78,12 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       sub: string;
     };
 
-    const { rows } = await db.query<DBResponse>(
-      `SELECT
-        "user" "userId",
-        refresh_token "refreshToken",
-        email,
-        first_name "firstName",
-        last_name "lastName",
-        image,
-        is_Registered "isRegistered",
-        date_created "dateCreated"
-      FROM sessions LEFT JOIN users ON "user" = user_id
-      WHERE session_id = $1`,
-      [validatedSession]
-    );
+    const { rows } = await db.query<DBResponse>(SELECT, [validatedSession]);
 
     // Unable to find any valid session with the provided session id
     if (rows.length === 0) return new UnknownError("Unable to verify session");
 
-    // Provided session was not assigned to the current logged in user
+    // Provided session was not assigned to the current user
     if (rows[0].userId !== sub) {
       return new UserSessionError("Unable to verify session");
     }
@@ -102,7 +104,14 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       return new NotAllowedError("Unable to verify session");
     }
 
-    const accessToken = await signAccessToken(sub);
+    const [refreshToken, accessToken, cookies] = await signTokens(sub);
+
+    setCookies(res, cookies);
+
+    await db.query(
+      `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND "user" = $3`,
+      [refreshToken, validatedSession, sub]
+    );
 
     const user = {
       email: rows[0].email,
@@ -118,20 +127,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
   } catch (err) {
     if (err instanceof TokenExpiredError) {
       try {
-        const { rows } = await db.query<DBResponse>(
-          `SELECT
-            "user" "userId",
-            refresh_token "refreshToken",
-            email,
-            first_name "firstName",
-            last_name "lastName",
-            image,
-            is_Registered "isRegistered",
-            date_created "dateCreated"
-          FROM sessions LEFT JOIN users ON "user" = user_id
-          WHERE session_id = $1`,
-          [validatedSession]
-        );
+        const { rows } = await db.query<DBResponse>(SELECT, [validatedSession]);
 
         // Unable to find any valid session with the provided session id
         if (rows.length === 0) {
@@ -154,7 +150,16 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
           return new NotAllowedError("Unable to verify session");
         }
 
-        const accessToken = await signAccessToken(rows[0].userId);
+        const [refreshToken, accessToken, cookies] = await signTokens(
+          rows[0].userId
+        );
+
+        setCookies(res, cookies);
+
+        await db.query(
+          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND "user" = $3`,
+          [refreshToken, validatedSession, rows[0].userId]
+        );
 
         const user = {
           email: rows[0].email,
@@ -179,8 +184,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     }
 
     if (err instanceof JsonWebTokenError) {
-      clearCookies(res);
-      return new NotAllowedError("Unable to verify session");
+      return new ForbiddenError("Unable to verify session");
     }
 
     if (err instanceof ValidationError) {

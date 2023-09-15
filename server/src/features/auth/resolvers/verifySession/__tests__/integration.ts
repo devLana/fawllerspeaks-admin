@@ -14,7 +14,12 @@ import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 import resolver from "..";
 import { verify } from "@lib/tokenPromise";
 
-import { clearCookies, sessionMail, JWT_REGEX } from "@features/auth/utils";
+import {
+  clearCookies,
+  setCookies,
+  sessionMail,
+  JWT_REGEX,
+} from "@features/auth/utils";
 import {
   cookies,
   data,
@@ -48,6 +53,7 @@ jest.mock("@features/auth/utils", () => {
     ...actualModule,
     clearCookies: jest.fn().mockName("clearCookies"),
     sessionMail: jest.fn().mockName("sessionMail"),
+    setCookies: jest.fn().mockName("setCookies"),
   };
 });
 
@@ -82,8 +88,7 @@ describe("Test verify session resolver", () => {
 
         const result = await resolver({}, { sessionId }, mockContext, info);
 
-        expect(clearCookies).toHaveBeenCalledTimes(1);
-        expect(clearCookies).toHaveBeenCalledWith(response);
+        expect(clearCookies).not.toHaveBeenCalled();
 
         expect(result).toHaveProperty("message", "Unable to verify session");
         expect(result).toHaveProperty("status", "ERROR");
@@ -103,8 +108,7 @@ describe("Test verify session resolver", () => {
 
         const result = await resolver({}, { sessionId }, mockContext, info);
 
-        expect(clearCookies).toHaveBeenCalledTimes(1);
-        expect(clearCookies).toHaveBeenCalledWith(response);
+        expect(clearCookies).not.toHaveBeenCalled();
 
         expect(verify).toHaveBeenCalledTimes(1);
         expect(verify).toThrow(JsonWebTokenError);
@@ -198,7 +202,7 @@ describe("Test verify session resolver", () => {
 
       test("Verify user session, Sign new access token and send user details ", async () => {
         const mockData = [{ ...dbResponse, ...obj }];
-        const spy = spyDb({ rows: mockData });
+        const spy = spyDb({ rows: mockData }).mockReturnValue({ rows: [] });
 
         verifyMock.mockImplementation(() => {
           throw new TokenExpiredError("Expired refresh token", new Date());
@@ -209,11 +213,14 @@ describe("Test verify session resolver", () => {
         expect(verify).toHaveBeenCalledTimes(1);
         expect(verify).toThrow(TokenExpiredError);
 
+        expect(setCookies).toHaveBeenCalledTimes(1);
+
         expect(clearCookies).not.toHaveBeenCalled();
         expect(sessionMail).not.toHaveBeenCalled();
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(2);
         expect(spy).toHaveNthReturnedWith(1, { rows: mockData });
+        expect(spy).toHaveNthReturnedWith(2, { rows: [] });
 
         expect(result).toHaveProperty("user");
         expect(result).toHaveProperty("user.email", data.email);
@@ -312,18 +319,21 @@ describe("Test verify session resolver", () => {
       test("Verify user session, Sign a new access token and send user details", async () => {
         verifyMock.mockReturnValueOnce({ sub: loggedInUserId });
 
-        const spy = spyDb({ rows: [mockObj] });
+        const spy = spyDb({ rows: [mockObj] }).mockReturnValue({ rows: [] });
 
         const result = await resolver({}, { sessionId }, mockContext, info);
 
         expect(verify).toHaveBeenCalledTimes(1);
         expect(verify).toHaveReturnedWith({ sub: loggedInUserId });
 
+        expect(setCookies).toHaveBeenCalledTimes(1);
+
         expect(clearCookies).not.toHaveBeenCalled();
         expect(sessionMail).not.toHaveBeenCalled();
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(2);
         expect(spy).toHaveNthReturnedWith(1, { rows: [mockObj] });
+        expect(spy).toHaveNthReturnedWith(2, { rows: [] });
 
         expect(result).toHaveProperty("user");
         expect(result).toHaveProperty("user.email", data.email);

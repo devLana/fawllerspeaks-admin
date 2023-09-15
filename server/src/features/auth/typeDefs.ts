@@ -72,7 +72,7 @@ export const authTypeDefs = `#graphql
 
   union Logout = Response | SessionIdValidationError | AuthenticationError | NotAllowedError | UnknownError
 
-  union RefreshToken = AccessToken | SessionIdValidationError | AuthenticationError | UserSessionError | NotAllowedError | UnknownError
+  union RefreshToken = AccessToken | SessionIdValidationError | ForbiddenError | UserSessionError | NotAllowedError | UnknownError
 
   union RegisterUser = RegisteredUser | RegisterUserValidationError | AuthenticationError | UnknownError | RegistrationError
 
@@ -80,7 +80,7 @@ export const authTypeDefs = `#graphql
 
   union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | NotAllowedError | RegistrationError
 
-  union VerifySession = VerifiedSession | SessionIdValidationError | UserSessionError | NotAllowedError | UnknownError
+  union VerifySession = VerifiedSession | SessionIdValidationError | UserSessionError | NotAllowedError | UnknownError | ForbiddenError
 
   input RegisterUserInput {
     firstName: String!

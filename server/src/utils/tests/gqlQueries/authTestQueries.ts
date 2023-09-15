@@ -212,7 +212,7 @@ export const VERIFY_PASSWORD_RESET_TOKEN = `#graphql
 `;
 
 export const VERIFY_SESSION = `#graphql
-  query VerifySession($sessionId: String!) {
+  mutation VerifySession($sessionId: String!) {
     verifySession(sessionId: $sessionId) {
       ... on SessionIdValidationError {
         __typename

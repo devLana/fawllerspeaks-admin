@@ -22,7 +22,6 @@ import {
 } from "@features/auth/utils";
 import {
   cookies,
-  expiredJwt,
   jwToken,
   loggedInUserId,
   sessionId,
@@ -65,21 +64,6 @@ describe("Test refresh token resolver", () => {
     jest.restoreAllMocks();
   });
 
-  describe("Verify user authentication", () => {
-    test("Return an error response if user is logged out", async () => {
-      mockContext.user = null;
-
-      const result = await resolver({}, { sessionId: "" }, mockContext, info);
-
-      expect(clearCookies).not.toHaveBeenCalled();
-      expect(setCookies).not.toHaveBeenCalled();
-      expect(sessionMail).not.toHaveBeenCalled();
-
-      expect(result).toHaveProperty("message", "Unable to refresh token");
-      expect(result).toHaveProperty("status", "ERROR");
-    });
-  });
-
   describe("Validate session id string", () => {
     test.each(validateSession)(
       "Return an error response if session id is an %s string",
@@ -106,9 +90,7 @@ describe("Test refresh token resolver", () => {
 
         expect(sessionMail).not.toHaveBeenCalled();
         expect(setCookies).not.toHaveBeenCalled();
-
-        expect(clearCookies).toHaveBeenCalledTimes(1);
-        expect(clearCookies).toHaveBeenCalledWith(response);
+        expect(clearCookies).not.toHaveBeenCalled();
 
         expect(result).toHaveProperty("message", "Unable to refresh token");
         expect(result).toHaveProperty("status", "ERROR");
@@ -127,9 +109,7 @@ describe("Test refresh token resolver", () => {
 
         expect(sessionMail).not.toHaveBeenCalled();
         expect(setCookies).not.toHaveBeenCalled();
-
-        expect(clearCookies).toHaveBeenCalledTimes(1);
-        expect(clearCookies).toHaveBeenCalledWith(response);
+        expect(clearCookies).not.toHaveBeenCalled();
 
         expect(verify).toHaveBeenCalledTimes(1);
         expect(verify).toThrow(JsonWebTokenError);
@@ -141,32 +121,29 @@ describe("Test refresh token resolver", () => {
     });
 
     describe("Expired refresh token", () => {
-      test.each(expiredJwt)(
-        "Return an error response if session id %s",
-        async (_, data) => {
-          const spy = spyDb({ rows: data });
+      test("Return an error response if session id is unknown", async () => {
+        const spy = spyDb({ rows: [] });
 
-          mockVerify.mockImplementation(() => {
-            throw new TokenExpiredError("Expired refresh token", new Date());
-          });
+        mockVerify.mockImplementation(() => {
+          throw new TokenExpiredError("Expired refresh token", new Date());
+        });
 
-          const result = await resolver({}, { sessionId }, mockContext, info);
+        const result = await resolver({}, { sessionId }, mockContext, info);
 
-          expect(clearCookies).not.toHaveBeenCalled();
-          expect(setCookies).not.toHaveBeenCalled();
-          expect(sessionMail).not.toHaveBeenCalled();
+        expect(clearCookies).not.toHaveBeenCalled();
+        expect(setCookies).not.toHaveBeenCalled();
+        expect(sessionMail).not.toHaveBeenCalled();
 
-          expect(verify).toHaveBeenCalledTimes(1);
-          expect(verify).toThrow(TokenExpiredError);
-          expect(verify).toThrow("Expired refresh token");
+        expect(verify).toHaveBeenCalledTimes(1);
+        expect(verify).toThrow(TokenExpiredError);
+        expect(verify).toThrow("Expired refresh token");
 
-          expect(spy).toHaveBeenCalledTimes(1);
-          expect(spy).toHaveReturnedWith({ rows: data });
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveReturnedWith({ rows: [] });
 
-          expect(result).toHaveProperty("message", "Unable to refresh token");
-          expect(result).toHaveProperty("status", "ERROR");
-        }
-      );
+        expect(result).toHaveProperty("message", "Unable to refresh token");
+        expect(result).toHaveProperty("status", "ERROR");
+      });
 
       test("Session refresh token does not match cookie refresh token, Return an error response and send a notification mail", async () => {
         const email = "test@mail.com";
@@ -271,29 +248,6 @@ describe("Test refresh token resolver", () => {
     });
 
     describe("Valid and not expired refresh token", () => {
-      test("Return an error response if refresh token was not signed for the current user", async () => {
-        const spy = spyDb({ rows: [] });
-
-        mockVerify.mockReturnValueOnce({ sub: "notLoggedInUserId" });
-
-        const result = await resolver({}, { sessionId }, mockContext, info);
-
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveReturnedWith({ rows: [] });
-
-        expect(verify).toHaveBeenCalledTimes(1);
-        expect(verify).toHaveReturnedWith({ sub: "notLoggedInUserId" });
-
-        expect(clearCookies).toHaveBeenCalledTimes(1);
-        expect(clearCookies).toHaveBeenCalledWith(response);
-
-        expect(sessionMail).not.toHaveBeenCalled();
-        expect(setCookies).not.toHaveBeenCalled();
-
-        expect(result).toHaveProperty("message", "Unable to refresh token");
-        expect(result).toHaveProperty("status", "ERROR");
-      });
-
       test.each(validJwt)("Return an error response if %s", async (_, data) => {
         const spy = spyDb({ rows: data });
 

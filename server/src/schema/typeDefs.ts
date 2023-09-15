@@ -5,10 +5,6 @@ import { postsTypeDefs } from "@features/posts";
 
 const types = `#graphql
   type Query {
-    ####Auth####
-    "Verify user session"
-    verifySession(sessionId: String!): VerifySession!
-
     ####POST TAGS####
     "Get all post tags"
     getPostTags: GetPostTags!
@@ -40,6 +36,8 @@ const types = `#graphql
     generatePassword(email: String!): ForgotGeneratePassword!
     "Verify password reset token"
     verifyResetToken(token: String!): VerifyResetToken!
+    "Verify user session"
+    verifySession(sessionId: String!): VerifySession!
 
     ####SETTINGS####
     "Change password of registered and signed in user"
@@ -118,6 +116,11 @@ const types = `#graphql
   }
 
   type UserSessionError implements BaseResponse {
+    message: String!
+    status: Status!
+  }
+
+  type ForbiddenError implements BaseResponse {
     message: String!
     status: Status!
   }

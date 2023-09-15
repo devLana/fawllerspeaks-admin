@@ -47,3 +47,4 @@ export class ServerError extends ErrorResponse {}
 export class RegistrationError extends ErrorResponse {}
 export class AuthenticationError extends ErrorResponse {}
 export class UserSessionError extends ErrorResponse {}
+export class ForbiddenError extends ErrorResponse {}

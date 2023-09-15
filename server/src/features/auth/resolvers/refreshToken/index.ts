@@ -14,7 +14,7 @@ import { AccessToken } from "./types";
 import { SessionIdValidationError } from "../types";
 
 import {
-  AuthenticationError,
+  ForbiddenError,
   MailError,
   NotAllowedError,
   UnknownError,
@@ -32,26 +32,29 @@ interface DBResponse {
   user: string;
 }
 
-const refreshToken: Refresh = async (_, args, { db, req, res, user }) => {
+const refreshToken: Refresh = async (_, args, { db, req, res }) => {
   if (!process.env.REFRESH_TOKEN_SECRET) throw new GraphQLError("Server Error");
 
   const schema = Joi.string().required().trim().messages({
     "string.empty": "Invalid session id",
   });
 
+  const SELECT = `
+    SELECT refresh_token "refreshToken", "user", email
+    FROM sessions LEFT JOIN users ON "user" = user_id
+    WHERE session_id = $1
+  `;
+
   let jwt: string | null = null;
   let validatedSession: string | null = null;
 
   try {
-    if (!user) return new AuthenticationError("Unable to refresh token");
-
     validatedSession = await schema.validateAsync(args.sessionId);
 
     const { auth, sig, token } = req.cookies as Cookies;
 
     if (!auth || !sig || !token) {
-      clearCookies(res);
-      return new NotAllowedError("Unable to refresh token");
+      return new ForbiddenError("Unable to refresh token");
     }
 
     jwt = `${sig}.${auth}.${token}`;
@@ -60,34 +63,18 @@ const refreshToken: Refresh = async (_, args, { db, req, res, user }) => {
       sub: string;
     };
 
-    /*
-      Access token and refresh token do not match because they were not signed for the same user
-      - delete the session with that refresh token from db
-      - clear cookies
-    */
-    if (sub !== user) {
-      await db.query(`DELETE FROM sessions WHERE refresh_token = $1`, [jwt]);
-      clearCookies(res);
-      return new NotAllowedError("Unable to refresh token");
-    }
+    const { rows } = await db.query<DBResponse>(SELECT, [validatedSession]);
 
-    const { rows } = await db.query<DBResponse>(
-      `SELECT refresh_token "refreshToken", "user", email
-      FROM sessions LEFT JOIN users ON "user" = user_id
-      WHERE session_id = $1`,
-      [validatedSession]
-    );
-
-    // Unable to find any valid session with the provided session id
+    // Unable to find a valid session with the provided session id
     if (rows.length === 0) return new UnknownError("Unable to refresh token");
 
-    // Provided session was not assigned to the current logged in user
-    if (rows[0].user !== user) {
+    // Provided session was not assigned to the current user
+    if (rows[0].user !== sub) {
       return new UserSessionError("Unable to refresh token");
     }
 
     /*
-      The refreshToken for the provided session isn't the same as the refreshToken assigned to the current logged in user(User may have been hacked):
+      The refreshToken for the provided session isn't the same as the refreshToken assigned to the current user(User may have been hacked):
       - clear that session from db
       - clear cookies
       - send mail
@@ -104,35 +91,26 @@ const refreshToken: Refresh = async (_, args, { db, req, res, user }) => {
 
     const [newRefreshToken, accessToken, cookies] = await signTokens(sub);
 
+    setCookies(res, cookies);
+
     await db.query(
       `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND "user" = $3`,
       [newRefreshToken, validatedSession, sub]
     );
 
-    setCookies(res, cookies);
     return new AccessToken(accessToken);
   } catch (err) {
     if (err instanceof TokenExpiredError) {
       try {
-        const { rows } = await db.query<DBResponse>(
-          `SELECT refresh_token "refreshToken", "user", email
-          FROM sessions LEFT JOIN users ON "user" = user_id
-          WHERE session_id = $1`,
-          [validatedSession]
-        );
+        const { rows } = await db.query<DBResponse>(SELECT, [validatedSession]);
 
-        // Unable to find any valid session with the provided session id
+        // Unable to find a valid session with the provided session id
         if (rows.length === 0) {
           return new UnknownError("Unable to refresh token");
         }
 
-        // Provided session was not assigned to the current logged in user
-        if (rows[0].user !== user) {
-          return new UserSessionError("Unable to refresh token");
-        }
-
         /*
-          The refreshToken for the provided session isn't the same as the refreshToken assigned to the current logged in user(User may have been hacked):
+          The refreshToken for the provided session isn't the same as the refreshToken assigned to the current user(User may have been hacked):
           - clear that session from db
           - clear cookies
           - send mail
@@ -151,12 +129,12 @@ const refreshToken: Refresh = async (_, args, { db, req, res, user }) => {
           rows[0].user
         );
 
-        await db.query(
-          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2`,
-          [newRefreshToken, validatedSession]
-        );
-
         setCookies(res, cookies);
+
+        await db.query(
+          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND "user" = $3`,
+          [newRefreshToken, validatedSession, rows[0].user]
+        );
 
         return new AccessToken(accessToken);
       } catch (error) {
@@ -171,8 +149,7 @@ const refreshToken: Refresh = async (_, args, { db, req, res, user }) => {
     }
 
     if (err instanceof JsonWebTokenError) {
-      clearCookies(res);
-      return new NotAllowedError("Unable to refresh token");
+      return new ForbiddenError("Unable to refresh token");
     }
 
     if (err instanceof ValidationError) {

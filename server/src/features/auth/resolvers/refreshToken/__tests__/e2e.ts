@@ -16,7 +16,6 @@ import {
 import {
   REFRESH_TOKEN,
   authUsers,
-  loginTestUser,
   post,
   registeredUser as registeredTestUser,
   testSession,
@@ -42,10 +41,9 @@ jest.mock("@features/auth/utils", () => {
 
 describe("Refresh TOken - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
-  let registeredJwt: string, registeredSessionId: string;
   let registeredCookies: string, newRegisteredSessionId: string;
-  let newRegisteredCookies: string, unregisteredJwt: string;
   let unregisteredSessionId: string, unregisteredCookies: string;
+  let registeredSessionId: string;
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
@@ -53,16 +51,12 @@ describe("Refresh TOken - E2E", () => {
       await authUsers(db);
 
     [
-      { sessionId: newRegisteredSessionId, cookies: newRegisteredCookies },
-      registeredJwt,
+      { sessionId: newRegisteredSessionId },
       { sessionId: registeredSessionId, cookies: registeredCookies },
-      unregisteredJwt,
       { sessionId: unregisteredSessionId, cookies: unregisteredCookies },
     ] = await Promise.all([
       testSession(db, newRegisteredUser.userId),
-      loginTestUser(registeredUser.userId),
       testSession(db, registeredUser.userId),
-      loginTestUser(unregisteredUser.userId),
       testSession(db, unregisteredUser.userId, "50"),
     ]);
   });
@@ -75,30 +69,13 @@ describe("Refresh TOken - E2E", () => {
     await db.end();
   });
 
-  describe("Verify user authentication", () => {
-    it("User is not logged in, Return an AuthenticationError response", async () => {
-      const payload = { query: REFRESH_TOKEN, variables: { sessionId: "" } };
-
-      const { data } = await post<Refresh>(url, payload);
-
-      expect(data.errors).toBeUndefined();
-      expect(data.data).toBeDefined();
-      expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "AuthenticationError",
-        message: "Unable to refresh token",
-        status: Status.Error,
-      });
-    });
-  });
-
   describe("Validate session id string", () => {
     it.each(gqlValidations)(
       "Should throw a graphql validation error for %s session id value",
       async (_, id) => {
         const payload = { query: REFRESH_TOKEN, variables: { sessionId: id } };
-        const options = { authorization: `Bearer ${registeredJwt}` };
 
-        const { data } = await post<Refresh>(url, payload, options);
+        const { data } = await post<Refresh>(url, payload);
 
         expect(data.errors).toBeDefined();
         expect(data.data).toBeUndefined();
@@ -109,9 +86,8 @@ describe("Refresh TOken - E2E", () => {
       "Return an error response if session id is an %s string",
       async (_, id) => {
         const payload = { query: REFRESH_TOKEN, variables: { sessionId: id } };
-        const options = { authorization: `Bearer ${registeredJwt}` };
 
-        const { data } = await post<Refresh>(url, payload, options);
+        const { data } = await post<Refresh>(url, payload);
 
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
@@ -127,18 +103,16 @@ describe("Refresh TOken - E2E", () => {
   describe("Validate cookie header", () => {
     it.each(verifyE2eCookie)(
       "Return an error response if request header has one or more %s",
-      async (_, cookieStr) => {
+      async (_, cookie) => {
         const variables = { sessionId: registeredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${registeredJwt}`;
-        const options = { authorization, cookie: cookieStr };
 
-        const { data } = await post<Refresh>(url, payload, options);
+        const { data } = await post<Refresh>(url, payload, { cookie });
 
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.refreshToken).toStrictEqual({
-          __typename: "NotAllowedError",
+          __typename: "ForbiddenError",
           message: "Unable to refresh token",
           status: Status.Error,
         });
@@ -148,11 +122,10 @@ describe("Refresh TOken - E2E", () => {
 
   describe("Verify cookie refresh token", () => {
     describe("Invalid refresh token", () => {
-      it("Token verification throws a JsonWebTokenError, Return a NotAllowedError response ", async () => {
+      it("Token verification throws a JsonWebTokenError, Return a ForbiddenError response ", async () => {
         const variables = { sessionId: registeredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${registeredJwt}`;
-        const options = { authorization, cookie: cookiesStr };
+        const options = { cookie: cookiesStr };
 
         const { data } = await post<Refresh>(url, payload, options);
 
@@ -161,7 +134,7 @@ describe("Refresh TOken - E2E", () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.refreshToken).toStrictEqual({
-          __typename: "NotAllowedError",
+          __typename: "ForbiddenError",
           message: "Unable to refresh token",
           status: Status.Error,
         });
@@ -172,8 +145,7 @@ describe("Refresh TOken - E2E", () => {
       it("Session id is unknown, Return an UnknownError response ", async () => {
         const variables = { sessionId: "unknown_session_id" };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${unregisteredJwt}`;
-        const options = { authorization, cookie: unregisteredCookies };
+        const options = { cookie: unregisteredCookies };
 
         const { data } = await post<Refresh>(url, payload, options);
 
@@ -186,28 +158,10 @@ describe("Refresh TOken - E2E", () => {
         });
       });
 
-      it("Session id was not assigned to the logged in user, Return a UserSessionError response", async () => {
-        const variables = { sessionId: registeredSessionId };
-        const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${unregisteredJwt}`;
-        const options = { authorization, cookie: unregisteredCookies };
-
-        const { data } = await post<Refresh>(url, payload, options);
-
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.refreshToken).toStrictEqual({
-          __typename: "UserSessionError",
-          message: "Unable to refresh token",
-          status: Status.Error,
-        });
-      });
-
       it("Should refresh tokens, Renew expired refresh token and send new access token", async () => {
         const variables = { sessionId: unregisteredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${unregisteredJwt}`;
-        const options = { authorization, cookie: unregisteredCookies };
+        const options = { cookie: unregisteredCookies };
 
         const { data } = await post<Refresh>(url, payload, options);
 
@@ -228,8 +182,7 @@ describe("Refresh TOken - E2E", () => {
 
         const variables = { sessionId: unregisteredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${unregisteredJwt}`;
-        const options = { authorization, cookie: unregisteredCookies };
+        const options = { cookie: unregisteredCookies };
 
         const { data } = await post<Refresh>(url, payload, options);
 
@@ -251,8 +204,7 @@ describe("Refresh TOken - E2E", () => {
       it("Session id is unknown, Return an UnknownError response", async () => {
         const variables = { sessionId: "unknown_session_id" };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${registeredJwt}`;
-        const options = { authorization, cookie: registeredCookies };
+        const options = { cookie: registeredCookies };
 
         const { data } = await post<Refresh>(url, payload, options);
 
@@ -265,11 +217,10 @@ describe("Refresh TOken - E2E", () => {
         });
       });
 
-      it("Session was not assigned to the logged in user, Return a UserSessionError response", async () => {
+      it("Session was not signed for the current user, Return a UserSessionError response", async () => {
         const variables = { sessionId: newRegisteredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${registeredJwt}`;
-        const options = { authorization, cookie: registeredCookies };
+        const options = { cookie: registeredCookies };
 
         const { data } = await post<Refresh>(url, payload, options);
 
@@ -285,8 +236,7 @@ describe("Refresh TOken - E2E", () => {
       it("Should refresh tokens, Renew refresh token and send new access token", async () => {
         const variables = { sessionId: registeredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${registeredJwt}`;
-        const options = { authorization, cookie: registeredCookies };
+        const options = { cookie: registeredCookies };
 
         const { data } = await post<Refresh>(url, payload, options);
 
@@ -299,30 +249,10 @@ describe("Refresh TOken - E2E", () => {
         });
       });
 
-      it("Cookie Refresh token was not signed for the logged in user, Return a NotAllowedError response", async () => {
-        const variables = { sessionId: registeredSessionId };
-        const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${registeredJwt}`;
-        const options = { authorization, cookie: newRegisteredCookies };
-
-        const { data } = await post<Refresh>(url, payload, options);
-
-        expect(sessionMail).not.toHaveBeenCalled();
-
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.refreshToken).toStrictEqual({
-          __typename: "NotAllowedError",
-          message: "Unable to refresh token",
-          status: Status.Error,
-        });
-      });
-
       it("Session refresh token does not match the cookie refresh token, Return a NotAllowedError response and send a notification mail", async () => {
         const variables = { sessionId: registeredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
-        const authorization = `Bearer ${registeredJwt}`;
-        const options = { authorization, cookie: registeredCookies };
+        const options = { cookie: registeredCookies };
 
         const { data } = await post<Refresh>(url, payload, options);
 

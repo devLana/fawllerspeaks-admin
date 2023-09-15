@@ -31,17 +31,9 @@ export const validateCookie: [string, Cookies][] = [
   ["has missing fields", { sig: "sig", auth: "auth" }],
 ];
 
-export const expiredJwt: [string, Record<string, string>[]][] = [
-  ["is unknown", []],
-  ["was not assigned to the logged in user", [{ user: "not_the_user" }]],
-];
-
 export const validJwt: [string, Record<string, string>[]][] = [
   ["session id is unknown", []],
-  [
-    "refresh token was not signed for the logged in user",
-    [{ user: "not_the_user" }],
-  ],
+  ["session was not assigned to the current user", [{ user: "not_the_user" }]],
 ];
 
 export const verifyE2eCookie: [string, string][] = [

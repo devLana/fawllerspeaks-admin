@@ -39,9 +39,8 @@ const login: Login = async (_, args, { db, req, res }) => {
       const { auth, sig, token } = req.cookies as Cookies;
 
       if (auth && sig && token) {
-        await db.query(`DELETE FROM sessions WHERE refresh_token = $1`, [
-          `${sig}.${auth}.${token}`,
-        ]);
+        const jwt = `${sig}.${auth}.${token}`;
+        void db.query(`DELETE FROM sessions WHERE refresh_token = $1`, [jwt]);
       }
     }
 
