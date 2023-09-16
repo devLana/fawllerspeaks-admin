@@ -157,6 +157,12 @@ export type EmptyBinWarning = BaseResponse & {
   status: Status;
 };
 
+export type ForbiddenError = BaseResponse & {
+  __typename?: 'ForbiddenError';
+  message: Scalars['String'];
+  status: Status;
+};
+
 export type ForgotGeneratePassword = EmailValidationError | NotAllowedError | RegistrationError | Response | ServerError;
 
 export type GetPost = NotAllowedError | PostIdValidationError | SinglePost | UnknownError;
@@ -232,6 +238,8 @@ export type Mutation = {
   unpublishPost: Publish_Unpublish;
   /** Verify password reset token */
   verifyResetToken: VerifyResetToken;
+  /** Verify user session */
+  verifySession: VerifySession;
 };
 
 
@@ -352,6 +360,11 @@ export type MutationVerifyResetTokenArgs = {
   token: Scalars['String'];
 };
 
+
+export type MutationVerifySessionArgs = {
+  sessionId: Scalars['String'];
+};
+
 export type NotAllowedError = BaseResponse & {
   __typename?: 'NotAllowedError';
   message: Scalars['String'];
@@ -458,8 +471,6 @@ export type Query = {
   getPostTags: GetPostTags;
   /** Get all posts */
   getPosts: GetPosts;
-  /** Verify user session */
-  verifySession: VerifySession;
 };
 
 
@@ -467,12 +478,7 @@ export type QueryGetPostArgs = {
   postId: Scalars['ID'];
 };
 
-
-export type QueryVerifySessionArgs = {
-  sessionId: Scalars['String'];
-};
-
-export type RefreshToken = AccessToken | AuthenticationError | NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError;
+export type RefreshToken = AccessToken | ForbiddenError | NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError;
 
 export type RegisterUser = AuthenticationError | RegisterUserValidationError | RegisteredUser | RegistrationError | UnknownError;
 
@@ -600,4 +606,4 @@ export type VerifyResetTokenValidationError = {
   tokenError: Scalars['String'];
 };
 
-export type VerifySession = NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError | VerifiedSession;
+export type VerifySession = ForbiddenError | NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError | VerifiedSession;

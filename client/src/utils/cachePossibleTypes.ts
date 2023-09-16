@@ -6,6 +6,7 @@ export const BaseResponse = [
   "UnauthorizedAuthorError",
   "UnknownError",
   "UserSessionError",
+  "ForbiddenError",
   "Response",
   "DuplicatePostTitleError",
   "EmptyBinWarning",

@@ -11,50 +11,54 @@ import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 import { SESSION_ID } from "@utils/constants";
 
 type StringNullState = React.Dispatch<React.SetStateAction<string | null>>;
-type SetClientHasRendered = React.Dispatch<React.SetStateAction<boolean>>;
-
-interface StateSetters {
-  setErrorMessage: StringNullState;
-  setUserId: StringNullState;
-  setClientHasRendered: SetClientHasRendered;
-}
 
 const msg =
   "An unexpected error has occurred while trying to verify your current session";
 
 const useVerifySession = (
   handleRefreshToken: (accessToken: string) => void,
-  { setErrorMessage, setUserId, setClientHasRendered }: StateSetters
+  setUserId: StringNullState
 ) => {
+  const [clientHasRendered, setClientHasRendered] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const { pathname, replace, events } = useRouter();
+
   const client = useApolloClient();
-  const { pathname, replace } = useRouter();
 
   const { handleAuthHeader } = useAuthHeaderHandler();
 
   React.useEffect(() => {
+    const handleRouteChanged = () => {
+      setClientHasRendered(true);
+    };
+
+    events.on("routeChangeComplete", handleRouteChanged);
+
+    return () => {
+      events.off("routeChangeComplete", handleRouteChanged);
+    };
+  }, []);
+
+  React.useEffect(() => {
     const sessionId = localStorage.getItem(SESSION_ID);
-    let isMounted = true;
 
     if (sessionId) {
       client
-        .query({ query: VERIFY_SESSION, variables: { sessionId } })
+        .mutate({ mutation: VERIFY_SESSION, variables: { sessionId } })
         .then(({ data }) => {
-          switch (data.verifySession.__typename) {
+          switch (data?.verifySession.__typename) {
             case "UnknownError":
-              if (isMounted) {
-                setErrorMessage(data.verifySession.message);
-                setClientHasRendered(true);
-              }
+              setErrorMessage(data.verifySession.message);
+              setClientHasRendered(true);
               break;
 
             case "SessionIdValidationError":
             case "UserSessionError":
-              if (isMounted) {
-                setErrorMessage(
-                  "Current logged in session could not be verified"
-                );
-                setClientHasRendered(true);
-              }
+            case "ForbiddenError":
+              setErrorMessage(
+                "Current logged in session could not be verified"
+              );
+              setClientHasRendered(true);
               break;
 
             case "NotAllowedError":
@@ -67,8 +71,8 @@ const useVerifySession = (
                 pathname !== "/reset-password" &&
                 pathname !== "/404"
               ) {
-                if (isMounted) void replace("/login");
-              } else if (isMounted) {
+                void replace("/login");
+              } else {
                 setClientHasRendered(true);
               }
               break;
@@ -83,13 +87,13 @@ const useVerifySession = (
                   pathname === "/reset-password" ||
                   pathname === "/register"
                 ) {
-                  if (isMounted) void replace("/");
-                } else if (isMounted) {
+                  void replace("/");
+                } else {
                   setClientHasRendered(true);
                 }
               } else if (pathname !== "/register") {
-                if (isMounted) void replace("/register");
-              } else if (isMounted) {
+                void replace("/register");
+              } else {
                 setClientHasRendered(true);
               }
 
@@ -101,11 +105,11 @@ const useVerifySession = (
             }
 
             default:
-              throw new Error(msg);
+              throw new Error();
           }
         })
         .catch((err: Error) => {
-          if (err instanceof InvalidTokenError && isMounted) {
+          if (err instanceof InvalidTokenError) {
             setClientHasRendered(true);
             setErrorMessage(msg);
           } else if (err instanceof ApolloError) {
@@ -114,11 +118,9 @@ const useVerifySession = (
                 ? err.graphQLErrors[0].message
                 : "Server is currently unreachable. Please try again later";
 
-            if (isMounted) {
-              setClientHasRendered(true);
-              setErrorMessage(message);
-            }
-          } else if (isMounted) {
+            setClientHasRendered(true);
+            setErrorMessage(message);
+          } else {
             setClientHasRendered(true);
             setErrorMessage(msg);
           }
@@ -137,11 +139,9 @@ const useVerifySession = (
         setClientHasRendered(true);
       }
     }
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  return { clientHasRendered, errorMessage };
 };
 
 export default useVerifySession;

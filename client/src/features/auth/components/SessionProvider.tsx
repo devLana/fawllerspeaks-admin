@@ -3,9 +3,12 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import { SessionContext } from "@context/SessionContext";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+
 import useRefreshToken from "../hooks/useRefreshToken";
 import useVerifySession from "../hooks/useVerifySession";
+import { SessionContext } from "@context/SessionContext";
 import type { PageLayout } from "@types";
 
 interface SessionProvideProps {
@@ -14,32 +17,16 @@ interface SessionProvideProps {
 }
 
 const SessionProvider = ({ layout, page }: SessionProvideProps) => {
-  const [clientHasRendered, setClientHasRendered] = React.useState(false);
   const [userId, setUserId] = React.useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const { reload } = useRouter();
 
-  const { events } = useRouter();
+  const { handleRefreshToken, handleClearRefreshTokenTimer, isOpen } =
+    useRefreshToken();
 
-  React.useEffect(() => {
-    const handleRouteChanged = () => {
-      setClientHasRendered(true);
-    };
-
-    events.on("routeChangeComplete", handleRouteChanged);
-
-    return () => {
-      events.off("routeChangeComplete", handleRouteChanged);
-    };
-  }, []);
-
-  const { handleRefreshToken, handleClearRefreshTokenTimer } =
-    useRefreshToken(setErrorMessage);
-
-  useVerifySession(handleRefreshToken, {
-    setErrorMessage,
-    setUserId,
-    setClientHasRendered,
-  });
+  const { clientHasRendered, errorMessage } = useVerifySession(
+    handleRefreshToken,
+    setUserId
+  );
 
   const handleUserId = (id: string) => setUserId(id);
 
@@ -53,6 +40,15 @@ const SessionProvider = ({ layout, page }: SessionProvideProps) => {
   return (
     <SessionContext.Provider value={value}>
       {layout(page, clientHasRendered, errorMessage)}
+      <Snackbar
+        open={isOpen}
+        message="Your access token could not be refreshed"
+        action={
+          <Button size="small" variant="contained" onClick={() => reload()}>
+            Reload Page
+          </Button>
+        }
+      />
     </SessionContext.Provider>
   );
 };

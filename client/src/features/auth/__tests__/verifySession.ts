@@ -5,7 +5,7 @@ import jwtDecode, { InvalidTokenError } from "jwt-decode";
 
 import {
   decode,
-  msg,
+  msg1,
   notAllowed,
   tableOne,
   tableThree,
@@ -128,7 +128,7 @@ describe("Verify user session on initial app render", () => {
         const alert = await screen.findByRole("alert");
 
         expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-        expect(alert).toHaveTextContent(msg);
+        expect(alert).toHaveTextContent(msg1);
         expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
 
         await user.click(screen.getByRole("button", { name: /reload page/i }));

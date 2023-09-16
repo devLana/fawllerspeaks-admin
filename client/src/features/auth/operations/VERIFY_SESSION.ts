@@ -1,14 +1,14 @@
 import { gql, type TypedDocumentNode as DocNode } from "@apollo/client";
 
 import { USER_FIELDS } from "@fragments/User";
-import type { Query, QueryVerifySessionArgs } from "@apiTypes";
+import type { Mutation, MutationVerifySessionArgs } from "@apiTypes";
 
-type VerifySessionData = Pick<Query, "verifySession">;
-type VerifySession = DocNode<VerifySessionData, QueryVerifySessionArgs>;
+type VerifySessionData = Pick<Mutation, "verifySession">;
+type VerifySession = DocNode<VerifySessionData, MutationVerifySessionArgs>;
 
 export const VERIFY_SESSION: VerifySession = gql`
   ${USER_FIELDS}
-  query VerifySession($sessionId: String!) {
+  mutation VerifySession($sessionId: String!) {
     verifySession(sessionId: $sessionId) {
       ... on SessionIdValidationError {
         __typename

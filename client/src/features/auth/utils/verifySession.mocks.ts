@@ -5,8 +5,9 @@ import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 
 export const TEXT_NODE = "Testing User Authentication";
-export const msg =
+export const msg1 =
   "An unexpected error has occurred while trying to verify your current session";
+const msg2 = "Current logged in session could not be verified";
 
 const refresh = {
   gql(sessionId: string): MockedResponse[] {
@@ -30,7 +31,7 @@ const request = (sessionId: string): MockedResponse["request"] => {
   return { query: VERIFY_SESSION, variables: { sessionId } };
 };
 
-class MocksOne {
+class MockOne {
   sessionId: string;
 
   constructor(readonly typename: string, readonly message: string, id: string) {
@@ -41,17 +42,13 @@ class MocksOne {
     return [
       {
         request: request(this.sessionId),
-        result: {
-          data: {
-            verifySession: { __typename: this.typename, message: this.message },
-          },
-        },
+        result: { data: { verifySession: { __typename: this.typename } } },
       },
     ];
   }
 }
 
-class MocksTwo {
+class MockTwo {
   sessionId: string;
 
   constructor(
@@ -89,29 +86,25 @@ class MocksTwo {
   }
 }
 
-export const notAllowed = new MocksOne(
-  "NotAllowedError",
-  "Failed to Authenticate User",
-  "NOT_ALLOWED"
-);
+export const notAllowed = {
+  sessionId: "NOT_ALLOWED_SESSION_ID",
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.sessionId),
+        result: { data: { verifySession: { __typename: "NotAllowedError" } } },
+      },
+    ];
+  },
+};
 
-const unknown = new MocksOne(
-  "UnknownError",
-  "Unknown session id. Authentication failed",
-  "UNKNOWN"
-);
+const unsupported = new MockOne("UnsupportedObjectType", msg1, "UNSUPPORTED");
+const forbid = new MockOne("ForbiddenError", msg2, "FORBIDDEN");
+const userSession = new MockOne("UserSessionError", msg2, "USER_SESSION");
 
-const unsupported = new MocksOne("UnsupportedObjectType", msg, "UNSUPPORTED");
-
-const userSession = new MocksOne(
-  "UserSessionError",
-  "Current logged in session could not be verified",
-  "USER_SESSION"
-);
-
-const validation = {
-  message: "Current logged in session could not be verified",
-  sessionId: "VALIDATION_SESSION_ID",
+const unknown = {
+  sessionId: "UNKNOWN_SESSION_ID",
+  message: "Unknown session id. Authentication failed",
   gql(): MockedResponse[] {
     return [
       {
@@ -119,11 +112,25 @@ const validation = {
         result: {
           data: {
             verifySession: {
-              __typename: "SessionIdValidationError",
-              sessionIdError: "Invalid session id. Authentication failed",
-              status: "ERROR",
+              __typename: "UnknownError",
+              message: this.message,
             },
           },
+        },
+      },
+    ];
+  },
+};
+
+const validation = {
+  message: msg2,
+  sessionId: "VALIDATION_SESSION_ID",
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.sessionId),
+        result: {
+          data: { verifySession: { __typename: "SessionIdValidationError" } },
         },
       },
     ];
@@ -153,13 +160,9 @@ const network = {
   },
 };
 
-export const decode = new MocksTwo(true, "registered_user_id", "DECODE");
-const registered = new MocksTwo(true, "registered_user_id", "REGISTERED");
-const unregistered = new MocksTwo(
-  false,
-  "unregistered_user_id",
-  "UNREGISTERED"
-);
+export const decode = new MockTwo(true, "registered_user_id", "DECODE");
+const registered = new MockTwo(true, "registered_user_id", "REGISTERED");
+const unregistered = new MockTwo(false, "unregistered_user_id", "UNREGISTERED");
 
 interface TableOne {
   message: string;
@@ -174,6 +177,10 @@ export const tableOne: [string, TableOne][] = [
     "Render an error alert if verification response is an unsupported object type",
     unsupported,
   ],
+  [
+    "Render an error alert if the refresh token could not be verified/validated",
+    forbid,
+  ],
   ["Render an error alert if user session could not be verified", userSession],
   ["Render an error alert if verification fails with a GraphQL error", graphql],
   ["Render an error alert if verification fails with a Network error", network],
@@ -182,7 +189,7 @@ export const tableOne: [string, TableOne][] = [
 interface TableTwo {
   from: string;
   to: string;
-  mock: MocksTwo;
+  mock: MockTwo;
 }
 
 export const tableTwo: [string, TableTwo][] = [
@@ -198,7 +205,7 @@ export const tableTwo: [string, TableTwo][] = [
 
 interface TableThree {
   pathname: string;
-  mock: MocksTwo;
+  mock: MockTwo;
 }
 
 export const tableThree: [string, TableThree][] = [

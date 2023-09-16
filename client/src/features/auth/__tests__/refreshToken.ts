@@ -4,9 +4,9 @@ import { screen, waitFor } from "@testing-library/react";
 
 import {
   newAccessToken,
+  notAllowed,
   refresh,
-  table1,
-  table2,
+  table,
 } from "../utils/refreshToken.mocks";
 import {
   handleAuthHeader,
@@ -24,27 +24,31 @@ describe("Refresh expired user access token", () => {
   });
 
   describe("Redirect to the login page", () => {
-    it.each(table1)("%s", async (_, status, mock) => {
+    it("User session could not be verified", async () => {
       const { replace } = useRouter();
-      localStorage.setItem(SESSION_ID, mock.sessionId);
+      localStorage.setItem(SESSION_ID, notAllowed.sessionId);
 
-      sessionTestRenderer(mock.gql());
+      sessionTestRenderer(notAllowed.gql());
 
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());
       await waitFor(() => expect(replace).toHaveBeenCalledTimes(2));
-      expect(replace).toHaveBeenCalledWith(`/login?status=${status}`);
+      expect(replace).toHaveBeenNthCalledWith(2, "/login?status=unauthorized");
     });
   });
 
-  describe("Render an error alert UI", () => {
-    it.each(table2)("%s", async (_, expected) => {
+  describe("Should show an alert message box", () => {
+    it.each(table)("%s", async (_, expected) => {
       localStorage.setItem(SESSION_ID, expected.sessionId);
 
       sessionTestRenderer(expected.gql());
 
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());
-      await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
-      expect(screen.getByRole("alert")).toHaveTextContent(expected.message);
+      await expect(screen.findByRole("alert")).resolves.toHaveTextContent(
+        "Your access token could not be refreshed"
+      );
+      expect(screen.getByRole("alert")).toContainElement(
+        screen.getByRole("button", { name: /^reload page$/i })
+      );
     });
   });
 
