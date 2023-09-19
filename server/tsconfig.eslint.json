@@ -7,6 +7,9 @@
     // Modules
     "types": ["@types/node"],
 
+    /* Language and Environment */
+    "target": "ES2022",
+
     // Emit
     "noEmit": true,
 

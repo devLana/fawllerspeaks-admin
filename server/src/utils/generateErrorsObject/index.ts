@@ -9,7 +9,7 @@ const generateErrorsObject = (errorList: ValidationErrorItem[]) => {
     const key = `${field}Error`;
     const value = errorItem.message;
 
-    if (Object.hasOwnProperty.call(errorsMap, key)) return errorsMap;
+    if (Object.hasOwn(errorsMap, key)) return errorsMap;
 
     errorsMap[key] = value;
 
