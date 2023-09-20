@@ -75,6 +75,7 @@ module.exports = {
     "no-unneeded-ternary": 1,
     "object-shorthand": 1,
     "prefer-destructuring": 1,
+    "prefer-object-has-own": 1,
     yoda: 1,
 
     /** TypeScript Rules */

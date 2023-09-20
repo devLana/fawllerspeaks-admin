@@ -34,13 +34,7 @@ module.exports = {
     "no-sparse-arrays": 1,
     "no-unreachable": 1,
     "no-unreachable-loop": 1,
-    "no-use-before-define": [
-      1,
-      {
-        functions: false,
-        classes: false,
-      },
-    ],
+    "no-use-before-define": [1, { functions: false, classes: false }],
     "require-atomic-updates": 2,
 
     // ESLint Suggestions
@@ -55,6 +49,7 @@ module.exports = {
     "no-unneeded-ternary": 1,
     "object-shorthand": 1,
     "prefer-destructuring": 1,
+    "prefer-object-has-own": 1,
     yoda: 1,
 
     // TypeScript Rules
