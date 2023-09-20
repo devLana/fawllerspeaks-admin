@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { randomUUID, createDecipheriv } from "node:crypto";
 
 import { test, expect } from "@jest/globals";
 
@@ -9,6 +9,18 @@ import { JWT_REGEX } from "../constants";
 interface Verify {
   sub: string;
 }
+
+const algorithm = process.env.CIPHER_ALGORITHM ?? "";
+const key = Buffer.from(process.env.CIPHER_KEY ?? "", "hex");
+const iv = Buffer.from(process.env.CIPHER_IV ?? "", "hex");
+
+const decrypt = (token: string) => {
+  const decipher = createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(token, "hex", "utf-8");
+
+  decrypted += decipher.final("utf-8");
+  return decrypted;
+};
 
 test("Auth | Should sign auth tokens", async () => {
   const userId = randomUUID();
@@ -22,9 +34,9 @@ test("Auth | Should sign auth tokens", async () => {
 
   const [header, payload, signature] = tokens[0].split(".");
 
-  expect(tokens[2]).toHaveProperty("auth", payload);
-  expect(tokens[2]).toHaveProperty("token", signature);
-  expect(tokens[2]).toHaveProperty("sig", header);
+  expect(decrypt(tokens[2].auth)).toBe(payload);
+  expect(decrypt(tokens[2].token)).toBe(signature);
+  expect(decrypt(tokens[2].sig)).toBe(header);
 
   const refreshSecret = process.env.REFRESH_TOKEN_SECRET ?? "";
   const accessSecret = process.env.ACCESS_TOKEN_SECRET ?? "";

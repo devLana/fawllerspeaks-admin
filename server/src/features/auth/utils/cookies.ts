@@ -15,7 +15,7 @@ export const cookieOptions: CookieOptions = {
   secure: true,
 };
 
-export const setCookies = (res: Response, cookies: Cookies) => {
+export const setCookies = (res: Response, cookies: Required<Cookies>) => {
   res.cookie("auth", cookies.auth, cookieOptions);
   res.cookie("token", cookies.token, cookieOptions);
   res.cookie("sig", cookies.sig, cookieOptions);
