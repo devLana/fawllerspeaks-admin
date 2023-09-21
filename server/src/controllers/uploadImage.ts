@@ -40,12 +40,10 @@ export const uploadImage = async (
       );
     }
 
-    const remoteUrl = `${storageUrl}${supabaseFilePath}`;
-
     res
       .status(201)
-      .set("Location", remoteUrl)
-      .json({ image: remoteUrl, status: "SUCCESS" });
+      .set("Location", `${storageUrl}${supabaseFilePath}`)
+      .json({ image: supabaseFilePath, status: "SUCCESS" });
   } catch (err) {
     if (err instanceof ApiError) return next(err);
 

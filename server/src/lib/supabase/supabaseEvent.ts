@@ -4,16 +4,13 @@ import supabase from "./supabaseClient";
 
 export const supabaseEvent = new EventEmitter();
 
-supabaseEvent.on("removeImage", (imageLink: string) => {
-  (async (imageUrl: string) => {
-    const { client, storageUrl } = supabase();
-    const regex = new RegExp(storageUrl, "i");
-    const imagePath = imageUrl.replace(regex, "");
-
+supabaseEvent.on("removeImage", (image: string) => {
+  (async (imagePath: string) => {
+    const { client } = supabase();
     const { error } = await client.storage.from("images").remove([imagePath]);
 
     if (error) console.error("Supabase delete image error - ", error);
-  })(imageLink);
+  })(image);
 });
 
 supabaseEvent.on("error", (error: Error) => {

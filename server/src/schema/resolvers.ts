@@ -3,6 +3,7 @@ import { settingsResolvers } from "@features/settings";
 import { postTagsResolvers } from "@features/postTags";
 import { postsResolvers } from "@features/posts";
 
+import supabase from "@lib/supabase/supabaseClient";
 import {
   NotAllowedError,
   Response,
@@ -27,7 +28,8 @@ type ResolverKeys =
   | "AuthenticationError"
   | "UserSessionError"
   | "ForbiddenError"
-  | "Response";
+  | "Response"
+  | "User";
 
 type ResolversDict = Pick<Resolvers, ResolverKeys>;
 type RootResolvers = ObjectMapper<ResolversDict>;
@@ -80,5 +82,12 @@ export const resolvers: RootResolvers = {
 
   Response: {
     __isTypeOf: parent => parent instanceof Response,
+  },
+
+  User: {
+    image: parent => {
+      const { storageUrl } = supabase();
+      return parent.image ? `${storageUrl}${parent.image}` : null;
+    },
   },
 };

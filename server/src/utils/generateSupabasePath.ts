@@ -1,6 +1,8 @@
 import crypto from "node:crypto";
 import util from "node:util";
 
+import { nodeEnv } from "./nodeEnv";
+
 const mimeTypeDict: Record<string, string | undefined> = {
   "image/avif": ".avif",
   "image/bmp": ".bmp",
@@ -21,7 +23,7 @@ export const generateSupabasePath = async (
 
   const filenameBuf = await randomBytes(30);
   const filename = filenameBuf.toString("base64url");
-  const isDev = process.env.NODE_ENV === "development" ? "dev/" : "";
+  const isDev = nodeEnv === "development" ? "dev/" : "";
   const extension = mimeTypeDict[mimeType] ?? "";
 
   return `${isDev}${imageCategory}/${filename}${extension}`;

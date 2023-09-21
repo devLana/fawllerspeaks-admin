@@ -81,23 +81,21 @@ const editProfile: EditProfile = async (_, args, { db, user }) => {
     let params: (string | null)[];
 
     if (image === undefined) {
+      params = [firstName, lastName, user];
       query = `
         UPDATE users
         SET first_name = $1, last_name = $2
         WHERE user_id = $3
         RETURNING email, date_created "dateCreated", image
       `;
-
-      params = [firstName, lastName, user];
     } else {
+      params = [firstName, lastName, image, user];
       query = `
         UPDATE users
         SET first_name = $1, last_name = $2, image = $3
         WHERE user_id = $4
         RETURNING email, date_created "dateCreated", image
       `;
-
-      params = [firstName, lastName, image, user];
     }
 
     const { rows: userInfo } = await db.query<UserInfo>(query, params);
