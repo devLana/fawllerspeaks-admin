@@ -17,6 +17,9 @@
       "@tests": ["utils/tests"]
     },
 
+    /* Language and Environment */
+    "target": "ES2022",
+
     /* Interop Constraints */
     "esModuleInterop": true,
 
