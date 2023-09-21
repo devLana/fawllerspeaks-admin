@@ -5,7 +5,6 @@ import { ApolloServer } from "@apollo/server";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 
 import express from "express";
-import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
 import * as dotenv from "dotenv";
@@ -15,6 +14,7 @@ import {
   authenticateUser,
   errorMiddleware,
   multipartParser,
+  parseCookies,
 } from "@middleware";
 import { uploadImage, catchAll, healthCheck, graphqlApi } from "@controllers";
 import { nodeEnv, getServerUrl, corsOptions, startServerHandler } from "@utils";
@@ -44,7 +44,7 @@ export const startServer = async (port: number) => {
     })
   );
 
-  app.use(/^\/$/, [cookieParser(), express.json()], graphqlApi(server));
+  app.use(/^\/$/, [express.json(), parseCookies], graphqlApi(server));
   app.post("/upload-image", [authenticateUser, multipartParser], uploadImage);
   app.get("/health-check", healthCheck);
   app.use("*", catchAll);

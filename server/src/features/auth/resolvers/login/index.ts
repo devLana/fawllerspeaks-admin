@@ -8,7 +8,7 @@ import { NotAllowedError, dateToISOString, generateErrorsObject } from "@utils";
 import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
 
 import { type MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc, Cookies, ValidationErrorObject } from "@types";
+import type { ResolverFunc, ValidationErrorObject } from "@types";
 
 type Login = ResolverFunc<MutationResolvers["login"]>;
 
@@ -35,13 +35,11 @@ const login: Login = async (_, args, { db, req, res }) => {
   });
 
   try {
-    if (req.cookies) {
-      const { auth, sig, token } = req.cookies as Cookies;
+    const { auth, sig, token } = req.cookies;
 
-      if (auth && sig && token) {
-        const jwt = `${sig}.${auth}.${token}`;
-        void db.query(`DELETE FROM sessions WHERE refresh_token = $1`, [jwt]);
-      }
+    if (auth && sig && token) {
+      const jwt = `${sig}.${auth}.${token}`;
+      void db.query(`DELETE FROM sessions WHERE refresh_token = $1`, [jwt]);
     }
 
     const { email, password } = await schema.validateAsync(args, {

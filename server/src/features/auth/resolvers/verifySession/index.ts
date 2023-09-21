@@ -22,7 +22,7 @@ import {
 } from "@utils";
 
 import { type MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc, Cookies } from "@types";
+import type { ResolverFunc } from "@types";
 
 type VerifySession = ResolverFunc<MutationResolvers["verifySession"]>;
 
@@ -66,7 +66,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
   try {
     validatedSession = await schema.validateAsync(args.sessionId);
 
-    const { auth, sig, token } = req.cookies as Cookies;
+    const { auth, sig, token } = req.cookies;
 
     if (!auth || !sig || !token) {
       return new ForbiddenError("Unable to verify session");

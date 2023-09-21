@@ -3,13 +3,6 @@ import type { Pool } from "pg";
 
 import type { PostStatus } from "@resolverTypes";
 
-export interface APIContext {
-  req: Request;
-  res: Response;
-  db: Pool;
-  user: string | null;
-}
-
 export interface IClientUrls {
   readonly login: string;
   readonly forgotPassword: string;
@@ -119,4 +112,15 @@ interface UploadedFile {
 
 export interface UploadRequest extends Request {
   upload?: { file: UploadedFile; imageCategory: "avatar" | "post" };
+}
+
+export interface GQLRequest extends Request {
+  cookies: Cookies;
+}
+
+export interface APIContext {
+  req: GQLRequest;
+  res: Response;
+  db: Pool;
+  user: string | null;
 }

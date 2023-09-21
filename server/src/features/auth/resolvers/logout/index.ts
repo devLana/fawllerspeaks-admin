@@ -11,7 +11,7 @@ import {
 } from "@utils";
 
 import { type MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc, Cookies } from "@types";
+import type { ResolverFunc } from "@types";
 
 type Logout = ResolverFunc<MutationResolvers["logout"]>;
 
@@ -24,7 +24,7 @@ const logout: Logout = async (_, { sessionId }, { db, user, req, res }) => {
     if (!user) return new AuthenticationError("Unable to logout");
 
     const validatedSession = await schema.validateAsync(sessionId);
-    const { auth, sig, token } = req.cookies as Cookies;
+    const { auth, sig, token } = req.cookies;
 
     if (!auth || !sig || !token) return new NotAllowedError("Unable to logout");
 

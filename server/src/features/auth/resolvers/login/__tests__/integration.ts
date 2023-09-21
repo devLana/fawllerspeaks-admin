@@ -79,7 +79,7 @@ describe("Test login resolver", () => {
 
   describe("User is already logged in and has an active session", () => {
     afterEach(() => {
-      mockContext.req.cookies = null;
+      mockContext.req.cookies = {};
     });
 
     test("Delete session from db, Return an error for unknown e-mail address", async () => {
