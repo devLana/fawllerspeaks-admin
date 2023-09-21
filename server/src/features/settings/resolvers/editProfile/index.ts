@@ -45,9 +45,8 @@ const editProfile: EditProfile = async (_, args, { db, user }) => {
         "string.empty": "Enter last name",
         "string.pattern.invert.base": "Last name cannot contain numbers",
       }),
-    image: Joi.string().uri().trim().allow(null).messages({
+    image: Joi.string().trim().allow(null).messages({
       "string.empty": "Profile image url cannot be empty",
-      "string.uri": "Profile image url is not a valid link",
     }),
   });
 

@@ -37,9 +37,7 @@ describe("Test edit profile resolver", () => {
     test("Return an error response if user is not logged in", async () => {
       mockContext.user = null;
 
-      const arg = { firstName: "", lastName: "" };
-
-      const result = await editProfile({}, arg, mockContext, info);
+      const result = await editProfile({}, args, mockContext, info);
 
       expect(result).toHaveProperty("message", "Unable to edit user profile");
       expect(result).toHaveProperty("status", "ERROR");

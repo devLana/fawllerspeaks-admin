@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import type { Pool } from "pg";
+import type { BaseContext } from "@apollo/server";
 
 import type { PostStatus } from "@resolverTypes";
 
@@ -118,7 +119,7 @@ export interface GQLRequest extends Request {
   cookies: Cookies;
 }
 
-export interface APIContext {
+export interface APIContext extends BaseContext {
   req: GQLRequest;
   res: Response;
   db: Pool;

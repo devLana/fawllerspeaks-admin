@@ -1,3 +1,4 @@
+import supabase from "@lib/supabase/supabaseClient";
 import type { InputErrors } from "@types";
 
 interface Input {
@@ -9,7 +10,9 @@ interface Input {
 
 type Validations = [string, Input, InputErrors<Input>][];
 
-const image = "https://mock_test_data_image_link/image.png";
+const image = "folder/image-folder/image.png";
+const { storageUrl } = supabase();
+
 export const args = { firstName: "Ade", lastName: "Lana" };
 export const dateCreated = "2022-11-07 13:22:43.717+01";
 export const mockDate = "2022-11-07T12:22:43.717Z";
@@ -42,15 +45,6 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
       imageError: nullOrUndefined,
     },
   ],
-  [
-    "Should return an error response if image string is not a valid uri string",
-    { firstName: "John", lastName: "Sam", image: "not_a_valid_uri_string" },
-    {
-      firstNameError: nullOrUndefined,
-      lastNameError: nullOrUndefined,
-      imageError: "Profile image url is not a valid link",
-    },
-  ],
 ];
 
 export const gqlValidate: [string, Record<string, unknown>][] = [
@@ -65,8 +59,11 @@ export const gqlValidate: [string, Record<string, unknown>][] = [
 ];
 
 export const verify: [string, Record<string, boolean>[]][] = [
-  ["Returns error on unknown user", []],
-  ["Returns error on unregistered user", [{ isRegistered: false }]],
+  ["Should return an error response if user is unknown", []],
+  [
+    "Should return an error response if user is unregistered",
+    [{ isRegistered: false }],
+  ],
 ];
 
 export const editSuccess: [string, Input, string | null][] = [
@@ -81,7 +78,11 @@ export const editSuccess: [string, Input, string | null][] = [
 
 export const edit: [string, Input, string | null][] = [
   ["Edit user's profile without an image", args, null],
-  ["Edit user's profile with an image", { ...args, image }, image],
+  [
+    "Edit user's profile with an image",
+    { ...args, image },
+    `${storageUrl}${image}`,
+  ],
   [
     "Should edit user's profile and remove image link",
     { ...args, image: null },
