@@ -18,7 +18,7 @@ import {
   validationTestsTable,
   UUID,
   dbData,
-} from "../testsData";
+} from "../draftPost.testUtils";
 
 type Module = typeof import("@features/posts/utils");
 type MockType = jest.MockedFunction<() => Tags | null>;

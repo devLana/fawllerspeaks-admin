@@ -19,7 +19,7 @@ import {
 
 import type { APIContext, TestData } from "@types";
 import { type PostTag, type Post, Status } from "@resolverTypes";
-import { testTable1 } from "../testsData";
+import { testTable1 } from "../unBinPosts.testUtils";
 
 type UnBinPost = TestData<{ unBinPosts: Record<string, unknown> }>;
 

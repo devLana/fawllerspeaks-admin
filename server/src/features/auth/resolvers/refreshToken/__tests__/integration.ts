@@ -29,7 +29,7 @@ import {
   validJwt,
   validateCookie,
   validateSession,
-} from "../utils/refreshTokenTestUtils";
+} from "../utils/refreshToken.testUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

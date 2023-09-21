@@ -14,7 +14,7 @@ import {
   testsTable2,
   testsTable3,
   userId,
-} from "../testsData";
+} from "../unpublishPost.testUtils";
 import { getPostTags } from "@features/posts/utils";
 
 import { info, mockContext, spyDb } from "@tests";

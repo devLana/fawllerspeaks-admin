@@ -10,7 +10,7 @@ import {
   dbPostTags,
   returnPost1,
   returnPost2,
-} from "../testsData";
+} from "../emptyBin.testUtils";
 
 beforeEach(() => {
   mockContext.user = "logged_In_User_Id";

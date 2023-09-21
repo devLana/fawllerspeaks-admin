@@ -17,7 +17,7 @@ import { startServer } from "@server";
 
 // import binPostsWorker from "../binPostsWorker";
 
-import { validationsTable } from "../testsData";
+import { validationsTable } from "../binPosts.testUtils";
 import {
   post,
   BIN_POSTS,

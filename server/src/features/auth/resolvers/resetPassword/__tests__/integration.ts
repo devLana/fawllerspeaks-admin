@@ -3,7 +3,7 @@ import { describe, test, expect, jest, afterAll } from "@jest/globals";
 import resetPassword from "..";
 
 import resetPasswordMail from "../utils/resetPasswordMail";
-import { validations } from "../utils/resetPasswordTestUtils";
+import { validations } from "../utils/resetPassword.testUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

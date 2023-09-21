@@ -3,7 +3,7 @@ import { describe, test, expect, jest, afterEach } from "@jest/globals";
 import createUser from "..";
 
 import createUserMail from "../utils/createUserMail";
-import { validations } from "../utils/createUserTestUtils";
+import { validations } from "../utils/createUser.testUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

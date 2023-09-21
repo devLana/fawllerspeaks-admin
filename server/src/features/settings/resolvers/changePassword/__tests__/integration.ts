@@ -15,7 +15,7 @@ import {
   args,
   validations,
   verifyUser,
-} from "../utils/changePasswordTestUtils";
+} from "../utils/changePassword.testUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

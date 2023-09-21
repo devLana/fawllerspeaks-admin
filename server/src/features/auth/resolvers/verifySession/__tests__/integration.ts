@@ -34,7 +34,7 @@ import {
   validateCookies,
   validateSession,
   validations,
-} from "../utils/verifySessionTestUtils";
+} from "../utils/verifySession.testUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

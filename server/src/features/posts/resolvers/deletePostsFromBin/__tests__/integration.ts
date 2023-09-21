@@ -14,7 +14,7 @@ import {
   returnPost3,
   returnPost4,
   validationsTable,
-} from "../testsData";
+} from "../deletePostsFromBin.testUtils";
 import { mockContext, info, spyDb } from "@tests";
 
 beforeEach(() => {

@@ -19,7 +19,7 @@ import {
   mockPostTags2,
   returnPost1,
   returnPost2,
-} from "../testsData";
+} from "../editPost.testUtils";
 
 type MockType = jest.MockedFunction<() => MockPostTags | null>;
 type Module = typeof import("@features/posts/utils");

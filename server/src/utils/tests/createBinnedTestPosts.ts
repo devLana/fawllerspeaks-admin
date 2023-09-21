@@ -7,7 +7,7 @@ import {
   publishedTestPosts,
   draftTestPosts,
 } from "./mocks";
-import dateToISOString from "../dateToISOSTring";
+import dateToISOString from "../dateToISOString";
 
 import { type PostTag, type Post, PostStatus } from "@resolverTypes";
 import type { DbFindPost, PostAuthor } from "@types";

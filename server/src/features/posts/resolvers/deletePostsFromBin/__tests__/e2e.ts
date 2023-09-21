@@ -7,7 +7,7 @@ import type { ApolloServer } from "@apollo/server";
 import { db } from "@lib/db";
 import { startServer } from "@server";
 
-import { validationsTable } from "../testsData";
+import { validationsTable } from "../deletePostsFromBin.testUtils";
 import {
   post,
   DELETE_POSTS_FROM_BIN,

@@ -3,7 +3,7 @@ import { test, expect, describe, jest } from "@jest/globals";
 import resolver from "..";
 
 import generatePasswordMail from "../utils/generatePasswordMail";
-import { validations, verifyMail } from "../utils/generatePasswordTestUtils";
+import { validations, verifyMail } from "../utils/generatePassword.testUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

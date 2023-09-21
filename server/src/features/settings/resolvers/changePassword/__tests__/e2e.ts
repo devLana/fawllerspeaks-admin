@@ -20,7 +20,7 @@ import {
   errorInput,
   validations,
   PASSWORD,
-} from "../utils/changePasswordTestUtils";
+} from "../utils/changePassword.testUtils";
 import {
   CHANGE_PASSWORD,
   testUsers,

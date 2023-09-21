@@ -17,7 +17,7 @@ import {
   gqlValidations,
   validations,
   verifyMailE2E,
-} from "../utils/generatePasswordTestUtils";
+} from "../utils/generatePassword.testUtils";
 import { MailError } from "@utils";
 import { unRegisteredUser, post, GENERATE_PASSWORD, testUsers } from "@tests";
 

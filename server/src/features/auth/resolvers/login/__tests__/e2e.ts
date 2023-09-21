@@ -11,7 +11,7 @@ import {
   gqlValidation,
   validations,
   verifyInputs,
-} from "../utils/loginTestUtils";
+} from "../utils/login.testUtils";
 import { registeredUser, post, LOGIN, testUsers } from "@tests";
 
 import type { APIContext, DbTestUser, TestData } from "@types";

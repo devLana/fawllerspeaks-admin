@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import type { Pool } from "pg";
 
 import { unRegisteredUser, registeredUser } from "../mocks";
-import dateToISOString from "../../dateToISOSTring";
+import dateToISOString from "../../dateToISOString";
 import type { DbTestUser } from "@types";
 
 interface Users {

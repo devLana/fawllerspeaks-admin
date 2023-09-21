@@ -17,7 +17,7 @@ import {
   returnPost3,
   returnPost4,
   validationsTable,
-} from "../testsData";
+} from "../binPosts.testUtils";
 import { mockContext, info, spyDb } from "@tests";
 
 jest.mock("node:worker_threads");

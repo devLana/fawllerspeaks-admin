@@ -10,7 +10,7 @@ import {
 import resolver from "..";
 
 import forgotPasswordMail from "../utils/forgotPasswordMail";
-import { validations } from "../utils/forgotPasswordTestUtils";
+import { validations } from "../utils/forgotPassword.testUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
 

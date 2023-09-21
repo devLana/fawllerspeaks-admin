@@ -6,7 +6,7 @@ import { type ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import { validationTestsTable } from "../testsData";
+import { validationTestsTable } from "../createPost.testUtils";
 import { DATE_REGEX, UUID_REGEX, urls } from "@utils";
 import {
   registeredUser,

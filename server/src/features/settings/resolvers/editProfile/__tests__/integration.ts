@@ -17,7 +17,7 @@ import {
   mockDate,
   validations,
   verify,
-} from "../utils/editProfileTestUtils";
+} from "../utils/editProfile.testUtils";
 
 jest.mock("@lib/supabase/supabaseEvent");
 

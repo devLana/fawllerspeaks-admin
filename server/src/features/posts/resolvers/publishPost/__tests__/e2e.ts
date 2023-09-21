@@ -6,7 +6,7 @@ import { type ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import { testsTable1 } from "../testsData";
+import { testsTable1 } from "../publishPost.testUtils";
 import {
   createTestPostTags,
   postsUsers,

@@ -26,7 +26,7 @@ import {
   gqlValidate,
   validations,
   edit,
-} from "../utils/editProfileTestUtils";
+} from "../utils/editProfile.testUtils";
 
 import { Status } from "@resolverTypes";
 import type { APIContext, DbTestUser, TestData } from "@types";

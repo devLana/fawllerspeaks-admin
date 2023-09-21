@@ -10,7 +10,7 @@ import {
   mockDate,
   mockUser,
   validations,
-} from "../utils/loginTestUtils";
+} from "../utils/login.testUtils";
 import { setCookies, JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
 import { mockContext, info, spyDb } from "@tests";
 

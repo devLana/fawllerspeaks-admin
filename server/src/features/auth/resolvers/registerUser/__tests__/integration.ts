@@ -15,7 +15,7 @@ import {
   registerMock,
   validations,
   verifyUser,
-} from "../utils/registerUserTestUtils";
+} from "../utils/registerUser.testUtils";
 import { mockContext, info, spyDb } from "@tests";
 
 describe("Test register user resolver", () => {

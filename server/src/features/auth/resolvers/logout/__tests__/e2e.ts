@@ -9,7 +9,7 @@ import {
   gqlValidations,
   validations,
   verifyE2eCookie,
-} from "../utils/logoutTestUtils";
+} from "../utils/logout.testUtils";
 import { LOGOUT, testUsers, loginTestUser, post, testSession } from "@tests";
 
 import type { APIContext, DbTestUser, TestData } from "@types";

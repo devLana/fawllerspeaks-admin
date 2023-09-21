@@ -13,7 +13,7 @@ import { startServer } from "@server";
 import { db } from "@lib/db";
 
 import createUserMail from "../utils/createUserMail";
-import { gqlValidations, validations } from "../utils/createUserTestUtils";
+import { gqlValidations, validations } from "../utils/createUser.testUtils";
 import { MailError } from "@utils";
 import { CREATE_USER, post } from "@tests";
 

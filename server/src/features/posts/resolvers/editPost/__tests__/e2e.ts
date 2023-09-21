@@ -10,7 +10,7 @@ import {
   e2eValidationsTable,
   postFields,
   validationsTable,
-} from "../testsData";
+} from "../editPost.testUtils";
 import {
   post,
   EDIT_POST,

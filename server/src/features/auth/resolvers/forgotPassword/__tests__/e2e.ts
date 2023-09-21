@@ -14,7 +14,7 @@ import { startServer } from "@server";
 import { db } from "@lib/db";
 
 import forgotPasswordMail from "../utils/forgotPasswordMail";
-import { gqlValidations, validations } from "../utils/forgotPasswordTestUtils";
+import { gqlValidations, validations } from "../utils/forgotPassword.testUtils";
 import { MailError } from "@utils";
 import {
   unRegisteredUser,

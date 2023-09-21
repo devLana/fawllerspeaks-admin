@@ -5,7 +5,11 @@ import { describe, test, expect, beforeEach, jest } from "@jest/globals";
 
 import createPost from "..";
 import { getPostTags } from "@features/posts/utils";
-import { validationTestsTable, dbPost, returnDateCreated } from "../testsData";
+import {
+  validationTestsTable,
+  dbPost,
+  returnDateCreated,
+} from "../createPost.testUtils";
 
 import { urls } from "@utils";
 import { info, mockContext, spyDb } from "@tests";

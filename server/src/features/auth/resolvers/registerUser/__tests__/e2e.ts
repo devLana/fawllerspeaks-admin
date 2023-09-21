@@ -9,7 +9,7 @@ import {
   gqlValidation,
   userInput,
   validations,
-} from "../utils/registerUserTestUtils";
+} from "../utils/registerUser.testUtils";
 import {
   post,
   REGISTER_USER,

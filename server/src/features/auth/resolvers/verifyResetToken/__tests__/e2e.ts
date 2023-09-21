@@ -9,7 +9,7 @@ import {
   gqlValidations,
   validations,
   verifyToken,
-} from "../utils/verifyResetTokenTestUtils";
+} from "../utils/verifyResetToken.testUtils";
 import {
   registeredUser,
   post,

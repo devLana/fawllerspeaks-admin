@@ -4,7 +4,7 @@ import { type ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import { UUID, testsTable1 } from "../testsData";
+import { UUID, testsTable1 } from "../unpublishPost.testUtils";
 import {
   createTestPostTags,
   postsUsers,

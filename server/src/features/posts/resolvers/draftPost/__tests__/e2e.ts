@@ -21,7 +21,10 @@ import {
 
 import type { APIContext, TestData } from "@types";
 import { type PostTag, type Post, Status, PostStatus } from "@resolverTypes";
-import { e2eValidationsTable, validationTestsTable } from "../testsData";
+import {
+  e2eValidationsTable,
+  validationTestsTable,
+} from "../draftPost.testUtils";
 
 type Draft = TestData<{ draftPost: Record<string, unknown> }>;
 

@@ -19,7 +19,7 @@ import {
   tags,
   returnDateCreated,
   returnDatePublished,
-} from "../testsData";
+} from "../publishPost.testUtils";
 
 type MockType = jest.MockedFunction<() => PostTags | null>;
 type Module = typeof import("@features/posts/utils");

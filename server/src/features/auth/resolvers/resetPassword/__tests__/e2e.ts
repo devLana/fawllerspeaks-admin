@@ -17,7 +17,7 @@ import {
   gqlValidations,
   validations,
   verifyEmail,
-} from "../utils/resetPasswordTestUtils";
+} from "../utils/resetPassword.testUtils";
 import { MailError } from "@utils";
 import {
   registeredUser,

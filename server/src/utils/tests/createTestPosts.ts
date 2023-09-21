@@ -1,7 +1,7 @@
 import type { Pool } from "pg";
 
 import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import dateToISOString from "../dateToISOSTring";
+import dateToISOString from "../dateToISOString";
 
 import type { DbFindPost, TestPosts, PostAuthor } from "@types";
 import type { Post, PostTag } from "@resolverTypes";
