@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { test, expect, describe, jest, afterEach } from "@jest/globals";
+import {
+  test,
+  expect,
+  describe,
+  jest,
+  afterEach,
+  beforeAll,
+} from "@jest/globals";
 import bcrypt from "bcrypt";
 
 import login from "..";
@@ -26,6 +33,10 @@ jest.mock("@features/auth/utils", () => {
 });
 
 describe("Test login resolver", () => {
+  beforeAll(() => {
+    mockContext.req.cookies = {};
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });

@@ -6,7 +6,12 @@ import type { Pool } from "pg";
 import { sign } from "@lib/tokenPromise";
 
 const testSession = async (db: Pool, userId: string, expiresIn = "15m") => {
-  if (!process.env.REFRESH_TOKEN_SECRET) {
+  if (
+    !process.env.REFRESH_TOKEN_SECRET ||
+    !process.env.CIPHER_ALGORITHM ||
+    !process.env.CIPHER_KEY ||
+    !process.env.CIPHER_IV
+  ) {
     throw new Error("No secret in environment");
   }
 
@@ -27,7 +32,18 @@ const testSession = async (db: Pool, userId: string, expiresIn = "15m") => {
       [refreshToken, userId, sessionId]
     );
 
-    const [header, payload, signature] = refreshToken.split(".");
+    const algorithm = process.env.CIPHER_ALGORITHM;
+    const key = Buffer.from(process.env.CIPHER_KEY, "hex");
+    const iv = Buffer.from(process.env.CIPHER_IV, "hex");
+
+    const [header, payload, signature] = refreshToken.split(".").map(part => {
+      const cipher = crypto.createCipheriv(algorithm, key, iv);
+      let encrypted = cipher.update(part, "utf8", "hex");
+
+      encrypted += cipher.final("hex");
+      return encrypted;
+    });
+
     const [auth, token, sig] = [payload, signature, header];
 
     return { cookies: `auth=${auth};token=${token};sig=${sig}`, sessionId };

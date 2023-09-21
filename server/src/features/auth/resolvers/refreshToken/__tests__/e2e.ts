@@ -39,7 +39,7 @@ jest.mock("@features/auth/utils", () => {
   };
 });
 
-describe("Refresh TOken - E2E", () => {
+describe("Refresh Token - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
   let registeredCookies: string, newRegisteredSessionId: string;
   let unregisteredSessionId: string, unregisteredCookies: string;

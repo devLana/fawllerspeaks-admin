@@ -6,6 +6,7 @@ import {
   jest,
   beforeEach,
   afterAll,
+  beforeAll,
 } from "@jest/globals";
 
 import logout from "..";
@@ -29,6 +30,10 @@ const cookies = { auth: "auth", sig: "sig", token: "token" };
 const sessionId = "session_id_string";
 
 describe("Test logout resolver", () => {
+  beforeAll(() => {
+    mockContext.req.cookies = {};
+  });
+
   beforeEach(() => {
     mockContext.user = "user_user_id";
   });

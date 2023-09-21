@@ -2,7 +2,6 @@ import { createDecipheriv } from "node:crypto";
 
 import type { Response, NextFunction } from "express";
 
-import { ApiError } from "@utils";
 import type { GQLRequest } from "@types";
 
 export const parseCookies = (
@@ -13,13 +12,9 @@ export const parseCookies = (
   if (
     !process.env.CIPHER_ALGORITHM ||
     !process.env.CIPHER_KEY ||
-    !process.env.CIPHER_IV
+    !process.env.CIPHER_IV ||
+    !req.headers.cookie
   ) {
-    const error = new ApiError("Sever error. Please try again later");
-    return next(error);
-  }
-
-  if (!req.headers.cookie) {
     const cookieReq = req;
     cookieReq.cookies = {};
     return next();
@@ -30,28 +25,32 @@ export const parseCookies = (
   const iv = Buffer.from(process.env.CIPHER_IV, "hex");
 
   try {
-    const splitCookies = req.headers.cookie.split(/;\s?/).map(cookie => {
-      const splitCookie = cookie.split(/=/);
-      const [name] = splitCookie;
+    const cookies = req.headers.cookie.split(/;\s?/);
+    const parsedCookies: Record<string, unknown> = {};
+
+    for (const cookie of cookies) {
+      const [name, value] = cookie.split(/=/);
 
       if (name === "auth" || name === "sig" || name === "token") {
-        const [, value] = splitCookie;
         const decipher = createDecipheriv(algorithm, key, iv);
         let decrypted = decipher.update(value, "hex", "utf-8");
 
         decrypted += decipher.final("utf-8");
-        return [name, decrypted];
+        parsedCookies[name] = decrypted;
+
+        continue;
       }
 
-      return splitCookie;
-    });
+      parsedCookies[name] = value;
+    }
 
     const cookieReq = req;
-    cookieReq.cookies = Object.fromEntries(splitCookies) as object;
+    cookieReq.cookies = parsedCookies;
 
     next();
-  } catch (err) {
-    const error = new ApiError("Sever error. Please try again later");
-    next(error);
+  } catch {
+    const cookieReq = req;
+    cookieReq.cookies = {};
+    return next();
   }
 };
