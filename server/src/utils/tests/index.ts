@@ -10,6 +10,7 @@ export { default as createAllTestPosts } from "./createAllTestPosts";
 export { default as createBinnedTestPosts } from "./createBinnedTestPosts";
 export { default as createDeleteTestPosts } from "./createDeleteTestPosts";
 export { default as testSession } from "./testSession";
+export { default as postFormData } from "./postFormData";
 
 export * from "./resolverArguments";
 export * from "./mocks";

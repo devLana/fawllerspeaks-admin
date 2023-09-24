@@ -1,6 +1,9 @@
+import process from "node:process";
+
 import formidable from "formidable";
 import type { Response, NextFunction } from "express";
 
+import { removeFile } from "@events/removeFile";
 import { ApiError, BadRequestError } from "@utils";
 import type { UploadRequest } from "@types";
 
@@ -14,8 +17,10 @@ export const multipartParser = async (
     return next(error);
   }
 
+  const uploadDir = `${process.cwd()}\\temp_upload`;
+
   try {
-    const form = formidable({ maxFiles: 1 });
+    const form = formidable({ uploadDir });
     const [fields, files] = await form.parse<"type", "image">(req);
 
     if (!files.image) {
@@ -47,13 +52,16 @@ export const multipartParser = async (
     }
 
     const [{ filepath, mimetype }] = files.image;
+
     const file = { filepath, mimetype };
     const uploadReq = req;
 
-    uploadReq.upload = { file, imageCategory: fields.type[0] };
+    uploadReq.upload = { file, imageCategory: fields.type[0], uploadDir };
 
     next();
   } catch (err) {
+    removeFile.emit("remove", uploadDir);
+
     if (err instanceof ApiError) return next(err);
 
     const error = new ApiError(

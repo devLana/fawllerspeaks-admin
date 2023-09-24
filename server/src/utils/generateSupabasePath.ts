@@ -21,7 +21,7 @@ export const generateSupabasePath = async (
 ) => {
   const randomBytes = util.promisify(crypto.randomBytes);
 
-  const filenameBuf = await randomBytes(30);
+  const filenameBuf = await randomBytes(25);
   const filename = filenameBuf.toString("base64url");
   const isDev = nodeEnv === "development" ? "dev/" : "";
   const extension = mimeTypeDict[mimeType] ?? "";

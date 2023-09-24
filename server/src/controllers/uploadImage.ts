@@ -4,7 +4,7 @@ import type { Response, NextFunction } from "express";
 
 import supabase from "@lib/supabase/supabaseClient";
 import { removeFile } from "@events/removeFile";
-import { ApiError, generateSupabasePath } from "@utils";
+import { ApiError, generateSupabasePath, upload } from "@utils";
 import type { UploadRequest } from "@types";
 
 export const uploadImage = async (
@@ -18,8 +18,8 @@ export const uploadImage = async (
   }
 
   try {
-    const { client, storageUrl } = supabase();
-    const { file, imageCategory } = req.upload;
+    const { storageUrl } = supabase();
+    const { file, imageCategory, uploadDir } = req.upload;
     const { mimetype, filepath } = file;
 
     const imageFile = await readFile(filepath);
@@ -28,11 +28,13 @@ export const uploadImage = async (
       mimetype
     );
 
-    const { error: supabaseErr } = await client.storage
-      .from("images")
-      .upload(supabaseFilePath, imageFile, { contentType: mimetype });
+    const { error: supabaseErr } = await upload(
+      supabaseFilePath,
+      mimetype,
+      imageFile
+    );
 
-    removeFile.emit("remove", filepath);
+    removeFile.emit("remove", uploadDir);
 
     if (supabaseErr) {
       throw new ApiError(

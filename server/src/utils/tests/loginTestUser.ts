@@ -1,6 +1,6 @@
 import { sign } from "@lib/tokenPromise";
 
-const loginTestUser = async (userId: string) => {
+const loginTestUser = async (userId: string, expiresIn = "10m") => {
   if (!process.env.ACCESS_TOKEN_SECRET) {
     throw new Error("No secret in environment");
   }
@@ -9,7 +9,7 @@ const loginTestUser = async (userId: string) => {
     const accessToken = await sign(
       { sub: userId },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "10m" }
+      { expiresIn }
     );
 
     return accessToken;
