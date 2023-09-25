@@ -1,10 +1,8 @@
-import process from "node:process";
-
 import formidable from "formidable";
 import type { Response, NextFunction } from "express";
 
 import { removeFile } from "@events/removeFile";
-import { ApiError, BadRequestError } from "@utils";
+import { ApiError, BadRequestError, uploadDir } from "@utils";
 import type { UploadRequest } from "@types";
 
 export const multipartParser = async (
@@ -16,8 +14,6 @@ export const multipartParser = async (
     const error = new BadRequestError("Invalid request type");
     return next(error);
   }
-
-  const uploadDir = `${process.cwd()}\\temp_upload`;
 
   try {
     const form = formidable({ uploadDir });
@@ -56,7 +52,7 @@ export const multipartParser = async (
     const file = { filepath, mimetype };
     const uploadReq = req;
 
-    uploadReq.upload = { file, imageCategory: fields.type[0], uploadDir };
+    uploadReq.upload = { file, imageCategory: fields.type[0] };
 
     next();
   } catch (err) {

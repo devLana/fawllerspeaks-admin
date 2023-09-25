@@ -4,7 +4,7 @@ import type { Response, NextFunction } from "express";
 
 import supabase from "@lib/supabase/supabaseClient";
 import { removeFile } from "@events/removeFile";
-import { ApiError, generateSupabasePath, upload } from "@utils";
+import { ApiError, generateSupabasePath, upload, uploadDir } from "@utils";
 import type { UploadRequest } from "@types";
 
 export const uploadImage = async (
@@ -19,7 +19,7 @@ export const uploadImage = async (
 
   try {
     const { storageUrl } = supabase();
-    const { file, imageCategory, uploadDir } = req.upload;
+    const { file, imageCategory } = req.upload;
     const { mimetype, filepath } = file;
 
     const imageFile = await readFile(filepath);

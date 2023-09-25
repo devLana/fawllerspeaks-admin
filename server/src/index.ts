@@ -12,6 +12,7 @@ import * as dotenv from "dotenv";
 import { typeDefs, resolvers } from "@schema";
 import {
   authenticateUser,
+  createTempDirectory,
   errorMiddleware,
   multipartParser,
   parseCookies,
@@ -45,7 +46,11 @@ export const startServer = async (port: number) => {
   );
 
   app.use(/^\/$/, [express.json(), parseCookies], graphqlApi(server));
-  app.post("/upload-image", [authenticateUser, multipartParser], uploadImage);
+  app.post(
+    "/upload-image",
+    [authenticateUser, createTempDirectory, multipartParser],
+    uploadImage
+  );
   app.get("/health-check", healthCheck);
   app.use("*", catchAll);
   app.use(errorMiddleware);

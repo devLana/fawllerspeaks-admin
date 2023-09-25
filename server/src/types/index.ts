@@ -112,11 +112,7 @@ interface UploadedFile {
 }
 
 export interface UploadRequest extends Request {
-  upload?: {
-    file: UploadedFile;
-    imageCategory: "avatar" | "post";
-    uploadDir: string;
-  };
+  upload?: { file: UploadedFile; imageCategory: "avatar" | "post" };
 }
 
 export interface GQLRequest extends Request {
