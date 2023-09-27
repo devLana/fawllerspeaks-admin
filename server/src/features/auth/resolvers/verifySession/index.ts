@@ -1,3 +1,5 @@
+import { Buffer } from "node:buffer";
+
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
@@ -17,7 +19,6 @@ import {
   MailError,
   NotAllowedError,
   UnknownError,
-  UserSessionError,
   dateToISOString,
 } from "@utils";
 
@@ -28,7 +29,6 @@ type VerifySession = ResolverFunc<MutationResolvers["verifySession"]>;
 
 interface DBResponse {
   userId: string;
-  refreshToken: string;
   email: string;
   firstName: string | null;
   lastName: string | null;
@@ -49,7 +49,6 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
   const SELECT = `
     SELECT
       "user" "userId",
-      refresh_token "refreshToken",
       email,
       first_name "firstName",
       last_name "lastName",
@@ -60,8 +59,8 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     WHERE session_id = $1
   `;
 
-  let jwt: string | null = null;
   let validatedSession: string | null = null;
+  let payload = "";
 
   try {
     validatedSession = await schema.validateAsync(args.sessionId);
@@ -72,7 +71,8 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       return new ForbiddenError("Unable to verify session");
     }
 
-    jwt = `${sig}.${auth}.${token}`;
+    const jwt = `${sig}.${auth}.${token}`;
+    payload = auth;
 
     const { sub } = (await verify(jwt, process.env.REFRESH_TOKEN_SECRET)) as {
       sub: string;
@@ -83,18 +83,13 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     // Unable to find any valid session with the provided session id
     if (rows.length === 0) return new UnknownError("Unable to verify session");
 
-    // Provided session was not assigned to the current user
-    if (rows[0].userId !== sub) {
-      return new UserSessionError("Unable to verify session");
-    }
-
     /*
-      The refreshToken for the provided session isn't the same as the refreshToken assigned to the current logged in user(User may have been hacked):
+      The provided session was not assigned to the current user(User may have been hacked):
       - clear that session from db
       - clear cookies
       - send mail
     */
-    if (rows[0].refreshToken !== jwt) {
+    if (rows[0].userId !== sub) {
       await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
         validatedSession,
       ]);
@@ -113,17 +108,18 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       [refreshToken, validatedSession, sub]
     );
 
-    const user = {
-      email: rows[0].email,
-      id: sub,
-      firstName: rows[0].firstName,
-      lastName: rows[0].lastName,
-      image: rows[0].image,
-      isRegistered: rows[0].isRegistered,
-      dateCreated: dateToISOString(rows[0].dateCreated),
-    };
-
-    return new VerifiedSession(user, accessToken);
+    return new VerifiedSession(
+      {
+        email: rows[0].email,
+        id: sub,
+        firstName: rows[0].firstName,
+        lastName: rows[0].lastName,
+        image: rows[0].image,
+        isRegistered: rows[0].isRegistered,
+        dateCreated: dateToISOString(rows[0].dateCreated),
+      },
+      accessToken
+    );
   } catch (err) {
     if (err instanceof TokenExpiredError) {
       try {
@@ -134,13 +130,16 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
           return new UnknownError("Unable to verify session");
         }
 
+        const decoded = Buffer.from(payload, "base64").toString();
+        const decodedPayload = JSON.parse(decoded) as { sub: string };
+
         /*
-          The refreshToken for the provided session isn't the same as the refreshToken assigned to the current logged in user(User may have been hacked):
+          The provided session was not assigned to the current user(User may have been hacked):
           - clear that session from db
           - clear cookies
           - send mail
         */
-        if (rows[0].refreshToken !== jwt) {
+        if (rows[0].userId !== decodedPayload.sub) {
           await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
             validatedSession,
           ]);
@@ -161,17 +160,18 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
           [refreshToken, validatedSession, rows[0].userId]
         );
 
-        const user = {
-          email: rows[0].email,
-          id: rows[0].userId,
-          firstName: rows[0].firstName,
-          lastName: rows[0].lastName,
-          image: rows[0].image,
-          isRegistered: rows[0].isRegistered,
-          dateCreated: dateToISOString(rows[0].dateCreated),
-        };
-
-        return new VerifiedSession(user, accessToken);
+        return new VerifiedSession(
+          {
+            email: rows[0].email,
+            id: rows[0].userId,
+            firstName: rows[0].firstName,
+            lastName: rows[0].lastName,
+            image: rows[0].image,
+            isRegistered: rows[0].isRegistered,
+            dateCreated: dateToISOString(rows[0].dateCreated),
+          },
+          accessToken
+        );
       } catch (error) {
         if (error instanceof MailError) {
           return new NotAllowedError("Unable to verify session");

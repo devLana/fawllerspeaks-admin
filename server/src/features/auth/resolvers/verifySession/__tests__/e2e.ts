@@ -19,6 +19,7 @@ import {
   authUsers,
   post,
   registeredUser as registeredTestUser,
+  newRegisteredUser as newTestUser,
   testSession,
   unRegisteredUser as unRegisteredTestUser,
 } from "@tests";
@@ -38,7 +39,7 @@ jest.mock("@features/auth/utils", () => {
   };
 });
 
-describe("Refresh TOken - E2E", () => {
+describe("Verify Session - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
   let registeredUser: DbTestUser, registeredSessionId: string;
   let registeredCookies: string, unregisteredUser: DbTestUser;
@@ -188,7 +189,7 @@ describe("Refresh TOken - E2E", () => {
         });
       });
 
-      it("Session refresh token does not match cookie refresh token, Return a NotAllowedError and send a notification mail", async () => {
+      it("Provided session was not assigned to the user of the cookie refresh token, Return a NotAllowedError and send a notification mail", async () => {
         const variables = { sessionId: unregisteredSessionId };
         const payload = { query: VERIFY_SESSION, variables };
         const options = { cookie: newRegisteredCookies };
@@ -225,7 +226,7 @@ describe("Refresh TOken - E2E", () => {
         });
       });
 
-      it("Session was not assigned to the logged in user, Return a UserSessionError", async () => {
+      it("Provided session was not assigned to the user of the cookie refresh token, Return a NotAllowedError", async () => {
         const variables = { sessionId: newRegisteredSessionId };
         const payload = { query: VERIFY_SESSION, variables };
         const options = { cookie: registeredCookies };
@@ -235,10 +236,12 @@ describe("Refresh TOken - E2E", () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.verifySession).toStrictEqual({
-          __typename: "UserSessionError",
+          __typename: "NotAllowedError",
           message: "Unable to verify session",
           status: Status.Error,
         });
+        expect(sessionMail).toHaveBeenCalledTimes(1);
+        expect(sessionMail).toHaveBeenCalledWith(newTestUser.email);
       });
 
       it("Should verify session, Sign a new access token and send user details", async () => {

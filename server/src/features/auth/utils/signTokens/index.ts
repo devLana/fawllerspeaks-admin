@@ -3,8 +3,8 @@ import { Buffer } from "node:buffer";
 
 import { GraphQLError } from "graphql";
 
-import { jwtExpires } from "../jwtExpires";
 import { sign } from "@lib/tokenPromise";
+import { nodeEnv } from "@utils";
 import type { Cookies } from "@types";
 
 type ResultTuple = [string, string, Required<Cookies>];
@@ -21,11 +21,11 @@ const signTokens = async (userId: string): Promise<ResultTuple> => {
   }
 
   const refresh = sign({ sub: userId }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: jwtExpires.refreshToken,
+    expiresIn: nodeEnv === "production" ? "2h" : "5h",
   });
 
   const access = sign({ sub: userId }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: jwtExpires.accessToken,
+    expiresIn: nodeEnv === "production" ? "1h" : "4h",
   });
 
   const [refreshToken, accessToken] = await Promise.all([refresh, access]);

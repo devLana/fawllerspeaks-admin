@@ -100,7 +100,6 @@ export const notAllowed = {
 
 const unsupported = new MockOne("UnsupportedObjectType", msg1, "UNSUPPORTED");
 const forbid = new MockOne("ForbiddenError", msg2, "FORBIDDEN");
-const userSession = new MockOne("UserSessionError", msg2, "USER_SESSION");
 
 const unknown = {
   sessionId: "UNKNOWN_SESSION_ID",
@@ -181,7 +180,6 @@ export const tableOne: [string, TableOne][] = [
     "Render an error alert if the refresh token could not be verified/validated",
     forbid,
   ],
-  ["Render an error alert if user session could not be verified", userSession],
   ["Render an error alert if verification fails with a GraphQL error", graphql],
   ["Render an error alert if verification fails with a Network error", network],
 ];

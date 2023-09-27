@@ -53,7 +53,6 @@ const useVerifySession = (
               break;
 
             case "SessionIdValidationError":
-            case "UserSessionError":
             case "ForbiddenError":
               setErrorMessage(
                 "Current logged in session could not be verified"

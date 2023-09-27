@@ -608,7 +608,7 @@ export type VerifyResetTokenValidationError = {
   tokenError: Scalars['String'];
 };
 
-export type VerifySession = ForbiddenError | NotAllowedError | SessionIdValidationError | UnknownError | UserSessionError | VerifiedSession;
+export type VerifySession = ForbiddenError | NotAllowedError | SessionIdValidationError | UnknownError | VerifiedSession;
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
@@ -758,7 +758,7 @@ export type ResolversTypes = ResolversObject<{
   VerifiedSession: ResolverTypeWrapper<VerifiedSession>;
   VerifyResetToken: ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['VerifiedResetToken'] | ResolversTypes['VerifyResetTokenValidationError'];
   VerifyResetTokenValidationError: ResolverTypeWrapper<VerifyResetTokenValidationError>;
-  VerifySession: ResolversTypes['ForbiddenError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['SessionIdValidationError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'] | ResolversTypes['VerifiedSession'];
+  VerifySession: ResolversTypes['ForbiddenError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['SessionIdValidationError'] | ResolversTypes['UnknownError'] | ResolversTypes['VerifiedSession'];
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -839,7 +839,7 @@ export type ResolversParentTypes = ResolversObject<{
   VerifiedSession: VerifiedSession;
   VerifyResetToken: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['VerifiedResetToken'] | ResolversParentTypes['VerifyResetTokenValidationError'];
   VerifyResetTokenValidationError: VerifyResetTokenValidationError;
-  VerifySession: ResolversParentTypes['ForbiddenError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['SessionIdValidationError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'] | ResolversParentTypes['VerifiedSession'];
+  VerifySession: ResolversParentTypes['ForbiddenError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['SessionIdValidationError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['VerifiedSession'];
 }>;
 
 export type AccessTokenResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['AccessToken'] = ResolversParentTypes['AccessToken']> = ResolversObject<{
@@ -1278,7 +1278,7 @@ export type VerifyResetTokenValidationErrorResolvers<ContextType = APIContext, P
 }>;
 
 export type VerifySessionResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['VerifySession'] = ResolversParentTypes['VerifySession']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'ForbiddenError' | 'NotAllowedError' | 'SessionIdValidationError' | 'UnknownError' | 'UserSessionError' | 'VerifiedSession', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'ForbiddenError' | 'NotAllowedError' | 'SessionIdValidationError' | 'UnknownError' | 'VerifiedSession', ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = APIContext> = ResolversObject<{

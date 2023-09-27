@@ -80,7 +80,7 @@ export const authTypeDefs = `#graphql
 
   union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | NotAllowedError | RegistrationError
 
-  union VerifySession = VerifiedSession | SessionIdValidationError | UserSessionError | NotAllowedError | UnknownError | ForbiddenError
+  union VerifySession = VerifiedSession | SessionIdValidationError | NotAllowedError | UnknownError | ForbiddenError
 
   input RegisterUserInput {
     firstName: String!

@@ -21,18 +21,16 @@ import {
   JWT_REGEX,
 } from "@features/auth/utils";
 import {
+  authCookies,
   cookies,
   data,
-  dbResponse,
   email,
   loggedInUserId,
   mockDate,
   mockObj,
   obj,
   sessionId,
-  token,
   validateCookies,
-  validateSession,
   validations,
 } from "../utils/verifySession.testUtils";
 import { MailError } from "@utils";
@@ -83,8 +81,8 @@ describe("Test verify session resolver", () => {
   describe("Validate cookie request header", () => {
     test.each(validateCookies)(
       "Return an error response if cookie header has %s",
-      async (_, authCookies) => {
-        mockContext.req.cookies = authCookies;
+      async (_, mockCookies) => {
+        mockContext.req.cookies = mockCookies;
 
         const result = await resolver({}, { sessionId }, mockContext, info);
 
@@ -141,10 +139,11 @@ describe("Test verify session resolver", () => {
         expect(result).toHaveProperty("status", "ERROR");
       });
 
-      test("Session refresh token does not match the cookie refresh token, Return an error response", async () => {
-        const mockData = [{ refreshToken: token, email }];
+      test("Provided session was not assigned to the user of the cookie refresh token, Return an error response and send mail notification", async () => {
+        const mockData = [{ userId: "loggedInUserId", email }];
         const spy = spyDb({ rows: mockData }).mockReturnValueOnce({ rows: [] });
 
+        mockContext.req.cookies = authCookies;
         verifyMock.mockImplementation(() => {
           throw new TokenExpiredError("Expired refresh token", new Date());
         });
@@ -168,10 +167,11 @@ describe("Test verify session resolver", () => {
         expect(result).toHaveProperty("status", "ERROR");
       });
 
-      test("Return an error response if session refresh token does not match the cookie refresh token and mail notification fails to send", async () => {
-        const mockData = [{ refreshToken: token, email }];
+      test("Return an error response if the provided session was not assigned to the current user of the cookie refresh token and mail notification failed to send", async () => {
+        const mockData = [{ userId: "loggedInUserId", email }];
         const spy = spyDb({ rows: mockData }).mockReturnValueOnce({ rows: [] });
 
+        mockContext.req.cookies = authCookies;
         verifyMock.mockImplementation(() => {
           throw new TokenExpiredError("Expired refresh token", new Date());
         });
@@ -201,9 +201,10 @@ describe("Test verify session resolver", () => {
       });
 
       test("Verify user session, Sign new access token and send user details ", async () => {
-        const mockData = [{ ...dbResponse, ...obj }];
+        const mockData = [{ ...obj }];
         const spy = spyDb({ rows: mockData }).mockReturnValue({ rows: [] });
 
+        mockContext.req.cookies = authCookies;
         verifyMock.mockImplementation(() => {
           throw new TokenExpiredError("Expired refresh token", new Date());
         });
@@ -239,32 +240,29 @@ describe("Test verify session resolver", () => {
     });
 
     describe("Valid and not expired refresh token", () => {
-      test.each(validateSession)(
-        "Return an error response if the %s",
-        async (_, mock) => {
-          const spy = spyDb({ rows: mock });
+      test("Return an error response if the session id is unknown", async () => {
+        const spy = spyDb({ rows: [] });
 
-          verifyMock.mockReturnValueOnce({ sub: loggedInUserId });
+        verifyMock.mockReturnValueOnce({ sub: loggedInUserId });
 
-          const result = await resolver({}, { sessionId }, mockContext, info);
+        const result = await resolver({}, { sessionId }, mockContext, info);
 
-          expect(verify).toHaveBeenCalledTimes(1);
-          expect(verify).toHaveReturnedWith({ sub: loggedInUserId });
+        expect(verify).toHaveBeenCalledTimes(1);
+        expect(verify).toHaveReturnedWith({ sub: loggedInUserId });
 
-          expect(spy).toHaveBeenCalledTimes(1);
-          expect(spy).toHaveReturnedWith({ rows: mock });
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveReturnedWith({ rows: [] });
 
-          expect(clearCookies).not.toHaveBeenCalled();
+        expect(clearCookies).not.toHaveBeenCalled();
 
-          expect(result).toHaveProperty("message", "Unable to verify session");
-          expect(result).toHaveProperty("status", "ERROR");
-        }
-      );
+        expect(result).toHaveProperty("message", "Unable to verify session");
+        expect(result).toHaveProperty("status", "ERROR");
+      });
 
-      test("Session refresh token does not match the cookie refresh token, Return an error response", async () => {
+      test("Provided session was not assigned to the user of the cookie refresh token, Return an error response and send mail notification", async () => {
         verifyMock.mockReturnValue({ sub: loggedInUserId });
 
-        const mock = [{ refreshToken: token, userId: loggedInUserId, email }];
+        const mock = [{ userId: "loggedInUserId", email }];
         const spy = spyDb({ rows: mock }).mockReturnValueOnce({ rows: [] });
 
         const result = await resolver({}, { sessionId }, mockContext, info);
@@ -286,14 +284,14 @@ describe("Test verify session resolver", () => {
         expect(result).toHaveProperty("status", "ERROR");
       });
 
-      test("Return an error response if the session refresh token does not match the cookie refresh token and notification mail fails to send", async () => {
+      test("Return an error response if the provided session was not assigned to the user of the cookie refresh token and notification mail fails to send", async () => {
         verifyMock.mockReturnValue({ sub: loggedInUserId });
 
         mockMailFn.mockImplementation(() => {
           throw new MailError("Unable to send session mail");
         });
 
-        const mock = [{ refreshToken: token, userId: loggedInUserId, email }];
+        const mock = [{ userId: "loggedInUserId", email }];
         const spy = spyDb({ rows: mock }).mockReturnValueOnce({ rows: [] });
 
         const result = await resolver({}, { sessionId }, mockContext, info);

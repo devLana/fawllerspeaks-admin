@@ -37,11 +37,7 @@ export const parseCookies = (
 
         decrypted += decipher.final("utf-8");
         parsedCookies[name] = decrypted;
-
-        continue;
       }
-
-      parsedCookies[name] = value;
     }
 
     const cookieReq = req;

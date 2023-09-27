@@ -5,18 +5,22 @@ type GQL = [
   boolean | number | [] | Record<string, unknown> | undefined | null
 ];
 
+const dateCreated = "2022-11-07 13:22:43.717+01";
+export const mockDate = "2022-11-07T12:22:43.717Z";
 export const cookieString = "auth=auth; sig=sig; token=token";
 export const cookies = { auth: "auth", sig: "sig", token: "token" };
-export const token = "refresh.token.string";
 export const sessionId = "session_id_string";
 export const loggedInUserId = "user_user";
 export const email = "test@mail.com";
 
-const dateCreated = "2022-11-07 13:22:43.717+01";
-export const mockDate = "2022-11-07T12:22:43.717Z";
+const authUserId = "28d9e034-11d1-46f2-8df5-a2ef94802d9c";
+export const authCookies = {
+  auth: "eyJzdWIiOiIyOGQ5ZTAzNC0xMWQxLTQ2ZjItOGRmNS1hMmVmOTQ4MDJkOWMiLCJpYXQiOjE2OTU4NDA2ODMsImV4cCI6MTY5NTg0MDY4M30",
+  token: "aiSxMDQYPhsKJ8n8Tfaq1ryJZrpjEwVbn1ADAepOWds",
+  sig: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+};
 
-export const dbResponse = {
-  refreshToken: `${cookies.sig}.${cookies.auth}.${cookies.token}`,
+const dbResponse = {
   email: "mail@mail.com",
   firstName: "first_name",
   lastName: "last_name",
@@ -42,16 +46,9 @@ export const validateCookies: [string, Cookies][] = [
   ["one or more missing cookies", { sig: "sig", auth: "auth" }],
 ];
 
-export const validateSession: [string, Record<string, string>[]][] = [
-  ["session id is unknown", []],
-  [
-    "refresh token was not signed for the user of the provided session",
-    [{ userId: "fake_user_id" }],
-  ],
-];
-
 export const obj = {
-  userId: "user_Id_One",
+  ...dbResponse,
+  userId: authUserId,
   isRegistered: false,
 };
 
