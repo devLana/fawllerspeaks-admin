@@ -4,13 +4,10 @@ import * as React from "react";
 import { useRouter } from "next/router";
 
 import { useApolloClient } from "@apollo/client";
-import jwt_decode, { type JwtPayload } from "jwt-decode";
 
 import { useAuthHeaderHandler } from "@context/ApolloContext";
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { SESSION_ID } from "@utils/constants";
-
-type Decoded = Required<Pick<JwtPayload, "exp" | "iat" | "sub">>;
 
 const useRefreshToken = () => {
   const [timer, setTimer] = React.useState(0);
@@ -45,8 +42,8 @@ const useRefreshToken = () => {
           break;
 
         case "AccessToken":
-          handleAuthHeader(data.refreshToken.accessToken);
           handleRefreshToken(data.refreshToken.accessToken);
+          handleAuthHeader(data.refreshToken.accessToken);
           break;
       }
     } catch {
@@ -71,7 +68,9 @@ const useRefreshToken = () => {
   }, [timer]);
 
   function handleRefreshToken(accessToken: string) {
-    const decoded = jwt_decode<Decoded>(accessToken);
+    const [, payload] = accessToken.split(".");
+    const payloadJson = window.atob(payload);
+    const decoded = JSON.parse(payloadJson) as { exp: number };
     const modifier = 15 * 1000;
     const validityPeriod = decoded.exp * 1000 - Date.now();
     const requestTime = validityPeriod - modifier;

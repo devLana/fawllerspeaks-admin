@@ -1,3 +1,5 @@
+import { Buffer } from "node:buffer";
+
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
@@ -45,8 +47,9 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
     WHERE session_id = $1
   `;
 
-  let jwt: string | null = null;
+  let payload = "";
   let validatedSession: string | null = null;
+  let jwt: string | null = null;
 
   try {
     validatedSession = await schema.validateAsync(args.sessionId);
@@ -58,6 +61,7 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
     }
 
     jwt = `${sig}.${auth}.${token}`;
+    payload = auth;
 
     const { sub } = (await verify(jwt, process.env.REFRESH_TOKEN_SECRET)) as {
       sub: string;
@@ -107,6 +111,14 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
         // Unable to find a valid session with the provided session id
         if (rows.length === 0) {
           return new UnknownError("Unable to refresh token");
+        }
+
+        const decoded = Buffer.from(payload, "base64").toString();
+        const decodedPayload = JSON.parse(decoded) as { sub: string };
+
+        // Provided session was not assigned to the current user
+        if (rows[0].user !== decodedPayload.sub) {
+          return new UserSessionError("Unable to refresh token");
         }
 
         /*

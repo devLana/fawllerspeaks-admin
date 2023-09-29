@@ -10,11 +10,11 @@ const ErrorAlert = ({ message }: { message: string }) => {
   return (
     <Box
       sx={{
-        height: 125,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
+        rowGap: 2,
       }}
     >
       <Alert severity="info" color="error">

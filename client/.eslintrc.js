@@ -69,6 +69,7 @@ module.exports = {
     eqeqeq: 1,
     "guard-for-in": 1,
     "max-params": [1, 3],
+    "no-console": 1,
     "no-extra-boolean-cast": 1,
     "no-lonely-if": 1,
     "no-param-reassign": [2, { props: true }],

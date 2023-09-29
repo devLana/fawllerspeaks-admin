@@ -21,6 +21,9 @@ import {
   JWT_REGEX,
 } from "@features/auth/utils";
 import {
+  authCookies,
+  authToken,
+  authUserId,
   cookies,
   jwToken,
   loggedInUserId,
@@ -83,8 +86,8 @@ describe("Test refresh token resolver", () => {
   describe("Validate request cookie", () => {
     test.each(validateCookie)(
       "Return an error response if the request cookie %s",
-      async (_, authCookies) => {
-        mockContext.req.cookies = authCookies;
+      async (_, mockCookies) => {
+        mockContext.req.cookies = mockCookies;
 
         const result = await resolver({}, { sessionId }, mockContext, info);
 
@@ -145,12 +148,38 @@ describe("Test refresh token resolver", () => {
         expect(result).toHaveProperty("status", "ERROR");
       });
 
+      test("Current session was not assigned to the user of the cookie refresh token, Return an error response", async () => {
+        const spy = spyDb({ rows: [{ user: loggedInUserId }] });
+
+        mockContext.req.cookies = authCookies;
+        mockVerify.mockImplementation(() => {
+          throw new TokenExpiredError("Expired refresh token", new Date());
+        });
+
+        const result = await resolver({}, { sessionId }, mockContext, info);
+
+        expect(clearCookies).not.toHaveBeenCalled();
+        expect(setCookies).not.toHaveBeenCalled();
+        expect(sessionMail).not.toHaveBeenCalled();
+
+        expect(verify).toHaveBeenCalledTimes(1);
+        expect(verify).toThrow(TokenExpiredError);
+        expect(verify).toThrow("Expired refresh token");
+
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveReturnedWith({ rows: [{ user: loggedInUserId }] });
+
+        expect(result).toHaveProperty("message", "Unable to refresh token");
+        expect(result).toHaveProperty("status", "ERROR");
+      });
+
       test("Session refresh token does not match cookie refresh token, Return an error response and send a notification mail", async () => {
         const email = "test@mail.com";
-        const data = [{ refreshToken: token, user: loggedInUserId, email }];
+        const data = [{ refreshToken: token, user: authUserId, email }];
 
         const spy = spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
 
+        mockContext.req.cookies = authCookies;
         mockVerify.mockImplementation(() => {
           throw new TokenExpiredError("Expired refresh token", new Date());
         });
@@ -179,9 +208,10 @@ describe("Test refresh token resolver", () => {
 
       test("Return an error response if session refresh token does not match cookie refresh token and session mail failed to send", async () => {
         const email = "test@mail.com";
-        const data = [{ refreshToken: token, user: loggedInUserId, email }];
+        const data = [{ refreshToken: token, user: authUserId, email }];
         const spy = spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
 
+        mockContext.req.cookies = authCookies;
         mockVerify.mockImplementation(() => {
           throw new TokenExpiredError("Expired refresh token", new Date());
         });
@@ -215,11 +245,10 @@ describe("Test refresh token resolver", () => {
 
       test("Refresh tokens, Renew expired refresh token and send new access token", async () => {
         const email = "test@mail.com";
-        const data = [{ refreshToken: jwToken, user: loggedInUserId, email }];
+        const data = [{ refreshToken: authToken, user: authUserId, email }];
+        const spy = spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
 
-        const spy = spyDb({ rows: data });
-        spy.mockReturnValueOnce({ rows: [] });
-
+        mockContext.req.cookies = authCookies;
         mockVerify.mockImplementation(() => {
           throw new TokenExpiredError("Expired refresh token", new Date());
         });

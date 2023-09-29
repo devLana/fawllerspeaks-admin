@@ -4,7 +4,6 @@ import * as React from "react";
 import { useRouter } from "next/router";
 
 import { ApolloError, useApolloClient } from "@apollo/client";
-import { InvalidTokenError } from "jwt-decode";
 
 import { useAuthHeaderHandler } from "@context/ApolloContext";
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
@@ -96,8 +95,8 @@ const useVerifySession = (
                 setClientHasRendered(true);
               }
 
-              handleAuthHeader(data.verifySession.accessToken);
               handleRefreshToken(data.verifySession.accessToken);
+              handleAuthHeader(data.verifySession.accessToken);
               setUserId(`${__typename}:${user.id}`);
 
               break;
@@ -107,11 +106,8 @@ const useVerifySession = (
               throw new Error();
           }
         })
-        .catch((err: Error) => {
-          if (err instanceof InvalidTokenError) {
-            setClientHasRendered(true);
-            setErrorMessage(msg);
-          } else if (err instanceof ApolloError) {
+        .catch(err => {
+          if (err instanceof ApolloError) {
             const message =
               err.graphQLErrors.length > 0
                 ? err.graphQLErrors[0].message

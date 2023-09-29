@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 
 import { screen, waitFor } from "@testing-library/react";
-import jwtDecode, { InvalidTokenError } from "jwt-decode";
 
 import {
+  authToken,
   decode,
   msg1,
   notAllowed,
@@ -17,8 +17,6 @@ import {
   sessionTestRenderer,
 } from "../utils/sessionTestRenderer";
 import { SESSION_ID } from "@utils/constants";
-
-const mock = jwtDecode as jest.MockedFunction<() => never>;
 
 describe("Verify user session on initial app render", () => {
   describe("User is not logged in", () => {
@@ -112,11 +110,7 @@ describe("Verify user session on initial app render", () => {
         expect(reload).toHaveBeenCalledTimes(1);
       });
 
-      it("Render an error alert if jwt decoding throws an InvalidTokenError", async () => {
-        mock.mockImplementationOnce(() => {
-          throw new InvalidTokenError("Invalid access token provided");
-        });
-
+      it("Render an error alert if there was an error decoding the jwt payload", async () => {
         const { reload } = useRouter();
         localStorage.setItem(SESSION_ID, decode.sessionId);
 
@@ -130,6 +124,7 @@ describe("Verify user session on initial app render", () => {
         expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
         expect(alert).toHaveTextContent(msg1);
         expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
+        expect(handleAuthHeader).not.toHaveBeenCalled();
 
         await user.click(screen.getByRole("button", { name: /reload page/i }));
         expect(reload).toHaveBeenCalledTimes(1);
@@ -166,7 +161,7 @@ describe("Verify user session on initial app render", () => {
           expect(screen.getByText(TEXT_NODE)).toBeInTheDocument();
 
           expect(handleAuthHeader).toHaveBeenCalled();
-          expect(handleAuthHeader).toHaveBeenCalledWith("accessToken");
+          expect(handleAuthHeader).toHaveBeenCalledWith(authToken);
         });
       });
 
@@ -187,7 +182,7 @@ describe("Verify user session on initial app render", () => {
           expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
 
           expect(handleAuthHeader).toHaveBeenCalled();
-          expect(handleAuthHeader).toHaveBeenCalledWith("accessToken");
+          expect(handleAuthHeader).toHaveBeenCalledWith(authToken);
         });
       });
     });

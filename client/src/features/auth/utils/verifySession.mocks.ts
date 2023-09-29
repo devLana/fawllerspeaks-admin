@@ -8,6 +8,8 @@ export const TEXT_NODE = "Testing User Authentication";
 export const msg1 =
   "An unexpected error has occurred while trying to verify your current session";
 const msg2 = "Current logged in session could not be verified";
+export const authToken =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGQ5ZTAzNC0xMWQxLTQ2ZjItOGRmNS1hMmVmOTQ4MDJkOWMiLCJpYXQiOjE2OTU4NDA2ODMsImV4cCI6MTY5NTg0MDY4M30.aiSxMDQYPhsKJ8n8Tfaq1ryJZrpjEwVbn1ADAepOWds";
 
 const refresh = {
   gql(sessionId: string): MockedResponse[] {
@@ -16,10 +18,7 @@ const refresh = {
         request: { query: REFRESH_TOKEN, variables: { sessionId } },
         result: {
           data: {
-            refreshToken: {
-              __typename: "AccessToken",
-              accessToken: "new_accessToken",
-            },
+            refreshToken: { __typename: "AccessToken", accessToken: authToken },
           },
         },
       },
@@ -52,9 +51,9 @@ class MockTwo {
   sessionId: string;
 
   constructor(
-    readonly isRegistered: boolean,
-    readonly userId: string,
-    id: string
+    id: string,
+    readonly data: { isRegistered: boolean; userId: string },
+    readonly token = authToken
   ) {
     this.sessionId = `${id}_SESSION_ID`;
   }
@@ -67,15 +66,15 @@ class MockTwo {
           data: {
             verifySession: {
               __typename: "VerifiedSession",
-              accessToken: "accessToken",
+              accessToken: this.token,
               user: {
                 __typename: "User",
-                id: this.userId,
+                id: this.data.userId,
                 email: "mail@example.com",
                 firstName: "first name",
                 lastName: "last Name",
                 image: null,
-                isRegistered: this.isRegistered,
+                isRegistered: this.data.isRegistered,
               },
             },
           },
@@ -159,9 +158,21 @@ const network = {
   },
 };
 
-export const decode = new MockTwo(true, "registered_user_id", "DECODE");
-const registered = new MockTwo(true, "registered_user_id", "REGISTERED");
-const unregistered = new MockTwo(false, "unregistered_user_id", "UNREGISTERED");
+export const decode = new MockTwo(
+  "DECODE",
+  { isRegistered: true, userId: "registered_user_id" },
+  "accessToken"
+);
+
+const registered = new MockTwo("REGISTERED", {
+  isRegistered: true,
+  userId: "registered_user_id",
+});
+
+const unregistered = new MockTwo("UNREGISTERED", {
+  isRegistered: false,
+  userId: "unregistered_user_id",
+});
 
 interface TableOne {
   message: string;

@@ -10,7 +10,11 @@ interface Expected {
 }
 
 const testUserId = "New_Authenticated_User_Id";
-export const newAccessToken = "new_access_token";
+export const oldAuthToken =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGQ5ZTAzNC0xMWQxLTQ2ZjItOGRmNS1hMmVmOTQ4MDJkOWMiLCJpYXQiOjE2OTU4NDA2ODMsImV4cCI6MTY5NTg0MDY4M30.aiSxMDQYPhsKJ8n8Tfaq1ryJZrpjEwVbn1ADAepOWds";
+
+export const newAuthToken =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4Njk4ZDI5Yy1kNGVkLTQ4MjUtYWE5NS0zZmQ3NTVlZmEwYmYiLCJpYXQiOjE2OTU5MzA5NTMsImV4cCI6MTY5NTkzMDk1M30.eofsd3QEw-XGNZ-KLldAvxQoVKMrTq5XN5uxQ8cxuSU";
 
 const request = (sessionId: string): MockedResponse["request"] => {
   return { query: REFRESH_TOKEN, variables: { sessionId } };
@@ -25,7 +29,7 @@ const verify = {
           data: {
             verifySession: {
               __typename: "VerifiedSession",
-              accessToken: "old_access_token",
+              accessToken: oldAuthToken,
               user: {
                 __typename: "User",
                 id: testUserId,
@@ -108,19 +112,24 @@ export const notAllowed = {
 
 export const refresh = {
   sessionId: "REFRESH_SESSION_ID",
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.sessionId),
-        result: {
-          data: {
-            refreshToken: {
-              __typename: "AccessToken",
-              accessToken: newAccessToken,
-            },
+  mock(): MockedResponse {
+    return {
+      request: request(this.sessionId),
+      result: {
+        data: {
+          refreshToken: {
+            __typename: "AccessToken",
+            accessToken: newAuthToken,
           },
         },
       },
+    };
+  },
+  gql(): MockedResponse[] {
+    return [
+      this.mock(),
+      this.mock(),
+      this.mock(),
       ...verify.gql(this.sessionId),
     ];
   },

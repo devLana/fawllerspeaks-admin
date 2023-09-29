@@ -3,8 +3,9 @@ import { useRouter } from "next/router";
 import { screen, waitFor } from "@testing-library/react";
 
 import {
-  newAccessToken,
+  newAuthToken,
   notAllowed,
+  oldAuthToken,
   refresh,
   table,
 } from "../utils/refreshToken.mocks";
@@ -59,8 +60,10 @@ describe("Refresh expired user access token", () => {
       sessionTestRenderer(refresh.gql());
 
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());
-      await waitFor(() => expect(handleAuthHeader).toHaveBeenCalledTimes(2));
-      expect(handleAuthHeader).toHaveBeenCalledWith(newAccessToken);
+      await waitFor(() => expect(handleAuthHeader).toHaveBeenCalledTimes(3));
+      expect(handleAuthHeader).toHaveBeenNthCalledWith(1, oldAuthToken);
+      expect(handleAuthHeader).toHaveBeenNthCalledWith(2, newAuthToken);
+      expect(handleAuthHeader).toHaveBeenNthCalledWith(3, newAuthToken);
     });
   });
 });

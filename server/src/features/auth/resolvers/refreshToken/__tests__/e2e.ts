@@ -158,6 +158,22 @@ describe("Refresh Token - E2E", () => {
         });
       });
 
+      it("Current session was not assigned to the user of the cookie refresh token, Return an UnknownError response ", async () => {
+        const variables = { sessionId: registeredSessionId };
+        const payload = { query: REFRESH_TOKEN, variables };
+        const options = { cookie: unregisteredCookies };
+
+        const { data } = await post<Refresh>(url, payload, options);
+
+        expect(data.errors).toBeUndefined();
+        expect(data.data).toBeDefined();
+        expect(data.data?.refreshToken).toStrictEqual({
+          __typename: "UserSessionError",
+          message: "Unable to refresh token",
+          status: Status.Error,
+        });
+      });
+
       it("Should refresh tokens, Renew expired refresh token and send new access token", async () => {
         const variables = { sessionId: unregisteredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
@@ -217,7 +233,7 @@ describe("Refresh Token - E2E", () => {
         });
       });
 
-      it("Session was not signed for the current user, Return a UserSessionError response", async () => {
+      it("Current session was not assigned to the user of the cookie refresh token, Return a UserSessionError response", async () => {
         const variables = { sessionId: newRegisteredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
         const options = { cookie: registeredCookies };
