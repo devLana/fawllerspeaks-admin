@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 import * as React from "react";
 import { useRouter } from "next/router";
 
@@ -30,17 +28,15 @@ const SessionProvider = ({ layout, page }: SessionProvideProps) => {
     setUserId
   );
 
-  const handleUserId = (id: string) => setUserId(id);
-
-  const value = {
-    userId,
-    handleUserId,
-    handleRefreshToken,
-    handleClearRefreshTokenTimer,
-  };
-
   return (
-    <SessionContext.Provider value={value}>
+    <SessionContext.Provider
+      value={{
+        userId,
+        handleUserId: (id: string) => setUserId(id),
+        handleRefreshToken,
+        handleClearRefreshTokenTimer,
+      }}
+    >
       {layout(page, clientHasRendered, errorMessage)}
       <Snackbar
         open={isOpen}

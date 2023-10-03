@@ -13,7 +13,6 @@ const PasswordAdornment = ({ isVisible, onClick }: PasswordAdornmentProps) => (
   <InputAdornment position="end">
     <Tooltip title={`${isVisible ? "Hide" : "Show"} password`}>
       <IconButton
-        aria-label={`${isVisible ? "Hide" : "Show"} password`}
         onClick={onClick}
         onMouseDown={e => e.preventDefault()}
         edge="end"

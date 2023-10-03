@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import * as React from "react";
 import { useRouter } from "next/router";
 
@@ -9,22 +8,15 @@ import { useAuthHeaderHandler } from "@context/ApolloContext";
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 import { SESSION_ID } from "@utils/constants";
 
-type StringNullState = React.Dispatch<React.SetStateAction<string | null>>;
-
-const msg =
-  "An unexpected error has occurred while trying to verify your current session";
-
 const useVerifySession = (
   handleRefreshToken: (accessToken: string) => void,
-  setUserId: StringNullState
+  setUserId: React.Dispatch<React.SetStateAction<string | null>>
 ) => {
   const [clientHasRendered, setClientHasRendered] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const { pathname, replace, events } = useRouter();
 
   const client = useApolloClient();
-
-  const { handleAuthHeader } = useAuthHeaderHandler();
 
   React.useEffect(() => {
     const handleRouteChanged = () => {
@@ -37,6 +29,8 @@ const useVerifySession = (
       events.off("routeChangeComplete", handleRouteChanged);
     };
   }, []);
+
+  const { handleAuthHeader } = useAuthHeaderHandler();
 
   React.useEffect(() => {
     const sessionId = localStorage.getItem(SESSION_ID);
@@ -78,6 +72,8 @@ const useVerifySession = (
             case "VerifiedSession": {
               const { __typename = "User", ...user } = data.verifySession.user;
 
+              handleRefreshToken(data.verifySession.accessToken);
+
               if (user.isRegistered) {
                 if (
                   pathname === "/login" ||
@@ -95,7 +91,6 @@ const useVerifySession = (
                 setClientHasRendered(true);
               }
 
-              handleRefreshToken(data.verifySession.accessToken);
               handleAuthHeader(data.verifySession.accessToken);
               setUserId(`${__typename}:${user.id}`);
 
@@ -117,7 +112,9 @@ const useVerifySession = (
             setErrorMessage(message);
           } else {
             setClientHasRendered(true);
-            setErrorMessage(msg);
+            setErrorMessage(
+              "An unexpected error has occurred while trying to verify your current session"
+            );
           }
         });
     } else {

@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import * as React from "react";
 import { useRouter } from "next/router";
 
@@ -13,8 +12,8 @@ const useRefreshToken = () => {
   const [timer, setTimer] = React.useState(0);
   const [isOpen, setIsOpen] = React.useState(false);
   const refreshTokenTimerId = React.useRef<number>();
-
   const router = useRouter();
+
   const client = useApolloClient();
 
   const { handleAuthHeader } = useAuthHeaderHandler();

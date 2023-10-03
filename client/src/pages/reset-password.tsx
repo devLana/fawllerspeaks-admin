@@ -33,9 +33,7 @@ const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
 
   const { push } = useRouter();
 
-  const [reset, { data }] = useMutation(RESET_PASSWORD, {
-    onError: err => onError(err, push),
-  });
+  const [reset, { data }] = useMutation(RESET_PASSWORD);
 
   const {
     register,
@@ -49,7 +47,10 @@ const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
   const submitHandler = async (values: OmitToken) => {
     const token = verified?.resetToken ?? "";
 
-    const { data: response } = await reset({ variables: { ...values, token } });
+    const { data: response } = await reset({
+      variables: { ...values, token },
+      onError: err => onError(err, push),
+    });
 
     if (response) {
       switch (response.resetPassword.__typename) {

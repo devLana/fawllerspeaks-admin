@@ -6,17 +6,15 @@ import UserAvatar from "@components/UserAvatar";
 const HeaderAvatar = () => {
   const user = useGetUserInfo();
 
-  const avatar = <UserAvatar user={user} renderWithLink />;
-
   if (!user) {
     return (
       <Skeleton variant="circular" aria-label="Authenticating user profile">
-        {avatar}
+        <UserAvatar user={user} renderWithLink />
       </Skeleton>
     );
   }
 
-  return avatar;
+  return <UserAvatar user={user} renderWithLink />;
 };
 
 export default HeaderAvatar;
