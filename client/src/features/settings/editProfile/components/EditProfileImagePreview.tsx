@@ -21,7 +21,13 @@ const EditProfileImagePreview = (props: EditProfileImagePreviewProps) => {
         alt={alt}
         sx={{ width: 200, height: 200, mb: 2, mx: "auto" }}
       />
-      <Stack direction="row" justifyContent="center" spacing={2}>
+      <Stack
+        direction="row"
+        justifyContent="center"
+        flexWrap="wrap"
+        rowGap={1}
+        columnGap={2}
+      >
         <Button
           size="small"
           onClick={onClick}

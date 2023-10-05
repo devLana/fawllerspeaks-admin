@@ -29,13 +29,7 @@ const EditProfileForm = ({
   fileInput,
 }: EditProfileFormProps) => (
   <form onSubmit={onSubmit}>
-    <Grid
-      container
-      rowSpacing={3}
-      columnSpacing={2}
-      marginBottom={3.3}
-      marginTop={0}
-    >
+    <Grid container rowSpacing={2} columnSpacing={2} mb={3.3} mt={0}>
       <Grid item xs={12} sm={6}>
         <TextField
           id="first-name"
