@@ -1,4 +1,5 @@
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import Box from "@mui/material/Box";
 import LoadingButton from "@mui/lab/LoadingButton";
 import TextField from "@mui/material/TextField";
 
@@ -17,7 +18,13 @@ const ChangePasswordForm = (props: ChangePasswordFormProps) => {
   const { fieldErrors, isLoading, email, onSubmit, register } = props;
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <Box
+      component="form"
+      onSubmit={onSubmit}
+      noValidate
+      width="100%"
+      maxWidth={570}
+    >
       <TextField
         id="email"
         autoComplete="email"
@@ -59,7 +66,7 @@ const ChangePasswordForm = (props: ChangePasswordFormProps) => {
       >
         <span>Change Password</span>
       </LoadingButton>
-    </form>
+    </Box>
   );
 };
 

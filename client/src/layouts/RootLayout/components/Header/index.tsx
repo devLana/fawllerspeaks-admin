@@ -13,7 +13,13 @@ import HeaderAvatar from "./components/HeaderAvatar";
 import HeaderThemeButton from "./components/HeaderThemeButton";
 
 const Header = ({ onClick }: { onClick: () => void }) => (
-  <AppBar sx={{ backgroundColor: "background.default" }}>
+  <AppBar
+    sx={({ appTheme: { themeMode } }) => ({
+      ...(themeMode === "sunny" && {
+        backgroundColor: "background.default",
+      }),
+    })}
+  >
     <Toolbar component={Container}>
       <IconButton
         size="large"
@@ -25,8 +31,8 @@ const Header = ({ onClick }: { onClick: () => void }) => (
       >
         <MenuIcon />
       </IconButton>
-      <Box sx={{ maxWidth: "10rem", width: "40%", mr: "auto" }}>
-        <NextLink href="/" sx={{ display: "flex" }} aria-label="Dashboard page">
+      <Box maxWidth="10rem" width="40%" mr="auto">
+        <NextLink href="/" aria-label="Dashboard page" display="flex">
           <Image
             src="/logo.png"
             alt="FawllerSpeaks brand logo"

@@ -41,11 +41,11 @@ const NavbarItem = (props: NavbarItemProps) => {
             pr: 0,
             borderRadius: "1.5rem 0 0 1.5rem",
             bgcolor: isActive ? "primary.main" : "transparent",
-            color: isActive ? "primary.dark" : "inherit",
+            color: isActive ? "background.default" : "inherit",
             transition: transition(theme, isOpen, ["background-color"]),
             "&:hover": {
               bgcolor: isActive ? "primary.main" : "action.hover",
-              color: isActive ? "primary.dark" : "inherit",
+              color: isActive ? "background.default" : "inherit",
             },
             [theme.breakpoints.up("sm")]: {
               whiteSpace: "nowrap",
@@ -67,10 +67,6 @@ const NavbarItem = (props: NavbarItemProps) => {
               "&>.MuiTypography-root": { lineHeight: 1 },
               [theme.breakpoints.up("sm")]: {
                 ...(isOpen ? { ml: 1, opacity: 1 } : { ml: 0, opacity: 0 }),
-                "&>.MuiTypography-root": {
-                  fontWeight: isActive ? 700 : 400,
-                  letterSpacing: isActive ? 0.5 : "normal",
-                },
               },
             })}
           />

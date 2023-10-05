@@ -43,7 +43,7 @@ const RootLayout = (props: RootLayoutProps) => {
       <Metadata {...metaProps} />
       <Header onClick={handleOpenNavbar} />
       <Navbar isOpen={navBarIsOpen} onClick={handleToggleNavbar} />
-      <Box component="main" sx={{ py: 4, flexGrow: { sm: 1 } }}>
+      <Box component="main" py={4} flexGrow={{ sm: 1 }}>
         <PageBreadcrumbs />
         {content}
       </Box>

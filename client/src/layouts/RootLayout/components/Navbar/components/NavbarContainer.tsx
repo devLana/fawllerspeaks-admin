@@ -37,8 +37,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
         },
         [theme.breakpoints.up("sm")]: {
           transition: transition(theme, isOpen, "width"),
-          // width: isOpen ? 160 : 75,
-          width: isOpen ? "10rem" : 75,
+          width: isOpen ? "calc(6.2em + 75px)" : "calc(50px + 1.5em)",
           borderRight: 1,
           borderColor: "divider",
         },
@@ -68,10 +67,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
             }),
             transform: isOpen ? "translateX(0)" : "translateX(-150%)",
           },
-          [theme.breakpoints.up("sm")]: {
-            height: "100%",
-            pt: 3,
-          },
+          [theme.breakpoints.up("sm")]: { pt: 3 },
         })}
       >
         {children}
