@@ -6,8 +6,8 @@ import { useAppTheme } from "@context/MUIThemeContext";
 import DefaultColor from "./DefaultColor";
 
 const colors = [
-  { label: "Blue", hexCode: "#7dd1f3" },
-  { label: "Gray", hexCode: "#6a6a6a" },
+  { themeColor: "#7dd1f3", light: "#7dd1f3", dark: "#149cd2", label: "Blue" },
+  { themeColor: "#6a6a6a", light: "#ccc", dark: "#6a6a6a", label: "Gray" },
 ] as const;
 
 const DefaultColors = () => {
@@ -15,21 +15,20 @@ const DefaultColors = () => {
 
   return (
     <Box component="section">
-      <Typography variant={"h2"} gutterBottom fontSize="16px">
+      <Typography variant="h2" gutterBottom>
         Default Color
       </Typography>
       <Box
-        sx={{
-          py: 2,
-          px: { xs: 2, sm: 1.5 },
-          bgcolor: "action.disabledBackground",
-          borderRadius: 1,
-        }}
+        py={2}
+        px={{ xs: 2, sm: 1.5 }}
+        bgcolor="action.disabledBackground"
+        borderRadius={1}
       >
         <Stack
           direction="row"
           flexWrap="wrap"
-          sx={{ rowGap: 2.5, columnGap: 7 }}
+          rowGap={2.5}
+          columnGap={5}
           justifyContent={{ sm: "flex-start" }}
         >
           {colors.map(color => (
