@@ -24,7 +24,7 @@ const RegisterUserForm = ({
   fieldErrors,
 }: RegisterUserFormProps) => (
   <form onSubmit={onSubmit} noValidate>
-    <Box marginBottom={3.3}>
+    <Box mb={3.3}>
       <Typography align="center" gutterBottom>
         Account information
       </Typography>

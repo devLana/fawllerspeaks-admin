@@ -55,8 +55,7 @@ const SettingsMenuItem = (props: SettingsMenuItemProps) => {
           <Icon fontSize="small" />
         </ListItemIcon>
         <ListItemText>{label}</ListItemText>
-        {/* <ListItemText sx={{ whiteSpace: "normal" }}>{label}</ListItemText> */}
-        <ChevronRightIcon sx={{ ml: 2, justifySelf: "flex-end" }} />
+        <ChevronRightIcon sx={{ ml: 1, justifySelf: "flex-end" }} />
       </NextLink>
     </MenuItem>
   );

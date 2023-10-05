@@ -11,16 +11,12 @@ const Card = ({ sx, children }: CardProps) => {
 
   return (
     <Box
-      sx={[
-        {
-          padding: { sm: "2rem" },
-          borderRadius: { sm: 1 },
-          boxShadow: theme => ({
-            sm: theme.appTheme.themeMode === "sunny" ? 3 : 5,
-          }),
-        },
-        ...sxProp,
-      ]}
+      p={{ sm: "2rem" }}
+      borderRadius={{ sm: 1 }}
+      boxShadow={theme => ({
+        sm: theme.appTheme.themeMode === "sunny" ? 3 : 5,
+      })}
+      sx={[...sxProp]}
     >
       {children}
     </Box>

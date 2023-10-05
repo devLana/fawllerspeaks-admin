@@ -32,7 +32,7 @@ const ResetPasswordForm = ({
       value={email}
       inputProps={{ readOnly: true }}
     />
-    <Typography align="center" sx={{ mt: 3, mb: 1 }}>
+    <Typography align="center" mt={3} mb={1}>
       Enter your new password below
     </Typography>
     <PasswordInput

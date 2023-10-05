@@ -49,8 +49,8 @@ const UserAvatar = (props: UserAvatarProps) => {
 
   return renderWithLink ? (
     <NextLink
+      fontStyle="normal"
       href="/settings/me"
-      sx={{ fontStyle: "normal" }}
       aria-label={`${firstName} ${lastName} profile page`}
     >
       <Avatar

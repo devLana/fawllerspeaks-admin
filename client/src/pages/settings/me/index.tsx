@@ -20,7 +20,7 @@ const Me: NextPageWithLayout = () => {
 
   return (
     <>
-      <Stack direction="row" spacing={4} alignItems="center">
+      <Stack direction="row" spacing={4} alignItems="center" pt={2}>
         <UserAvatar
           sx={{
             width: { xs: 100, md: 115 },
