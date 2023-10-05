@@ -1,6 +1,6 @@
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
+import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 
 import { useAppTheme } from "@context/MUIThemeContext";
@@ -12,38 +12,33 @@ const Theme = () => {
   const { appTheme } = useTheme();
   const handleAppTheme = useAppTheme();
 
-  const handleChange = (id: ThemeMode) => {
-    handleAppTheme("themeMode", id);
-  };
-
   return (
-    <Box sx={{ mb: 5 }} component="section">
-      <Typography variant={"h2"} gutterBottom fontSize="16px">
+    <Box component="section" sx={{ mb: 5, pt: 2 }}>
+      <Typography variant="h2" gutterBottom>
         Theme
       </Typography>
-      <Box
+      <RadioGroup
+        row
+        name="theme-settings"
+        value={appTheme.themeMode}
+        onChange={e => handleAppTheme("themeMode", e.target.value as ThemeMode)}
         sx={{
+          bgcolor: "action.disabledBackground",
           py: 2,
           px: { xs: 2, sm: 1.5 },
-          bgcolor: "action.disabledBackground",
           borderRadius: 1,
+          rowGap: 2.5,
+          columnGap: 2.65,
         }}
       >
-        <Stack
-          direction="row"
-          flexWrap="wrap"
-          sx={{ rowGap: 2.5, columnGap: 2.65 }}
-        >
-          {themes.map(theme => (
-            <ThemeItem
-              key={theme.id}
-              currentTheme={appTheme.themeMode}
-              onChange={handleChange}
-              {...theme}
-            />
-          ))}
-        </Stack>
-      </Box>
+        {themes.map(theme => (
+          <ThemeItem
+            key={theme.id}
+            isCurrentTheme={appTheme.themeMode === theme.id}
+            {...theme}
+          />
+        ))}
+      </RadioGroup>
     </Box>
   );
 };
