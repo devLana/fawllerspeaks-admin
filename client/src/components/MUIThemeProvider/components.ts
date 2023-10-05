@@ -65,13 +65,6 @@ export const components: Components = {
       }),
     },
   },
-  MuiContainer: {
-    styleOverrides: {
-      root: ({ theme }) => ({
-        [theme.breakpoints.up("lg")]: { maxWidth: 1000 },
-      }),
-    },
-  },
   MuiSkeleton: {
     defaultProps: { animation: "wave" },
     styleOverrides: {
@@ -84,5 +77,12 @@ export const components: Components = {
         }),
       }),
     },
+  },
+  MuiCssBaseline: {
+    styleOverrides: `
+      html {
+        font-size: 16px;
+      }
+    `,
   },
 };

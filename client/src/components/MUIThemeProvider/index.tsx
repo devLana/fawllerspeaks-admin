@@ -11,7 +11,7 @@ import type { AppTheme as Theme } from "@types";
 const MUIThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [appTheme, setAppTheme] = React.useState<Theme>({
     themeMode: "sunny",
-    fontSize: 16,
+    fontSize: 14,
     color: "#7dd1f3",
   });
 

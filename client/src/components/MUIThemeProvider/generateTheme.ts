@@ -23,7 +23,7 @@ export const generateTheme = (appTheme: AppTheme): MuiThemeOptions => {
       appTheme,
       palette: palette(appTheme.themeMode, appTheme.color),
       typography: typography(appTheme.fontSize),
-      shape,
+      shape: shape(appTheme.fontSize),
       shadows: shadows("4,35,47"),
       components,
     };
@@ -34,7 +34,7 @@ export const generateTheme = (appTheme: AppTheme): MuiThemeOptions => {
       appTheme,
       palette: palette(appTheme.themeMode, appTheme.color),
       typography: typography(appTheme.fontSize),
-      shape,
+      shape: shape(appTheme.fontSize),
       shadows: shadows("140,140,140"),
       components,
     };
@@ -44,7 +44,7 @@ export const generateTheme = (appTheme: AppTheme): MuiThemeOptions => {
     appTheme,
     palette: palette(appTheme.themeMode, appTheme.color),
     typography: typography(appTheme.fontSize),
-    shape,
+    shape: shape(appTheme.fontSize),
     shadows: shadows("20,156,210"),
     components,
   };
