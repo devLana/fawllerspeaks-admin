@@ -7,7 +7,7 @@ import { DEFAULT_THEME } from "@utils/constants";
 const storageTheme = (theme: string) => {
   return JSON.stringify({
     themeMode: theme,
-    fontSize: 16,
+    fontSize: 14,
     color: "#7dd1f3",
   });
 };
