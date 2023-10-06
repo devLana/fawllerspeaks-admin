@@ -4,13 +4,14 @@ import Typography from "@mui/material/Typography";
 
 import { useAppTheme } from "@context/MUIThemeContext";
 import DefaultColor from "./DefaultColor";
+import type { AppTheme } from "@types";
 
 const colors = [
   { themeColor: "#7dd1f3", light: "#7dd1f3", dark: "#149cd2", label: "Blue" },
   { themeColor: "#6a6a6a", light: "#ccc", dark: "#6a6a6a", label: "Gray" },
 ] as const;
 
-const DefaultColors = () => {
+const DefaultColors = ({ appTheme }: { appTheme: AppTheme }) => {
   const handleAppTheme = useAppTheme();
 
   return (
@@ -35,6 +36,7 @@ const DefaultColors = () => {
             <DefaultColor
               key={color.label}
               onClick={handleAppTheme}
+              isDefaultColor={appTheme.color === color.themeColor}
               {...color}
             />
           ))}

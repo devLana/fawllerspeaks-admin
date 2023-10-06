@@ -1,4 +1,3 @@
-import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
@@ -6,10 +5,9 @@ import Typography from "@mui/material/Typography";
 import { useAppTheme } from "@context/MUIThemeContext";
 import ThemeItem from "./ThemeItem";
 import { themes } from "@utils/appThemes";
-import type { ThemeMode } from "@types";
+import type { AppTheme, ThemeMode } from "@types";
 
-const Theme = () => {
-  const { appTheme } = useTheme();
+const Theme = ({ appTheme }: { appTheme: AppTheme }) => {
   const handleAppTheme = useAppTheme();
 
   return (

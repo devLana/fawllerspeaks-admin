@@ -1,5 +1,7 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import CheckIcon from "@mui/icons-material/Check";
+
 import type { ThemeColors } from "@types";
 
 interface DefaultColorProps {
@@ -8,10 +10,11 @@ interface DefaultColorProps {
   light: "#7dd1f3" | "#ccc";
   dark: "#149cd2" | "#6a6a6a";
   label: "Blue" | "Gray";
+  isDefaultColor: boolean;
 }
 
 const DefaultColor = (props: DefaultColorProps) => {
-  const { onClick, dark, label, light, themeColor } = props;
+  const { onClick, dark, label, light, themeColor, isDefaultColor } = props;
 
   return (
     <Button
@@ -21,7 +24,7 @@ const DefaultColor = (props: DefaultColorProps) => {
         borderColor: themeMode === "sunny" ? dark : light,
         "&:hover": { borderColor: themeMode === "sunny" ? dark : light },
         color: themeMode === "sunny" ? dark : light,
-        fontSize: "16px",
+        fontSize: "1em",
         justifyContent: "flex-start",
         flexGrow: 1,
         columnGap: 4,
@@ -29,12 +32,24 @@ const DefaultColor = (props: DefaultColorProps) => {
     >
       <Box
         component="span"
-        p={2.2}
+        display="inline-flex"
+        alignItems="center"
+        justifyContent="center"
+        height={40}
+        width={40}
         borderRadius="50%"
         bgcolor={({ appTheme: { themeMode } }) => {
           return themeMode === "sunny" ? dark : light;
         }}
-      />
+      >
+        {isDefaultColor && (
+          <CheckIcon
+            sx={({ appTheme: { themeMode } }) => ({
+              color: themeMode === "sunny" ? "primary.light" : "primary.dark",
+            })}
+          />
+        )}
+      </Box>
       {label}
     </Button>
   );

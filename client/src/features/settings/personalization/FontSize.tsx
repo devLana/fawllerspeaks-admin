@@ -1,13 +1,12 @@
-import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { useAppTheme } from "@context/MUIThemeContext";
+import type { AppTheme } from "@types";
 
-const FontSize = () => {
-  const { typography } = useTheme();
+const FontSize = ({ appTheme }: { appTheme: AppTheme }) => {
   const handleAppTheme = useAppTheme();
 
   return (
@@ -28,12 +27,12 @@ const FontSize = () => {
           Aa
         </Typography>
         <Slider
-          aria-label="font size"
+          aria-label="change font size"
           getAriaValueText={(value: number) => `font size ${value}`}
           min={14}
           max={18}
           marks
-          value={typography.fontSize}
+          value={appTheme.fontSize}
           onChangeCommitted={(_, value) => {
             handleAppTheme("fontSize", value as number);
           }}
