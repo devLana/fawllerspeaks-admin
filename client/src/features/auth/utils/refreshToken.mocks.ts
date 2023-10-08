@@ -65,11 +65,32 @@ class Mocks {
   }
 }
 
+class RedirectMock {
+  sessionId: string;
+
+  constructor(id: string, readonly typename: string) {
+    this.sessionId = `${id}_SESSION_ID`;
+  }
+
+  gql(): MockedResponse[] {
+    return [
+      {
+        request: request(this.sessionId),
+        result: { data: { refreshToken: { __typename: this.typename } } },
+      },
+      ...verify.gql(this.sessionId),
+    ];
+  }
+}
+
 const session = new Mocks("SESSION", "UserSessionError");
 const validate = new Mocks("VALIDATion", "SessionIdValidationError");
 const unknown = new Mocks("UNKNOWN", "UnknownError");
 const forbid = new Mocks("FORBIDDEN", "ForbiddenError");
 const unsupported = new Mocks("UNSUPPORTED", "UnrecognisedObject");
+
+const notAllowed = new RedirectMock("NOT_ALLOWED", "NotAllowedError");
+const authCookie = new RedirectMock("AUTH_COOKIE", "AuthCookieError");
 
 const graphql = {
   sessionId: "GRAPHQL_ERROR_SESSION_ID",
@@ -91,19 +112,6 @@ const network = {
       {
         request: request(this.sessionId),
         error: new Error("Server is currently unreachable"),
-      },
-      ...verify.gql(this.sessionId),
-    ];
-  },
-};
-
-export const notAllowed = {
-  sessionId: "NOT_ALLOWED_SESSION_ID",
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.sessionId),
-        result: { data: { refreshToken: { __typename: "NotAllowedError" } } },
       },
       ...verify.gql(this.sessionId),
     ];
@@ -143,4 +151,9 @@ export const table: [string, Expected][] = [
   ["The current user's access token could not be refreshed", forbid],
   ["Server resolved with a graphql error", graphql],
   ["Server request failed with a network error", network],
+];
+
+export const redirectTable: [string, string, RedirectMock][] = [
+  ["User session could not be verified", "unauthorized", notAllowed],
+  ["User session expired", "expired", authCookie],
 ];

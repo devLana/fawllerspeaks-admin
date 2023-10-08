@@ -85,17 +85,25 @@ class MockTwo {
   }
 }
 
-export const notAllowed = {
-  sessionId: "NOT_ALLOWED_SESSION_ID",
+class MockThree {
+  sessionId: string;
+
+  constructor(readonly typename: string, sessionId: string) {
+    this.sessionId = `${sessionId}_SESSION_ID`;
+  }
+
   gql(): MockedResponse[] {
     return [
       {
         request: request(this.sessionId),
-        result: { data: { verifySession: { __typename: "NotAllowedError" } } },
+        result: { data: { verifySession: { __typename: this.typename } } },
       },
     ];
-  },
-};
+  }
+}
+
+const notAllowed = new MockThree("NotAllowedError", "NOT_ALLOWED_SESSION_ID");
+const authCookie = new MockThree("AuthCookieError", "AUTH_COOKIE_SESSION_ID");
 
 const unsupported = new MockOne("UnsupportedObjectType", msg1, "UNSUPPORTED");
 const forbid = new MockOne("ForbiddenError", msg2, "FORBIDDEN");
@@ -225,5 +233,29 @@ export const tableThree: [string, TableThree][] = [
   [
     "Render the register page if user is unregistered",
     { pathname: "/register", mock: unregistered },
+  ],
+];
+
+export const tableFour: [string, MockThree][] = [
+  [
+    "Redirect to the login page if the response is a NotAllowedError",
+    notAllowed,
+  ],
+  [
+    "User session expired, Should redirect the user to the login page",
+    authCookie,
+  ],
+];
+
+export const tableFive: [string, string, MockThree][] = [
+  [
+    "Render the page at the current route if the response is a NotAllowedError",
+    "/forgot-password",
+    notAllowed,
+  ],
+  [
+    "User session expired, Render the current(login) page",
+    "/login",
+    authCookie,
   ],
 ];

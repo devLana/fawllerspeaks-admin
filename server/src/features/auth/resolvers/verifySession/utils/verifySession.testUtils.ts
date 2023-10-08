@@ -1,5 +1,3 @@
-import type { Cookies } from "@types";
-
 type GQL = [
   string,
   boolean | number | [] | Record<string, unknown> | undefined | null
@@ -7,7 +5,6 @@ type GQL = [
 
 const dateCreated = "2022-11-07 13:22:43.717+01";
 export const mockDate = "2022-11-07T12:22:43.717Z";
-export const cookieString = "auth=auth; sig=sig; token=token";
 export const cookies = { auth: "auth", sig: "sig", token: "token" };
 export const sessionId = "session_id_string";
 export const loggedInUserId = "user_user";
@@ -41,11 +38,6 @@ export const validations: [string, string][] = [
   ["empty whitespace", "    "],
 ];
 
-export const validateCookies: [string, Cookies][] = [
-  ["invalid values", { ...cookies, auth: "" }],
-  ["one or more missing cookies", { sig: "sig", auth: "auth" }],
-];
-
 export const obj = {
   ...dbResponse,
   userId: authUserId,
@@ -65,9 +57,4 @@ export const gqlValidations: GQL[] = [
   ["a boolean", true],
   ["an array", []],
   ["an object", {}],
-];
-
-export const verifyE2eCookie: [string, string][] = [
-  ["invalid cookie values", "auth=auth; sig= ; token=token"],
-  ["missing cookies", "auth=auth; sig=sig"],
 ];

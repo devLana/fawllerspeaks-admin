@@ -57,7 +57,6 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
             break;
 
           case "AuthenticationError":
-            localStorage.removeItem(SESSION_ID);
             handleClearRefreshTokenTimer();
             void client.clearStore();
             void replace("/login?status=unauthenticated");

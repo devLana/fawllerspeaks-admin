@@ -10,7 +10,7 @@ import {
   UnknownError,
 } from "@utils";
 
-import { type MutationResolvers } from "@resolverTypes";
+import { Status, type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
 
 type Logout = ResolverFunc<MutationResolvers["logout"]>;
@@ -24,7 +24,27 @@ const logout: Logout = async (_, { sessionId }, { db, user, req, res }) => {
     if (!user) return new AuthenticationError("Unable to logout");
 
     const validatedSession = await schema.validateAsync(sessionId);
+
     const { auth, sig, token } = req.cookies;
+
+    if (!auth && !sig && !token) {
+      const { rows } = await db.query<{ user: string }>(
+        `SELECT  "user" FROM sessions WHERE session_id = $1`,
+        [validatedSession]
+      );
+
+      if (rows.length === 0) return new UnknownError("Unable to logout");
+
+      if (rows[0].user !== user) {
+        return new NotAllowedError("Unable to logout");
+      }
+
+      await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
+        validatedSession,
+      ]);
+
+      return new Response("User logged out", Status.Warn);
+    }
 
     if (!auth || !sig || !token) return new NotAllowedError("Unable to logout");
 

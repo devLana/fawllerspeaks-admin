@@ -16,6 +16,7 @@ import { AccessToken } from "./types";
 import { SessionIdValidationError } from "../types";
 
 import {
+  AuthCookieError,
   ForbiddenError,
   MailError,
   NotAllowedError,
@@ -55,6 +56,10 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
     validatedSession = await schema.validateAsync(args.sessionId);
 
     const { auth, sig, token } = req.cookies;
+
+    if (!auth && !sig && !token) {
+      return new AuthCookieError("Unable to refresh token");
+    }
 
     if (!auth || !sig || !token) {
       return new ForbiddenError("Unable to refresh token");

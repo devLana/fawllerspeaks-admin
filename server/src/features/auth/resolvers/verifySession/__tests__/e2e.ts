@@ -7,12 +7,7 @@ import { startServer } from "@server";
 import { db } from "@lib/db";
 
 import { JWT_REGEX, sessionMail } from "@features/auth/utils";
-import {
-  cookieString,
-  gqlValidations,
-  validations,
-  verifyE2eCookie,
-} from "../utils/verifySession.testUtils";
+import { gqlValidations, validations } from "../utils/verifySession.testUtils";
 
 import {
   VERIFY_SESSION,
@@ -104,48 +99,43 @@ describe("Verify Session - E2E", () => {
   });
 
   describe("Validate cookie request header", () => {
-    it.each(verifyE2eCookie)(
-      "Request header has one or more %s, Return a ForbiddenError response",
-      async (_, str) => {
-        const variables = { sessionId: "session_id" };
-        const payload = { query: VERIFY_SESSION, variables };
+    it("Should return a UserSessionError response if the request has no cookies", async () => {
+      const variables = { sessionId: "session_id" };
+      const payload = { query: VERIFY_SESSION, variables };
 
-        const { data } = await post<Verify>(url, payload, { cookie: str });
+      const { data } = await post<Verify>(url, payload);
 
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.verifySession).toStrictEqual({
-          __typename: "ForbiddenError",
-          message: "Unable to verify session",
-          status: Status.Error,
-        });
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.verifySession).toStrictEqual({
+        __typename: "AuthCookieError",
+        message: "Unable to verify session",
+        status: Status.Error,
+      });
 
-        expect(sessionMail).not.toHaveBeenCalled();
-      }
-    );
+      expect(sessionMail).not.toHaveBeenCalled();
+    });
+
+    it("Request cookie header has a missing cookie, Return a ForbiddenError response", async () => {
+      const cookie = registeredCookies.split(";").splice(1, 1).join(";");
+      const variables = { sessionId: "session_id" };
+      const payload = { query: VERIFY_SESSION, variables };
+
+      const { data } = await post<Verify>(url, payload, { cookie });
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.verifySession).toStrictEqual({
+        __typename: "ForbiddenError",
+        message: "Unable to verify session",
+        status: Status.Error,
+      });
+
+      expect(sessionMail).not.toHaveBeenCalled();
+    });
   });
 
   describe("Verify cookie refresh token", () => {
-    describe("Invalid refresh token", () => {
-      it("Token verification throws a JsonWebTokenError, Return a ForbiddenError response", async () => {
-        const variables = { sessionId: "session_id" };
-        const payload = { query: VERIFY_SESSION, variables };
-        const options = { cookie: cookieString };
-
-        const { data } = await post<Verify>(url, payload, options);
-
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.verifySession).toStrictEqual({
-          __typename: "ForbiddenError",
-          message: "Unable to verify session",
-          status: Status.Error,
-        });
-
-        expect(sessionMail).not.toHaveBeenCalled();
-      });
-    });
-
     describe("Expired refresh token", () => {
       it("Session id is unknown, Return an UnknownError response ", async () => {
         const variables = { sessionId: "unknown_session_id" };

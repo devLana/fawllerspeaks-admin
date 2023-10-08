@@ -22,6 +22,8 @@ import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 import type { MutationLoginArgs } from "@apiTypes";
 
+type LoginFormValues = Omit<MutationLoginArgs, "sessionId">;
+
 const Login: NextPageWithLayout = () => {
   const [status, setStatus] = React.useState<"idle" | "submitting">("idle");
   const [isOpen, setIsOpen] = React.useState(false);
@@ -41,11 +43,16 @@ const Login: NextPageWithLayout = () => {
   const { handleUserId, handleRefreshToken } = useSession();
   const { handleAuthHeader } = useAuthHeaderHandler();
 
-  const submitHandler = async (values: MutationLoginArgs) => {
+  const submitHandler = async (values: LoginFormValues) => {
     setStatus("submitting");
 
+    const sessionId = localStorage.getItem(SESSION_ID);
+    const variables: MutationLoginArgs = sessionId
+      ? { ...values, sessionId }
+      : values;
+
     const { data: loginData } = await login({
-      variables: values,
+      variables,
       onError() {
         setStatus("idle");
         setIsOpen(true);
@@ -56,10 +63,15 @@ const Login: NextPageWithLayout = () => {
     if (loginData) {
       switch (loginData.login.__typename) {
         case "LoginValidationError": {
-          const { emailError, passwordError: pwdError } = loginData.login;
+          const { emailError, passwordError, sessionIdError } = loginData.login;
           const focus = { shouldFocus: true };
 
-          if (pwdError) setError("password", { message: pwdError }, focus);
+          if (sessionIdError) setIsOpen(true);
+
+          if (passwordError) {
+            setError("password", { message: passwordError }, focus);
+          }
+
           if (emailError) setError("email", { message: emailError }, focus);
 
           setStatus("idle");
@@ -100,6 +112,11 @@ const Login: NextPageWithLayout = () => {
     alertMessage = data.login.message;
   } else if (error?.graphQLErrors[0]) {
     alertMessage = error.graphQLErrors[0].message;
+  } else if (
+    data?.login.__typename === "LoginValidationError" &&
+    data.login.sessionIdError
+  ) {
+    alertMessage = data.login.sessionIdError;
   } else if (statusMessage) {
     alertMessage = statusMessage;
   }

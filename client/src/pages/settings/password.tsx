@@ -10,7 +10,6 @@ import { useSession } from "@context/SessionContext";
 import ChangePasswordForm from "@features/settings/changePassword/components/ChangePasswordForm";
 import { changePasswordValidator } from "@features/settings/changePassword/utils/changePasswordValidator";
 import { CHANGE_PASSWORD } from "@features/settings/changePassword/operations/CHANGE_PASSWORD";
-import { SESSION_ID } from "@utils/constants";
 import settingsLayout from "@utils/settings/settingsLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { type NextPageWithLayout } from "@types";
@@ -79,13 +78,11 @@ const ChangePassword: NextPageWithLayout = () => {
         }
 
         case "AuthenticationError":
-          localStorage.removeItem(SESSION_ID);
           void client.clearStore();
           void replace("/login?status=unauthenticated");
           break;
 
         case "UnknownError":
-          localStorage.removeItem(SESSION_ID);
           void client.clearStore();
           void replace("/login?status=unauthorized");
           break;

@@ -30,7 +30,6 @@ import {
   sessionId,
   token,
   validJwt,
-  validateCookie,
   validateSession,
 } from "../utils/refreshToken.testUtils";
 import { MailError } from "@utils";
@@ -60,7 +59,6 @@ const mockSessionMail = sessionMail as jest.MockedFunction<() => unknown>;
 describe("Test refresh token resolver", () => {
   beforeEach(() => {
     mockContext.req.cookies = cookies;
-    mockContext.user = loggedInUserId;
   });
 
   afterEach(() => {
@@ -83,22 +81,32 @@ describe("Test refresh token resolver", () => {
     );
   });
 
-  describe("Validate request cookie", () => {
-    test.each(validateCookie)(
-      "Return an error response if the request cookie %s",
-      async (_, mockCookies) => {
-        mockContext.req.cookies = mockCookies;
+  describe("Validate request cookie header", () => {
+    test("Return an error response if the request has no cookies", async () => {
+      mockContext.req.cookies = {};
 
-        const result = await resolver({}, { sessionId }, mockContext, info);
+      const result = await resolver({}, { sessionId }, mockContext, info);
 
-        expect(sessionMail).not.toHaveBeenCalled();
-        expect(setCookies).not.toHaveBeenCalled();
-        expect(clearCookies).not.toHaveBeenCalled();
+      expect(sessionMail).not.toHaveBeenCalled();
+      expect(setCookies).not.toHaveBeenCalled();
+      expect(clearCookies).not.toHaveBeenCalled();
 
-        expect(result).toHaveProperty("message", "Unable to refresh token");
-        expect(result).toHaveProperty("status", "ERROR");
-      }
-    );
+      expect(result).toHaveProperty("message", "Unable to refresh token");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
+
+    test("Return an error response if the request has missing cookie fields", async () => {
+      mockContext.req.cookies = { auth: "auth", sig: "sig" };
+
+      const result = await resolver({}, { sessionId }, mockContext, info);
+
+      expect(sessionMail).not.toHaveBeenCalled();
+      expect(setCookies).not.toHaveBeenCalled();
+      expect(clearCookies).not.toHaveBeenCalled();
+
+      expect(result).toHaveProperty("message", "Unable to refresh token");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
   describe("Verify cookie refresh token", () => {

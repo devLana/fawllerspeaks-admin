@@ -19,6 +19,11 @@ const useStatusAlert = (
             );
             break;
 
+          case "expired":
+            setIsOpen(true);
+            setStatusMessage("Current session has expired. Please log in");
+            break;
+
           default:
             setStatusMessage(null);
         }

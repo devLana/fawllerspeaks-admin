@@ -26,15 +26,13 @@ describe("Login Page", () => {
       router.query = {};
     });
 
-    it.each(redirectStatus)("%s", (_, status) => {
+    it.each(redirectStatus)("%s", (_, status, message) => {
       const router = useRouter();
       router.query = { status };
 
       renderTestUI(<Login />);
 
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        "You are unable to perform that action. Please log in"
-      );
+      expect(screen.getByRole("alert")).toHaveTextContent(message);
       expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardInfo");
     });
   });
@@ -73,8 +71,9 @@ describe("Login Page", () => {
 
   describe("If server responds with an error object type or an unsupported object type after login request", () => {
     it("Set error messages on appropriate form input fields", async () => {
+      localStorage.setItem(SESSION_ID, validation.sessionId);
       const { user } = renderTestUI(<Login />, validation.gql());
-      const { emailError, passwordError, email, password } = validation;
+      const { sessionIdError, email, password } = validation;
 
       await user.type(screen.getByRole("textbox", emailLabel), email);
       await user.type(screen.getByLabelText(/^password$/i), password);
@@ -84,16 +83,19 @@ describe("Login Page", () => {
 
       await waitFor(() => {
         expect(screen.getByRole("textbox", emailLabel)).toHaveErrorMessage(
-          emailError
+          validation.emailError
         );
       });
 
       expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
-        passwordError
+        validation.passwordError
       );
+
+      expect(screen.getByRole("alert")).toHaveTextContent(sessionIdError);
 
       expect(screen.getByRole("textbox", emailLabel)).toHaveFocus();
       expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
+      localStorage.removeItem(SESSION_ID);
     });
 
     it.each(errorTable)("Show an alert message if %s", async (_, error) => {

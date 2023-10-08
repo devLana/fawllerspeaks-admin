@@ -32,21 +32,26 @@ const login: Login = async (_, args, { db, req, res }) => {
     password: Joi.string().required().messages({
       "string.empty": "Enter password",
     }),
+    sessionId: Joi.string().trim().allow(null).messages({
+      "string.empty": "Enter session id",
+    }),
   });
 
   try {
+    const { email, password, sessionId } = await schema.validateAsync(args, {
+      abortEarly: false,
+    });
+
     const { auth, sig, token } = req.cookies;
 
     if (auth && sig && token) {
       const jwt = `${sig}.${auth}.${token}`;
       void db.query(`DELETE FROM sessions WHERE refresh_token = $1`, [jwt]);
+    } else if (sessionId) {
+      void db.query(`DELETE FROM sessions WHERE session_id = $1`, [sessionId]);
     }
 
-    const { email, password } = await schema.validateAsync(args, {
-      abortEarly: false,
-    });
-
-    const sessionPromise = generateBytes(28, "base64url");
+    const session = generateBytes(28, "base64url");
     const findUser = db.query<DBUser>(
       `SELECT
         first_name "firstName",
@@ -62,7 +67,7 @@ const login: Login = async (_, args, { db, req, res }) => {
       [email.toLowerCase()]
     );
 
-    const [{ rows }, sessionId] = await Promise.all([findUser, sessionPromise]);
+    const [{ rows }, newSessionId] = await Promise.all([findUser, session]);
 
     if (rows.length === 0) {
       return new NotAllowedError("Invalid email or password");
@@ -93,7 +98,7 @@ const login: Login = async (_, args, { db, req, res }) => {
 
     await db.query(
       `INSERT INTO sessions (refresh_token, "user", session_id) VALUES ($1, $2, $3)`,
-      [refreshToken, userId, sessionId]
+      [refreshToken, userId, newSessionId]
     );
 
     setCookies(res, cookies);
@@ -108,14 +113,17 @@ const login: Login = async (_, args, { db, req, res }) => {
       dateCreated: dateToISOString(dateCreated),
     };
 
-    return new LoggedInUser(user, accessToken, sessionId);
+    return new LoggedInUser(user, accessToken, newSessionId);
   } catch (err) {
     if (err instanceof ValidationError) {
-      const { emailError, passwordError } = generateErrorsObject(
-        err.details
-      ) as ValidationErrorObject<typeof args>;
+      const { emailError, passwordError, sessionIdError } =
+        generateErrorsObject(err.details) as ValidationErrorObject<typeof args>;
 
-      return new LoginValidationError(emailError, passwordError);
+      return new LoginValidationError(
+        emailError,
+        passwordError,
+        sessionIdError
+      );
     }
 
     throw new GraphQLError("Unable to login. Please try again later");

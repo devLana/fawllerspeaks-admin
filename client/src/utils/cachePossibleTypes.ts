@@ -7,6 +7,7 @@ export const BaseResponse = [
   "UnknownError",
   "UserSessionError",
   "ForbiddenError",
+  "AuthCookieError",
   "Response",
   "DuplicatePostTitleError",
   "EmptyBinWarning",

@@ -13,6 +13,7 @@ import {
   AuthenticationError,
   UserSessionError,
   ForbiddenError,
+  AuthCookieError,
 } from "@utils";
 
 import type { ObjectMapper } from "@types";
@@ -28,6 +29,7 @@ type ResolverKeys =
   | "AuthenticationError"
   | "UserSessionError"
   | "ForbiddenError"
+  | "AuthCookieError"
   | "Response"
   | "User";
 
@@ -78,6 +80,10 @@ export const resolvers: RootResolvers = {
 
   ForbiddenError: {
     __isTypeOf: parent => parent instanceof ForbiddenError,
+  },
+
+  AuthCookieError: {
+    __isTypeOf: parent => parent instanceof AuthCookieError,
   },
 
   Response: {

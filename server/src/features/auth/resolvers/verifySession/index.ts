@@ -15,6 +15,7 @@ import {
 
 import { verify } from "@lib/tokenPromise";
 import {
+  AuthCookieError,
   ForbiddenError,
   MailError,
   NotAllowedError,
@@ -66,6 +67,10 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     validatedSession = await schema.validateAsync(args.sessionId);
 
     const { auth, sig, token } = req.cookies;
+
+    if (!auth && !sig && !token) {
+      return new AuthCookieError("Unable to verify session");
+    }
 
     if (!auth || !sig || !token) {
       return new ForbiddenError("Unable to verify session");

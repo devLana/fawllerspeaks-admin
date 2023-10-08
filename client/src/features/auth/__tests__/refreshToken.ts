@@ -4,8 +4,8 @@ import { screen, waitFor } from "@testing-library/react";
 
 import {
   newAuthToken,
-  notAllowed,
   oldAuthToken,
+  redirectTable,
   refresh,
   table,
 } from "../utils/refreshToken.mocks";
@@ -25,15 +25,15 @@ describe("Refresh expired user access token", () => {
   });
 
   describe("Redirect to the login page", () => {
-    it("User session could not be verified", async () => {
+    it.each(redirectTable)("%s", async (_, status, mock) => {
       const { replace } = useRouter();
-      localStorage.setItem(SESSION_ID, notAllowed.sessionId);
+      localStorage.setItem(SESSION_ID, mock.sessionId);
 
-      sessionTestRenderer(notAllowed.gql());
+      sessionTestRenderer(mock.gql());
 
       await waitFor(() => expect(setTimeout).toHaveBeenCalled());
       await waitFor(() => expect(replace).toHaveBeenCalledTimes(2));
-      expect(replace).toHaveBeenNthCalledWith(2, "/login?status=unauthorized");
+      expect(replace).toHaveBeenNthCalledWith(2, `/login?status=${status}`);
     });
   });
 

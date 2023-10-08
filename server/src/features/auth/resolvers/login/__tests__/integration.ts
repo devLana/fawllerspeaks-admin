@@ -42,18 +42,16 @@ describe("Test login resolver", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(validations(undefined))(
-      "Return an error for %s",
-      async (_, data, errors) => {
-        const result = await login({}, data, mockContext, info);
+    test.each(validations(undefined))("%s", async (_, data, errors) => {
+      const result = await login({}, data, mockContext, info);
 
-        expect(setCookies).not.toHaveBeenCalled();
+      expect(setCookies).not.toHaveBeenCalled();
 
-        expect(result).toHaveProperty("emailError", errors[0]);
-        expect(result).toHaveProperty("passwordError", errors[1]);
-        expect(result).toHaveProperty("status", "ERROR");
-      }
-    );
+      expect(result).toHaveProperty("emailError", errors[0]);
+      expect(result).toHaveProperty("passwordError", errors[1]);
+      expect(result).toHaveProperty("sessionIdError", errors[2]);
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
   describe("Verify e-mail and password", () => {
@@ -71,7 +69,7 @@ describe("Test login resolver", () => {
       expect(result).toHaveProperty("status", "ERROR");
     });
 
-    test("Return an error if the e-mail & password combination is incorrect", async () => {
+    test("Return an error if the login credentials do not match", async () => {
       const hash = await bcrypt.hash("noT_password123", 10);
       const user = { userPassword: hash, userId: "user id" };
       const dbSpy = spyDb({ rows: [user] });
@@ -93,7 +91,7 @@ describe("Test login resolver", () => {
       mockContext.req.cookies = {};
     });
 
-    test("Delete session from db, Return an error for unknown e-mail address", async () => {
+    test("Use cookies to delete session from db, Return an error for unknown e-mail address", async () => {
       mockContext.req.cookies = cookies;
 
       const dbSpy = spyDb({ rows: [] }).mockReturnValueOnce({ rows: [] });
@@ -103,6 +101,24 @@ describe("Test login resolver", () => {
       expect(dbSpy).toHaveBeenCalledTimes(2);
       expect(dbSpy).toHaveNthReturnedWith(1, { rows: [] });
       expect(dbSpy).toHaveNthReturnedWith(2, { rows: [] });
+
+      expect(setCookies).not.toHaveBeenCalled();
+
+      expect(result).toHaveProperty("message", "Invalid email or password");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
+
+    test("Use session id to delete session from db, Return an error if login credentials do not match", async () => {
+      const hash = await bcrypt.hash("noT_password123", 10);
+      const user = { userPassword: hash, userId: "user id" };
+      const dbSpy = spyDb({ rows: [] }).mockReturnValueOnce({ rows: [user] });
+      const input = { ...args, sessionId: "session_id" };
+
+      const result = await login({}, input, mockContext, info);
+
+      expect(dbSpy).toHaveBeenCalledTimes(2);
+      expect(dbSpy).toHaveNthReturnedWith(1, { rows: [] });
+      expect(dbSpy).toHaveNthReturnedWith(2, { rows: [user] });
 
       expect(setCookies).not.toHaveBeenCalled();
 

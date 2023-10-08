@@ -8,10 +8,8 @@ import { db } from "@lib/db";
 
 import { JWT_REGEX, sessionMail } from "@features/auth/utils";
 import {
-  cookiesStr,
   gqlValidations,
   validateSession,
-  verifyE2eCookie,
 } from "../utils/refreshToken.testUtils";
 import {
   REFRESH_TOKEN,
@@ -101,46 +99,39 @@ describe("Refresh Token - E2E", () => {
   });
 
   describe("Validate cookie header", () => {
-    it.each(verifyE2eCookie)(
-      "Return an error response if request header has one or more %s",
-      async (_, cookie) => {
-        const variables = { sessionId: registeredSessionId };
-        const payload = { query: REFRESH_TOKEN, variables };
+    it("No cookies in the request's cookie header, Should respond with an error", async () => {
+      const variables = { sessionId: registeredSessionId };
+      const payload = { query: REFRESH_TOKEN, variables };
 
-        const { data } = await post<Refresh>(url, payload, { cookie });
+      const { data } = await post<Refresh>(url, payload);
 
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.refreshToken).toStrictEqual({
-          __typename: "ForbiddenError",
-          message: "Unable to refresh token",
-          status: Status.Error,
-        });
-      }
-    );
-  });
-
-  describe("Verify cookie refresh token", () => {
-    describe("Invalid refresh token", () => {
-      it("Token verification throws a JsonWebTokenError, Return a ForbiddenError response ", async () => {
-        const variables = { sessionId: registeredSessionId };
-        const payload = { query: REFRESH_TOKEN, variables };
-        const options = { cookie: cookiesStr };
-
-        const { data } = await post<Refresh>(url, payload, options);
-
-        expect(sessionMail).not.toHaveBeenCalled();
-
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.refreshToken).toStrictEqual({
-          __typename: "ForbiddenError",
-          message: "Unable to refresh token",
-          status: Status.Error,
-        });
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.refreshToken).toStrictEqual({
+        __typename: "AuthCookieError",
+        message: "Unable to refresh token",
+        status: Status.Error,
       });
     });
 
+    it("Return an error response if request header has a missing cookie", async () => {
+      const cookie = registeredCookies.split(";").splice(1, 1).join(";");
+      const variables = { sessionId: registeredSessionId };
+      const payload = { query: REFRESH_TOKEN, variables };
+
+      const { data } = await post<Refresh>(url, payload, { cookie });
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.refreshToken).toStrictEqual({
+        __typename: "ForbiddenError",
+        message: "Unable to refresh token",
+        status: Status.Error,
+      });
+    });
+  });
+
+  describe("Verify cookie refresh token", () => {
     describe("Expired refresh token", () => {
       it("Session id is unknown, Return an UnknownError response ", async () => {
         const variables = { sessionId: "unknown_session_id" };

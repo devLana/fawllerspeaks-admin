@@ -13,7 +13,6 @@ import Card from "@components/Card";
 import RegisterUserForm from "@features/register/components/RegisterUserForm";
 import { REGISTER_USER } from "@features/register/operations/REGISTER_USER";
 import { registerUserValidator } from "@features/register/utils/registerUserValidator";
-import { SESSION_ID } from "@utils/constants";
 import uiLayout from "@utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 import type { MutationRegisterUserArgs } from "@apiTypes";
@@ -84,13 +83,11 @@ const RegisterUser: NextPageWithLayout = () => {
         }
 
         case "AuthenticationError":
-          localStorage.removeItem(SESSION_ID);
           void client.clearStore();
           void router.replace("/login?status=unauthenticated");
           break;
 
         case "UnknownError":
-          localStorage.removeItem(SESSION_ID);
           void client.clearStore();
           void router.replace("/login?status=unauthorized");
           break;

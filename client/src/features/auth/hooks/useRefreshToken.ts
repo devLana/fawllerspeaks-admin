@@ -34,6 +34,11 @@ const useRefreshToken = () => {
           setIsOpen(true);
           break;
 
+        case "AuthCookieError":
+          void client.clearStore();
+          void router.replace("/login?status=expired");
+          break;
+
         case "NotAllowedError":
           localStorage.removeItem(SESSION_ID);
           void client.clearStore();

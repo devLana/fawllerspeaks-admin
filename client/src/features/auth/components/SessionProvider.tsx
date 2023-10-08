@@ -32,7 +32,7 @@ const SessionProvider = ({ layout, page }: SessionProvideProps) => {
     <SessionContext.Provider
       value={{
         userId,
-        handleUserId: (id: string) => setUserId(id),
+        handleUserId: id => setUserId(id),
         handleRefreshToken,
         handleClearRefreshTokenTimer,
       }}

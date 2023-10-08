@@ -6,7 +6,8 @@ import {
   authToken,
   decode,
   msg1,
-  notAllowed,
+  tableFive,
+  tableFour,
   tableOne,
   tableThree,
   tableTwo,
@@ -58,11 +59,11 @@ describe("Verify user session on initial app render", () => {
     });
 
     describe("Session verification responds with an error or an unsupported object type", () => {
-      it("Redirect to the login page if the response is a NotAllowedError", async () => {
+      it.each(tableFour)("%s", async (_, mock) => {
         const { replace } = useRouter();
-        localStorage.setItem(SESSION_ID, notAllowed.sessionId);
+        localStorage.setItem(SESSION_ID, mock.sessionId);
 
-        sessionTestRenderer(notAllowed.gql());
+        sessionTestRenderer(mock.gql());
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
         expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();
@@ -74,12 +75,12 @@ describe("Verify user session on initial app render", () => {
         expect(screen.getByText(TEXT_NODE)).toBeInTheDocument();
       });
 
-      it("Render the page at the current route if the response is a NotAllowedError", async () => {
+      it.each(tableFive)("%s", async (_, pathname, mock) => {
         const router = useRouter();
-        router.pathname = "/login";
-        localStorage.setItem(SESSION_ID, notAllowed.sessionId);
+        router.pathname = pathname;
+        localStorage.setItem(SESSION_ID, mock.sessionId);
 
-        sessionTestRenderer(notAllowed.gql());
+        sessionTestRenderer(mock.gql());
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
         expect(screen.queryByText(TEXT_NODE)).not.toBeInTheDocument();

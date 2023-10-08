@@ -6,13 +6,12 @@ import {
   jest,
   beforeEach,
   afterAll,
-  beforeAll,
 } from "@jest/globals";
 
 import logout from "..";
 
 import { clearCookies } from "@features/auth/utils";
-import { validateCookie, validations } from "../utils/logout.testUtils";
+import { validations } from "../utils/logout.testUtils";
 import { mockContext, info, spyDb } from "@tests";
 
 type Module = typeof import("@features/auth/utils");
@@ -30,12 +29,9 @@ const cookies = { auth: "auth", sig: "sig", token: "token" };
 const sessionId = "session_id_string";
 
 describe("Test logout resolver", () => {
-  beforeAll(() => {
-    mockContext.req.cookies = {};
-  });
-
   beforeEach(() => {
-    mockContext.user = "user_user_id";
+    mockContext.req.cookies = {};
+    mockContext.user = "new_user_id";
   });
 
   afterAll(() => {
@@ -55,36 +51,64 @@ describe("Test logout resolver", () => {
   });
 
   describe("Validate session id string", () => {
-    test.each(validations)(
-      "Return an error if session id is an %s string",
-      async (_, id) => {
-        const result = await logout({}, { sessionId: id }, mockContext, info);
+    test.each(validations)("%s", async (_, id) => {
+      const result = await logout({}, { sessionId: id }, mockContext, info);
 
-        expect(clearCookies).not.toHaveBeenCalled();
+      expect(clearCookies).not.toHaveBeenCalled();
 
-        expect(result).toHaveProperty("sessionIdError", "Invalid session id");
-        expect(result).toHaveProperty("status", "ERROR");
-      }
-    );
+      expect(result).toHaveProperty("sessionIdError", "Invalid session id");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
-  describe("Validate refresh token cookies", () => {
-    test.each(validateCookie)(
-      "Return an error if request cookie is %s",
-      async (_, authCookies) => {
-        mockContext.req.cookies = authCookies;
+  describe("Request is made with an empty cookie header", () => {
+    test("Should return an error response if user session could not be found", async () => {
+      const spy = spyDb({ rows: [] });
+      const result = await logout({}, { sessionId }, mockContext, info);
 
-        const result = await logout({}, { sessionId }, mockContext, info);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveNthReturnedWith(1, { rows: [] });
+      expect(result).toHaveProperty("message", "Unable to logout");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
 
-        expect(clearCookies).not.toHaveBeenCalled();
+    test("Should return an error response if the session was not assigned to the logged in user", async () => {
+      const spy = spyDb({ rows: [{ user: "not_user_id" }] });
+      const result = await logout({}, { sessionId }, mockContext, info);
 
-        expect(result).toHaveProperty("message", "Unable to logout");
-        expect(result).toHaveProperty("status", "ERROR");
-      }
-    );
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveNthReturnedWith(1, { rows: [{ user: "not_user_id" }] });
+      expect(result).toHaveProperty("message", "Unable to logout");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
+
+    test("Delete session, Log user out", async () => {
+      const spy = spyDb({ rows: [{ user: "new_user_id" }] });
+      spy.mockReturnValueOnce({ rows: [] });
+      const result = await logout({}, { sessionId }, mockContext, info);
+
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy).toHaveNthReturnedWith(1, { rows: [{ user: "new_user_id" }] });
+      expect(spy).toHaveNthReturnedWith(2, { rows: [] });
+      expect(result).toHaveProperty("message", "User logged out");
+      expect(result).toHaveProperty("status", "WARN");
+    });
   });
 
-  describe("Verify session id string", () => {
+  describe("Validate request cookie", () => {
+    test("Return an error if request has a missing cookie", async () => {
+      mockContext.req.cookies = { auth: "auth", sig: "sig" };
+
+      const result = await logout({}, { sessionId }, mockContext, info);
+
+      expect(clearCookies).not.toHaveBeenCalled();
+
+      expect(result).toHaveProperty("message", "Unable to logout");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
+  });
+
+  describe("Verify user session", () => {
     test("Return an error if session id is unknown", async () => {
       mockContext.req.cookies = cookies;
 

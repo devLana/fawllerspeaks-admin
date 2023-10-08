@@ -1,30 +1,30 @@
-import type { Cookies } from "@types";
-
 type GQL = [
   string,
   boolean | number | [] | Record<string, unknown> | undefined | null
 ];
 
 export const validations: [string, string][] = [
-  ["empty", ""],
-  ["empty whitespace", "      "],
+  ["Return an error response if session id is an empty string", ""],
+  [
+    "Return an error response if session id is an empty whitespace string",
+    "      ",
+  ],
 ];
 
 export const gqlValidations: GQL[] = [
-  ["a null", null],
-  ["an undefined", undefined],
-  ["a number", 59],
-  ["a boolean", true],
-  ["an array", []],
-  ["an object", {}],
-];
-
-export const validateCookie: [string, Cookies][] = [
-  ["invalid", { auth: "", sig: "sig", token: "token" }],
-  ["missing a field", { auth: "auth", sig: "sig" }],
-];
-
-export const verifyE2eCookie: [string, string][] = [
-  ["invalid cookie values", "auth=auth; sig= ; token=token"],
-  ["missing cookies", "auth=auth; sig=sig"],
+  ["Should throw a graphql validation error for a null session id value", null],
+  [
+    "Should throw a graphql validation error for an undefined session id value",
+    undefined,
+  ],
+  ["Should throw a graphql validation error for a number session id value", 59],
+  [
+    "Should throw a graphql validation error for a boolean session id value",
+    true,
+  ],
+  ["Should throw a graphql validation error for an array session id value", []],
+  [
+    "Should throw a graphql validation error for an object session id value",
+    {},
+  ],
 ];

@@ -30,7 +30,6 @@ import {
   mockObj,
   obj,
   sessionId,
-  validateCookies,
   validations,
 } from "../utils/verifySession.testUtils";
 import { MailError } from "@utils";
@@ -79,19 +78,27 @@ describe("Test verify session resolver", () => {
   });
 
   describe("Validate cookie request header", () => {
-    test.each(validateCookies)(
-      "Return an error response if cookie header has %s",
-      async (_, mockCookies) => {
-        mockContext.req.cookies = mockCookies;
+    test("Return an error response if request cookie header has no cookies", async () => {
+      mockContext.req.cookies = {};
 
-        const result = await resolver({}, { sessionId }, mockContext, info);
+      const result = await resolver({}, { sessionId }, mockContext, info);
 
-        expect(clearCookies).not.toHaveBeenCalled();
+      expect(clearCookies).not.toHaveBeenCalled();
 
-        expect(result).toHaveProperty("message", "Unable to verify session");
-        expect(result).toHaveProperty("status", "ERROR");
-      }
-    );
+      expect(result).toHaveProperty("message", "Unable to verify session");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
+
+    test("Return an error response if request cookie header has a missing cookie", async () => {
+      mockContext.req.cookies = { auth: "auth", token: "token" };
+
+      const result = await resolver({}, { sessionId }, mockContext, info);
+
+      expect(clearCookies).not.toHaveBeenCalled();
+
+      expect(result).toHaveProperty("message", "Unable to verify session");
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
   describe("Verify cookie refresh token", () => {

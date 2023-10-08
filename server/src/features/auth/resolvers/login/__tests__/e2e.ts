@@ -36,54 +36,45 @@ describe("Login - E2E", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(gqlValidation)(
-      "Throw a graphql validation error for %s input values",
-      async (_, variables) => {
-        const payload = { query: LOGIN, variables };
+    test.each(gqlValidation)("%s", async (_, variables) => {
+      const payload = { query: LOGIN, variables };
 
-        const { data } = await post<Login>(url, payload);
+      const { data } = await post<Login>(url, payload);
 
-        expect(data.errors).toBeDefined();
-        expect(data.data).toBeUndefined();
-      }
-    );
+      expect(data.errors).toBeDefined();
+      expect(data.data).toBeUndefined();
+    });
 
-    test.each(validations(null))(
-      "Returns error for %s",
-      async (_, variables, errors) => {
-        const payload = { query: LOGIN, variables };
+    test.each(validations(null))("%s", async (_, variables, errors) => {
+      const payload = { query: LOGIN, variables };
 
-        const { data } = await post<Login>(url, payload);
+      const { data } = await post<Login>(url, payload);
 
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.login).toStrictEqual({
-          __typename: "LoginValidationError",
-          emailError: errors[0],
-          passwordError: errors[1],
-          status: Status.Error,
-        });
-      }
-    );
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.login).toStrictEqual({
+        __typename: "LoginValidationError",
+        emailError: errors[0],
+        passwordError: errors[1],
+        status: Status.Error,
+      });
+    });
   });
 
   describe("Verify e-mail and password", () => {
-    test.each(verifyInputs)(
-      "Return an error if the %s",
-      async (_, variables) => {
-        const payload = { query: LOGIN, variables };
+    test.each(verifyInputs)("%s", async (_, variables) => {
+      const payload = { query: LOGIN, variables };
 
-        const { data } = await post<Login>(url, payload);
+      const { data } = await post<Login>(url, payload);
 
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.login).toStrictEqual({
-          __typename: "NotAllowedError",
-          message: "Invalid email or password",
-          status: Status.Error,
-        });
-      }
-    );
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.login).toStrictEqual({
+        __typename: "NotAllowedError",
+        message: "Invalid email or password",
+        status: Status.Error,
+      });
+    });
   });
 
   describe("Successfully log in user", () => {

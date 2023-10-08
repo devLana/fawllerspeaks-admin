@@ -53,6 +53,16 @@ const useVerifySession = (
               setClientHasRendered(true);
               break;
 
+            case "AuthCookieError":
+              void client.clearStore();
+
+              if (pathname === "/login") {
+                setClientHasRendered(true);
+              } else {
+                void replace("/login");
+              }
+              break;
+
             case "NotAllowedError":
               localStorage.removeItem(SESSION_ID);
               void client.clearStore();

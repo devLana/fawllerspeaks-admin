@@ -15,7 +15,6 @@ import EditProfileFileInput, {
 import { editProfileValidator } from "@features/settings/editProfile/utils/editProfileValidator";
 import { EDIT_PROFILE } from "@features/settings/editProfile/operations/EDIT_PROFILE";
 import settingsLayout from "@utils/settings/settingsLayout";
-import { SESSION_ID } from "@utils/constants";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 import type { MutationEditProfileArgs } from "@apiTypes";
@@ -104,13 +103,11 @@ const EditMe: NextPageWithLayout = () => {
         }
 
         case "AuthenticationError":
-          localStorage.removeItem(SESSION_ID);
           void client.clearStore();
           void router.replace("/login?status=unauthenticated");
           break;
 
         case "UnknownError":
-          localStorage.removeItem(SESSION_ID);
           void client.clearStore();
           void router.replace("/login?status=unauthorized");
           break;

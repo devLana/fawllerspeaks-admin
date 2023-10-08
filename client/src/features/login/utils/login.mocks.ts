@@ -19,26 +19,30 @@ const msg = "You are unable to login at the moment. Please try again later";
 
 const request = (
   email: string,
-  password: string
+  password: string,
+  sessionId?: string | null
 ): MockedResponse["request"] => {
-  return { query: LOGIN_USER, variables: { email, password } };
+  return { query: LOGIN_USER, variables: { email, password, sessionId } };
 };
 
 export const validation = {
   email: `validation_${EMAIL}`,
   password: `validation_${PASSWORD}`,
+  sessionId: `validation_Session_Id`,
   emailError: "Invalid e-mail address",
   passwordError: "Enter Password",
+  sessionIdError: "Enter session id",
   gql(): MockedResponse[] {
     return [
       {
-        request: request(this.email, this.password),
+        request: request(this.email, this.password, this.sessionId),
         result: {
           data: {
             login: {
               __typename: "LoginValidationError",
               emailError: this.emailError,
               passwordError: this.passwordError,
+              sessionIdError: this.sessionIdError,
             },
           },
         },
@@ -197,10 +201,20 @@ export const successTable: [string, ExpectedSuccess][] = [
   ],
 ];
 
-export const redirectStatus: [string, string][] = [
+export const redirectStatus: [string, string, string][] = [
   [
     "Display an alert message if user attempted an unauthorized action",
     "unauthorized",
+    "You are unable to perform that action. Please log in",
   ],
-  ["Display an alert message if user is unauthenticated", "unauthenticated"],
+  [
+    "Display an alert message if user is unauthenticated",
+    "unauthenticated",
+    "You are unable to perform that action. Please log in",
+  ],
+  [
+    "Display an alert message if current session has expired",
+    "expired",
+    "Current session has expired. Please log in",
+  ],
 ];
