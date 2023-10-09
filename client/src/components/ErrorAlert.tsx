@@ -13,7 +13,7 @@ const ErrorAlert = ({ message }: { message: string }) => {
       flexDirection="column"
       justifyContent="space-between"
       alignItems="center"
-      rowGap="2"
+      rowGap={2}
     >
       <Alert severity="info" color="error">
         {message}
