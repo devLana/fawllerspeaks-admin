@@ -71,7 +71,8 @@ const useVerifySession = (
                 pathname !== "/login" &&
                 pathname !== "/forgot-password" &&
                 pathname !== "/reset-password" &&
-                pathname !== "/404"
+                pathname !== "/404" &&
+                pathname !== "/500"
               ) {
                 void replace("/login");
               } else {
@@ -131,14 +132,15 @@ const useVerifySession = (
       void client.clearStore();
 
       if (
-        pathname !== "/login" &&
-        pathname !== "/forgot-password" &&
-        pathname !== "/reset-password" &&
-        pathname !== "/404"
+        pathname === "/login" ||
+        pathname === "/forgot-password" ||
+        pathname === "/reset-password" ||
+        pathname === "/404" ||
+        pathname === "/500"
       ) {
-        void replace("/login");
-      } else {
         setClientHasRendered(true);
+      } else {
+        void replace("/login");
       }
     }
   }, []);
