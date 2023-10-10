@@ -6,9 +6,9 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Snackbar from "@mui/material/Snackbar";
-import Tooltip from "@mui/material/Tooltip";
 
 import LogoutModal from "./LogoutModal";
+import { NavbarTooltip } from "./NavbarTooltip";
 import transition from "../utils/transition";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { MuiIconType } from "@types";
@@ -36,23 +36,23 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
 
   return (
     <>
-      <Tooltip title={isOpen ? null : label} placement="right">
+      <NavbarTooltip isOpen={isOpen} title={label} placement="right">
         <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
           <ListItemButton
-            sx={theme => ({
+            sx={{
               px: 1.5,
               borderRadius: 1,
-              transition: transition(theme, isOpen, [
-                "background-color",
-                "padding",
-              ]),
-              "&:hover": { bgcolor: "action.hover" },
-              [theme.breakpoints.up("sm")]: {
-                flexGrow: 0,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
+              flexGrow: { sm: 0 },
+              whiteSpace: { sm: "nowrap" },
+              overflow: { sm: "hidden" },
+              transition: theme => {
+                return transition(theme.transitions, isOpen, [
+                  "background-color",
+                  "padding",
+                ]);
               },
-            })}
+              "&:hover": { bgcolor: "action.hover" },
+            }}
             component={Button}
             onClick={() => setModalIsOpen(true)}
             aria-haspopup="dialog"
@@ -64,22 +64,23 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
             </ListItemIcon>
             <ListItemText
               primary={label}
-              sx={theme => ({
-                ml: 1,
+              sx={{
                 my: 0,
-                transition: transition(theme, isOpen, [
-                  "margin-left",
-                  "opacity",
-                ]),
-                "&>.MuiTypography-root": { lineHeight: 1 },
-                [theme.breakpoints.up("sm")]: {
-                  ...(isOpen ? { ml: 1, opacity: 1 } : { ml: 0, opacity: 0 }),
+                marginLeft: 2,
+                ml: { sm: isOpen ? 2 : 0, md: isOpen ? 0 : 2 },
+                opacity: { sm: isOpen ? 1 : 0, md: isOpen ? 0 : 1 },
+                transition: ({ transitions: transit }) => {
+                  return transition(transit, isOpen, [
+                    "margin-left",
+                    "opacity",
+                  ]);
                 },
-              })}
+                "&>.MuiTypography-root": { lineHeight: 1 },
+              }}
             />
           </ListItemButton>
         </ListItem>
-      </Tooltip>
+      </NavbarTooltip>
       <Snackbar
         message={toastMessage}
         open={alertIsOpen}

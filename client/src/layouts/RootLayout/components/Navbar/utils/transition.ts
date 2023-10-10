@@ -1,14 +1,13 @@
-import type { Theme } from "@mui/material/styles";
+import type { Transitions } from "@mui/material/styles";
 
 const transition = (
-  theme: Theme,
+  transitions: Transitions,
   isOpen: boolean,
   props: string | string[]
 ) => {
-  return theme.transitions.create(props, {
-    easing: theme.transitions.easing.sharp,
-    duration:
-      theme.transitions.duration[isOpen ? "enteringScreen" : "leavingScreen"],
+  return transitions.create(props, {
+    easing: transitions.easing.sharp,
+    duration: transitions.duration[isOpen ? "enteringScreen" : "leavingScreen"],
   });
 };
 

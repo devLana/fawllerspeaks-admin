@@ -30,15 +30,13 @@ const RootLayout = (props: RootLayoutProps) => {
 
   return (
     <Container
-      sx={theme => ({
+      sx={{
         minHeight: "100vh",
-        pt: "56px",
-        [theme.breakpoints.up("sm")]: {
-          pt: "64px",
-          display: "flex",
-          columnGap: 4,
-        },
-      })}
+        paddingTop: "56px",
+        pt: { sm: "64px" },
+        display: { sm: "flex" },
+        columnGap: { sm: 4 },
+      }}
     >
       <Metadata {...metaProps} />
       <Header onClick={handleOpenNavbar} />

@@ -2,11 +2,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
-import type { MuiIconType } from "@types";
+import { NavbarTooltip } from "./NavbarTooltip";
 import transition from "../utils/transition";
+import type { MuiIconType } from "@types";
 
 interface NavbarNewLinkProps {
   label: string;
@@ -19,23 +19,21 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
   const { label, href, Icon, isOpen } = props;
 
   return (
-    <Tooltip title={isOpen ? null : label} placement="right">
+    <NavbarTooltip isOpen={isOpen} title={label} placement="right">
       <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
         <ListItemButton
-          sx={theme => ({
+          sx={{
             px: 1.5,
             borderRadius: 1,
             border: 1,
             borderColor: "primary.main",
             color: "primary.main",
             boxShadow: 3,
+            flexGrow: { sm: 0 },
+            whiteSpace: { sm: "nowrap" },
+            overflow: { sm: "hidden" },
             "&:hover": { color: "primary.main", bgcolor: "inherit" },
-            [theme.breakpoints.up("sm")]: {
-              flexGrow: 0,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-            },
-          })}
+          }}
           component={NextLink}
           href={href}
         >
@@ -44,19 +42,20 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
           </ListItemIcon>
           <ListItemText
             primary={label}
-            sx={theme => ({
-              ml: 1,
+            sx={{
               my: 0,
-              transition: transition(theme, isOpen, ["margin-left", "opacity"]),
-              "&>.MuiTypography-root": { lineHeight: 1 },
-              [theme.breakpoints.up("sm")]: {
-                ...(isOpen ? { ml: 1, opacity: 1 } : { ml: 0, opacity: 0 }),
+              marginLeft: 2,
+              ml: { sm: isOpen ? 2 : 0, md: isOpen ? 0 : 2 },
+              opacity: { sm: isOpen ? 1 : 0, md: isOpen ? 0 : 1 },
+              transition: ({ transitions: transit }) => {
+                return transition(transit, isOpen, ["margin-left", "opacity"]);
               },
-            })}
+              "&>.MuiTypography-root": { lineHeight: 1 },
+            }}
           />
         </ListItemButton>
       </ListItem>
-    </Tooltip>
+    </NavbarTooltip>
   );
 };
 

@@ -36,10 +36,13 @@ const NavbarContainer = (props: NavbarContainerProps) => {
           }),
         },
         [theme.breakpoints.up("sm")]: {
-          transition: transition(theme, isOpen, "width"),
-          width: isOpen ? "calc(6.2em + 75px)" : "calc(50px + 1.5em)",
+          transition: transition(theme.transitions, isOpen, "width"),
+          width: isOpen ? "calc(42px + 8em)" : "calc(50px + 1.5em)",
           borderRight: 1,
           borderColor: "divider",
+        },
+        [theme.breakpoints.up("md")]: {
+          width: isOpen ? "calc(50px + 1.5em)" : "calc(42px + 8em)",
         },
       })}
     >
@@ -53,7 +56,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
       <Box
         sx={theme => ({
           [theme.breakpoints.down("sm")]: {
-            transition: transition(theme, isOpen, "transform"),
+            transition: transition(theme.transitions, isOpen, "transform"),
             position: "fixed",
             top: 0,
             bottom: 0,

@@ -19,7 +19,10 @@ const NavbarToggleButton = ({ isOpen, onClick }: NavbarToggleButtonProps) => (
             ? "primary.dark"
             : "primary.main";
         },
-        transform: { sm: isOpen ? "rotate(0deg)" : "rotate(180deg)" },
+        transform: {
+          sm: isOpen ? "rotate(0deg)" : "rotate(180deg)",
+          md: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+        },
       }}
     >
       <ChevronLeftIcon />
