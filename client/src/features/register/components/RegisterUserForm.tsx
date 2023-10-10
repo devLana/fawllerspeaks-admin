@@ -74,7 +74,7 @@ const RegisterUserForm = ({
         </Grid>
       </Grid>
     </Box>
-    <Box marginBottom={3}>
+    <Box mb={3}>
       <Typography align="center" gutterBottom>
         Update account password
       </Typography>

@@ -44,9 +44,11 @@ const DefaultColor = (props: DefaultColorProps) => {
       >
         {isDefaultColor && (
           <CheckIcon
-            sx={({ appTheme: { themeMode } }) => ({
-              color: themeMode === "sunny" ? "primary.light" : "primary.dark",
-            })}
+            sx={{
+              color: ({ appTheme: { themeMode } }) => {
+                return themeMode === "sunny" ? "primary.light" : "primary.dark";
+              },
+            }}
           />
         )}
       </Box>

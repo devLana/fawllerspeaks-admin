@@ -55,14 +55,15 @@ const UserAvatar = (props: UserAvatarProps) => {
     >
       <Avatar
         sx={[
-          ({ appTheme }) => ({
-            bgcolor:
-              appTheme.themeMode === "sunny"
+          {
+            bgcolor: theme => {
+              return theme.appTheme.themeMode === "sunny"
                 ? "secondary.light"
-                : "secondary.dark",
+                : "secondary.dark";
+            },
             color: "primary.main",
             fontSize: 17,
-          }),
+          },
           ...sxProp,
         ]}
       >
@@ -73,14 +74,15 @@ const UserAvatar = (props: UserAvatarProps) => {
     <Avatar
       aria-label={`${firstName} ${lastName} initials`}
       sx={[
-        ({ appTheme }) => ({
-          bgcolor:
-            appTheme.themeMode === "sunny"
+        {
+          bgcolor: theme => {
+            return theme.appTheme.themeMode === "sunny"
               ? "secondary.light"
-              : "secondary.dark",
+              : "secondary.dark";
+          },
           color: "primary.main",
           fontSize: 17,
-        }),
+        },
         ...sxProp,
       ]}
     >

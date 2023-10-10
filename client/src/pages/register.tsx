@@ -132,7 +132,13 @@ const RegisterUser: NextPageWithLayout = () => {
       <Typography align="center" variant="h1">
         Register Your Account
       </Typography>
-      <Card sx={{ width: "100%", maxWidth: { xs: "22.5rem", sm: "43rem" } }}>
+      <Card
+        sx={theme => ({
+          width: "100%",
+          maxWidth: "22.5rem",
+          [theme.breakpoints.up("sm")]: { maxWidth: "43rem" },
+        })}
+      >
         <RegisterUserForm
           isLoading={status === "loading"}
           onSubmit={handleSubmit(submitHandler)}

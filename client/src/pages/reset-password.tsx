@@ -122,7 +122,7 @@ const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
       <Typography align="center" variant="h1">
         Reset Your Password
       </Typography>
-      <Card sx={{ maxWidth: { xs: "21.875rem", sm: "25rem" } }}>
+      <Card>
         <ResetPasswordForm
           isLoading={loading}
           onSubmit={handleSubmit(submitHandler)}

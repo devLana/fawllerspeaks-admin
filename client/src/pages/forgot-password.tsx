@@ -120,7 +120,7 @@ const ForgotPassword: NextPageWithLayout = () => {
       <Typography variant="h1" align="center">
         Forgot Password
       </Typography>
-      <Card sx={{ maxWidth: { xs: "21.875rem", sm: "25rem" } }}>
+      <Card>
         <Typography align="center" mb="1.5rem">
           Can&apos;t remember your password? Enter your e-mail below to have a
           password reset link sent to you

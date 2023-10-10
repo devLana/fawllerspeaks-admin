@@ -67,7 +67,7 @@ const EditProfileForm = ({
         />
       </Grid>
     </Grid>
-    <Box marginBottom={3.3}>{fileInput}</Box>
+    <Box mb={3.3}>{fileInput}</Box>
     <LoadingButton
       loading={isLoading}
       variant="contained"

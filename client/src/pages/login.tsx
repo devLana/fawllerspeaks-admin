@@ -133,7 +133,7 @@ const Login: NextPageWithLayout = () => {
         content={alertMessage}
       />
       <Typography variant="h1">Sign In</Typography>
-      <Card sx={{ maxWidth: { xs: "21.875rem", sm: "25rem" } }}>
+      <Card>
         <LoginForm
           isLoading={status === "submitting"}
           onSubmit={handleSubmit(submitHandler)}

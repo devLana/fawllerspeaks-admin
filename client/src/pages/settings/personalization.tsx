@@ -8,6 +8,7 @@ import { type NextPageWithLayout } from "@types";
 
 const Personalize: NextPageWithLayout = () => {
   const { appTheme } = useTheme();
+
   return (
     <>
       <Theme appTheme={appTheme} />
