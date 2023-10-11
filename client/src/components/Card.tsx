@@ -3,19 +3,22 @@ import type { SxPropsArray } from "@types";
 
 interface CardProps {
   children: React.ReactNode;
+  maxWidth?: string | number;
+  smMaxWidth?: string | number;
   sx?: BoxProps["sx"];
 }
 
-const Card = ({ sx, children }: CardProps) => {
+const Card = (props: CardProps) => {
+  const { sx, maxWidth = "21.875rem", smMaxWidth = "25rem", children } = props;
   const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
   return (
     <Box
       sx={[
         theme => ({
-          maxWidth: "21.875rem",
+          maxWidth,
           [theme.breakpoints.up("sm")]: {
-            maxWidth: "25rem",
+            maxWidth: smMaxWidth,
             p: "2rem",
             borderRadius: 1,
             boxShadow: theme.appTheme.themeMode === "sunny" ? 3 : 5,

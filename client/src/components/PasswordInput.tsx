@@ -1,9 +1,11 @@
 import * as React from "react";
 
 import TextField, { type TextFieldProps } from "@mui/material/TextField";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
 import type { UseFormRegisterReturn, FieldError } from "react-hook-form";
 
-import PasswordAdornment from "./PasswordAdornment";
+import TextFieldAdornment from "./TextFieldAdornment";
 
 type Name =
   | "password"
@@ -94,7 +96,12 @@ const PasswordInput = (props: PasswordInputProps) => {
       InputProps={{
         ...(InputProps && InputProps),
         endAdornment: (
-          <PasswordAdornment isVisible={isVisible} onClick={handleClick} />
+          <TextFieldAdornment
+            position="end"
+            title={`${isVisible ? "Hide" : "Show"} password`}
+            Icon={isVisible ? VisibilityOffRoundedIcon : VisibilityRoundedIcon}
+            onClick={handleClick}
+          />
         ),
       }}
     />
