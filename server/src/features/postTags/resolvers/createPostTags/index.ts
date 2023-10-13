@@ -2,8 +2,13 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
 import { PostTags, PostTagsWarning, DuplicatePostTagError } from "../types";
-import { CreatePostTagsValidationError } from "./CreatePostTagsValidationError";
-import { NotAllowedError, dateToISOString } from "@utils";
+import { CreatePostTagsValidationError } from "./types";
+import {
+  AuthenticationError,
+  RegistrationError,
+  UnknownError,
+  dateToISOString,
+} from "@utils";
 
 import type { ResolverFunc } from "@types";
 import type { MutationResolvers, PostTag } from "@resolverTypes";
@@ -36,41 +41,55 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
   const tagOrTags = tags.length > 1 ? "tags" : "tag";
 
   try {
-    if (!user) return new NotAllowedError(`Unable to create post ${tagOrTags}`);
+    if (!user) {
+      return new AuthenticationError(`Unable to create post ${tagOrTags}`);
+    }
 
     const validatedTags = await schema.validateAsync(tags, {
       abortEarly: false,
     });
 
-    const { rows } = await db.query<{ isRegistered: boolean }>(
+    const findUser = db.query<{ isRegistered: boolean }>(
       `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
       [user]
     );
 
-    if (rows.length === 0 || !rows[0].isRegistered) {
-      return new NotAllowedError(`Unable to create post ${tagOrTags}`);
+    const findTags = db.query<{ name: string }>(
+      `SELECT name
+      FROM post_tags
+      WHERE lower(replace(replace(replace(name, '-', ''), ' ', ''), '_', '')) = ANY ($1)`,
+      [validatedTags.map(tag => tag.toLowerCase().replace(/[\s_-]/g, ""))]
+    );
+
+    const [{ rows: foundUser }, { rows: existingPostTags }] = await Promise.all(
+      [findUser, findTags]
+    );
+
+    if (foundUser.length === 0) {
+      return new UnknownError(`Unable to create post ${tagOrTags}`);
     }
 
-    const lowercaseTags = validatedTags.map(tag => tag.toLowerCase());
-
-    const { rows: alreadyPostTagsWarning } = await db.query<{ name: string }>(
-      `SELECT name FROM post_tags WHERE lower(name) = ANY ($1)`,
-      [lowercaseTags]
-    );
+    if (!foundUser[0].isRegistered) {
+      return new RegistrationError(`Unable to create post ${tagOrTags}`);
+    }
 
     const set = new Set<string>();
 
-    alreadyPostTagsWarning.forEach(tag => {
-      set.add(tag.name.toLowerCase());
+    existingPostTags.forEach(tag => {
+      set.add(tag.name.toLowerCase().replace(/[\s_-]/g, ""));
     });
 
     const insertInput: (string | number)[] = [];
+    const existingTags: string[] = [];
     let insertParams = "";
     let index = 1;
-    let createdTags: PostTag[] = [];
+    let createdPostTags: PostTag[] = [];
 
     for (const validatedTag of validatedTags) {
-      if (set.has(validatedTag.toLowerCase())) continue;
+      if (set.has(validatedTag.toLowerCase().replace(/[\s_-]/g, ""))) {
+        existingTags.push(validatedTag);
+        continue;
+      }
 
       const sqlParams = `($${index}), `;
 
@@ -79,13 +98,13 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
       index += 1;
     }
 
-    if (insertParams && insertInput.length > 0) {
+    if (insertParams) {
       const sqlParams = insertParams.replace(/, $/, "");
 
-      ({ rows: createdTags } = await db.query<PostTag>(
+      ({ rows: createdPostTags } = await db.query<PostTag>(
         `INSERT INTO
           post_tags (name)
-        VALUES
+        VALUES 
           ${sqlParams}
         RETURNING
           tag_id id,
@@ -96,35 +115,36 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
       ));
     }
 
-    createdTags = createdTags.map(createdTag => ({
+    createdPostTags = createdPostTags.map(createdTag => ({
       ...createdTag,
       dateCreated: dateToISOString(createdTag.dateCreated),
     }));
 
-    if (alreadyPostTagsWarning.length > 0) {
-      if (createdTags.length === 0) {
-        const _tagOrTags = alreadyPostTagsWarning.length > 1 ? "tags" : "tag";
-        const hasOrHave = alreadyPostTagsWarning.length > 1 ? "have" : "has";
-        const msg = `The provided post ${_tagOrTags} ${hasOrHave} already been created`;
+    if (existingTags.length > 0) {
+      if (createdPostTags.length === 0) {
+        const msg =
+          existingTags.length > 1
+            ? "Post tags similar to the ones provided have already been created"
+            : "A post tag similar to the one provided has already been created";
 
         return new DuplicatePostTagError(msg);
       }
 
-      const [{ name }] = alreadyPostTagsWarning;
-      const remainingTags = alreadyPostTagsWarning.length - 1;
+      const [name] = existingTags;
+      const remainingTags = existingTags.length - 1;
       const _tagOrTags = remainingTags > 1 ? "tags" : "tag";
-      const createdTagOrTags = createdTags.length > 1 ? "tags" : "tag";
+      const createdTagOrTags = createdPostTags.length > 1 ? "tags" : "tag";
 
       const tagsMsg =
         remainingTags === 0
-          ? `${name} has already been created`
-          : `'${name}' and ${remainingTags} other post ${_tagOrTags} have already been created`;
+          ? `A post tag similar to '${name}' has already been created`
+          : `Post tags similar to '${name}' and ${remainingTags} other post ${_tagOrTags} have already been created`;
 
-      const msg = `${createdTags.length} post ${createdTagOrTags} created. ${tagsMsg}`;
-      return new PostTagsWarning(createdTags, msg);
+      const msg = `${createdPostTags.length} post ${createdTagOrTags} created. ${tagsMsg}`;
+      return new PostTagsWarning(createdPostTags, msg);
     }
 
-    return new PostTags(createdTags);
+    return new PostTags(createdPostTags);
   } catch (err) {
     if (err instanceof ValidationError) {
       return new CreatePostTagsValidationError(err.details[0].message);

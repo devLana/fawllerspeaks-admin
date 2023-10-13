@@ -9,7 +9,7 @@ import {
   DuplicatePostTagErrorResolver,
 } from "./types";
 import { EditedPostTagResolver } from "./editPostTag/EditedPostTag";
-import { CreatePostTagsValidationErrorResolver } from "./createPostTags/CreatePostTagsValidationError";
+import { CreatePostTagsValidationErrorResolver } from "./createPostTags/types/CreatePostTagsValidationError";
 import { DeletePostTagsValidationErrorResolver } from "./deletePostTags/DeletePostTagsValidationError";
 import { EditPostTagValidationErrorResolver } from "./editPostTag/EditPostTagValidationError";
 

@@ -43,7 +43,7 @@ export const postTagsTypeDefs = `#graphql
     status: Status!
   }
 
-  union CreatePostTags = PostTags | PostTagsWarning | CreatePostTagsValidationError | DuplicatePostTagError | NotAllowedError
+  union CreatePostTags = PostTags | PostTagsWarning | CreatePostTagsValidationError | DuplicatePostTagError | UnknownError | AuthenticationError | RegistrationError
 
   union DeletePostTags = PostTags | PostTagsWarning | DeletePostTagsValidationError | NotAllowedError | UnknownError
 

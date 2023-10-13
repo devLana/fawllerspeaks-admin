@@ -1,0 +1,132 @@
+export const gqlValidations: [string, unknown][] = [
+  ["Should throw a graphql validation error for a null input", null],
+  ["Should throw a graphql validation error for an undefined input", undefined],
+  ["Should throw a graphql validation error for a boolean input", true],
+  ["Should throw a graphql validation error for a number input", 100],
+  [
+    "Should throw a graphql validation error for an array with invalid inputs",
+    [false, 90, {}, []],
+  ],
+];
+
+export const validations: [string, string[], string][] = [
+  [
+    "Returns a validation error for an array input that exceeds the maximum limit of 10",
+    ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"],
+    "Input tags can only contain at most 10 tags",
+  ],
+  [
+    "Returns a validation error for an empty input array",
+    [],
+    "No post tags were provided",
+  ],
+  [
+    "Returns a validation error for an array of empty strings & empty whitespace strings",
+    ["", "   "],
+    "Input tags cannot contain empty values",
+  ],
+  [
+    "Returns a validation error for an array of duplicate input strings",
+    ["tag a", "tagA", "b"],
+    "Input tags can only contain unique tags",
+  ],
+];
+
+const dateCreated = "2022-11-07 13:22:43.717+01";
+const mockDate = "2022-11-07T12:22:43.717Z";
+
+export const tags = ["tag1", "tag2", "tag3", "tag4"];
+
+const mockTag1 = { id: "100", name: tags[0], lastModified: null };
+const mockTag2 = { id: "500", name: tags[1], lastModified: null };
+const mockTag3 = { id: "21", name: tags[2], lastModified: null };
+const mockTag4 = { id: "436921", name: tags[3], lastModified: null };
+
+export const dbTag1 = { ...mockTag1, dateCreated };
+export const dbTag2 = { ...mockTag2, dateCreated };
+export const dbTag3 = { ...mockTag3, dateCreated };
+export const dbTag4 = { ...mockTag4, dateCreated };
+
+export const tag1 = { ...mockTag1, dateCreated: mockDate };
+export const tag2 = { ...mockTag2, dateCreated: mockDate };
+export const tag3 = { ...mockTag3, dateCreated: mockDate };
+export const tag4 = { ...mockTag4, dateCreated: mockDate };
+
+const existingPostTags = [
+  { name: tags[0] },
+  { name: tags[1] },
+  { name: tags[2] },
+  { name: tags[3] },
+];
+
+export const verify: [string, Record<string, boolean>[], string[], string][] = [
+  [
+    "Should return an error response for an unknown user",
+    [],
+    ["tag1", "tag2"],
+    "tags",
+  ],
+  [
+    "Should return an error response if the user is unregistered",
+    [{ isRegistered: false }],
+    ["tag1"],
+    "tag",
+  ],
+];
+
+export const warn: [string, string[], string[], string][] = [
+  [
+    "Should create new post tags and return a warning message if only one input post tag already exists",
+    ["test POST_tag-3", "tag4", "tag5"],
+    ["tag4", "tag5"],
+    "2 post tags created. A post tag similar to 'test POST_tag-3' has already been created",
+  ],
+  [
+    "Should create new post tags and return a warning message if more than one input post tag already exists",
+    ["tag_4", "tag-5", "TAG 6", "tag 7"],
+    ["TAG 6", "tag 7"],
+    "2 post tags created. Post tags similar to 'tag_4' and 1 other post tag have already been created",
+  ],
+];
+
+export const duplicate: [string, string[], string][] = [
+  [
+    "Should respond with a DuplicatePostTagError if all the provided input post tags already exist",
+    ["tag1", "tag2", "tag 4", "tAg_5", "tag-6"],
+    "Post tags similar to the ones provided have already been created",
+  ],
+  [
+    "Should respond with a DuplicatePostTagError if the only provided input post tag already exists",
+    ["t_a-g 7"],
+    "A post tag similar to the one provided has already been created",
+  ],
+];
+
+export const testWarn: [
+  string,
+  Record<string, unknown>[][],
+  Record<string, unknown>[],
+  string
+][] = [
+  [
+    "Should create new post tags and return a warning message if more than one input post tag already exists",
+    [[{ name: tags[0] }], [dbTag3, dbTag4]],
+    [tag3, tag4],
+    "2 post tags created. A post tag similar to 'tag1' has already been created",
+  ],
+];
+
+export const testDuplicate: [string, string[], { name: string }[], string][] = [
+  [
+    "Should return an error response if all the provided input post tags already exist",
+    tags,
+    existingPostTags,
+    "Post tags similar to the ones provided have already been created",
+  ],
+  [
+    "Should return an error response if the only provided input post tag already exists",
+    [tags[1]],
+    [existingPostTags[1]],
+    "A post tag similar to the one provided has already been created",
+  ],
+];
