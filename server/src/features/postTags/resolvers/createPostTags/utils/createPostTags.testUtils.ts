@@ -33,24 +33,33 @@ export const validations: [string, string[], string][] = [
 ];
 
 const dateCreated = "2022-11-07 13:22:43.717+01";
-const mockDate = "2022-11-07T12:22:43.717Z";
 
 export const tags = ["tag1", "tag2", "tag3", "tag4"];
 
-const mockTag1 = { id: "100", name: tags[0], lastModified: null };
-const mockTag2 = { id: "500", name: tags[1], lastModified: null };
-const mockTag3 = { id: "21", name: tags[2], lastModified: null };
-const mockTag4 = { id: "436921", name: tags[3], lastModified: null };
-
-export const dbTag1 = { ...mockTag1, dateCreated };
-export const dbTag2 = { ...mockTag2, dateCreated };
-export const dbTag3 = { ...mockTag3, dateCreated };
-export const dbTag4 = { ...mockTag4, dateCreated };
-
-export const tag1 = { ...mockTag1, dateCreated: mockDate };
-export const tag2 = { ...mockTag2, dateCreated: mockDate };
-export const tag3 = { ...mockTag3, dateCreated: mockDate };
-export const tag4 = { ...mockTag4, dateCreated: mockDate };
+export const tag1 = {
+  id: "100",
+  name: tags[0],
+  dateCreated,
+  lastModified: null,
+};
+export const tag2 = {
+  id: "500",
+  name: tags[1],
+  dateCreated,
+  lastModified: null,
+};
+export const tag3 = {
+  id: "21",
+  name: tags[2],
+  dateCreated,
+  lastModified: null,
+};
+export const tag4 = {
+  id: "436921",
+  name: tags[3],
+  dateCreated,
+  lastModified: null,
+};
 
 const existingPostTags = [
   { name: tags[0] },
@@ -110,9 +119,18 @@ export const testWarn: [
 ][] = [
   [
     "Should create new post tags and return a warning message if more than one input post tag already exists",
-    [[{ name: tags[0] }], [dbTag3, dbTag4]],
+    [
+      [{ name: tags[0] }, { name: tags[1] }],
+      [tag3, tag4],
+    ],
     [tag3, tag4],
-    "2 post tags created. A post tag similar to 'tag1' has already been created",
+    "2 post tags created. Post tags similar to 'tag1' and 1 other post tag have already been created",
+  ],
+  [
+    "Should create new post tags and return a warning message if only one input post tag already exists",
+    [[{ name: tags[0] }], [tag2, tag3, tag4]],
+    [tag2, tag3, tag4],
+    "3 post tags created. A post tag similar to 'tag1' has already been created",
   ],
 ];
 

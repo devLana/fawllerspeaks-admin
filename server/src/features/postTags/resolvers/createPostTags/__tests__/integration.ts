@@ -3,10 +3,6 @@ import { describe, expect, it, beforeEach } from "@jest/globals";
 import createPostTags from "..";
 import { mockContext, info, spyDb } from "@tests";
 import {
-  dbTag1,
-  dbTag2,
-  dbTag3,
-  dbTag4,
   tags,
   tag1,
   tag2,
@@ -69,17 +65,16 @@ describe("Test create post tags resolver", () => {
 
   describe("Create post tags", () => {
     it("Should create new post tags from the provided input array", async () => {
-      const mock = [dbTag1, dbTag2, dbTag3, dbTag4];
       const spy = spyDb({ rows: [{ isRegistered: true }] });
       spy.mockReturnValueOnce({ rows: [] });
-      spy.mockReturnValueOnce({ rows: mock });
+      spy.mockReturnValueOnce({ rows: [tag1, tag2, tag3, tag4] });
 
       const result = await createPostTags({}, { tags }, mockContext, info);
 
       expect(spy).toHaveBeenCalledTimes(3);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
       expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-      expect(spy).toHaveNthReturnedWith(3, { rows: mock });
+      expect(spy).toHaveNthReturnedWith(3, { rows: [tag1, tag2, tag3, tag4] });
       expect(result).toHaveProperty("tags", [tag1, tag2, tag3, tag4]);
       expect(result).toHaveProperty("status", "SUCCESS");
     });

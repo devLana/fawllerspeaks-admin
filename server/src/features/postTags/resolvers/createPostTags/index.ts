@@ -3,12 +3,7 @@ import Joi, { ValidationError } from "joi";
 
 import { PostTags, PostTagsWarning, DuplicatePostTagError } from "../types";
 import { CreatePostTagsValidationError } from "./types";
-import {
-  AuthenticationError,
-  RegistrationError,
-  UnknownError,
-  dateToISOString,
-} from "@utils";
+import { AuthenticationError, RegistrationError, UnknownError } from "@utils";
 
 import type { ResolverFunc } from "@types";
 import type { MutationResolvers, PostTag } from "@resolverTypes";
@@ -26,8 +21,8 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
     .min(1)
     .max(10)
     .unique((a: string, b: string) => {
-      const aStripped = a.replace(/[^a-zÀ-ȕ\d]/gi, "");
-      const bStripped = b.replace(/[^a-zÀ-ȕ\d]/gi, "");
+      const aStripped = a.replace(/[\s_-]/g, "");
+      const bStripped = b.replace(/[\s_-]/g, "");
 
       return aStripped.toLowerCase() === bStripped.toLowerCase();
     })
@@ -114,11 +109,6 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
         insertInput
       ));
     }
-
-    createdPostTags = createdPostTags.map(createdTag => ({
-      ...createdTag,
-      dateCreated: dateToISOString(createdTag.dateCreated),
-    }));
 
     if (existingTags.length > 0) {
       if (createdPostTags.length === 0) {
