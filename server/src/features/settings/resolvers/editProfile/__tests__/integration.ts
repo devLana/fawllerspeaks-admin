@@ -14,7 +14,6 @@ import {
   args,
   dateCreated,
   editSuccess,
-  mockDate,
   validations,
   verify,
 } from "../utils/editProfile.testUtils";
@@ -86,7 +85,7 @@ describe("Test edit profile resolver", () => {
       expect(data).toHaveProperty("user.lastName", args.lastName);
       expect(data).toHaveProperty("user.image", image);
       expect(data).toHaveProperty("user.isRegistered", true);
-      expect(data).toHaveProperty("user.dateCreated", mockDate);
+      expect(data).toHaveProperty("user.dateCreated", dateCreated);
       expect(data).toHaveProperty("status", "SUCCESS");
     });
   });

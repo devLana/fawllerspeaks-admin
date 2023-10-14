@@ -32,8 +32,7 @@ export const userInput = {
   confirmPassword: "abcdEf65#",
 };
 
-const dateCreated = "2022-11-07 13:22:43.717+01";
-export const mockDate = "2022-11-07T12:22:43.717Z";
+export const dateCreated = "2022-11-07 13:22:43.717+01";
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [
   [

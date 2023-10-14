@@ -11,7 +11,7 @@ import resolver from "..";
 
 import {
   args,
-  mockDate,
+  dateCreated,
   registerMock,
   validations,
   verifyUser,
@@ -84,7 +84,7 @@ describe("Test register user resolver", () => {
       expect(data).toHaveProperty("user.lastName", args.lastName);
       expect(data).toHaveProperty("user.image", null);
       expect(data).toHaveProperty("user.isRegistered", true);
-      expect(data).toHaveProperty("user.dateCreated", mockDate);
+      expect(data).toHaveProperty("user.dateCreated", dateCreated);
       expect(data).toHaveProperty("status", "SUCCESS");
     });
   });

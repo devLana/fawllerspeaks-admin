@@ -20,7 +20,6 @@ import {
   MailError,
   NotAllowedError,
   UnknownError,
-  dateToISOString,
 } from "@utils";
 
 import { type MutationResolvers } from "@resolverTypes";
@@ -121,7 +120,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
         lastName: rows[0].lastName,
         image: rows[0].image,
         isRegistered: rows[0].isRegistered,
-        dateCreated: dateToISOString(rows[0].dateCreated),
+        dateCreated: rows[0].dateCreated,
       },
       accessToken
     );
@@ -173,7 +172,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
             lastName: rows[0].lastName,
             image: rows[0].image,
             isRegistered: rows[0].isRegistered,
-            dateCreated: dateToISOString(rows[0].dateCreated),
+            dateCreated: rows[0].dateCreated,
           },
           accessToken
         );

@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 import { LoggedInUser, LoginValidationError } from "./types";
 
-import { NotAllowedError, dateToISOString, generateErrorsObject } from "@utils";
+import { NotAllowedError, generateErrorsObject } from "@utils";
 import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
 
 import { type MutationResolvers } from "@resolverTypes";
@@ -110,7 +110,7 @@ const login: Login = async (_, args, { db, req, res }) => {
       lastName,
       image,
       isRegistered,
-      dateCreated: dateToISOString(dateCreated),
+      dateCreated,
     };
 
     return new LoggedInUser(user, accessToken, newSessionId);

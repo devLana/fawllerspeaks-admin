@@ -14,7 +14,7 @@ import login from "..";
 import {
   args,
   cookies,
-  mockDate,
+  dateCreated,
   mockUser,
   validations,
 } from "../utils/login.testUtils";
@@ -151,7 +151,7 @@ describe("Test login resolver", () => {
       expect(result).toHaveProperty("user.lastName", user.lastName);
       expect(result).toHaveProperty("user.image", user.image);
       expect(result).toHaveProperty("user.isRegistered", user.isRegistered);
-      expect(result).toHaveProperty("user.dateCreated", mockDate);
+      expect(result).toHaveProperty("user.dateCreated", dateCreated);
       expect(result).toHaveProperty(
         "accessToken",
         expect.stringMatching(JWT_REGEX)
@@ -186,7 +186,7 @@ describe("Test login resolver", () => {
       expect(result).toHaveProperty("user.lastName", user.lastName);
       expect(result).toHaveProperty("user.image", user.image);
       expect(result).toHaveProperty("user.isRegistered", user.isRegistered);
-      expect(result).toHaveProperty("user.dateCreated", mockDate);
+      expect(result).toHaveProperty("user.dateCreated", dateCreated);
       expect(result).toHaveProperty(
         "accessToken",
         expect.stringMatching(JWT_REGEX)

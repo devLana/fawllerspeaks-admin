@@ -8,7 +8,6 @@ import {
   AuthenticationError,
   RegistrationError,
   UnknownError,
-  dateToISOString,
   generateErrorsObject,
 } from "@utils";
 
@@ -105,7 +104,7 @@ const registerUser: RegisterUser = async (_, { userInput }, { db, user }) => {
       lastName,
       image: rows[0].image,
       isRegistered: true,
-      dateCreated: dateToISOString(rows[0].dateCreated),
+      dateCreated: rows[0].dateCreated,
     });
   } catch (err) {
     if (err instanceof ValidationError) {

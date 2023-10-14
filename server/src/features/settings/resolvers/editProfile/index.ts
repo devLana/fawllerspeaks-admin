@@ -7,7 +7,6 @@ import {
   AuthenticationError,
   RegistrationError,
   UnknownError,
-  dateToISOString,
   generateErrorsObject,
 } from "@utils";
 
@@ -110,7 +109,7 @@ const editProfile: EditProfile = async (_, args, { db, user }) => {
       lastName,
       image: userInfo[0].image,
       isRegistered,
-      dateCreated: dateToISOString(userInfo[0].dateCreated),
+      dateCreated: userInfo[0].dateCreated,
     });
   } catch (err) {
     if (err instanceof ValidationError) {

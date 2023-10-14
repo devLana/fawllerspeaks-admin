@@ -3,8 +3,7 @@ type GQL = [
   boolean | number | [] | Record<string, unknown> | undefined | null
 ];
 
-const dateCreated = "2022-11-07 13:22:43.717+01";
-export const mockDate = "2022-11-07T12:22:43.717Z";
+export const dateCreated = "2022-11-07 13:22:43.717+01";
 export const cookies = { auth: "auth", sig: "sig", token: "token" };
 export const sessionId = "session_id_string";
 export const loggedInUserId = "user_user";
@@ -17,20 +16,12 @@ export const authCookies = {
   sig: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
 };
 
-const dbResponse = {
+export const data = {
   email: "mail@mail.com",
   firstName: "first_name",
   lastName: "last_name",
   image: null,
   dateCreated,
-};
-
-export const data = {
-  email: dbResponse.email,
-  firstName: dbResponse.firstName,
-  lastName: dbResponse.lastName,
-  image: dbResponse.image,
-  dateCreated: dbResponse.dateCreated,
 };
 
 export const validations: [string, string][] = [
@@ -39,13 +30,13 @@ export const validations: [string, string][] = [
 ];
 
 export const obj = {
-  ...dbResponse,
+  ...data,
   userId: authUserId,
   isRegistered: false,
 };
 
 export const mockObj = {
-  ...dbResponse,
+  ...data,
   userId: loggedInUserId,
   isRegistered: true,
 };

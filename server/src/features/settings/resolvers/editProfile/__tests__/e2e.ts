@@ -45,6 +45,7 @@ describe("Edit user profile - E2E", () => {
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
     const { registeredUser, unregisteredUser } = await testUsers(db);
+
     user = registeredUser;
 
     const registered = loginTestUser(registeredUser.userId);
