@@ -7,11 +7,11 @@ import {
 export class CreatePostTagsValidationError implements Error {
   readonly status: Status;
 
-  constructor(public readonly tagsError: string) {
+  constructor(readonly tagsError: string) {
     this.status = Status.Error;
   }
 }
 
-export const CreatePostTagsValidationErrorResolver: Resolvers = {
+export const CreatePostTagsValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof CreatePostTagsValidationError,
 };

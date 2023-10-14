@@ -7,7 +7,7 @@ import {
 export class AccessToken implements AccessTokenData {
   readonly status: Status;
 
-  constructor(public readonly accessToken: string) {
+  constructor(readonly accessToken: string) {
     this.status = Status.Success;
   }
 }

@@ -8,9 +8,9 @@ export class ResetPasswordValidationError implements Errors {
   readonly status: Status;
 
   constructor(
-    public readonly tokenError?: string,
-    public readonly passwordError?: string,
-    public readonly confirmPasswordError?: string
+    readonly tokenError?: string,
+    readonly passwordError?: string,
+    readonly confirmPasswordError?: string
   ) {
     this.status = Status.Error;
   }

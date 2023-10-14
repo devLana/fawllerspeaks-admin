@@ -7,7 +7,7 @@ import {
 export class EmailValidationError implements Errors {
   readonly status: Status;
 
-  constructor(public readonly emailError: string) {
+  constructor(readonly emailError: string) {
     this.status = Status.Error;
   }
 }

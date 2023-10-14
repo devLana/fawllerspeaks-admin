@@ -16,12 +16,10 @@ type TypeKeys =
   | "EditProfileValidationError";
 
 type MutationsKeys = "changePassword" | "editProfile";
-type SettingsMutations = Pick<MutationResolvers, MutationsKeys>;
-type SettingsTypes = Pick<Resolvers, TypeKeys>;
 
 interface SettingsResolvers {
-  Mutations: ResolversMapper<SettingsMutations>;
-  Types: ObjectMapper<SettingsTypes>;
+  Mutations: ResolversMapper<Pick<MutationResolvers, MutationsKeys>>;
+  Types: ObjectMapper<Pick<Resolvers, TypeKeys>>;
 }
 
 export const settingsResolvers: SettingsResolvers = {

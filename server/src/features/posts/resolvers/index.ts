@@ -57,14 +57,10 @@ type TypeKeys =
   | "PostIdsValidationError"
   | "CreatePostValidationError";
 
-type PostsQueries = Pick<QueryResolvers, "getPosts" | "getPost">;
-type PostsMutations = Pick<MutationResolvers, MutationsKeys>;
-type PostsTypes = Pick<Resolvers, TypeKeys>;
-
 interface PostsResolvers {
-  Queries: ResolversMapper<PostsQueries>;
-  Mutations: ResolversMapper<PostsMutations>;
-  Types: ObjectMapper<PostsTypes>;
+  Queries: ResolversMapper<Pick<QueryResolvers, "getPosts" | "getPost">>;
+  Mutations: ResolversMapper<Pick<MutationResolvers, MutationsKeys>>;
+  Types: ObjectMapper<Pick<Resolvers, TypeKeys>>;
 }
 
 export const postsResolvers: PostsResolvers = {

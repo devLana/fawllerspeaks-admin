@@ -61,12 +61,9 @@ type MutationsKeys =
   | "verifyResetToken"
   | "verifySession";
 
-type AuthMutations = Pick<MutationResolvers, MutationsKeys>;
-type AuthTypes = Pick<Resolvers, TypeKeys>;
-
 interface AuthResolvers {
-  Mutations: ResolversMapper<AuthMutations>;
-  Types: ObjectMapper<AuthTypes>;
+  Mutations: ResolversMapper<Pick<MutationResolvers, MutationsKeys>>;
+  Types: ObjectMapper<Pick<Resolvers, TypeKeys>>;
 }
 
 export const authResolvers: AuthResolvers = {

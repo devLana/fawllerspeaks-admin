@@ -7,7 +7,7 @@ import {
 export class VerifyResetTokenValidationError implements Errors {
   readonly status: Status;
 
-  constructor(public readonly tokenError: string) {
+  constructor(readonly tokenError: string) {
     this.status = Status.Error;
   }
 }

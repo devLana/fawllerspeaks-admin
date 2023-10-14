@@ -8,9 +8,9 @@ export class ChangePasswordValidationError implements Errors {
   readonly status: Status;
 
   constructor(
-    public readonly currentPasswordError?: string,
-    public readonly newPasswordError?: string,
-    public readonly confirmNewPasswordError?: string
+    readonly currentPasswordError?: string,
+    readonly newPasswordError?: string,
+    readonly confirmNewPasswordError?: string
   ) {
     this.status = Status.Error;
   }

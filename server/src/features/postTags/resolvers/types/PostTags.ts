@@ -1,6 +1,6 @@
 import {
   type PostTags as Tags,
-  type PostTagsResolvers,
+  type PostTagsResolvers as Resolvers,
   type PostTag,
   Status,
 } from "@resolverTypes";
@@ -8,11 +8,11 @@ import {
 export class PostTags implements Tags {
   readonly status: Status;
 
-  constructor(public readonly tags: PostTag[]) {
+  constructor(readonly tags: PostTag[]) {
     this.status = Status.Success;
   }
 }
 
-export const PostTagsResolver: PostTagsResolvers = {
+export const PostTagsResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof PostTags,
 };

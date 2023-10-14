@@ -15,6 +15,6 @@ export class EditPostTagValidationError implements Errors {
   }
 }
 
-export const EditPostTagValidationErrorResolver: Resolvers = {
+export const EditPostTagValidationErrorResolvers: Resolvers = {
   __isTypeOf: parent => parent instanceof EditPostTagValidationError,
 };

@@ -7,10 +7,7 @@ import {
 export class VerifiedResetToken implements VerifiedResetTokenResponse {
   readonly status: Status;
 
-  constructor(
-    public readonly email: string,
-    public readonly resetToken: string
-  ) {
+  constructor(readonly email: string, readonly resetToken: string) {
     this.status = Status.Success;
   }
 }

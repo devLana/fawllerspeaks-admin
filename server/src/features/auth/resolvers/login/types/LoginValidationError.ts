@@ -8,9 +8,9 @@ export class LoginValidationError implements Errors {
   readonly status: Status;
 
   constructor(
-    public readonly emailError?: string,
-    public readonly passwordError?: string,
-    public readonly sessionIdError?: string
+    readonly emailError?: string,
+    readonly passwordError?: string,
+    readonly sessionIdError?: string
   ) {
     this.status = Status.Error;
   }

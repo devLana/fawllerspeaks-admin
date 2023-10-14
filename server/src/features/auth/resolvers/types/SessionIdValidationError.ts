@@ -7,7 +7,7 @@ import {
 export class SessionIdValidationError implements Errors {
   readonly status: Status;
 
-  constructor(public readonly sessionIdError: string) {
+  constructor(readonly sessionIdError: string) {
     this.status = Status.Error;
   }
 }

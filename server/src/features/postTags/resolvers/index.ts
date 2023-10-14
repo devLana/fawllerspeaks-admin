@@ -4,14 +4,17 @@ import editPostTag from "./editPostTag";
 import getPostTags from "./getPostTags";
 
 import {
-  PostTagsResolver,
-  PostTagsWarningResolver,
-  DuplicatePostTagErrorResolver,
+  PostTag,
+  PostTagsResolvers,
+  PostTagsWarningResolvers,
+  DuplicatePostTagErrorResolvers,
 } from "./types";
-import { EditedPostTagResolver } from "./editPostTag/EditedPostTag";
-import { CreatePostTagsValidationErrorResolver } from "./createPostTags/types/CreatePostTagsValidationError";
-import { DeletePostTagsValidationErrorResolver } from "./deletePostTags/DeletePostTagsValidationError";
-import { EditPostTagValidationErrorResolver } from "./editPostTag/EditPostTagValidationError";
+
+import { EditedPostTagResolvers } from "./editPostTag/EditedPostTag";
+import { EditPostTagValidationErrorResolvers } from "./editPostTag/EditPostTagValidationError";
+
+import { CreatePostTagsValidationErrorResolvers } from "./createPostTags/types/CreatePostTagsValidationError";
+import { DeletePostTagsValidationErrorResolvers } from "./deletePostTags/DeletePostTagsValidationError";
 
 import type {
   QueryResolvers,
@@ -21,6 +24,7 @@ import type {
 import type { ResolversMapper, ObjectMapper } from "@types";
 
 type TypeKeys =
+  | "PostTag"
   | "PostTags"
   | "PostTagsWarning"
   | "EditedPostTag"
@@ -31,34 +35,25 @@ type TypeKeys =
 
 type MutationKeys = "createPostTags" | "editPostTag" | "deletePostTags";
 
-type PostTagsQuery = Pick<QueryResolvers, "getPostTags">;
-type PostTagsMutations = Pick<MutationResolvers, MutationKeys>;
-type PostTagsTypes = Pick<Resolvers, TypeKeys>;
-
-interface PostTagsResolvers {
-  Query: ResolversMapper<PostTagsQuery>;
-  Mutations: ResolversMapper<PostTagsMutations>;
-  Types: ObjectMapper<PostTagsTypes>;
+interface PostTagsSchemaResolvers {
+  Query: ResolversMapper<Pick<QueryResolvers, "getPostTags">>;
+  Mutations: ResolversMapper<Pick<MutationResolvers, MutationKeys>>;
+  Types: ObjectMapper<Pick<Resolvers, TypeKeys>>;
 }
 
-export const postTagsResolvers: PostTagsResolvers = {
-  Query: {
-    getPostTags,
-  },
+export const postTagsResolvers: PostTagsSchemaResolvers = {
+  Query: { getPostTags },
 
-  Mutations: {
-    createPostTags,
-    editPostTag,
-    deletePostTags,
-  },
+  Mutations: { createPostTags, editPostTag, deletePostTags },
 
   Types: {
-    PostTags: PostTagsResolver,
-    PostTagsWarning: PostTagsWarningResolver,
-    EditedPostTag: EditedPostTagResolver,
-    DuplicatePostTagError: DuplicatePostTagErrorResolver,
-    CreatePostTagsValidationError: CreatePostTagsValidationErrorResolver,
-    DeletePostTagsValidationError: DeletePostTagsValidationErrorResolver,
-    EditPostTagValidationError: EditPostTagValidationErrorResolver,
+    PostTag,
+    PostTags: PostTagsResolvers,
+    PostTagsWarning: PostTagsWarningResolvers,
+    EditedPostTag: EditedPostTagResolvers,
+    DuplicatePostTagError: DuplicatePostTagErrorResolvers,
+    CreatePostTagsValidationError: CreatePostTagsValidationErrorResolvers,
+    DeletePostTagsValidationError: DeletePostTagsValidationErrorResolvers,
+    EditPostTagValidationError: EditPostTagValidationErrorResolvers,
   },
 };
