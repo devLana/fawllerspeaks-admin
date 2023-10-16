@@ -49,5 +49,5 @@ export const postTagsTypeDefs = `#graphql
 
   union EditPostTag = EditedPostTag | EditPostTagValidationError | DuplicatePostTagError | NotAllowedError | UnknownError
 
-  union GetPostTags = PostTags | NotAllowedError
+  union GetPostTags = PostTags | AuthenticationError | UnknownError | RegistrationError
 `;

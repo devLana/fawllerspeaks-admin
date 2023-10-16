@@ -123,7 +123,7 @@ export const GET_POST_TAGS = `#graphql
         status
       }
 
-      ... on NotAllowedError {
+      ... on BaseResponse {
         __typename
         message
         status

@@ -60,7 +60,7 @@ export type CreatePostInput = {
   title: Scalars['String'];
 };
 
-export type CreatePostTags = CreatePostTagsValidationError | DuplicatePostTagError | NotAllowedError | PostTags | PostTagsWarning;
+export type CreatePostTags = AuthenticationError | CreatePostTagsValidationError | DuplicatePostTagError | PostTags | PostTagsWarning | RegistrationError | UnknownError;
 
 export type CreatePostTagsValidationError = {
   __typename?: 'CreatePostTagsValidationError';
@@ -175,7 +175,7 @@ export type ForgotGeneratePassword = EmailValidationError | NotAllowedError | Re
 
 export type GetPost = NotAllowedError | PostIdValidationError | SinglePost | UnknownError;
 
-export type GetPostTags = NotAllowedError | PostTags;
+export type GetPostTags = AuthenticationError | PostTags | RegistrationError | UnknownError;
 
 export type GetPosts = NotAllowedError | Posts;
 
@@ -698,7 +698,7 @@ export type ResolversTypes = ResolversObject<{
   ChangePasswordValidationError: ResolverTypeWrapper<ChangePasswordValidationError>;
   CreatePost: ResolversTypes['CreatePostValidationError'] | ResolversTypes['DuplicatePostTitleError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['SinglePost'] | ResolversTypes['UnknownError'];
   CreatePostInput: CreatePostInput;
-  CreatePostTags: ResolversTypes['CreatePostTagsValidationError'] | ResolversTypes['DuplicatePostTagError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['PostTags'] | ResolversTypes['PostTagsWarning'];
+  CreatePostTags: ResolversTypes['AuthenticationError'] | ResolversTypes['CreatePostTagsValidationError'] | ResolversTypes['DuplicatePostTagError'] | ResolversTypes['PostTags'] | ResolversTypes['PostTagsWarning'] | ResolversTypes['RegistrationError'] | ResolversTypes['UnknownError'];
   CreatePostTagsValidationError: ResolverTypeWrapper<CreatePostTagsValidationError>;
   CreatePostValidationError: ResolverTypeWrapper<CreatePostValidationError>;
   CreateUser: ResolversTypes['EmailValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'];
@@ -721,7 +721,7 @@ export type ResolversTypes = ResolversObject<{
   ForbiddenError: ResolverTypeWrapper<ForbiddenError>;
   ForgotGeneratePassword: ResolversTypes['EmailValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'];
   GetPost: ResolversTypes['NotAllowedError'] | ResolversTypes['PostIdValidationError'] | ResolversTypes['SinglePost'] | ResolversTypes['UnknownError'];
-  GetPostTags: ResolversTypes['NotAllowedError'] | ResolversTypes['PostTags'];
+  GetPostTags: ResolversTypes['AuthenticationError'] | ResolversTypes['PostTags'] | ResolversTypes['RegistrationError'] | ResolversTypes['UnknownError'];
   GetPosts: ResolversTypes['NotAllowedError'] | ResolversTypes['Posts'];
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -782,7 +782,7 @@ export type ResolversParentTypes = ResolversObject<{
   ChangePasswordValidationError: ChangePasswordValidationError;
   CreatePost: ResolversParentTypes['CreatePostValidationError'] | ResolversParentTypes['DuplicatePostTitleError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['SinglePost'] | ResolversParentTypes['UnknownError'];
   CreatePostInput: CreatePostInput;
-  CreatePostTags: ResolversParentTypes['CreatePostTagsValidationError'] | ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostTags'] | ResolversParentTypes['PostTagsWarning'];
+  CreatePostTags: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['CreatePostTagsValidationError'] | ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['PostTags'] | ResolversParentTypes['PostTagsWarning'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['UnknownError'];
   CreatePostTagsValidationError: CreatePostTagsValidationError;
   CreatePostValidationError: CreatePostValidationError;
   CreateUser: ResolversParentTypes['EmailValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'];
@@ -805,7 +805,7 @@ export type ResolversParentTypes = ResolversObject<{
   ForbiddenError: ForbiddenError;
   ForgotGeneratePassword: ResolversParentTypes['EmailValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'];
   GetPost: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostIdValidationError'] | ResolversParentTypes['SinglePost'] | ResolversParentTypes['UnknownError'];
-  GetPostTags: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostTags'];
+  GetPostTags: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['PostTags'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['UnknownError'];
   GetPosts: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['Posts'];
   ID: Scalars['ID'];
   Int: Scalars['Int'];
@@ -897,7 +897,7 @@ export type CreatePostResolvers<ContextType = APIContext, ParentType extends Res
 }>;
 
 export type CreatePostTagsResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['CreatePostTags'] = ResolversParentTypes['CreatePostTags']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'CreatePostTagsValidationError' | 'DuplicatePostTagError' | 'NotAllowedError' | 'PostTags' | 'PostTagsWarning', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'CreatePostTagsValidationError' | 'DuplicatePostTagError' | 'PostTags' | 'PostTagsWarning' | 'RegistrationError' | 'UnknownError', ParentType, ContextType>;
 }>;
 
 export type CreatePostTagsValidationErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['CreatePostTagsValidationError'] = ResolversParentTypes['CreatePostTagsValidationError']> = ResolversObject<{
@@ -1012,7 +1012,7 @@ export type GetPostResolvers<ContextType = APIContext, ParentType extends Resolv
 }>;
 
 export type GetPostTagsResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['GetPostTags'] = ResolversParentTypes['GetPostTags']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'NotAllowedError' | 'PostTags', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'PostTags' | 'RegistrationError' | 'UnknownError', ParentType, ContextType>;
 }>;
 
 export type GetPostsResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['GetPosts'] = ResolversParentTypes['GetPosts']> = ResolversObject<{

@@ -18,7 +18,7 @@ beforeEach(() => {
   mockContext.user = "logged_In_User_Id";
 });
 
-describe("Test create post tags resolver", () => {
+describe("Test createPostTags resolver", () => {
   describe("Verify user authentication", () => {
     it("Should return an error response if the user is not logged in", async () => {
       mockContext.user = null;
