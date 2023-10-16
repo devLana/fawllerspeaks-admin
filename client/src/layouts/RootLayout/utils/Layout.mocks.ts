@@ -1,12 +1,12 @@
 import { GraphQLError } from "graphql";
-import { gql } from "@apollo/client";
+import { type InMemoryCache, gql } from "@apollo/client";
 import type { MockedResponse } from "@apollo/client/testing";
 
 import { LOGOUT } from "../components/Navbar/components/LogoutModal/LOGOUT";
-import { testCache, testUserId } from "@utils/renderTestUI";
+import { testUserId } from "@utils/renderTestUI";
 
-export const avatar = (hasImage: boolean) => {
-  testCache.writeFragment({
+export const avatar = (cache: InMemoryCache, hasImage: boolean) => {
+  cache.writeFragment({
     id: `User:${testUserId}`,
     data: {
       __typename: "User",

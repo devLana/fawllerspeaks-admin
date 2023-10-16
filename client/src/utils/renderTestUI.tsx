@@ -11,6 +11,7 @@ import { BaseResponse, UserData } from "./cachePossibleTypes";
 interface AppWrapperProps {
   children: React.ReactElement;
   mocks: MockedResponse[];
+  cache: InMemoryCache;
 }
 
 export const testUserId = "Authenticated_User_Id";
@@ -29,13 +30,9 @@ const sessionValue = {
   handleClearRefreshTokenTimer: stopRefreshTokenTimer,
 };
 
-export const testCache = new InMemoryCache({
-  possibleTypes: { BaseResponse, UserData },
-});
-
-const AppWrapper = ({ children, mocks }: AppWrapperProps) => (
+const AppWrapper = ({ children, mocks, cache }: AppWrapperProps) => (
   <ApolloContext.Provider value={{ handleAuthHeader, jwt: "auth-token" }}>
-    <MockedProvider mocks={mocks} cache={testCache}>
+    <MockedProvider mocks={mocks} cache={cache}>
       <MUIThemeProvider>
         <SessionContext.Provider value={sessionValue}>
           {children}
@@ -50,8 +47,17 @@ export const renderTestUI = (
   mocks: MockedResponse[] = [],
   options?: RenderOptions
 ) => {
+  const cache = new InMemoryCache({
+    possibleTypes: { BaseResponse, UserData },
+  });
+
   return {
     user: userEvent.setup({ applyAccept: false }),
-    ...render(<AppWrapper mocks={mocks}>{ui}</AppWrapper>, options),
+    ...render(
+      <AppWrapper cache={cache} mocks={mocks}>
+        {ui}
+      </AppWrapper>,
+      options
+    ),
   };
 };

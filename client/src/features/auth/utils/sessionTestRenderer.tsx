@@ -14,19 +14,21 @@ export const handleAuthHeader = jest.fn().mockName("handleAuthHeader");
 
 const TestComponent = () => <span>{TEXT_NODE}</span>;
 
-const testCache = new InMemoryCache({
-  possibleTypes: { BaseResponse, UserData },
-});
+const SessionProviderTestUI = ({ mocks }: { mocks: MockedResponse[] }) => {
+  const cache = new InMemoryCache({
+    possibleTypes: { BaseResponse, UserData },
+  });
 
-const SessionProviderTestUI = ({ mocks }: { mocks: MockedResponse[] }) => (
-  <ApolloContext.Provider value={{ handleAuthHeader, jwt: "auth-token" }}>
-    <MockedProvider mocks={mocks} cache={testCache}>
-      <MUIThemeProvider>
-        <SessionProvider layout={testLayout} page={<TestComponent />} />
-      </MUIThemeProvider>
-    </MockedProvider>
-  </ApolloContext.Provider>
-);
+  return (
+    <ApolloContext.Provider value={{ handleAuthHeader, jwt: "auth-token" }}>
+      <MockedProvider mocks={mocks} cache={cache}>
+        <MUIThemeProvider>
+          <SessionProvider layout={testLayout} page={<TestComponent />} />
+        </MUIThemeProvider>
+      </MockedProvider>
+    </ApolloContext.Provider>
+  );
+};
 
 export const sessionTestRenderer = (
   mocks: MockedResponse[] = [],

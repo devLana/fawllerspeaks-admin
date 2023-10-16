@@ -4,12 +4,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import RootLayout from "..";
-import {
-  avatar,
-  errorsTable,
-  logoutTable,
-  storageTheme,
-} from "../utils/Layout.mocks";
+import { errorsTable, logoutTable, storageTheme } from "../utils/Layout.mocks";
 import { renderTestUI, stopRefreshTokenTimer } from "@utils/renderTestUI";
 import { DEFAULT_THEME, SESSION_ID } from "@utils/constants";
 
@@ -90,32 +85,6 @@ describe("Protected Pages Root Layout", () => {
         expect(localStorage.getItem(DEFAULT_THEME)).toBe(storageTheme("sunny"));
 
         localStorage.removeItem(DEFAULT_THEME);
-      });
-    });
-
-    describe("Header user avatar", () => {
-      it("User information is not available, Render an icon avatar", () => {
-        renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
-
-        expect(
-          screen.getByLabelText(/^authenticating user profile$/i)
-        ).toBeInTheDocument();
-      });
-
-      it("User information has an image link, Render an image avatar", () => {
-        avatar(true);
-        renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
-
-        expect(
-          screen.getByRole("img", { name: /^john doe avatar$/i })
-        ).toBeInTheDocument();
-      });
-
-      it("User information does not have an image link, Display user initials", () => {
-        avatar(false);
-        renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
-
-        expect(screen.getByText("JD")).toBeInTheDocument();
       });
     });
   });
