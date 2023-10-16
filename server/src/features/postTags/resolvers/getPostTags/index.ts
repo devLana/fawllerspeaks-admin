@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 
 import { PostTags } from "../types";
-import { NotAllowedError, dateToISOString } from "@utils";
+import { AuthenticationError, RegistrationError, UnknownError } from "@utils";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -10,33 +10,30 @@ type GetPostTags = ResolverFunc<QueryResolvers["getPostTags"]>;
 
 const getPostTags: GetPostTags = async (_, __, { db, user }) => {
   try {
-    if (!user) return new NotAllowedError("Unable to get post tags");
+    if (!user) return new AuthenticationError("Unable to get post tags");
 
     const { rows: findUser } = await db.query<{ isRegistered: boolean }>(
       `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
       [user]
     );
 
-    if (findUser.length === 0 || !findUser[0].isRegistered) {
-      return new NotAllowedError("Unable to get post tags");
+    if (findUser.length === 0) {
+      return new UnknownError("Unable to get post tags");
     }
 
-    let { rows: tags } = await db.query<PostTag>(
+    if (!findUser[0].isRegistered) {
+      return new RegistrationError("Unable to get post tags");
+    }
+
+    const { rows: tags } = await db.query<PostTag>(
       `SELECT
         name,
         tag_id id,
         date_created "dateCreated",
         last_Modified "lastModified"
-      FROM post_tags`
+      FROM post_tags
+      ORDER BY name`
     );
-
-    tags = tags.map(tag => ({
-      ...tag,
-      dateCreated: dateToISOString(tag.dateCreated),
-      lastModified: tag.lastModified
-        ? dateToISOString(tag.lastModified)
-        : tag.lastModified,
-    }));
 
     return new PostTags(tags);
   } catch {

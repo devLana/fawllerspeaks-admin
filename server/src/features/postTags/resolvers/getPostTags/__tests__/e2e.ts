@@ -20,7 +20,7 @@ type GetPostTags = TestData<{ getPostTags: Record<string, unknown> }>;
 
 describe("Get post tags - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
-  let registeredUserAccessToken: string, unRegisteredUserAccessToken: string;
+  let registeredJwt: string, unregisteredJwt: string;
   let postTags: PostTag[];
 
   beforeAll(async () => {
@@ -31,8 +31,11 @@ describe("Get post tags - E2E", () => {
     const unRegistered = loginTestUser(unregisteredUser.userId);
     const createPostTags = createTestPostTags(db);
 
-    [registeredUserAccessToken, unRegisteredUserAccessToken, postTags] =
-      await Promise.all([registered, unRegistered, createPostTags]);
+    [registeredJwt, unregisteredJwt, postTags] = await Promise.all([
+      registered,
+      unRegistered,
+      createPostTags,
+    ]);
   });
 
   afterAll(async () => {
@@ -43,49 +46,51 @@ describe("Get post tags - E2E", () => {
     await db.end();
   });
 
-  it("Returns error for logged out user", async () => {
-    const payload = { query: GET_POST_TAGS };
-    const { data } = await post<GetPostTags>(url, payload);
+  describe("Verify user authentication", () => {
+    it("Should respond with an AuthenticationError if the user is not logged in", async () => {
+      const { data } = await post<GetPostTags>(url, { query: GET_POST_TAGS });
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-
-    expect(data.data?.getPostTags).toStrictEqual({
-      __typename: "NotAllowedError",
-      message: "Unable to get post tags",
-      status: Status.Error,
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.getPostTags).toStrictEqual({
+        __typename: "AuthenticationError",
+        message: "Unable to get post tags",
+        status: Status.Error,
+      });
     });
   });
 
-  it("Returns error for unregistered user", async () => {
-    const payload = { query: GET_POST_TAGS };
-    const { data } = await post<GetPostTags>(url, payload, {
-      authorization: `Bearer ${unRegisteredUserAccessToken}`,
-    });
+  describe("Verify user registration status", () => {
+    it("Should respond with a RegistrationError if the user is unregistered", async () => {
+      const payload = { query: GET_POST_TAGS };
+      const options = { authorization: `Bearer ${unregisteredJwt}` };
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
+      const { data } = await post<GetPostTags>(url, payload, options);
 
-    expect(data.data?.getPostTags).toStrictEqual({
-      __typename: "NotAllowedError",
-      message: "Unable to get post tags",
-      status: Status.Error,
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.getPostTags).toStrictEqual({
+        __typename: "RegistrationError",
+        message: "Unable to get post tags",
+        status: Status.Error,
+      });
     });
   });
 
-  it("Returns all post tags", async () => {
-    const payload = { query: GET_POST_TAGS };
-    const { data } = await post<GetPostTags>(url, payload, {
-      authorization: `Bearer ${registeredUserAccessToken}`,
-    });
+  describe("Get all post tags", () => {
+    it("Should respond with all the post tags saved in the db", async () => {
+      const options = { authorization: `Bearer ${registeredJwt}` };
+      const payload = { query: GET_POST_TAGS };
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
+      const { data } = await post<GetPostTags>(url, payload, options);
 
-    expect(data.data?.getPostTags).toStrictEqual({
-      __typename: "PostTags",
-      tags: expect.arrayContaining(postTags),
-      status: Status.Success,
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.getPostTags).toStrictEqual({
+        __typename: "PostTags",
+        tags: expect.arrayContaining(postTags),
+        status: Status.Success,
+      });
     });
   });
 });
