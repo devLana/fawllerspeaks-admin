@@ -55,6 +55,7 @@ export const redirectTable: [string, ReturnType<typeof redirectMock>][] = [
 
 const message =
   "You are unable to create post tags at the moment. Please try again later";
+
 const network = {
   tags: ["network post tag 1", "network post tag 2"],
   message,
