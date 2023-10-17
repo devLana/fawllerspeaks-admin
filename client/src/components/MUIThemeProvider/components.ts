@@ -24,7 +24,9 @@ export const components: Components = {
   MuiTypography: {
     styleOverrides: {
       gutterBottom: ({ ownerState: { variant, gutterBottom } }) => ({
-        ...(variant === "body1" && gutterBottom && { marginBottom: "0.7rem" }),
+        ...(variant === "body1" && gutterBottom && { marginBottom: "0.7em" }),
+        ...(variant?.match(/^h[0-6]$/) &&
+          gutterBottom && { marginBottom: "0.75em" }),
       }),
     },
   },

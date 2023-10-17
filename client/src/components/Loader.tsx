@@ -30,6 +30,7 @@ const stylesTwo = (theme: AppTheme, secondary: Palette["secondary"]) => ({
 
 const Loader = () => (
   <Box
+    aria-label="authenticating user"
     role="progressbar"
     sx={{
       mx: "auto",
