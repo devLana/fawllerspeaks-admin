@@ -1,0 +1,23 @@
+import { gql, type TypedDocumentNode } from "@apollo/client";
+
+import { POST_TAG_FIELDS } from "@fragments/PostTag";
+import type { Query } from "@apiTypes";
+
+type GetPostTagsData = Pick<Query, "getPostTags">;
+type GetPostTags = TypedDocumentNode<GetPostTagsData>;
+
+export const GET_POST_TAGS: GetPostTags = gql`
+  ${POST_TAG_FIELDS}
+  query GetPostTags {
+    getPostTags {
+      ... on BaseResponse {
+        __typename
+      }
+      ... on PostTags {
+        tags {
+          ...PostTagFields
+        }
+      }
+    }
+  }
+`;

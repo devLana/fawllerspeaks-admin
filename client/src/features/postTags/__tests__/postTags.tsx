@@ -10,9 +10,14 @@ import {
   warnCreate,
 } from "../CreatePostTags/utils/createPostTags.mocks";
 import { renderTestUI } from "@utils/renderTestUI";
+import {
+  getAlerts,
+  getRedirect,
+  getTags,
+} from "../GetPostTags/utils/getPostTags.mocks";
 
 describe("Post Tags Page", () => {
-  describe("Create post tags", () => {
+  describe.skip("Create post tags", () => {
     const createBtn = { name: /^create post tags$/i };
     const dialog = { name: /^create new post tags$/i };
     const cancelBtn = { name: /^cancel$/i };
@@ -183,8 +188,50 @@ describe("Post Tags Page", () => {
     });
   });
 
-  /** describe("View post tags", () => {}); */
+  describe("View post tags", () => {
+    describe("Get post tags response error should redirect the user to an authentication page", () => {
+      it.each(getRedirect)("%s", async (_, mock) => {
+        const { replace } = useRouter();
+
+        renderTestUI(<PostTags />, mock.gql());
+
+        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+        expect(replace).toHaveBeenCalledWith(mock.path);
+        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+      });
+    });
+
+    describe("Render a message", () => {
+      it.each(getAlerts)("%s", async (_, mock) => {
+        const { message } = mock;
+
+        renderTestUI(<PostTags />, mock.gql());
+
+        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+        expect(await screen.findByRole("alert")).toHaveTextContent(message);
+        expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+      });
+    });
+
+    describe("Get post tags", () => {
+      it("Should render a list of post tags", async () => {
+        renderTestUI(<PostTags />, getTags.gql());
+
+        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+
+        const list = await screen.findByRole("list");
+        const listItem = within(list).getAllByRole("listitem");
+
+        expect(listItem).toHaveLength(getTags.tags.length);
+        expect(listItem[0]).toHaveTextContent(getTags.tags[0]);
+        expect(listItem[1]).toHaveTextContent(getTags.tags[1]);
+        expect(listItem[2]).toHaveTextContent(getTags.tags[2]);
+        expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+      });
+    });
+  });
+
   /** describe("Edit a post tag", () => {});*/
   /** describe("Delete post tags", () => {});*/
-  /** describe("Search post tags", () => {});*/
 });

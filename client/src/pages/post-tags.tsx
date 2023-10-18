@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 
 import RootLayout from "@layouts/RootLayout";
 import CreatePostTags from "@features/postTags/CreatePostTags";
+import GetPostTags from "@features/postTags/GetPostTags";
 import uiLayout from "@utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
@@ -25,7 +26,7 @@ const PostTags: NextPageWithLayout = () => {
         direction="row"
         flexWrap="wrap"
         rowGap={2}
-        columnGap={3}
+        columnGap={5}
         justifyContent="space-between"
         mb={5}
       >
@@ -34,6 +35,7 @@ const PostTags: NextPageWithLayout = () => {
         </Typography>
         <CreatePostTags onOpenSnackbar={handleOpenSnackbar} />
       </Stack>
+      <GetPostTags />
       <Snackbar
         message={message}
         open={isOpen}
