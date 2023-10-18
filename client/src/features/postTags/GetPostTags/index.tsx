@@ -18,7 +18,7 @@ const GetPostTags = () => {
   if (loading) return <PostTagsLoading id={id} />;
 
   if (error) {
-    const message = error.graphQLErrors[0]?.message || msg;
+    const message = error.graphQLErrors[0]?.message ?? msg;
     return <PostTagsTextContent severity="error" id={id} text={message} />;
   }
 

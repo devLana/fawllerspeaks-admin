@@ -115,9 +115,8 @@ const useVerifySession = (
         .catch(err => {
           if (err instanceof ApolloError) {
             const message =
-              err.graphQLErrors.length > 0
-                ? err.graphQLErrors[0].message
-                : "Server is currently unreachable. Please try again later";
+              err.graphQLErrors[0]?.message ??
+              "Server is currently unreachable. Please try again later";
 
             setClientHasRendered(true);
             setErrorMessage(message);
