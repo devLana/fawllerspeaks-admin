@@ -139,6 +139,9 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
           Add More
         </Button>
         <Stack direction="row" justifyContent="center" mt={3} columnGap={2}>
+          <Button onClick={onCloseDialog} disabled={status === "submitting"}>
+            Cancel
+          </Button>
           <LoadingButton
             variant="contained"
             type="submit"
@@ -146,9 +149,6 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
           >
             <span>Save {inputs.length > 1 ? "Tags" : "Tag"}</span>
           </LoadingButton>
-          <Button onClick={onCloseDialog} disabled={status === "submitting"}>
-            Cancel
-          </Button>
         </Stack>
       </form>
       <Snackbar

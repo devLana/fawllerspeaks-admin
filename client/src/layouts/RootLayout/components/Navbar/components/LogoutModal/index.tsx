@@ -95,6 +95,9 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+        <Button disabled={status === "loading"} onClick={onClick}>
+          Cancel
+        </Button>
         <LoadingButton
           onClick={handleLogout}
           loading={status === "loading"}
@@ -102,9 +105,6 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
         >
           <span>Logout</span>
         </LoadingButton>
-        <Button disabled={status === "loading"} onClick={onClick}>
-          Cancel
-        </Button>
       </DialogActions>
     </Dialog>
   );
