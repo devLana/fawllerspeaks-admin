@@ -12,9 +12,9 @@ import PageBreadcrumbs from "./components/PageBreadcrumbs";
 import { type RootLayoutProps } from "@types";
 
 const RootLayout = (props: RootLayoutProps) => {
+  const { children, clientHasRendered, errorMessage, ...metaProps } = props;
   const [navBarIsOpen, setNavBarIsOpen] = React.useState(false);
 
-  const { children, clientHasRendered, errorMessage, ...metaProps } = props;
   let content: React.ReactElement;
 
   if (!clientHasRendered) {
@@ -26,6 +26,7 @@ const RootLayout = (props: RootLayoutProps) => {
   }
 
   const handleOpenNavbar = () => setNavBarIsOpen(true);
+  const handleCloseNavbar = () => setNavBarIsOpen(false);
   const handleToggleNavbar = () => setNavBarIsOpen(!navBarIsOpen);
 
   return (
@@ -40,7 +41,11 @@ const RootLayout = (props: RootLayoutProps) => {
     >
       <Metadata {...metaProps} />
       <Header onClick={handleOpenNavbar} />
-      <Navbar isOpen={navBarIsOpen} onClick={handleToggleNavbar} />
+      <Navbar
+        isOpen={navBarIsOpen}
+        onToggleNav={handleToggleNavbar}
+        onCloseNav={handleCloseNavbar}
+      />
       <Box component="main" py={4} flexGrow={{ sm: 1 }}>
         <PageBreadcrumbs />
         {content}

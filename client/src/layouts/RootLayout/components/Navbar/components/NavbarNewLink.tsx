@@ -13,10 +13,11 @@ interface NavbarNewLinkProps {
   href: string;
   Icon: MuiIconType;
   isOpen: boolean;
+  onClick: (() => void) | undefined;
 }
 
 const NavbarNewLink = (props: NavbarNewLinkProps) => {
-  const { label, href, Icon, isOpen } = props;
+  const { label, href, Icon, isOpen, onClick } = props;
 
   return (
     <NavbarTooltip isOpen={isOpen} title={label} placement="right">
@@ -36,6 +37,7 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
           }}
           component={NextLink}
           href={href}
+          onClick={onClick}
         >
           <ListItemIcon sx={{ color: "inherit", minWidth: 0 }}>
             <Icon />

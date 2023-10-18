@@ -1,22 +1,17 @@
-import useMediaQuery from "@mui/material/useMediaQuery";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
-import type { Theme } from "@mui/material/styles";
 
 import transition from "../utils/transition";
 
 interface NavbarContainerProps {
   isOpen: boolean;
-  onClick: () => void;
+  belowSm: boolean;
   children: React.ReactNode;
+  onClick: () => void;
 }
 
-const mq = (theme: Theme) => theme.breakpoints.down("sm");
-
 const NavbarContainer = (props: NavbarContainerProps) => {
-  const { children, isOpen, onClick } = props;
-
-  const belowSm = useMediaQuery(mq);
+  const { children, isOpen, belowSm, onClick } = props;
 
   return (
     <Box

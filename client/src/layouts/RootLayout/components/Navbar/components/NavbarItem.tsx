@@ -16,6 +16,7 @@ interface NavbarItemProps {
   href: string;
   Icon: MuiIconType;
   isOpen: boolean;
+  onClick: (() => void) | undefined;
 }
 
 const multiPageHrefs = ["/posts", "/settings"];
@@ -23,7 +24,7 @@ const multiPageHrefs = ["/posts", "/settings"];
 const NavbarItem = (props: NavbarItemProps) => {
   const { pathname } = useRouter();
 
-  const { label, href, Icon, isOpen } = props;
+  const { label, href, Icon, isOpen, onClick } = props;
   let isActive = false;
 
   if (href === pathname) {
@@ -54,6 +55,7 @@ const NavbarItem = (props: NavbarItemProps) => {
           }}
           component={NextLink}
           href={href}
+          onClick={onClick}
         >
           <ListItemIcon sx={{ color: "inherit", minWidth: 0 }}>
             <Icon />

@@ -1,7 +1,9 @@
 import * as React from "react";
 
 import Divider from "@mui/material/Divider";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import List from "@mui/material/List";
+import type { Theme } from "@mui/material/styles";
 
 import NavbarContainer from "./components/NavbarContainer";
 import NavbarItem from "./components/NavbarItem";
@@ -11,49 +13,66 @@ import NavbarToggleButton from "./components/NavbarToggleButton";
 import { topLinks, postLinks, otherLinks } from "./utils/navbarMenu";
 
 interface NavbarProps {
-  onClick: () => void;
   isOpen: boolean;
+  onToggleNav: () => void;
+  onCloseNav: () => void;
 }
 
-const Navbar = ({ isOpen, onClick }: NavbarProps) => (
-  <NavbarContainer isOpen={isOpen} onClick={onClick}>
-    <NavbarToggleButton isOpen={isOpen} onClick={onClick} />
-    <Divider sx={{ mb: 2.5, mr: { sm: 3 } }} />
-    <List>
-      {topLinks.map(({ primary, ...link }) => (
-        <React.Fragment key={link.label}>
-          {primary ? (
-            <NavbarNewLink {...link} isOpen={isOpen} />
-          ) : (
-            <NavbarItem {...link} isOpen={isOpen} />
-          )}
-        </React.Fragment>
-      ))}
-    </List>
-    <Divider sx={{ mr: { sm: 3 } }} />
-    <List>
-      {postLinks.map(link => (
-        <NavbarItem key={link.label} {...link} isOpen={isOpen} />
-      ))}
-    </List>
-    <Divider sx={{ mr: { sm: 3 } }} />
-    <List>
-      {otherLinks.map(({ Icon, label, ...link }) => (
-        <React.Fragment key={label}>
-          {link.type === "link" ? (
-            <NavbarItem
-              label={label}
-              href={link.href}
-              Icon={Icon}
+const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
+  const belowSm = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const onClickNavLink = belowSm ? onCloseNav : undefined;
+
+  return (
+    <NavbarContainer isOpen={isOpen} belowSm={belowSm} onClick={onCloseNav}>
+      <NavbarToggleButton isOpen={isOpen} onClick={onToggleNav} />
+      <Divider sx={{ mb: 2.5, mr: { sm: 3 } }} />
+      <List>
+        {topLinks.map(({ primary, ...link }) => {
+          return primary ? (
+            <NavbarNewLink
+              key={link.label}
+              {...link}
               isOpen={isOpen}
+              onClick={onClickNavLink}
             />
           ) : (
-            <NavbarLogoutButton label={label} Icon={Icon} isOpen={isOpen} />
-          )}
-        </React.Fragment>
-      ))}
-    </List>
-  </NavbarContainer>
-);
+            <NavbarItem
+              key={link.label}
+              {...link}
+              isOpen={isOpen}
+              onClick={onClickNavLink}
+            />
+          );
+        })}
+      </List>
+      <Divider sx={{ mr: { sm: 3 } }} />
+      <List>
+        {postLinks.map(link => (
+          <NavbarItem
+            key={link.label}
+            {...link}
+            isOpen={isOpen}
+            onClick={onClickNavLink}
+          />
+        ))}
+      </List>
+      <Divider sx={{ mr: { sm: 3 } }} />
+      <List>
+        {otherLinks.map(link => {
+          return link.type === "link" ? (
+            <NavbarItem
+              key={link.label}
+              {...link}
+              isOpen={isOpen}
+              onClick={onClickNavLink}
+            />
+          ) : (
+            <NavbarLogoutButton key={link.label} {...link} isOpen={isOpen} />
+          );
+        })}
+      </List>
+    </NavbarContainer>
+  );
+};
 
 export default Navbar;
