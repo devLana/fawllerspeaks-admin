@@ -1,7 +1,8 @@
 import { GraphQLError } from "graphql";
 import type { MockedResponse } from "@apollo/client/testing";
 
-import { GET_POST_TAGS } from "../operations/GET_POST_TAGS";
+import { testPostTag } from "./testPostTag";
+import { GET_POST_TAGS } from "../GetPostTags/operations/GET_POST_TAGS";
 
 interface AlertMocks {
   message: string;
@@ -104,14 +105,6 @@ export const getAlerts: [string, AlertMocks][] = [
   ],
 ];
 
-const tag = (name: string, id: string) => ({
-  __typename: "PostTag",
-  id,
-  name,
-  dateCreated: new Date().toISOString(),
-  lastModified: null,
-});
-
 export const getTags = {
   tags: ["Tag 1", "Tag 2", "Tag 3"],
   gql(): MockedResponse[] {
@@ -123,9 +116,9 @@ export const getTags = {
             getPostTags: {
               __typename: "PostTags",
               tags: [
-                tag(this.tags[0], "1"),
-                tag(this.tags[1], "2"),
-                tag(this.tags[2], "3"),
+                testPostTag(this.tags[0], "1"),
+                testPostTag(this.tags[1], "2"),
+                testPostTag(this.tags[2], "3"),
               ],
             },
           },

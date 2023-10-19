@@ -1,7 +1,9 @@
 import { GraphQLError } from "graphql";
 import type { MockedResponse } from "@apollo/client/testing";
 
-import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
+import { getTestPostTags } from "./getTestPostTags";
+import { testPostTag } from "./testPostTag";
+import { CREATE_POST_TAGS } from "../CreatePostTags/operations/CREATE_POST_TAGS";
 
 interface AlertMocks {
   tags: string[];
@@ -22,6 +24,7 @@ const redirectMock = (label: string, typename: string, path: string) => ({
         request: request(this.tags),
         result: { data: { createPostTags: { __typename: typename } } },
       },
+      getTestPostTags(),
     ];
   },
 });
@@ -60,7 +63,10 @@ const network = {
   tags: ["network post tag 1", "network post tag 2"],
   message,
   gql(): MockedResponse[] {
-    return [{ request: request(this.tags), error: new Error(this.message) }];
+    return [
+      { request: request(this.tags), error: new Error(this.message) },
+      getTestPostTags(),
+    ];
   },
 };
 
@@ -73,6 +79,7 @@ const graphql = {
         request: request(this.tags),
         result: { errors: [new GraphQLError(this.message)] },
       },
+      getTestPostTags(),
     ];
   },
 };
@@ -86,6 +93,7 @@ const unsupported = {
         request: request(this.tags),
         result: { data: { createPostTags: { __typename: "UnsupportedType" } } },
       },
+      getTestPostTags(),
     ];
   },
 };
@@ -106,6 +114,7 @@ const validation = {
           },
         },
       },
+      getTestPostTags(),
     ];
   },
 };
@@ -126,6 +135,7 @@ const duplicate = {
           },
         },
       },
+      getTestPostTags(),
     ];
   },
 };
@@ -152,25 +162,34 @@ export const alertTable: [string, AlertMocks][] = [
 
 export const create = {
   tags: ["create post tag 1", "create post tag 2", "create post tag 3"],
+  postTags() {
+    return [
+      testPostTag(this.tags[0], "1"),
+      testPostTag(this.tags[1], "2"),
+      testPostTag(this.tags[2], "3"),
+    ];
+  },
   gql(): MockedResponse[] {
     return [
       {
         request: request(this.tags),
         result: {
-          data: { createPostTags: { __typename: "PostTags", tags: [] } },
+          data: {
+            createPostTags: { __typename: "PostTags", tags: [this.postTags()] },
+          },
         },
       },
+      getTestPostTags(),
+      getTestPostTags(this.postTags()),
     ];
   },
 };
 
 export const warnCreate = {
-  tags: [
-    "warn create post tag 1",
-    "warn create post tag 2",
-    "warn create post tag 3",
-    "warn create post tag 4",
-  ],
+  tags: ["post tag 1", "post tag 2", "post tag 3", "post tag 4"],
+  postTags() {
+    return [testPostTag(this.tags[0], "1"), testPostTag(this.tags[3], "4")];
+  },
   message: "This response message will be shown in an alert",
   gql(): MockedResponse[] {
     return [
@@ -180,12 +199,14 @@ export const warnCreate = {
           data: {
             createPostTags: {
               __typename: "PostTagsWarning",
-              tags: [],
+              tags: [this.postTags()],
               message: this.message,
             },
           },
         },
       },
+      getTestPostTags(),
+      getTestPostTags(this.postTags()),
     ];
   },
 };

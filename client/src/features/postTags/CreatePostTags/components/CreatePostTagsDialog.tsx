@@ -13,8 +13,9 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 import PostTagsDialog from "../../components/PostTagsDialog";
 import CreatePostTagsInput from "./CreatePostTagsInput";
-import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
 import { createPostTagsValidator } from "../utils/createPostTagsValidator";
+import { refetchQueries } from "../utils/refetchQueries";
+import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 
 interface CreatePostTagsFormProps {
@@ -61,6 +62,7 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
         setStatus("idle");
         setAlertIsOpen(true);
       },
+      refetchQueries,
     });
 
     if (createData) {
@@ -147,7 +149,7 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
             type="submit"
             loading={status === "submitting"}
           >
-            <span>Save {inputs.length > 1 ? "Tags" : "Tag"}</span>
+            <span>Create {inputs.length > 1 ? "Tags" : "Tag"}</span>
           </LoadingButton>
         </Stack>
       </form>
