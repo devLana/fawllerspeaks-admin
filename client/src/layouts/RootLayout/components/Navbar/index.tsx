@@ -20,7 +20,19 @@ interface NavbarProps {
 
 const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
   const belowSm = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const sm_Above = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
+  const md_Above = useMediaQuery((theme: Theme) => theme.breakpoints.up("md"));
+
   const onClickNavLink = belowSm ? onCloseNav : undefined;
+  let showTooltip: boolean;
+
+  if (md_Above) {
+    showTooltip = isOpen;
+  } else if (sm_Above) {
+    showTooltip = !isOpen;
+  } else {
+    showTooltip = false;
+  }
 
   return (
     <NavbarContainer isOpen={isOpen} belowSm={belowSm} onClick={onCloseNav}>
@@ -33,6 +45,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
               key={link.label}
               {...link}
               isOpen={isOpen}
+              showTooltip={showTooltip}
               onClick={onClickNavLink}
             />
           ) : (
@@ -40,6 +53,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
               key={link.label}
               {...link}
               isOpen={isOpen}
+              showTooltip={showTooltip}
               onClick={onClickNavLink}
             />
           );
@@ -52,6 +66,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
             key={link.label}
             {...link}
             isOpen={isOpen}
+            showTooltip={showTooltip}
             onClick={onClickNavLink}
           />
         ))}
@@ -64,10 +79,16 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
               key={link.label}
               {...link}
               isOpen={isOpen}
+              showTooltip={showTooltip}
               onClick={onClickNavLink}
             />
           ) : (
-            <NavbarLogoutButton key={link.label} {...link} isOpen={isOpen} />
+            <NavbarLogoutButton
+              key={link.label}
+              {...link}
+              isOpen={isOpen}
+              showTooltip={showTooltip}
+            />
           );
         })}
       </List>

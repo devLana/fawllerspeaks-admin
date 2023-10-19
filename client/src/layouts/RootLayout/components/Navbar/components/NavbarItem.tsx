@@ -1,13 +1,12 @@
-import React from "react";
 import { useRouter } from "next/router";
 
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
-import { NavbarTooltip } from "./NavbarTooltip";
 import transition from "../utils/transition";
 import type { MuiIconType } from "@types";
 
@@ -16,15 +15,16 @@ interface NavbarItemProps {
   href: string;
   Icon: MuiIconType;
   isOpen: boolean;
+  showTooltip: boolean;
   onClick: (() => void) | undefined;
 }
 
 const multiPageHrefs = ["/posts", "/settings"];
 
 const NavbarItem = (props: NavbarItemProps) => {
+  const { label, href, Icon, isOpen, showTooltip, onClick } = props;
   const { pathname } = useRouter();
 
-  const { label, href, Icon, isOpen, onClick } = props;
   let isActive = false;
 
   if (href === pathname) {
@@ -34,7 +34,7 @@ const NavbarItem = (props: NavbarItemProps) => {
   }
 
   return (
-    <NavbarTooltip isOpen={isOpen} title={label} placement="right">
+    <Tooltip title={showTooltip ? label : null} placement="right">
       <ListItem sx={{ py: 1, pr: 0, pl: { xs: 3, sm: 0 } }}>
         <ListItemButton
           sx={{
@@ -75,7 +75,7 @@ const NavbarItem = (props: NavbarItemProps) => {
           />
         </ListItemButton>
       </ListItem>
-    </NavbarTooltip>
+    </Tooltip>
   );
 };
 

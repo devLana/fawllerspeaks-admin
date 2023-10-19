@@ -6,9 +6,9 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Snackbar from "@mui/material/Snackbar";
+import Tooltip from "@mui/material/Tooltip";
 
 import LogoutModal from "./LogoutModal";
-import { NavbarTooltip } from "./NavbarTooltip";
 import transition from "../utils/transition";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { MuiIconType } from "@types";
@@ -17,10 +17,11 @@ interface NavbarLogoutButtonProps {
   label: string;
   Icon: MuiIconType;
   isOpen: boolean;
+  showTooltip: boolean;
 }
 
 const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
-  const { Icon, label, isOpen } = props;
+  const { Icon, label, isOpen, showTooltip } = props;
 
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState("");
@@ -36,7 +37,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
 
   return (
     <>
-      <NavbarTooltip isOpen={isOpen} title={label} placement="right">
+      <Tooltip title={showTooltip ? label : null} placement="right">
         <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
           <ListItemButton
             sx={{
@@ -80,7 +81,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
             />
           </ListItemButton>
         </ListItem>
-      </NavbarTooltip>
+      </Tooltip>
       <Snackbar
         message={toastMessage}
         open={alertIsOpen}

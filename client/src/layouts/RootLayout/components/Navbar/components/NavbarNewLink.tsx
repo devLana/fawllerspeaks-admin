@@ -2,9 +2,9 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
-import { NavbarTooltip } from "./NavbarTooltip";
 import transition from "../utils/transition";
 import type { MuiIconType } from "@types";
 
@@ -13,14 +13,15 @@ interface NavbarNewLinkProps {
   href: string;
   Icon: MuiIconType;
   isOpen: boolean;
+  showTooltip: boolean;
   onClick: (() => void) | undefined;
 }
 
 const NavbarNewLink = (props: NavbarNewLinkProps) => {
-  const { label, href, Icon, isOpen, onClick } = props;
+  const { label, href, Icon, isOpen, showTooltip, onClick } = props;
 
   return (
-    <NavbarTooltip isOpen={isOpen} title={label} placement="right">
+    <Tooltip title={showTooltip ? label : null} placement="right">
       <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
         <ListItemButton
           sx={{
@@ -57,7 +58,7 @@ const NavbarNewLink = (props: NavbarNewLinkProps) => {
           />
         </ListItemButton>
       </ListItem>
-    </NavbarTooltip>
+    </Tooltip>
   );
 };
 
