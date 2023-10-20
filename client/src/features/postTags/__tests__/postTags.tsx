@@ -6,7 +6,6 @@ import PostTags from "@pages/post-tags";
 import { renderTestUI } from "@utils/renderTestUI";
 import * as createMocks from "../utils/createPostTags.mocks";
 import { getAlerts, getRedirect, getTags } from "../utils/getPostTags.mocks";
-import { getTestPostTags } from "../utils/getTestPostTags";
 
 describe("Post Tags Page", () => {
   describe("Create post tags", () => {
@@ -19,22 +18,21 @@ describe("Post Tags Page", () => {
 
     describe("Create post tags client side input validation", () => {
       it("Input fields should have error messages if their values are empty", async () => {
-        const { user } = renderTestUI(<PostTags />, [getTestPostTags()]);
+        const { createPostTagsMock } = createMocks;
+        const { user } = renderTestUI(<PostTags />, [createPostTagsMock]);
 
         await user.click(screen.getByRole("button", createBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-        const addMoreBtn = within(modal).getByRole("button", addMore);
 
-        await user.click(addMoreBtn);
-        await user.click(addMoreBtn);
+        await user.click(within(modal).getByRole("button", addMore));
+        await user.click(within(modal).getByRole("button", addMore));
 
-        const saveButton = within(modal).getByRole("button", saveBtn);
         const inputBoxes = within(modal).getAllByRole("textbox", textbox);
 
         expect(inputBoxes).toHaveLength(3);
 
-        await user.click(saveButton);
+        await user.click(within(modal).getByRole("button", saveBtn));
 
         expect(inputBoxes[0]).toHaveErrorMessage("Enter post tag");
         expect(inputBoxes[1]).toHaveErrorMessage("Enter post tag");
@@ -51,19 +49,17 @@ describe("Post Tags Page", () => {
         await user.click(screen.getByRole("button", createBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-        const cancelButton = within(modal).getByRole("button", cancelBtn);
         const inputBox = within(modal).getByRole("textbox", textbox);
-        const save = within(modal).getByRole("button", saveButton);
 
         await user.type(inputBox, mock.tags[0]);
-        await user.click(save);
+        await user.click(within(modal).getByRole("button", saveButton));
 
-        expect(save).toBeDisabled();
-        expect(cancelButton).toBeDisabled();
+        expect(within(modal).getByRole("button", saveButton)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
         await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
         expect(replace).toHaveBeenCalledWith(mock.path);
-        expect(save).toBeDisabled();
-        expect(cancelButton).toBeDisabled();
+        expect(within(modal).getByRole("button", saveButton)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
       });
     });
 
@@ -74,28 +70,25 @@ describe("Post Tags Page", () => {
         await user.click(screen.getByRole("button", createBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-        const cancelButton = within(modal).getByRole("button", cancelBtn);
-        const addMoreBtn = within(modal).getByRole("button", addMore);
 
-        await user.click(addMoreBtn);
+        await user.click(within(modal).getByRole("button", addMore));
 
-        const saveButton = within(modal).getByRole("button", saveBtn);
         const inputBoxes = within(modal).getAllByRole("textbox", textbox);
 
         expect(inputBoxes).toHaveLength(2);
 
         await user.type(inputBoxes[0], mock.tags[0]);
         await user.type(inputBoxes[1], mock.tags[1]);
-        await user.click(saveButton);
+        await user.click(within(modal).getByRole("button", saveBtn));
 
-        expect(saveButton).toBeDisabled();
-        expect(cancelButton).toBeDisabled();
+        expect(within(modal).getByRole("button", saveBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
 
         await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
         expect(screen.getByRole("alert")).toHaveTextContent(mock.message);
         expect(modal).toBeInTheDocument();
-        expect(cancelButton).toBeEnabled();
-        expect(saveButton).toBeEnabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeEnabled();
+        expect(within(modal).getByRole("button", saveBtn)).toBeEnabled();
       });
     });
 
@@ -107,13 +100,10 @@ describe("Post Tags Page", () => {
         await user.click(screen.getByRole("button", createBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-        const cancelButton = within(modal).getByRole("button", cancelBtn);
-        const addMoreBtn = within(modal).getByRole("button", addMore);
 
-        await user.click(addMoreBtn);
-        await user.click(addMoreBtn);
+        await user.click(within(modal).getByRole("button", addMore));
+        await user.click(within(modal).getByRole("button", addMore));
 
-        const saveButton = within(modal).getByRole("button", saveBtn);
         const inputBoxes = within(modal).getAllByRole("textbox", textbox);
 
         expect(inputBoxes).toHaveLength(3);
@@ -121,10 +111,10 @@ describe("Post Tags Page", () => {
         await user.type(inputBoxes[0], create.tags[0]);
         await user.type(inputBoxes[1], create.tags[1]);
         await user.type(inputBoxes[2], create.tags[2]);
-        await user.click(saveButton);
+        await user.click(within(modal).getByRole("button", saveBtn));
 
-        expect(saveButton).toBeDisabled();
-        expect(cancelButton).toBeDisabled();
+        expect(within(modal).getByRole("button", saveBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
 
         const alert = await screen.findAllByRole("alert");
 
@@ -142,14 +132,11 @@ describe("Post Tags Page", () => {
         await user.click(screen.getByRole("button", createBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-        const cancelButton = within(modal).getByRole("button", cancelBtn);
-        const addMoreBtn = within(modal).getByRole("button", addMore);
 
-        await user.click(addMoreBtn);
-        await user.click(addMoreBtn);
-        await user.click(addMoreBtn);
+        await user.click(within(modal).getByRole("button", addMore));
+        await user.click(within(modal).getByRole("button", addMore));
+        await user.click(within(modal).getByRole("button", addMore));
 
-        const saveButton = within(modal).getByRole("button", saveBtn);
         const inputBoxes = within(modal).getAllByRole("textbox", textbox);
 
         expect(inputBoxes).toHaveLength(4);
@@ -158,10 +145,10 @@ describe("Post Tags Page", () => {
         await user.type(inputBoxes[1], warnCreate.tags[1]);
         await user.type(inputBoxes[2], warnCreate.tags[2]);
         await user.type(inputBoxes[3], warnCreate.tags[3]);
-        await user.click(saveButton);
+        await user.click(within(modal).getByRole("button", saveBtn));
 
-        expect(saveButton).toBeDisabled();
-        expect(cancelButton).toBeDisabled();
+        expect(within(modal).getByRole("button", saveBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
 
         const alert = await screen.findAllByRole("alert");
 
@@ -173,7 +160,7 @@ describe("Post Tags Page", () => {
     });
   });
 
-  describe("View post tags", () => {
+  describe("View/Get post tags", () => {
     describe("Get post tags response error should redirect the user to an authentication page", () => {
       it.each(getRedirect)("%s", async (_, mock) => {
         const { replace } = useRouter();
@@ -199,7 +186,7 @@ describe("Post Tags Page", () => {
       });
     });
 
-    describe("Get post tags", () => {
+    describe("Get all post tags", () => {
       it("Should render a list of post tags", async () => {
         renderTestUI(<PostTags />, getTags.gql());
 

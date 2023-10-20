@@ -115,7 +115,7 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
   return (
     <PostTagsDialog
       open={isOpen}
-      onClose={onCloseDialog}
+      onClose={status === "submitting" ? undefined : onCloseDialog}
       title="Create new post tags"
       contentText="You can create up to 10 post tags at a time."
       fullWidth

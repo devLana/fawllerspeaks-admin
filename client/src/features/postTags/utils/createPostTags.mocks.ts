@@ -11,6 +11,8 @@ interface AlertMocks {
   gql: () => MockedResponse[];
 }
 
+export const createPostTagsMock = getTestPostTags();
+
 const request = (tags: string[]): MockedResponse["request"] => {
   return { query: CREATE_POST_TAGS, variables: { tags } };
 };

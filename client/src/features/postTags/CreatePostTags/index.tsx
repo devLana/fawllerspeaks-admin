@@ -13,7 +13,11 @@ const CreatePostTags = ({ onOpenSnackbar }: CreatePostTagsProps) => {
 
   return (
     <>
-      <Button variant="contained" onClick={() => setIsOpen(true)}>
+      <Button
+        variant="contained"
+        onClick={() => setIsOpen(true)}
+        aria-haspopup="dialog"
+      >
         Create Post Tags
       </Button>
       <CreatePostTagsDialog
