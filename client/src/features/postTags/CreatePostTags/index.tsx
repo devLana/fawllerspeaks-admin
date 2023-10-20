@@ -16,13 +16,11 @@ const CreatePostTags = ({ onOpenSnackbar }: CreatePostTagsProps) => {
       <Button variant="contained" onClick={() => setIsOpen(true)}>
         Create Post Tags
       </Button>
-      {isOpen && (
-        <CreatePostTagsDialog
-          onOpenSnackbar={onOpenSnackbar}
-          isOpen={isOpen}
-          onCloseDialog={() => setIsOpen(false)}
-        />
-      )}
+      <CreatePostTagsDialog
+        onOpenSnackbar={onOpenSnackbar}
+        isOpen={isOpen}
+        onCloseDialog={() => setIsOpen(false)}
+      />
     </>
   );
 };

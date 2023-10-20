@@ -1,4 +1,5 @@
 import Right from "@components/SlideTransitions/Right";
+import Up from "@components/SlideTransitions/Up";
 import type { ThemeOptions } from "@mui/material/styles";
 
 type Components = NonNullable<ThemeOptions["components"]>;
@@ -83,5 +84,11 @@ export const components: Components = {
         font-size: 16px;
       }
     `,
+  },
+  MuiDialog: {
+    defaultProps: {
+      TransitionComponent: Up,
+      transitionDuration: { enter: 220, exit: 100 },
+    },
   },
 };

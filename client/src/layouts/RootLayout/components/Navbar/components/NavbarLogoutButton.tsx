@@ -87,13 +87,11 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
         open={alertIsOpen}
         onClose={handleCloseAlert<boolean>(false, setAlertIsOpen)}
       />
-      {modalIsOpen && (
-        <LogoutModal
-          isOpen={modalIsOpen}
-          onClick={handleCloseModal}
-          onApiError={handleToast}
-        />
-      )}
+      <LogoutModal
+        isOpen={modalIsOpen}
+        onClick={handleCloseModal}
+        onApiError={handleToast}
+      />
     </>
   );
 };
