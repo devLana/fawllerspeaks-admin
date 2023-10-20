@@ -6,13 +6,12 @@ import Alert, { type AlertColor, type AlertProps } from "@mui/material/Alert";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import { type SlideProps } from "@mui/material/Slide";
 
-import {
-  DownTransition,
-  LeftTransition,
-  RightTransition,
-  UpTransition,
-  type TransitionProps,
-} from "./SlideTransitions";
+import Up from "./SlideTransitions/Up";
+import Down from "./SlideTransitions/Down";
+import Left from "./SlideTransitions/Left";
+import Right from "./SlideTransitions/Right";
+
+type TransitionProps = Omit<SlideProps, "direction">;
 
 interface AlertToastProps {
   horizontal?: SnackbarOrigin["horizontal"];
@@ -39,17 +38,17 @@ const AlertToast = ({
 
   switch (direction) {
     case "down":
-      transition = DownTransition;
+      transition = Down;
       break;
     case "up":
-      transition = UpTransition;
+      transition = Up;
       break;
     case "left":
     default:
-      transition = LeftTransition;
+      transition = Left;
       break;
     case "right":
-      transition = RightTransition;
+      transition = Right;
   }
 
   const handleClose = (

@@ -1,4 +1,4 @@
-import { RightTransition } from "@components/SlideTransitions";
+import Right from "@components/SlideTransitions/Right";
 import type { ThemeOptions } from "@mui/material/styles";
 
 type Components = NonNullable<ThemeOptions["components"]>;
@@ -53,10 +53,7 @@ export const components: Components = {
     },
   },
   MuiSnackbar: {
-    defaultProps: {
-      TransitionComponent: RightTransition,
-      autoHideDuration: 4000,
-    },
+    defaultProps: { TransitionComponent: Right, autoHideDuration: 4000 },
   },
   MuiSnackbarContent: {
     styleOverrides: {
