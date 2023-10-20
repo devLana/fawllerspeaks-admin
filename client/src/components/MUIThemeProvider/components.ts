@@ -31,7 +31,16 @@ export const components: Components = {
       }),
     },
   },
-  MuiButton: { styleOverrides: { root: { textTransform: "capitalize" } } },
+  MuiButton: {
+    styleOverrides: {
+      root: ({ theme: { appTheme, palette } }) => ({
+        textTransform: "capitalize",
+        ...(appTheme.themeMode !== "sunny" && {
+          ":hover": { color: palette.primary.light },
+        }),
+      }),
+    },
+  },
   MuiCard: {
     styleOverrides: {
       root: ({ ownerState, theme }) => ({

@@ -45,7 +45,7 @@ export const generateTheme = (appTheme: AppTheme): MuiThemeOptions => {
     palette: palette(appTheme.themeMode, appTheme.color),
     typography: typography(appTheme.fontSize),
     shape: shape(appTheme.fontSize),
-    shadows: shadows("20,156,210"),
+    shadows: shadows("15,121,163"),
     components,
   };
 };
