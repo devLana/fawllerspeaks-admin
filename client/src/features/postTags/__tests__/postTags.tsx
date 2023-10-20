@@ -9,30 +9,29 @@ import { getAlerts, getRedirect, getTags } from "../utils/getPostTags.mocks";
 
 describe("Post Tags Page", () => {
   describe("Create post tags", () => {
-    const createBtn = { name: /^create post tags$/i };
+    const createDialogBtn = { name: /^create post tags$/i };
     const dialog = { name: /^create new post tags$/i };
     const cancelBtn = { name: /^cancel$/i };
     const textbox = { name: /^post tag$/i };
-    const addMore = { name: /^add more$/i };
-    const saveBtn = { name: /^Create tags$/i };
+    const addMoreBtn = { name: /^add more$/i };
+    const createTagBtn = { name: /^Create tags$/i };
 
     describe("Create post tags client side input validation", () => {
       it("Input fields should have error messages if their values are empty", async () => {
         const { createPostTagsMock } = createMocks;
         const { user } = renderTestUI(<PostTags />, [createPostTagsMock]);
 
-        await user.click(screen.getByRole("button", createBtn));
+        await user.click(screen.getByRole("button", createDialogBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-
-        await user.click(within(modal).getByRole("button", addMore));
-        await user.click(within(modal).getByRole("button", addMore));
+        await user.click(within(modal).getByRole("button", addMoreBtn));
+        await user.click(within(modal).getByRole("button", addMoreBtn));
 
         const inputBoxes = within(modal).getAllByRole("textbox", textbox);
 
         expect(inputBoxes).toHaveLength(3);
 
-        await user.click(within(modal).getByRole("button", saveBtn));
+        await user.click(within(modal).getByRole("button", createTagBtn));
 
         expect(inputBoxes[0]).toHaveErrorMessage("Enter post tag");
         expect(inputBoxes[1]).toHaveErrorMessage("Enter post tag");
@@ -46,11 +45,10 @@ describe("Post Tags Page", () => {
         const { replace } = useRouter();
         const { user } = renderTestUI(<PostTags />, mock.gql());
 
-        await user.click(screen.getByRole("button", createBtn));
+        await user.click(screen.getByRole("button", createDialogBtn));
 
         const modal = screen.getByRole("dialog", dialog);
         const inputBox = within(modal).getByRole("textbox", textbox);
-
         await user.type(inputBox, mock.tags[0]);
         await user.click(within(modal).getByRole("button", saveButton));
 
@@ -67,11 +65,10 @@ describe("Post Tags Page", () => {
       it.each(createMocks.alertTable)("%s", async (_, mock) => {
         const { user } = renderTestUI(<PostTags />, mock.gql());
 
-        await user.click(screen.getByRole("button", createBtn));
+        await user.click(screen.getByRole("button", createDialogBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-
-        await user.click(within(modal).getByRole("button", addMore));
+        await user.click(within(modal).getByRole("button", addMoreBtn));
 
         const inputBoxes = within(modal).getAllByRole("textbox", textbox);
 
@@ -79,16 +76,15 @@ describe("Post Tags Page", () => {
 
         await user.type(inputBoxes[0], mock.tags[0]);
         await user.type(inputBoxes[1], mock.tags[1]);
-        await user.click(within(modal).getByRole("button", saveBtn));
+        await user.click(within(modal).getByRole("button", createTagBtn));
 
-        expect(within(modal).getByRole("button", saveBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", createTagBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
-
         await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
         expect(screen.getByRole("alert")).toHaveTextContent(mock.message);
         expect(modal).toBeInTheDocument();
         expect(within(modal).getByRole("button", cancelBtn)).toBeEnabled();
-        expect(within(modal).getByRole("button", saveBtn)).toBeEnabled();
+        expect(within(modal).getByRole("button", createTagBtn)).toBeEnabled();
       });
     });
 
@@ -97,12 +93,11 @@ describe("Post Tags Page", () => {
         const { create } = createMocks;
         const { user } = renderTestUI(<PostTags />, create.gql());
 
-        await user.click(screen.getByRole("button", createBtn));
+        await user.click(screen.getByRole("button", createDialogBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-
-        await user.click(within(modal).getByRole("button", addMore));
-        await user.click(within(modal).getByRole("button", addMore));
+        await user.click(within(modal).getByRole("button", addMoreBtn));
+        await user.click(within(modal).getByRole("button", addMoreBtn));
 
         const inputBoxes = within(modal).getAllByRole("textbox", textbox);
 
@@ -111,9 +106,9 @@ describe("Post Tags Page", () => {
         await user.type(inputBoxes[0], create.tags[0]);
         await user.type(inputBoxes[1], create.tags[1]);
         await user.type(inputBoxes[2], create.tags[2]);
-        await user.click(within(modal).getByRole("button", saveBtn));
+        await user.click(within(modal).getByRole("button", createTagBtn));
 
-        expect(within(modal).getByRole("button", saveBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", createTagBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
 
         const alert = await screen.findAllByRole("alert");
@@ -129,13 +124,12 @@ describe("Post Tags Page", () => {
         const { warnCreate } = createMocks;
         const { user } = renderTestUI(<PostTags />, warnCreate.gql());
 
-        await user.click(screen.getByRole("button", createBtn));
+        await user.click(screen.getByRole("button", createDialogBtn));
 
         const modal = screen.getByRole("dialog", dialog);
-
-        await user.click(within(modal).getByRole("button", addMore));
-        await user.click(within(modal).getByRole("button", addMore));
-        await user.click(within(modal).getByRole("button", addMore));
+        await user.click(within(modal).getByRole("button", addMoreBtn));
+        await user.click(within(modal).getByRole("button", addMoreBtn));
+        await user.click(within(modal).getByRole("button", addMoreBtn));
 
         const inputBoxes = within(modal).getAllByRole("textbox", textbox);
 
@@ -145,9 +139,9 @@ describe("Post Tags Page", () => {
         await user.type(inputBoxes[1], warnCreate.tags[1]);
         await user.type(inputBoxes[2], warnCreate.tags[2]);
         await user.type(inputBoxes[3], warnCreate.tags[3]);
-        await user.click(within(modal).getByRole("button", saveBtn));
+        await user.click(within(modal).getByRole("button", createTagBtn));
 
-        expect(within(modal).getByRole("button", saveBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", createTagBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
 
         const alert = await screen.findAllByRole("alert");
