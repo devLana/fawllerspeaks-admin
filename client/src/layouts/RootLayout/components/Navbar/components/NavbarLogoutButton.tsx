@@ -57,8 +57,6 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
             component={Button}
             onClick={() => setModalIsOpen(true)}
             aria-haspopup="dialog"
-            aria-controls={modalIsOpen ? "logout-dialog" : undefined}
-            aria-expanded={modalIsOpen || undefined}
           >
             <ListItemIcon sx={{ color: "inherit", minWidth: 0 }}>
               <Icon />
