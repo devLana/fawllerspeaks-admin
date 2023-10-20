@@ -4,6 +4,7 @@ import Joi, { ValidationError } from "joi";
 import { PostTags, PostTagsWarning, DuplicatePostTagError } from "../types";
 import { CreatePostTagsValidationError } from "./types";
 import { AuthenticationError, RegistrationError, UnknownError } from "@utils";
+import { formatTagName } from "@features/postTags/utils";
 
 import type { ResolverFunc } from "@types";
 import type { MutationResolvers, PostTag } from "@resolverTypes";
@@ -53,7 +54,7 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
       `SELECT name
       FROM post_tags
       WHERE lower(replace(replace(replace(name, '-', ''), ' ', ''), '_', '')) = ANY ($1)`,
-      [validatedTags.map(tag => tag.toLowerCase().replace(/[\s_-]/g, ""))]
+      [validatedTags.map(tag => formatTagName(tag))]
     );
 
     const [{ rows: foundUser }, { rows: existingPostTags }] = await Promise.all(
@@ -71,7 +72,7 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
     const set = new Set<string>();
 
     existingPostTags.forEach(tag => {
-      set.add(tag.name.toLowerCase().replace(/[\s_-]/g, ""));
+      set.add(formatTagName(tag.name));
     });
 
     const insertInput: (string | number)[] = [];
@@ -81,7 +82,7 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
     let createdPostTags: PostTag[] = [];
 
     for (const validatedTag of validatedTags) {
-      if (set.has(validatedTag.toLowerCase().replace(/[\s_-]/g, ""))) {
+      if (set.has(formatTagName(validatedTag))) {
         existingTags.push(validatedTag);
         continue;
       }
