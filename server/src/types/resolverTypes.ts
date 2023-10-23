@@ -120,7 +120,7 @@ export type EditPostInput = {
   title: Scalars['String'];
 };
 
-export type EditPostTag = DuplicatePostTagError | EditPostTagValidationError | EditedPostTag | NotAllowedError | UnknownError;
+export type EditPostTag = AuthenticationError | DuplicatePostTagError | EditPostTagValidationError | EditedPostTag | EditedPostTagWarning | NotAllowedError | RegistrationError | UnknownError;
 
 export type EditPostTagValidationError = {
   __typename?: 'EditPostTagValidationError';
@@ -141,6 +141,13 @@ export type EditProfileValidationError = {
 
 export type EditedPostTag = {
   __typename?: 'EditedPostTag';
+  status: Status;
+  tag: PostTag;
+};
+
+export type EditedPostTagWarning = BaseResponse & {
+  __typename?: 'EditedPostTagWarning';
+  message: Scalars['String'];
   status: Status;
   tag: PostTag;
 };
@@ -691,7 +698,7 @@ export type ResolversTypes = ResolversObject<{
   AccessToken: ResolverTypeWrapper<AccessToken>;
   AuthCookieError: ResolverTypeWrapper<AuthCookieError>;
   AuthenticationError: ResolverTypeWrapper<AuthenticationError>;
-  BaseResponse: ResolversTypes['AuthCookieError'] | ResolversTypes['AuthenticationError'] | ResolversTypes['DuplicatePostTagError'] | ResolversTypes['DuplicatePostTitleError'] | ResolversTypes['EmptyBinWarning'] | ResolversTypes['ForbiddenError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['NotAllowedPostActionError'] | ResolversTypes['PostTagsWarning'] | ResolversTypes['PostsWarning'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'];
+  BaseResponse: ResolversTypes['AuthCookieError'] | ResolversTypes['AuthenticationError'] | ResolversTypes['DuplicatePostTagError'] | ResolversTypes['DuplicatePostTitleError'] | ResolversTypes['EditedPostTagWarning'] | ResolversTypes['EmptyBinWarning'] | ResolversTypes['ForbiddenError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['NotAllowedPostActionError'] | ResolversTypes['PostTagsWarning'] | ResolversTypes['PostsWarning'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'] | ResolversTypes['UserSessionError'];
   Bin_UnBin_Delete: ResolversTypes['NotAllowedError'] | ResolversTypes['PostIdsValidationError'] | ResolversTypes['Posts'] | ResolversTypes['PostsWarning'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'];
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   ChangePassword: ResolversTypes['AuthenticationError'] | ResolversTypes['ChangePasswordValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'] | ResolversTypes['UnknownError'];
@@ -709,11 +716,12 @@ export type ResolversTypes = ResolversObject<{
   DuplicatePostTagError: ResolverTypeWrapper<DuplicatePostTagError>;
   DuplicatePostTitleError: ResolverTypeWrapper<DuplicatePostTitleError>;
   EditPostInput: EditPostInput;
-  EditPostTag: ResolversTypes['DuplicatePostTagError'] | ResolversTypes['EditPostTagValidationError'] | ResolversTypes['EditedPostTag'] | ResolversTypes['NotAllowedError'] | ResolversTypes['UnknownError'];
+  EditPostTag: ResolversTypes['AuthenticationError'] | ResolversTypes['DuplicatePostTagError'] | ResolversTypes['EditPostTagValidationError'] | ResolversTypes['EditedPostTag'] | ResolversTypes['EditedPostTagWarning'] | ResolversTypes['NotAllowedError'] | ResolversTypes['RegistrationError'] | ResolversTypes['UnknownError'];
   EditPostTagValidationError: ResolverTypeWrapper<EditPostTagValidationError>;
   EditProfile: ResolversTypes['AuthenticationError'] | ResolversTypes['EditProfileValidationError'] | ResolversTypes['EditedProfile'] | ResolversTypes['RegistrationError'] | ResolversTypes['UnknownError'];
   EditProfileValidationError: ResolverTypeWrapper<EditProfileValidationError>;
   EditedPostTag: ResolverTypeWrapper<EditedPostTag>;
+  EditedPostTagWarning: ResolverTypeWrapper<EditedPostTagWarning>;
   EditedProfile: ResolverTypeWrapper<EditedProfile>;
   EmailValidationError: ResolverTypeWrapper<EmailValidationError>;
   EmptyBin: ResolversTypes['EmptyBinWarning'] | ResolversTypes['NotAllowedError'] | ResolversTypes['Posts'];
@@ -775,7 +783,7 @@ export type ResolversParentTypes = ResolversObject<{
   AccessToken: AccessToken;
   AuthCookieError: AuthCookieError;
   AuthenticationError: AuthenticationError;
-  BaseResponse: ResolversParentTypes['AuthCookieError'] | ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['DuplicatePostTitleError'] | ResolversParentTypes['EmptyBinWarning'] | ResolversParentTypes['ForbiddenError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['NotAllowedPostActionError'] | ResolversParentTypes['PostTagsWarning'] | ResolversParentTypes['PostsWarning'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'];
+  BaseResponse: ResolversParentTypes['AuthCookieError'] | ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['DuplicatePostTitleError'] | ResolversParentTypes['EditedPostTagWarning'] | ResolversParentTypes['EmptyBinWarning'] | ResolversParentTypes['ForbiddenError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['NotAllowedPostActionError'] | ResolversParentTypes['PostTagsWarning'] | ResolversParentTypes['PostsWarning'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'] | ResolversParentTypes['UserSessionError'];
   Bin_UnBin_Delete: ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostIdsValidationError'] | ResolversParentTypes['Posts'] | ResolversParentTypes['PostsWarning'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'];
   Boolean: Scalars['Boolean'];
   ChangePassword: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['ChangePasswordValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'] | ResolversParentTypes['UnknownError'];
@@ -793,11 +801,12 @@ export type ResolversParentTypes = ResolversObject<{
   DuplicatePostTagError: DuplicatePostTagError;
   DuplicatePostTitleError: DuplicatePostTitleError;
   EditPostInput: EditPostInput;
-  EditPostTag: ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['EditPostTagValidationError'] | ResolversParentTypes['EditedPostTag'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['UnknownError'];
+  EditPostTag: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['DuplicatePostTagError'] | ResolversParentTypes['EditPostTagValidationError'] | ResolversParentTypes['EditedPostTag'] | ResolversParentTypes['EditedPostTagWarning'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['UnknownError'];
   EditPostTagValidationError: EditPostTagValidationError;
   EditProfile: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['EditProfileValidationError'] | ResolversParentTypes['EditedProfile'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['UnknownError'];
   EditProfileValidationError: EditProfileValidationError;
   EditedPostTag: EditedPostTag;
+  EditedPostTagWarning: EditedPostTagWarning;
   EditedProfile: EditedProfile;
   EmailValidationError: EmailValidationError;
   EmptyBin: ResolversParentTypes['EmptyBinWarning'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['Posts'];
@@ -871,7 +880,7 @@ export type AuthenticationErrorResolvers<ContextType = APIContext, ParentType ex
 }>;
 
 export type BaseResponseResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['BaseResponse'] = ResolversParentTypes['BaseResponse']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthCookieError' | 'AuthenticationError' | 'DuplicatePostTagError' | 'DuplicatePostTitleError' | 'EmptyBinWarning' | 'ForbiddenError' | 'NotAllowedError' | 'NotAllowedPostActionError' | 'PostTagsWarning' | 'PostsWarning' | 'RegistrationError' | 'Response' | 'ServerError' | 'UnauthorizedAuthorError' | 'UnknownError' | 'UserSessionError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthCookieError' | 'AuthenticationError' | 'DuplicatePostTagError' | 'DuplicatePostTitleError' | 'EditedPostTagWarning' | 'EmptyBinWarning' | 'ForbiddenError' | 'NotAllowedError' | 'NotAllowedPostActionError' | 'PostTagsWarning' | 'PostsWarning' | 'RegistrationError' | 'Response' | 'ServerError' | 'UnauthorizedAuthorError' | 'UnknownError' | 'UserSessionError', ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
 }>;
@@ -947,7 +956,7 @@ export type DuplicatePostTitleErrorResolvers<ContextType = APIContext, ParentTyp
 }>;
 
 export type EditPostTagResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['EditPostTag'] = ResolversParentTypes['EditPostTag']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'DuplicatePostTagError' | 'EditPostTagValidationError' | 'EditedPostTag' | 'NotAllowedError' | 'UnknownError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'DuplicatePostTagError' | 'EditPostTagValidationError' | 'EditedPostTag' | 'EditedPostTagWarning' | 'NotAllowedError' | 'RegistrationError' | 'UnknownError', ParentType, ContextType>;
 }>;
 
 export type EditPostTagValidationErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['EditPostTagValidationError'] = ResolversParentTypes['EditPostTagValidationError']> = ResolversObject<{
@@ -970,6 +979,13 @@ export type EditProfileValidationErrorResolvers<ContextType = APIContext, Parent
 }>;
 
 export type EditedPostTagResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['EditedPostTag'] = ResolversParentTypes['EditedPostTag']> = ResolversObject<{
+  status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
+  tag?: Resolver<ResolversTypes['PostTag'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type EditedPostTagWarningResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['EditedPostTagWarning'] = ResolversParentTypes['EditedPostTagWarning']> = ResolversObject<{
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   tag?: Resolver<ResolversTypes['PostTag'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -1321,6 +1337,7 @@ export type Resolvers<ContextType = APIContext> = ResolversObject<{
   EditProfile?: EditProfileResolvers<ContextType>;
   EditProfileValidationError?: EditProfileValidationErrorResolvers<ContextType>;
   EditedPostTag?: EditedPostTagResolvers<ContextType>;
+  EditedPostTagWarning?: EditedPostTagWarningResolvers<ContextType>;
   EditedProfile?: EditedProfileResolvers<ContextType>;
   EmailValidationError?: EmailValidationErrorResolvers<ContextType>;
   EmptyBin?: EmptyBinResolvers<ContextType>;

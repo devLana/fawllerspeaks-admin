@@ -10,8 +10,11 @@ import {
   DuplicatePostTagErrorResolvers,
 } from "./types";
 
-import { EditedPostTagResolvers } from "./editPostTag/EditedPostTag";
-import { EditPostTagValidationErrorResolvers } from "./editPostTag/EditPostTagValidationError";
+import {
+  EditedPostTagResolvers,
+  EditedPostTagWarningResolvers,
+  EditPostTagValidationErrorResolvers,
+} from "./editPostTag/types";
 
 import { CreatePostTagsValidationErrorResolvers } from "./createPostTags/types/CreatePostTagsValidationError";
 import { DeletePostTagsValidationErrorResolvers } from "./deletePostTags/DeletePostTagsValidationError";
@@ -28,6 +31,7 @@ type TypeKeys =
   | "PostTags"
   | "PostTagsWarning"
   | "EditedPostTag"
+  | "EditedPostTagWarning"
   | "DuplicatePostTagError"
   | "CreatePostTagsValidationError"
   | "DeletePostTagsValidationError"
@@ -51,6 +55,7 @@ export const postTagsResolvers: PostTagsSchemaResolvers = {
     PostTags: PostTagsResolvers,
     PostTagsWarning: PostTagsWarningResolvers,
     EditedPostTag: EditedPostTagResolvers,
+    EditedPostTagWarning: EditedPostTagWarningResolvers,
     DuplicatePostTagError: DuplicatePostTagErrorResolvers,
     CreatePostTagsValidationError: CreatePostTagsValidationErrorResolvers,
     DeletePostTagsValidationError: DeletePostTagsValidationErrorResolvers,

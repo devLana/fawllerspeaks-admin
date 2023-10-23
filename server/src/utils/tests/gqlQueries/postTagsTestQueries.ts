@@ -94,6 +94,16 @@ export const EDIT_POST_TAG = `#graphql
         status
       }
 
+      ... on EditedPostTagWarning {
+        __typename
+        tag {
+          __typename
+          ...postTagFields
+        }
+        message
+        status
+      }
+
       ... on EditPostTagValidationError {
         __typename
         tagIdError

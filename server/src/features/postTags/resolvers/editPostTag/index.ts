@@ -1,15 +1,20 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import { EditedPostTag } from "./EditedPostTag";
-import { DuplicatePostTagError } from "../types";
-import { EditPostTagValidationError } from "./EditPostTagValidationError";
 import {
+  EditedPostTag,
+  EditedPostTagWarning,
+  EditPostTagValidationError,
+} from "./types";
+import { DuplicatePostTagError } from "../types";
+import {
+  AuthenticationError,
   NotAllowedError,
+  RegistrationError,
   UnknownError,
-  dateToISOString,
   generateErrorsObject,
 } from "@utils";
+import { formatTagName } from "@features/postTags/utils";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";
@@ -32,7 +37,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
   });
 
   try {
-    if (!user) return new NotAllowedError("Unable to edit post tag");
+    if (!user) return new AuthenticationError("Unable to edit post tag");
 
     const { name, tagId } = await schema.validateAsync(args, {
       abortEarly: false,
@@ -43,8 +48,12 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
       [user]
     );
 
-    if (findUser.length === 0 || !findUser[0].isRegistered) {
+    if (findUser.length === 0) {
       return new NotAllowedError("Unable to edit post tag");
+    }
+
+    if (!findUser[0].isRegistered) {
+      return new RegistrationError("Unable to edit post tag");
     }
 
     const { rows: findTagId } = await db.query<PostTag>(
@@ -59,21 +68,21 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
     );
 
     if (findTagId.length === 0) {
-      return new UnknownError("Unable to edit unknown post tag");
+      return new UnknownError(
+        "The post tag you are trying to edit does not exist"
+      );
     }
 
     const [tag] = findTagId;
 
-    if (tag.name === name)
-      return new EditedPostTag({
-        ...tag,
-        dateCreated: dateToISOString(tag.dateCreated),
-        lastModified: tag.lastModified
-          ? dateToISOString(tag.lastModified)
-          : tag.lastModified,
-      });
+    if (tag.name === name) {
+      return new EditedPostTagWarning(
+        tag,
+        "Post tag not updated. New post tag name is the same as the old one"
+      );
+    }
 
-    if (tag.name.toLowerCase() === name.toLowerCase()) {
+    if (formatTagName(tag.name) === formatTagName(name)) {
       const { rows: updateTag } = await db.query<PostTag>(
         `UPDATE post_tags
         SET name = $1, last_modified = $2
@@ -86,18 +95,14 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
         [name, new Date().toISOString(), tagId]
       );
 
-      return new EditedPostTag({
-        ...updateTag[0],
-        dateCreated: dateToISOString(updateTag[0].dateCreated),
-        lastModified: updateTag[0].lastModified
-          ? dateToISOString(updateTag[0].lastModified)
-          : updateTag[0].lastModified,
-      });
+      return new EditedPostTag(updateTag[0]);
     }
 
     const { rows: findTagName } = await db.query<{ name: string }>(
-      `SELECT name FROM post_tags WHERE lower(name) = $1`,
-      [name.toLowerCase()]
+      `SELECT name
+      FROM post_tags
+      WHERE lower(replace(replace(replace(name, '-', ''), ' ', ''), '_', '')) = $1`,
+      [formatTagName(name)]
     );
 
     if (findTagName.length > 0) {
@@ -123,13 +128,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
       [name, new Date().toISOString(), tagId]
     );
 
-    return new EditedPostTag({
-      ...updateTag[0],
-      dateCreated: dateToISOString(updateTag[0].dateCreated),
-      lastModified: updateTag[0].lastModified
-        ? dateToISOString(updateTag[0].lastModified)
-        : updateTag[0].lastModified,
-    });
+    return new EditedPostTag(updateTag[0]);
   } catch (err) {
     if (err instanceof ValidationError) {
       const { nameError, tagIdError } = generateErrorsObject(
