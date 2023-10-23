@@ -21,6 +21,7 @@ const CreatePostTagsInput = (props: CreatePostTagsInputProps) => {
     <Grid item xs={12} sm={numberOfInputs === 1 ? 12 : 6}>
       <TextField
         id={tag}
+        autoComplete="on"
         fullWidth
         label="Post Tag"
         {...register(tag)}

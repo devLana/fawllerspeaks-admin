@@ -113,9 +113,9 @@ describe("Post Tags Page", () => {
         expect(within(modal).getByRole("button", createTagBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
 
-        const alert = await screen.findAllByRole("alert");
-
-        expect(alert[1]).toHaveTextContent("Post tags created");
+        await expect(screen.findByRole("alert")).resolves.toHaveTextContent(
+          "Post tags created"
+        );
         expect(screen.getByText(create.tags[0])).toBeInTheDocument();
         expect(screen.getByText(create.tags[1])).toBeInTheDocument();
         expect(screen.getByText(create.tags[2])).toBeInTheDocument();
@@ -146,9 +146,9 @@ describe("Post Tags Page", () => {
         expect(within(modal).getByRole("button", createTagBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
 
-        const alert = await screen.findAllByRole("alert");
-
-        expect(alert[1]).toHaveTextContent(createMocks.warnCreate.message);
+        await expect(screen.findByRole("alert")).resolves.toHaveTextContent(
+          createMocks.warnCreate.message
+        );
         expect(screen.getByText(warnCreate.tags[0])).toBeInTheDocument();
         expect(screen.getByText(warnCreate.tags[3])).toBeInTheDocument();
         expect(modal).not.toBeInTheDocument();
