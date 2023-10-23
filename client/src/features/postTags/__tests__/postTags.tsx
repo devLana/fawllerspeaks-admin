@@ -6,12 +6,14 @@ import PostTags from "@pages/post-tags";
 import { renderTestUI } from "@utils/renderTestUI";
 import * as createMocks from "../utils/createPostTags.mocks";
 import { getAlerts, getRedirect, getTags } from "../utils/getPostTags.mocks";
+import * as editMocks from "../utils/editPostTag.mocks";
 
 describe("Post Tags Page", () => {
+  const cancelBtn = { name: /^cancel$/i };
+
   describe("Create post tags", () => {
     const createDialogBtn = { name: /^create post tags$/i };
     const dialog = { name: /^create new post tags$/i };
-    const cancelBtn = { name: /^cancel$/i };
     const textbox = { name: /^post tag$/i };
     const addMoreBtn = { name: /^add more$/i };
     const createTagBtn = { name: /^Create tags$/i };
@@ -198,6 +200,149 @@ describe("Post Tags Page", () => {
     });
   });
 
-  /** describe("Edit a post tag", () => {});*/
+  describe("Edit a post tag", () => {
+    const wrapper = new RegExp(`^${editMocks.tag} post tag container$`, "i");
+    const name = { name: new RegExp(`^${editMocks.tag} post tag$`, "i") };
+    const editMenuItem = { name: /^edit$/i };
+    const dialog = { name: /^edit post tag$/i };
+    const editBtn = { name: /^edit tag$/i };
+    const textbox = { name: /^post tag$/i };
+
+    describe("Form input client side validation", () => {
+      it("Input box should have an error if value is empty", async () => {
+        const { user } = renderTestUI(<PostTags />, editMocks.editMock.gql());
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+
+        await user.hover(screen.getByLabelText(wrapper));
+        await user.click(screen.getByRole("button", name));
+
+        const tagMenu = screen.getByRole("menu", name);
+        await user.click(within(tagMenu).getByRole("menuitem", editMenuItem));
+
+        const modal = screen.getByRole("dialog", dialog);
+        const inputBox = within(modal).getByRole("textbox", textbox);
+
+        await user.clear(inputBox);
+        await user.click(within(modal).getByRole("button", editBtn));
+
+        expect(inputBox).toHaveErrorMessage("Enter new post tag name");
+      });
+    });
+
+    describe("Edit post tag error object response should redirect the user to an authentication page", () => {
+      it.each(editMocks.registerTable)("%s", async (_, mock) => {
+        const { replace } = useRouter();
+        const { user } = renderTestUI(<PostTags />, mock.gql());
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+
+        await user.hover(screen.getByLabelText(wrapper));
+        await user.click(screen.getByRole("button", name));
+
+        const tagMenu = screen.getByRole("menu", name);
+        await user.click(within(tagMenu).getByRole("menuitem", editMenuItem));
+
+        const modal = screen.getByRole("dialog", dialog);
+        const inputBox = within(modal).getByRole("textbox", textbox);
+
+        await user.clear(inputBox);
+        await user.type(inputBox, mock.tag);
+        await user.click(within(modal).getByRole("button", editBtn));
+
+        expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+        expect(replace).toHaveBeenCalledWith(mock.path);
+        expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+      });
+    });
+
+    describe("Edit post tag response error should render an input box error", () => {
+      it.each(editMocks.validationTable)("%s", async (_, mock) => {
+        const { message } = mock;
+        const { user } = renderTestUI(<PostTags />, mock.gql());
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+
+        await user.hover(screen.getByLabelText(wrapper));
+        await user.click(screen.getByRole("button", name));
+
+        const tagMenu = screen.getByRole("menu", name);
+        await user.click(within(tagMenu).getByRole("menuitem", editMenuItem));
+
+        const modal = screen.getByRole("dialog", dialog);
+        const inputBox = within(modal).getByRole("textbox", textbox);
+
+        await user.clear(inputBox);
+        await user.type(inputBox, mock.tag);
+        await user.click(within(modal).getByRole("button", editBtn));
+
+        expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+        await waitFor(() => expect(inputBox).toHaveErrorMessage(message));
+        expect(within(modal).getByRole("button", editBtn)).toBeEnabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeEnabled();
+      });
+    });
+
+    describe("Edit post tag response renders a notification alert message", () => {
+      it.each(editMocks.alertsTable)("%s", async (_, mock) => {
+        const { user } = renderTestUI(<PostTags />, mock.gql());
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+
+        await user.hover(screen.getByLabelText(wrapper));
+        await user.click(screen.getByRole("button", name));
+
+        const tagMenu = screen.getByRole("menu", name);
+        await user.click(within(tagMenu).getByRole("menuitem", editMenuItem));
+
+        const modal = screen.getByRole("dialog", dialog);
+        const inputBox = within(modal).getByRole("textbox", textbox);
+
+        await user.clear(inputBox);
+        await user.type(inputBox, mock.tag);
+        await user.click(within(modal).getByRole("button", editBtn));
+
+        expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(mock.message);
+        expect(within(modal).getByRole("button", editBtn)).toBeEnabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeEnabled();
+      });
+    });
+
+    describe("Edit post tag success response", () => {
+      it("Should edit the post tag", async () => {
+        const { user } = renderTestUI(<PostTags />, editMocks.edit.gql());
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+
+        await user.hover(screen.getByLabelText(wrapper));
+        await user.click(screen.getByRole("button", name));
+
+        const tagMenu = screen.getByRole("menu", name);
+        await user.click(within(tagMenu).getByRole("menuitem", editMenuItem));
+
+        const modal = screen.getByRole("dialog", dialog);
+        const inputBox = within(modal).getByRole("textbox", textbox);
+
+        await user.clear(inputBox);
+        await user.type(inputBox, editMocks.edit.tag);
+        await user.click(within(modal).getByRole("button", editBtn));
+
+        expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent("Post tag edited");
+        expect(modal).not.toBeInTheDocument();
+        expect(screen.getByText(editMocks.edit.tag)).toBeInTheDocument();
+      });
+    });
+  });
+
   /** describe("Delete post tags", () => {});*/
 });

@@ -15,6 +15,7 @@ export const BaseResponse = [
   "PostsWarning",
   "DuplicatePostTagError",
   "PostTagsWarning",
+  "EditedPostTagWarning",
 ];
 
 export const UserData = [
