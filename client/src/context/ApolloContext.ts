@@ -4,6 +4,7 @@ interface ApolloContextValues {
   jwt: string;
   handleAuthHeader: (jwt: string) => void;
 }
+
 type ApolloContextValue = ApolloContextValues | null;
 
 export const ApolloContext = React.createContext<ApolloContextValue>(null);

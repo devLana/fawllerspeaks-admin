@@ -77,7 +77,11 @@ const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
   };
 
   return (
-    <Dialog open={isOpen} aria-labelledby="logout-dialog-title">
+    <Dialog
+      open={isOpen}
+      onClose={status === "loading" ? undefined : onClick}
+      aria-labelledby="logout-dialog-title"
+    >
       <DialogTitle id="logout-dialog-title" sx={{ textAlign: "center" }}>
         Logout of your account
       </DialogTitle>

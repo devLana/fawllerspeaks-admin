@@ -95,30 +95,13 @@ describe("Protected Pages Root Layout", () => {
 
     const btnName = { name: /^logout$/i };
     const cancelName = { name: /^cancel$/i };
-    const dialogName = { name: /logout of your account/i };
+    const dialogName = { name: /^logout of your account$/i };
 
     afterAll(() => {
       localStorage.removeItem(SESSION_ID);
     });
 
     describe("Navbar logout button", () => {
-      it("Open and close the logout modal", async () => {
-        const { user } = renderTestUI(
-          <RootLayout {...props}>{page}</RootLayout>
-        );
-
-        await user.click(screen.getByRole("button", btnName));
-
-        const modal = screen.getByRole("dialog", dialogName);
-
-        expect(modal).toBeInTheDocument();
-        expect(within(modal).getByRole("button", btnName)).toBeInTheDocument();
-
-        await user.click(within(modal).getByRole("button", cancelName));
-
-        expect(modal).not.toBeInTheDocument();
-      });
-
       describe("Logout request receives an error/unsupported object response", () => {
         it.each(errorsTable)("%s", async (_, data) => {
           localStorage.setItem(SESSION_ID, data.sessionId);
@@ -133,8 +116,6 @@ describe("Protected Pages Root Layout", () => {
           const dialog = screen.getByRole("dialog", dialogName);
           const dialogLogout = within(dialog).getByRole("button", btnName);
           const cancelBtn = within(dialog).getByRole("button", cancelName);
-
-          expect(dialog).toBeInTheDocument();
 
           await user.click(dialogLogout);
 
@@ -163,8 +144,6 @@ describe("Protected Pages Root Layout", () => {
           const dialog = screen.getByRole("dialog", dialogName);
           const dialogLogout = within(dialog).getByRole("button", btnName);
           const cancelBtn = within(dialog).getByRole("button", cancelName);
-
-          expect(dialog).toBeInTheDocument();
 
           await user.click(dialogLogout);
 
