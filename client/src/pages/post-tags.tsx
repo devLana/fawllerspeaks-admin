@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import RootLayout from "@layouts/RootLayout";
+import { PostTagsContext } from "@features/postTags/context/PostTagsContext";
 import CreatePostTags from "@features/postTags/CreatePostTags";
 import GetPostTags from "@features/postTags/GetPostTags";
 import uiLayout from "@utils/uiLayout";
@@ -12,16 +13,14 @@ import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 
 const PostTags: NextPageWithLayout = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [message, setMessage] = React.useState("");
+  const [alert, setAlert] = React.useState({ open: false, message: "" });
 
-  const handleOpenSnackbar = (msg: string) => {
-    setMessage(msg);
-    setIsOpen(true);
+  const handleOpenAlert = (message: string) => {
+    setAlert({ open: true, message });
   };
 
   return (
-    <>
+    <PostTagsContext.Provider value={{ handleOpenAlert }}>
       <Stack
         direction="row"
         flexWrap="wrap"
@@ -33,15 +32,15 @@ const PostTags: NextPageWithLayout = () => {
         <Typography variant="h1">
           Use post tags to categorize blog posts
         </Typography>
-        <CreatePostTags onOpenSnackbar={handleOpenSnackbar} />
+        <CreatePostTags />
       </Stack>
       <GetPostTags />
       <Snackbar
-        message={message}
-        open={isOpen}
-        onClose={handleCloseAlert<boolean>(false, setIsOpen)}
+        message={alert.message}
+        open={alert.open}
+        onClose={handleCloseAlert({ ...alert, open: false }, setAlert)}
       />
-    </>
+    </PostTagsContext.Provider>
   );
 };
 

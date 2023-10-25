@@ -25,7 +25,7 @@ const GetPostTags = () => {
   if (!data) {
     const text =
       "No post tags found. Click on 'Create Post Tags' above to get started";
-    return <PostTagsTextContent severity="info" id={id} text={text} />;
+    return <PostTagsTextContent id={id} text={text} />;
   }
 
   switch (data.getPostTags.__typename) {
@@ -47,13 +47,13 @@ const GetPostTags = () => {
       if (data.getPostTags.tags.length === 0) {
         const text =
           "No post tags have been created yet. Click on 'Create Post Tags' above to get started";
-        return <PostTagsTextContent severity="info" id={id} text={text} />;
+        return <PostTagsTextContent id={id} text={text} />;
       }
 
       return <Tags id={id} tags={data.getPostTags.tags} />;
 
     default:
-      return <PostTagsTextContent severity="info" id={id} text={msg} />;
+      return <PostTagsTextContent id={id} text={msg} />;
   }
 };
 

@@ -7,28 +7,28 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 interface TagMenuProps {
-  tagId: string;
-  tagName: string;
-  onEditPostTag: (tagName: string, tagId: string) => void;
+  id: string;
+  name: string;
+  onOpenEdit: (tagName: string, tagId: string) => void;
 }
 
-const TagMenu = ({ tagId, tagName, onEditPostTag }: TagMenuProps) => {
+const TagMenu = ({ id, name, onOpenEdit }: TagMenuProps) => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
 
-  const handleClick = (name: string, id: string) => {
-    onEditPostTag(name, id);
+  const handleEdit = (tagName: string, tagId: string) => {
+    onOpenEdit(tagName, tagId);
     setAnchor(null);
   };
 
   const isOpen = !!anchor;
-  const idName = tagName.replace(" ", "-");
+  const idName = name.replace(/[\s_.]/g, "-");
 
   return (
     <>
       <IconButton
         id={`${idName}-post-tag-btn`}
         size="small"
-        aria-label={`${tagName} post tag`}
+        aria-label={`${name} post tag`}
         aria-controls={isOpen ? `${idName}-post-tag-menu` : undefined}
         aria-haspopup="true"
         aria-expanded={isOpen || undefined}
@@ -54,7 +54,7 @@ const TagMenu = ({ tagId, tagName, onEditPostTag }: TagMenuProps) => {
         <MenuItem
           sx={{ columnGap: 3 }}
           aria-haspopup="dialog"
-          onClick={() => handleClick(tagName, tagId)}
+          onClick={() => handleEdit(name, id)}
         >
           <ModeEditIcon fontSize="small" /> Edit
         </MenuItem>

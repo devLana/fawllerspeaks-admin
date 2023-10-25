@@ -10,6 +10,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
+import { usePostTags } from "@features/postTags/context/PostTagsContext";
 import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
 import { editPostTagValidator } from "../utils/editPostTagValidator";
 import { refetchQueries } from "../utils/refetchQueries";
@@ -22,14 +23,12 @@ interface EditPostTagFormProps {
   name: string;
   id: string;
   status: "idle" | "submitting";
-  onCloseDialog: () => void;
-  onOpenAlert: (message: string) => void;
+  onCloseEdit: () => void;
   onStatusChange: (nextStatus: "idle" | "submitting") => void;
 }
 
 const EditPostTagForm = (props: EditPostTagFormProps) => {
-  const { name, id, status, onCloseDialog, onStatusChange, onOpenAlert } =
-    props;
+  const { name, id, status, onCloseEdit, onStatusChange } = props;
 
   const [alertIsOpen, setAlertIsOpen] = React.useState(false);
   const router = useRouter();
@@ -45,6 +44,8 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
     resolver: yupResolver(editPostTagValidator),
     defaultValues: { name },
   });
+
+  const { handleOpenAlert } = usePostTags();
 
   const submitHandler = async (values: OmitTagId) => {
     onStatusChange("submitting");
@@ -78,10 +79,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
           const { nameError, tagIdError } = editData.editPostTag;
           const focus = { shouldFocus: true };
 
-          if (tagIdError) {
-            onStatusChange("idle");
-            setAlertIsOpen(true);
-          }
+          if (tagIdError) setAlertIsOpen(true);
 
           if (nameError) setError("name", { message: nameError }, focus);
 
@@ -106,8 +104,9 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
           break;
 
         case "EditedPostTag":
-          onOpenAlert("Post tag edited");
-          onCloseDialog();
+          handleOpenAlert("Post tag edited");
+          onStatusChange("idle");
+          onCloseEdit();
       }
     }
   };
@@ -149,7 +148,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
           }}
         />
         <Stack direction="row" justifyContent="center" mt={3} columnGap={2}>
-          <Button onClick={onCloseDialog} disabled={status === "submitting"}>
+          <Button onClick={onCloseEdit} disabled={status === "submitting"}>
             Cancel
           </Button>
           <LoadingButton

@@ -9,18 +9,16 @@ interface EditPostTagProps {
   open: boolean;
   name: string;
   id: string;
-  onCloseDialog: () => void;
-  onOpenAlert: (message: string) => void;
+  onCloseEdit: () => void;
 }
 
-const EditPostTag = (props: EditPostTagProps) => {
-  const { open, name, id, onCloseDialog, onOpenAlert } = props;
+const EditPostTag = ({ open, name, id, onCloseEdit }: EditPostTagProps) => {
   const [status, setStatus] = React.useState<Status>("idle");
 
   return (
     <PostTagsDialog
       open={open}
-      onClose={status === "submitting" ? undefined : onCloseDialog}
+      onClose={status === "submitting" ? undefined : onCloseEdit}
       title="Edit post tag"
       contentText={`Edit post tag "${name}"`}
       fullWidth
@@ -30,9 +28,8 @@ const EditPostTag = (props: EditPostTagProps) => {
         name={name}
         id={id}
         status={status}
-        onCloseDialog={onCloseDialog}
-        onOpenAlert={onOpenAlert}
-        onStatusChange={(nextStatus: Status) => setStatus(nextStatus)}
+        onCloseEdit={onCloseEdit}
+        onStatusChange={(newStatus: Status) => setStatus(newStatus)}
       />
     </PostTagsDialog>
   );

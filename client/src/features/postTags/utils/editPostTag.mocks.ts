@@ -165,7 +165,7 @@ const graphql = {
 };
 
 const warning = {
-  tag: "warning tag name",
+  tag,
   message: "New post tag name same as old one",
   gql(): MockedResponse[] {
     return [
@@ -188,6 +188,10 @@ const warning = {
 
 export const alertsTable: [string, Mocks][] = [
   [
+    "Should display a notification alert message if the new post name is the same as the old post tag name",
+    warning,
+  ],
+  [
     "Should display a notification alert message if the provided post tag id validation failed",
     { ...validation2, message: validation2.tagIdError },
   ],
@@ -198,10 +202,6 @@ export const alertsTable: [string, Mocks][] = [
   [
     "Should display a notification alert message if the response is an unsupported object type",
     unsupported,
-  ],
-  [
-    "Should display a notification alert message if the new post name is the same as the old post tag name",
-    warning,
   ],
   [
     "Should display a notification alert message if the response is a graphql error",

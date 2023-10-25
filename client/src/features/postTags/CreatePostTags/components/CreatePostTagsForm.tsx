@@ -11,7 +11,7 @@ import Stack from "@mui/material/Stack";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import PostTagsDialog from "../../components/PostTagsDialog";
+import { usePostTags } from "../../context/PostTagsContext";
 import CreatePostTagsInput from "./CreatePostTagsInput";
 import { createPostTagsValidator } from "../utils/createPostTagsValidator";
 import { refetchQueries } from "../utils/refetchQueries";
@@ -19,16 +19,15 @@ import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 
 interface CreatePostTagsFormProps {
-  isOpen: boolean;
   onCloseDialog: () => void;
-  onOpenSnackbar: (message: string) => void;
+  onStatusChange: (newStatus: "idle" | "submitting") => void;
+  status: "idle" | "submitting";
 }
 
-const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
-  const { isOpen, onCloseDialog, onOpenSnackbar } = props;
+const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
+  const { status, onStatusChange, onCloseDialog } = props;
 
   const [inputs, setInputs] = React.useState([1]);
-  const [status, setStatus] = React.useState<"idle" | "submitting">("idle");
   const [alertIsOpen, setAlertIsOpen] = React.useState(false);
   const router = useRouter();
 
@@ -43,6 +42,8 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
     resolver: yupResolver(createPostTagsValidator(inputs)),
   });
 
+  const { handleOpenAlert } = usePostTags();
+
   const handleAddMore = () => {
     const lastInputValue = inputs.at(-1) ?? 0;
     setInputs([...inputs, lastInputValue + 1]);
@@ -54,12 +55,12 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
   };
 
   const submitHandler = async (values: Record<string, string>) => {
-    setStatus("submitting");
+    onStatusChange("submitting");
 
     const { data: createData } = await create({
       variables: { tags: Object.values(values) },
       onError() {
-        setStatus("idle");
+        onStatusChange("idle");
         setAlertIsOpen(true);
       },
       refetchQueries,
@@ -84,18 +85,18 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
         case "CreatePostTagsValidationError":
         case "DuplicatePostTagError":
         default:
-          setStatus("idle");
+          onStatusChange("idle");
           setAlertIsOpen(true);
           break;
 
         case "PostTagsWarning":
           onCloseDialog();
-          onOpenSnackbar(createData.createPostTags.message);
+          handleOpenAlert(createData.createPostTags.message);
           break;
 
         case "PostTags":
           onCloseDialog();
-          onOpenSnackbar("Post tags created");
+          handleOpenAlert("Post tags created");
           break;
       }
     }
@@ -113,13 +114,7 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
   }
 
   return (
-    <PostTagsDialog
-      open={isOpen}
-      onClose={status === "submitting" ? undefined : onCloseDialog}
-      title="Create new post tags"
-      contentText="You can create up to 10 post tags at a time."
-      fullWidth
-    >
+    <>
       <form onSubmit={handleSubmit(submitHandler)}>
         <Grid container rowSpacing={3} columnSpacing={2} mb={2}>
           {inputs.map(value => (
@@ -158,8 +153,8 @@ const CreatePostTagsDialog = (props: CreatePostTagsFormProps) => {
         open={alertIsOpen}
         onClose={handleCloseAlert<boolean>(false, setAlertIsOpen)}
       />
-    </PostTagsDialog>
+    </>
   );
 };
 
-export default CreatePostTagsDialog;
+export default CreatePostTagsForm;

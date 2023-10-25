@@ -4,15 +4,17 @@ import PostTagsWrapper from "./PostTagsWrapper";
 interface PostTagsTextContentProps {
   id: string;
   text: string;
-  severity: AlertColor;
+  severity?: AlertColor;
 }
 
 const PostTagsTextContent = (props: PostTagsTextContentProps) => {
-  const { id, text, severity } = props;
+  const { id, text, severity = "info" } = props;
 
   return (
     <PostTagsWrapper id={id}>
-      <Alert severity={severity}>{text}</Alert>
+      <Alert aria-busy={false} severity={severity}>
+        {text}
+      </Alert>
     </PostTagsWrapper>
   );
 };
