@@ -2,6 +2,7 @@ import * as React from "react";
 
 import PostTagsDialog from "../components/PostTagsDialog";
 import EditPostTagForm from "./components/EditPostTagForm";
+import EditPostTagDescription from "./components/EditPostTagDescription";
 
 type Status = "idle" | "submitting";
 
@@ -20,7 +21,7 @@ const EditPostTag = ({ open, name, id, onCloseEdit }: EditPostTagProps) => {
       open={open}
       onClose={status === "submitting" ? undefined : onCloseEdit}
       title="Edit post tag"
-      contentText={`Edit post tag "${name}"`}
+      contentText={<EditPostTagDescription name={name} />}
       fullWidth
       maxWidth="xs"
     >

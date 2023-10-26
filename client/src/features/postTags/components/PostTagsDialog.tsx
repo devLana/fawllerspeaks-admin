@@ -8,7 +8,7 @@ type OmitDialogProps = Omit<DialogProps, Keys>;
 
 interface PostTagsDialogProps extends OmitDialogProps {
   title: string;
-  contentText: string;
+  contentText: string | React.ReactElement;
 }
 
 const PostTagsDialog = (props: PostTagsDialogProps) => {
