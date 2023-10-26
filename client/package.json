@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "codegen": "graphql-codegen",
+    "codegen:remove": "cd src/types/api && rm index.ts gql.ts fragment-masking.ts",
+    "codegen": "graphql-codegen && npm run codegen:remove",
     "codegen:watch": "graphql-codegen -w",
     "compile:dev": "npm run codegen && next dev -p 4040",
     "dev": "next dev -p 4040",
