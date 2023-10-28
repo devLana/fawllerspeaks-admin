@@ -50,7 +50,7 @@ const GetPostTags = () => {
         return <PostTagsTextContent id={id} text={text} />;
       }
 
-      return <Tags id={id} tags={data.getPostTags.tags} />;
+      return <Tags id={id} />;
 
     default:
       return <PostTagsTextContent id={id} text={msg} />;
