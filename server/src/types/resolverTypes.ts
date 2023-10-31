@@ -80,7 +80,7 @@ export type CreatePostValidationError = {
 
 export type CreateUser = EmailValidationError | NotAllowedError | Response | ServerError;
 
-export type DeletePostTags = DeletePostTagsValidationError | NotAllowedError | PostTags | PostTagsWarning | UnknownError;
+export type DeletePostTags = AuthenticationError | DeletePostTagsValidationError | NotAllowedError | PostTags | PostTagsWarning | RegistrationError | UnknownError;
 
 export type DeletePostTagsValidationError = {
   __typename?: 'DeletePostTagsValidationError';
@@ -709,7 +709,7 @@ export type ResolversTypes = ResolversObject<{
   CreatePostTagsValidationError: ResolverTypeWrapper<CreatePostTagsValidationError>;
   CreatePostValidationError: ResolverTypeWrapper<CreatePostValidationError>;
   CreateUser: ResolversTypes['EmailValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['Response'] | ResolversTypes['ServerError'];
-  DeletePostTags: ResolversTypes['DeletePostTagsValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['PostTags'] | ResolversTypes['PostTagsWarning'] | ResolversTypes['UnknownError'];
+  DeletePostTags: ResolversTypes['AuthenticationError'] | ResolversTypes['DeletePostTagsValidationError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['PostTags'] | ResolversTypes['PostTagsWarning'] | ResolversTypes['RegistrationError'] | ResolversTypes['UnknownError'];
   DeletePostTagsValidationError: ResolverTypeWrapper<DeletePostTagsValidationError>;
   DraftPostInput: DraftPostInput;
   Draft_Edit: ResolversTypes['DuplicatePostTitleError'] | ResolversTypes['NotAllowedError'] | ResolversTypes['NotAllowedPostActionError'] | ResolversTypes['PostValidationError'] | ResolversTypes['SinglePost'] | ResolversTypes['UnauthorizedAuthorError'] | ResolversTypes['UnknownError'];
@@ -794,7 +794,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreatePostTagsValidationError: CreatePostTagsValidationError;
   CreatePostValidationError: CreatePostValidationError;
   CreateUser: ResolversParentTypes['EmailValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['Response'] | ResolversParentTypes['ServerError'];
-  DeletePostTags: ResolversParentTypes['DeletePostTagsValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostTags'] | ResolversParentTypes['PostTagsWarning'] | ResolversParentTypes['UnknownError'];
+  DeletePostTags: ResolversParentTypes['AuthenticationError'] | ResolversParentTypes['DeletePostTagsValidationError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['PostTags'] | ResolversParentTypes['PostTagsWarning'] | ResolversParentTypes['RegistrationError'] | ResolversParentTypes['UnknownError'];
   DeletePostTagsValidationError: DeletePostTagsValidationError;
   DraftPostInput: DraftPostInput;
   Draft_Edit: ResolversParentTypes['DuplicatePostTitleError'] | ResolversParentTypes['NotAllowedError'] | ResolversParentTypes['NotAllowedPostActionError'] | ResolversParentTypes['PostValidationError'] | ResolversParentTypes['SinglePost'] | ResolversParentTypes['UnauthorizedAuthorError'] | ResolversParentTypes['UnknownError'];
@@ -930,7 +930,7 @@ export type CreateUserResolvers<ContextType = APIContext, ParentType extends Res
 }>;
 
 export type DeletePostTagsResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['DeletePostTags'] = ResolversParentTypes['DeletePostTags']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'DeletePostTagsValidationError' | 'NotAllowedError' | 'PostTags' | 'PostTagsWarning' | 'UnknownError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'DeletePostTagsValidationError' | 'NotAllowedError' | 'PostTags' | 'PostTagsWarning' | 'RegistrationError' | 'UnknownError', ParentType, ContextType>;
 }>;
 
 export type DeletePostTagsValidationErrorResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['DeletePostTagsValidationError'] = ResolversParentTypes['DeletePostTagsValidationError']> = ResolversObject<{

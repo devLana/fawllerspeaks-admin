@@ -16,8 +16,8 @@ import {
   EditPostTagValidationErrorResolvers,
 } from "./editPostTag/types";
 
-import { CreatePostTagsValidationErrorResolvers } from "./createPostTags/types/CreatePostTagsValidationError";
-import { DeletePostTagsValidationErrorResolvers } from "./deletePostTags/DeletePostTagsValidationError";
+import { CreatePostTagsValidationErrorResolvers } from "./createPostTags/types";
+import { DeletePostTagsValidationErrorResolvers } from "./deletePostTags/types";
 
 import type {
   QueryResolvers,

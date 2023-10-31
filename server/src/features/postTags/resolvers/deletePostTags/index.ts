@@ -1,12 +1,18 @@
-import { Worker } from "node:worker_threads";
-import path from "node:path";
+// import { Worker } from "node:worker_threads";
+// import path from "node:path";
+
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
 // import deletePostTagsWorker from "./deletePostTagsWorker";
 import { PostTags, PostTagsWarning } from "../types";
-import { DeletePostTagsValidationError } from "./DeletePostTagsValidationError";
-import { NotAllowedError, UnknownError, dateToISOString } from "@utils";
+import { DeletePostTagsValidationError } from "./types/DeletePostTagsValidationError";
+import {
+  AuthenticationError,
+  NotAllowedError,
+  RegistrationError,
+  UnknownError,
+} from "@utils";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -18,24 +24,24 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
     .required()
     .items(
       Joi.string().trim().guid({ version: "uuidv4", separator: "-" }).messages({
-        "string.empty": "Input tags cannot contain empty values",
+        "string.empty": "Input tag ids cannot be empty strings",
         "string.guid": "Invalid post tag id",
       })
     )
     .min(1)
-    .max(10)
     .unique()
     .messages({
-      "array.max": "Input tags can only contain at most {{#limit}} tags",
-      "array.min": "No post tags were provided",
-      "array.unique": "Input tags can only contain unique tag ids",
+      "array.min": "No post tag provided",
+      "array.unique": "No duplicate tags allowed. Input tag ids must be unique",
       "array.base": "Post tags input must be an array",
     });
 
   const tagOrTags = tagIds.length > 1 ? "tags" : "tag";
 
   try {
-    if (!user) return new NotAllowedError(`Unable to delete post ${tagOrTags}`);
+    if (!user) {
+      return new AuthenticationError(`Unable to delete post ${tagOrTags}`);
+    }
 
     const validatedTagIds = await schema.validateAsync(tagIds, {
       abortEarly: false,
@@ -46,11 +52,15 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
       [user]
     );
 
-    if (findUser.length === 0 || !findUser[0].isRegistered) {
+    if (findUser.length === 0) {
       return new NotAllowedError(`Unable to delete post ${tagOrTags}`);
     }
 
-    let { rows: deletedTags } = await db.query<PostTag>(
+    if (!findUser[0].isRegistered) {
+      return new RegistrationError(`Unable to delete post ${tagOrTags}`);
+    }
+
+    const { rows: deletedTags } = await db.query<PostTag>(
       `DELETE FROM post_tags WHERE
         tag_id = ANY ($1)
       RETURNING
@@ -61,25 +71,17 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
       [validatedTagIds]
     );
 
-    deletedTags = deletedTags.map(tag => ({
-      ...tag,
-      dateCreated: dateToISOString(tag.dateCreated),
-      lastModified: tag.lastModified
-        ? dateToISOString(tag.lastModified)
-        : tag.lastModified,
-    }));
-
-    // On a new thread delete from a post's tags, every tag in deletedTags
-    if (deletedTags.length > 0) {
-      // deletePostTagsWorker(deletedTags);
-      const worker = new Worker(
-        path.join(__dirname, "deletePostTagsWorker.ts")
-      );
-      worker.postMessage(deletedTags);
-      worker.on("error", err => {
-        console.log("Delete post tags worker thread error", err);
-      });
-    }
+    // Set up an event or worker to delete each deleted post tag from every post they were assigned to
+    // if (deletedTags.length > 0) {
+    //   // deletePostTagsWorker(deletedTags);
+    //   const worker = new Worker(
+    //     path.join(__dirname, "deletePostTagsWorker.ts")
+    //   );
+    //   worker.postMessage(deletedTags);
+    //   worker.on("error", err => {
+    //     console.log("Delete post tags worker thread error", err);
+    //   });
+    // }
 
     const set = new Set<string>();
     const notDeletedTags: string[] = [];
@@ -94,25 +96,24 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
     }
 
     if (notDeletedTags.length > 0) {
-      const notDeletedTagOrTags = notDeletedTags.length > 1 ? "tags" : "tag";
+      const _tagOrTags = notDeletedTags.length > 1 ? "tags" : "tag";
 
       if (deletedTags.length === 0) {
         return new UnknownError(
-          `The provided post ${notDeletedTagOrTags} could not be deleted`
+          `The provided post ${_tagOrTags} could not be deleted`
         );
       }
 
       const [{ name }] = deletedTags;
       const remainingTags = deletedTags.length - 1;
-      const deletedTagOrTags = remainingTags > 1 ? "tags" : "tag";
+      const __tagOrTags = remainingTags > 1 ? "tags" : "tag";
 
       const msg =
         remainingTags === 0
           ? `${name} deleted`
-          : `${name} and ${remainingTags} other post ${deletedTagOrTags} deleted`;
+          : `${name} and ${remainingTags} other post ${__tagOrTags} deleted`;
 
-      const message = `${msg}. ${notDeletedTags.length} post ${notDeletedTagOrTags} could not be deleted`;
-
+      const message = `${msg}. ${notDeletedTags.length} post ${_tagOrTags} could not be deleted`;
       return new PostTagsWarning(deletedTags, message);
     }
 
