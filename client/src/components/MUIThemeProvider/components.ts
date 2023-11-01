@@ -100,4 +100,5 @@ export const components: Components = {
       transitionDuration: { enter: 220, exit: 100 },
     },
   },
+  MuiAlert: { styleOverrides: { root: { display: "inline-flex" } } },
 };
