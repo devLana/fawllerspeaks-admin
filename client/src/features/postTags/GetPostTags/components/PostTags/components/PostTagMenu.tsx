@@ -5,23 +5,26 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
 
-interface TagMenuProps {
+interface PostTagMenuProps {
   id: string;
   name: string;
+  idName: string;
   onOpenEdit: (tagName: string, tagId: string) => void;
+  onOpenDelete: (name: string, id: string) => void;
 }
 
-const TagMenu = ({ id, name, onOpenEdit }: TagMenuProps) => {
+const PostTagMenu = (props: PostTagMenuProps) => {
+  const { id, name, idName, onOpenEdit, onOpenDelete } = props;
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
 
-  const handleEdit = (tagName: string, tagId: string) => {
-    onOpenEdit(tagName, tagId);
+  const handleAction = (cb: (...args: unknown[]) => void) => () => {
+    cb();
     setAnchor(null);
   };
 
   const isOpen = !!anchor;
-  const idName = name.replace(/[\s_.]/g, "-");
 
   return (
     <>
@@ -49,17 +52,27 @@ const TagMenu = ({ id, name, onOpenEdit }: TagMenuProps) => {
         MenuListProps={{ "aria-labelledby": `${idName}-post-tag-btn` }}
         onClose={() => setAnchor(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <MenuItem
+          dense
           sx={{ columnGap: 3 }}
           aria-haspopup="dialog"
-          onClick={() => handleEdit(name, id)}
+          onClick={handleAction(() => onOpenEdit(name, id))}
         >
           <ModeEditIcon fontSize="small" /> Edit
+        </MenuItem>
+        <MenuItem
+          dense
+          sx={{ columnGap: 3, color: "error.main" }}
+          aria-haspopup="dialog"
+          onClick={handleAction(() => onOpenDelete(name, id))}
+        >
+          <DeleteForeverRoundedIcon color="error" fontSize="small" /> Delete
         </MenuItem>
       </Menu>
     </>
   );
 };
-export default TagMenu;
+
+export default PostTagMenu;

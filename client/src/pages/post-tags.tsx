@@ -12,7 +12,7 @@ import uiLayout from "@utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 
-const PostTags: NextPageWithLayout = () => {
+const PostTagsPage: NextPageWithLayout = () => {
   const [alert, setAlert] = React.useState({ open: false, message: "" });
 
   const handleOpenAlert = (message: string) => {
@@ -44,6 +44,6 @@ const PostTags: NextPageWithLayout = () => {
   );
 };
 
-PostTags.layout = uiLayout(RootLayout, { title: "Blog Post Tags" });
+PostTagsPage.layout = uiLayout(RootLayout, { title: "Blog Post Tags" });
 
-export default PostTags;
+export default PostTagsPage;

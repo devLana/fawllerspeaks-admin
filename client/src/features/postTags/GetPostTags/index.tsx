@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 
 import { useQuery } from "@apollo/client";
 
-import Tags from "./components/Tags";
+import PostTags from "./components/PostTags";
 import PostTagsLoading from "./components/PostTagsLoading";
 import PostTagsTextContent from "./components/PostTagsTextContent";
 import { GET_POST_TAGS } from "./operations/GET_POST_TAGS";
@@ -50,7 +50,7 @@ const GetPostTags = () => {
         return <PostTagsTextContent id={id} text={text} />;
       }
 
-      return <Tags id={id} />;
+      return <PostTags id={id} />;
 
     default:
       return <PostTagsTextContent id={id} text={msg} />;

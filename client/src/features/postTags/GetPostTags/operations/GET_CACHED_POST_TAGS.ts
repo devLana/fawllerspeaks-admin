@@ -1,17 +1,11 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
 import { POST_TAG_FIELDS } from "@fragments/PostTag";
-import type { PostTags, Query } from "@apiTypes";
+import type { CachePostTags } from "@types";
 
-type ExtractPostTags = Extract<Query["getPostTags"], PostTags>;
+type CachedPostTagsData = TypedDocumentNode<CachePostTags>;
 
-interface PostTagsData {
-  getPostTags: Omit<ExtractPostTags, "status" | "__typename">;
-}
-
-type CachedPostTags = TypedDocumentNode<PostTagsData>;
-
-export const GET_CACHED_POST_TAGS: CachedPostTags = gql`
+export const GET_CACHED_POST_TAGS: CachedPostTagsData = gql`
   ${POST_TAG_FIELDS}
   query GetCachedPostTags {
     getPostTags {
