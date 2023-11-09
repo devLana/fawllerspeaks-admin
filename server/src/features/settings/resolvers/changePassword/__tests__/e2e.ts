@@ -30,7 +30,6 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { Status } from "@resolverTypes";
 
 type ChangePassword = TestData<{ changePassword: Record<string, unknown> }>;
 
@@ -63,7 +62,7 @@ describe("Change password - E2E", () => {
   });
 
   describe("Verify user authentication", () => {
-    test("User is not logged in, Return an AuthenticationError response", async () => {
+    test("User is not logged in, Send an error response", async () => {
       const payload = { query: CHANGE_PASSWORD, variables: authCheck };
 
       const { data } = await post<ChangePassword>(url, payload);
@@ -74,7 +73,7 @@ describe("Change password - E2E", () => {
       expect(data.data?.changePassword).toStrictEqual({
         __typename: "AuthenticationError",
         message: "Unable to change password",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -103,13 +102,13 @@ describe("Change password - E2E", () => {
       expect(data.data?.changePassword).toStrictEqual({
         __typename: "ChangePasswordValidationError",
         ...errors,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify user registration status", () => {
-    test("Should return an error response for an unregistered user", async () => {
+    test("Should send an error response if the user is unregistered", async () => {
       const payload = { query: CHANGE_PASSWORD, variables: errorInput };
       const options = { authorization: `Bearer ${unRegisteredJWT}` };
 
@@ -121,13 +120,13 @@ describe("Change password - E2E", () => {
       expect(data.data?.changePassword).toStrictEqual({
         __typename: "RegistrationError",
         message: "Unable to change password",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify user's current password", () => {
-    test("Should return an error response if passwords do not match", async () => {
+    test("Should send an error response if the current password does not match the user's password", async () => {
       const payload = { query: CHANGE_PASSWORD, variables: errorInput };
       const options = { authorization: `Bearer ${registeredJWT}` };
 
@@ -139,13 +138,13 @@ describe("Change password - E2E", () => {
       expect(data.data?.changePassword).toStrictEqual({
         __typename: "NotAllowedError",
         message: "Unable to change password",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Change user password", () => {
-    test("Change password and send confirmation mail", async () => {
+    test("Should change the user's password and send a confirmation mail", async () => {
       const options = { authorization: `Bearer ${registeredJWT}` };
       const payload = {
         query: CHANGE_PASSWORD,
@@ -164,21 +163,19 @@ describe("Change password - E2E", () => {
       expect(data.data?.changePassword).toStrictEqual({
         __typename: "Response",
         message: "Password changed",
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
 
-    test("Sending confirmation mail fails, Revert update and send an error response", async () => {
+    test("Confirmation mail fails to send, Revert all updates and send an error response", async () => {
       const mock = changePasswordMail as jest.MockedFunction<() => never>;
       const options = { authorization: `Bearer ${registeredJWT}` };
-      const payload = {
-        query: CHANGE_PASSWORD,
-        variables: {
-          currentPassword: PASSWORD,
-          newPassword: "newPassW3!ord1@",
-          confirmNewPassword: "newPassW3!ord1@",
-        },
+      const variables = {
+        currentPassword: PASSWORD,
+        newPassword: "newPassW3!ord1@",
+        confirmNewPassword: "newPassW3!ord1@",
       };
+      const payload = { query: CHANGE_PASSWORD, variables };
 
       mock.mockImplementation(() => {
         throw new MailError("Unable to send mail");
@@ -194,7 +191,7 @@ describe("Change password - E2E", () => {
       expect(data.data?.changePassword).toStrictEqual({
         __typename: "ServerError",
         message: "Unable to send mail",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });

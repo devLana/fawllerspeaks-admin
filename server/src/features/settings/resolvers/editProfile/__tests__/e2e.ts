@@ -28,7 +28,6 @@ import {
   edit,
 } from "../utils/editProfile.testUtils";
 
-import { Status } from "@resolverTypes";
 import type { APIContext, DbTestUser, TestData } from "@types";
 
 type EditProfile = TestData<{ editProfile: Record<string, unknown> }>;
@@ -69,7 +68,7 @@ describe("Edit user profile - E2E", () => {
   });
 
   describe("Verify user authentication", () => {
-    test("Should return an error response if user is logged out", async () => {
+    test("Should send an error response if the user is not logged in", async () => {
       const input = { firstName: "", lastName: "" };
       const payload = { query: EDIT_PROFILE, variables: input };
 
@@ -80,7 +79,7 @@ describe("Edit user profile - E2E", () => {
       expect(data.data?.editProfile).toStrictEqual({
         __typename: "AuthenticationError",
         message: "Unable to edit user profile",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -107,13 +106,13 @@ describe("Edit user profile - E2E", () => {
       expect(data.data?.editProfile).toStrictEqual({
         __typename: "EditProfileValidationError",
         ...errors,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify user registration status", () => {
-    test("Respond with an error if the user is unregistered", async () => {
+    test("Should respond with an error if the user is unregistered", async () => {
       const payload = { query: EDIT_PROFILE, variables };
       const options = { authorization: `Bearer ${unregisteredJwt}` };
 
@@ -124,7 +123,7 @@ describe("Edit user profile - E2E", () => {
       expect(data.data?.editProfile).toStrictEqual({
         __typename: "RegistrationError",
         message: "Unable to edit user profile",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -153,7 +152,7 @@ describe("Edit user profile - E2E", () => {
           isRegistered: mockUser.registered,
           dateCreated: user.dateCreated,
         },
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
   });

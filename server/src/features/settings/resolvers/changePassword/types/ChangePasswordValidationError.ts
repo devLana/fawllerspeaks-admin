@@ -1,10 +1,10 @@
-import {
-  type ChangePasswordValidationErrorResolvers as Resolvers,
-  type ChangePasswordValidationError as Errors,
+import type {
+  ChangePasswordValidationErrorResolvers as Resolvers,
+  ChangePasswordValidationError as ValidationErrors,
   Status,
 } from "@resolverTypes";
 
-export class ChangePasswordValidationError implements Errors {
+export class ChangePasswordValidationError implements ValidationErrors {
   readonly status: Status;
 
   constructor(
@@ -12,7 +12,7 @@ export class ChangePasswordValidationError implements Errors {
     readonly newPasswordError?: string,
     readonly confirmNewPasswordError?: string
   ) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

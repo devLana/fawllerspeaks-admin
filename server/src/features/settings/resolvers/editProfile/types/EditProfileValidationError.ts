@@ -1,6 +1,6 @@
-import {
-  type EditProfileValidationErrorResolvers as Resolvers,
-  type EditProfileValidationError as Errors,
+import type {
+  EditProfileValidationErrorResolvers as Resolvers,
+  EditProfileValidationError as Errors,
   Status,
 } from "@resolverTypes";
 
@@ -12,7 +12,7 @@ export class EditProfileValidationError implements Errors {
     readonly lastNameError?: string,
     readonly imageError?: string
   ) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

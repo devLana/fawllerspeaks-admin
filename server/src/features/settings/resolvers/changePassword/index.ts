@@ -1,9 +1,10 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
 import changePasswordMail from "./utils/changePasswordMail";
 import { ChangePasswordValidationError } from "./types";
+import { changePasswordValidator } from "./utils/changePassword.validator";
 import {
   AuthenticationError,
   MailError,
@@ -27,35 +28,14 @@ interface User {
 }
 
 const changePassword: ChangePassword = async (_, args, { db, user }) => {
-  const schema = Joi.object<typeof args>({
-    currentPassword: Joi.string().required().messages({
-      "string.empty": "Enter current password",
-    }),
-    newPassword: Joi.string()
-      .required()
-      .pattern(/\d+/)
-      .pattern(/[a-z]+/)
-      .pattern(/[A-Z]+/)
-      .pattern(/[^a-z\d]+/i)
-      .min(8)
-      .messages({
-        "string.empty": "Enter new password",
-        "string.pattern.base":
-          "New password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol",
-        "string.min": "New Password must be at least 8 characters long",
-      }),
-    confirmNewPassword: Joi.any()
-      .valid(Joi.ref("newPassword"))
-      .required()
-      .messages({ "any.only": "Passwords do not match" }),
-  });
+  if (!user) return new AuthenticationError("Unable to change password");
 
   let currentPassword: string | null = null;
 
   try {
-    if (!user) return new AuthenticationError("Unable to change password");
-
-    const validate = await schema.validateAsync(args, { abortEarly: false });
+    const validate = await changePasswordValidator.validateAsync(args, {
+      abortEarly: false,
+    });
     const { newPassword } = validate;
     ({ currentPassword } = validate);
 

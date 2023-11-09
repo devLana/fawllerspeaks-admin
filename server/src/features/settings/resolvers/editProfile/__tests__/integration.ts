@@ -33,7 +33,7 @@ describe("Test edit profile resolver", () => {
   });
 
   describe("Verify user authentication", () => {
-    test("Return an error response if user is not logged in", async () => {
+    test("Should return an error response if the user is not logged in", async () => {
       mockContext.user = null;
 
       const result = await editProfile({}, args, mockContext, info);
@@ -61,13 +61,12 @@ describe("Test edit profile resolver", () => {
 
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveReturnedWith({ rows: data });
-
       expect(result).toHaveProperty("message", "Unable to edit user profile");
       expect(result).toHaveProperty("status", "ERROR");
     });
   });
 
-  describe("Edit user data, Respond with updated user object", () => {
+  describe("Edit the user's profile data, Return updated user details", () => {
     test.each(editSuccess)("%s", async (_, input, image) => {
       const mock = [{ email: "test@mail.com", dateCreated, image }];
       const spy = spyDb({ rows: [{ isRegistered: true }] });
@@ -78,7 +77,6 @@ describe("Test edit profile resolver", () => {
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
       expect(spy).toHaveNthReturnedWith(2, { rows: mock });
-
       expect(data).toHaveProperty("user.id", "insane_user_id");
       expect(data).toHaveProperty("user.email", "test@mail.com");
       expect(data).toHaveProperty("user.firstName", args.firstName);

@@ -1,14 +1,12 @@
 import type { InputErrors } from "@types";
 
 interface GQL {
-  [key: string]: unknown;
   currentPassword: number | null;
   newPassword: boolean | undefined;
   confirmNewPassword: [] | null;
 }
 
 interface Input {
-  [key: string]: unknown;
   currentPassword: string;
   newPassword: string;
   confirmNewPassword: string;
@@ -17,7 +15,6 @@ interface Input {
 type Validations = [string, Input, InputErrors<Input>][];
 
 interface VerifyUser {
-  [key: string]: unknown;
   isRegistered: boolean;
   password: string;
 }
@@ -32,18 +29,18 @@ export const authCheck = {
 
 export const gqlValidation: [string, GQL][] = [
   [
-    "Should throw graphql validation error for null and undefined input values",
+    "Should throw a graphql validation error for null and undefined input values",
     { currentPassword: null, newPassword: undefined, confirmNewPassword: null },
   ],
   [
-    "Should throw graphql validation error for number and boolean input values",
+    "Should throw a graphql validation error for number and boolean input values",
     { currentPassword: 576, newPassword: false, confirmNewPassword: [] },
   ],
 ];
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [
   [
-    "Returns error for empty input values",
+    "Should return a validation error response if the input strings are empty",
     {
       currentPassword: "",
       newPassword: "",
@@ -56,7 +53,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "Returns error for empty whitespace and password mismatch input values ",
+    "Should return a validation error response if the inputs are empty whitespace strings",
     {
       currentPassword: "  ",
       newPassword: "             ",
@@ -70,7 +67,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "Returns error for invalid password and password mismatch input values",
+    "Should return a validation error response if the password is invalid and if the password does not match the confirm password",
     {
       currentPassword: "null",
       newPassword: "gh5tY#",
@@ -97,9 +94,9 @@ export const args = {
 };
 
 export const verifyUser: [string, VerifyUser[]][] = [
-  ["Returns error on unknown user", []],
+  ["Should return an error response if the user is unknown", []],
   [
-    "Returns error on unregistered user",
+    "Should return an error response if the user is unregistered",
     [{ isRegistered: false, password: "saved_db_password" }],
   ],
 ];

@@ -35,7 +35,7 @@ beforeEach(() => {
 
 describe("Test change password resolver", () => {
   describe("Verify user authentication", () => {
-    test("User is not logged in, Return an AuthenticationError response", async () => {
+    test("User is not logged in, Return an error response", async () => {
       mockContext.user = null;
 
       const result = await changePassword({}, args, mockContext, info);
@@ -51,22 +51,18 @@ describe("Test change password resolver", () => {
       const result = await changePassword({}, data, mockContext, info);
 
       expect(changePasswordMail).not.toHaveBeenCalled();
-
       expect(result).toHaveProperty(
         "currentPasswordError",
         errors.currentPasswordError
       );
-
       expect(result).toHaveProperty(
         "newPasswordError",
         errors.newPasswordError
       );
-
       expect(result).toHaveProperty(
         "confirmNewPasswordError",
         errors.confirmNewPasswordError
       );
-
       expect(result).toHaveProperty("status", "ERROR");
     });
   });
@@ -87,7 +83,7 @@ describe("Test change password resolver", () => {
   });
 
   describe("Verify user's current password", () => {
-    test("Should return an error response if passwords do not match", async () => {
+    test("Should return an error response if the current password does not match the user's password", async () => {
       const hashed = await bcrypt.hash("in_CorrecT_PassW0rd", 10);
       const spy = spyDb({
         rows: [{ isRegistered: true, password: hashed }],
@@ -96,19 +92,17 @@ describe("Test change password resolver", () => {
       const result = await changePassword({}, args, mockContext, info);
 
       expect(changePasswordMail).not.toHaveBeenCalled();
-
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveReturnedWith({
         rows: [{ isRegistered: true, password: hashed }],
       });
-
       expect(result).toHaveProperty("message", "Unable to change password");
       expect(result).toHaveProperty("status", "ERROR");
     });
   });
 
   describe("Change user password", () => {
-    test("Change password and send confirmation mail", async () => {
+    test("Should change the user's password and send a confirmation mail", async () => {
       const mock = { rows: [{ isRegistered: true, password: hash }] };
       const spy = spyDb(mock);
       spy.mockReturnValueOnce({ rows: [] });
@@ -123,7 +117,7 @@ describe("Test change password resolver", () => {
       expect(result).toHaveProperty("status", "SUCCESS");
     });
 
-    test("Sending confirmation mail fails, Revert update and return an error", async () => {
+    test("Confirmation mail fails to send, Revert all updates and return an error response", async () => {
       const mock = changePasswordMail as jest.Mock<() => never>;
       const mockData = { rows: [{ isRegistered: true, password: hash }] };
       const spy = spyDb(mockData);

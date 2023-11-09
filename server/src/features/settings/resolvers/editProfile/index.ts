@@ -1,8 +1,9 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import { EditedProfile, EditProfileValidationError } from "./types";
+import { editProfileValidator } from "./utils/editProfile.validator";
 import {
   AuthenticationError,
   RegistrationError,
@@ -27,35 +28,15 @@ interface UserInfo {
 }
 
 const editProfile: EditProfile = async (_, args, { db, user }) => {
-  const schema = Joi.object<typeof args>({
-    firstName: Joi.string()
-      .required()
-      .trim()
-      .pattern(/[\d]/, { invert: true })
-      .messages({
-        "string.empty": "Enter first name",
-        "string.pattern.invert.base": "First name cannot contain numbers",
-      }),
-    lastName: Joi.string()
-      .required()
-      .trim()
-      .pattern(/[\d]/, { invert: true })
-      .messages({
-        "string.empty": "Enter last name",
-        "string.pattern.invert.base": "Last name cannot contain numbers",
-      }),
-    image: Joi.string().trim().allow(null).messages({
-      "string.empty": "Profile image url cannot be empty",
-    }),
-  });
-
   try {
     if (!user) {
       if (args.image) supabaseEvent.emit("removeImage", args.image);
       return new AuthenticationError("Unable to edit user profile");
     }
 
-    const validated = await schema.validateAsync(args, { abortEarly: false });
+    const validated = await editProfileValidator.validateAsync(args, {
+      abortEarly: false,
+    });
     const { firstName, lastName, image } = validated;
 
     const { rows } = await db.query<SelectUSerInfo>(

@@ -2,7 +2,6 @@ import supabase from "@lib/supabase/supabaseClient";
 import type { InputErrors } from "@types";
 
 interface Input {
-  [key: string]: unknown;
   firstName: string;
   lastName: string;
   image?: string | null;
@@ -18,7 +17,7 @@ export const dateCreated = "2022-11-07 13:22:43.717+01";
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [
   [
-    "Provided input values are empty strings, Return an error response",
+    "The provided input values are empty strings, Should return a validation error response",
     { firstName: "", lastName: "", image: "" },
     {
       firstNameError: "Enter first name",
@@ -27,7 +26,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "Return an error response if input values are empty whitespace strings",
+    "Should return a validation error response if input values are empty whitespace strings",
     { firstName: "    ", lastName: "   ", image: "       " },
     {
       firstNameError: "Enter first name",
@@ -36,7 +35,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "First name and last name input values are invalid, Return an error response",
+    "First name and last name input values are invalid, Return a validation error response",
     { firstName: "John3", lastName: "12sam" },
     {
       firstNameError: "First name cannot contain numbers",
@@ -66,24 +65,24 @@ export const verify: [string, Record<string, boolean>[]][] = [
 ];
 
 export const editSuccess: [string, Input, string | null][] = [
-  ["Should edit user profile without an image", args, null],
-  ["Should edit user profile with an image", { ...args, image }, image],
+  ["Should edit the user's profile without an image", args, null],
+  ["Should edit the user's profile with an image", { ...args, image }, image],
   [
-    "Edit's user profile and deletes image link",
+    "Should edit the user's profile and delete any previously saved image link",
     { ...args, image: null },
     null,
   ],
 ];
 
 export const edit: [string, Input, string | null][] = [
-  ["Edit user's profile without an image", args, null],
+  ["Should edit the user's profile without an image", args, null],
   [
-    "Edit user's profile with an image",
+    "Should edit the user's profile with an image",
     { ...args, image },
     `${storageUrl}${image}`,
   ],
   [
-    "Should edit user's profile and remove image link",
+    "Should edit user's profile and delete any previously saved image link",
     { ...args, image: null },
     null,
   ],
