@@ -1,5 +1,5 @@
-import { GraphQLResolveInfo } from 'graphql';
-import { APIContext } from '.';
+import type { GraphQLResolveInfo } from 'graphql';
+import type { APIContext } from '.';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -16,26 +16,26 @@ export type Scalars = {
 };
 
 export type AccessToken = {
-  __typename?: 'AccessToken';
-  accessToken: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'AccessToken';
+  readonly accessToken: Scalars['String'];
+  readonly status: Status;
 };
 
 export type AuthCookieError = BaseResponse & {
-  __typename?: 'AuthCookieError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'AuthCookieError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type AuthenticationError = BaseResponse & {
-  __typename?: 'AuthenticationError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'AuthenticationError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type BaseResponse = {
-  message: Scalars['String'];
-  status: Status;
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type Bin_UnBin_Delete = NotAllowedError | PostIdsValidationError | Posts | PostsWarning | UnauthorizedAuthorError | UnknownError;
@@ -43,39 +43,39 @@ export type Bin_UnBin_Delete = NotAllowedError | PostIdsValidationError | Posts 
 export type ChangePassword = AuthenticationError | ChangePasswordValidationError | NotAllowedError | RegistrationError | Response | ServerError | UnknownError;
 
 export type ChangePasswordValidationError = {
-  __typename?: 'ChangePasswordValidationError';
-  confirmNewPasswordError?: Maybe<Scalars['String']>;
-  currentPasswordError?: Maybe<Scalars['String']>;
-  newPasswordError?: Maybe<Scalars['String']>;
-  status: Status;
+  readonly __typename?: 'ChangePasswordValidationError';
+  readonly confirmNewPasswordError?: Maybe<Scalars['String']>;
+  readonly currentPasswordError?: Maybe<Scalars['String']>;
+  readonly newPasswordError?: Maybe<Scalars['String']>;
+  readonly status: Status;
 };
 
 export type CreatePost = CreatePostValidationError | DuplicatePostTitleError | NotAllowedError | SinglePost | UnknownError;
 
 export type CreatePostInput = {
-  content: Scalars['String'];
-  description: Scalars['String'];
-  slug?: InputMaybe<Scalars['String']>;
-  tags?: InputMaybe<Array<Scalars['ID']>>;
-  title: Scalars['String'];
+  readonly content: Scalars['String'];
+  readonly description: Scalars['String'];
+  readonly slug?: InputMaybe<Scalars['String']>;
+  readonly tags?: InputMaybe<ReadonlyArray<Scalars['ID']>>;
+  readonly title: Scalars['String'];
 };
 
 export type CreatePostTags = AuthenticationError | CreatePostTagsValidationError | DuplicatePostTagError | PostTags | PostTagsWarning | RegistrationError | UnknownError;
 
 export type CreatePostTagsValidationError = {
-  __typename?: 'CreatePostTagsValidationError';
-  status: Status;
-  tagsError: Scalars['String'];
+  readonly __typename?: 'CreatePostTagsValidationError';
+  readonly status: Status;
+  readonly tagsError: Scalars['String'];
 };
 
 export type CreatePostValidationError = {
-  __typename?: 'CreatePostValidationError';
-  contentError?: Maybe<Scalars['String']>;
-  descriptionError?: Maybe<Scalars['String']>;
-  slugError?: Maybe<Scalars['String']>;
-  status: Status;
-  tagsError?: Maybe<Scalars['String']>;
-  titleError?: Maybe<Scalars['String']>;
+  readonly __typename?: 'CreatePostValidationError';
+  readonly contentError?: Maybe<Scalars['String']>;
+  readonly descriptionError?: Maybe<Scalars['String']>;
+  readonly slugError?: Maybe<Scalars['String']>;
+  readonly status: Status;
+  readonly tagsError?: Maybe<Scalars['String']>;
+  readonly titleError?: Maybe<Scalars['String']>;
 };
 
 export type CreateUser = EmailValidationError | NotAllowedError | Response | ServerError;
@@ -83,99 +83,99 @@ export type CreateUser = EmailValidationError | NotAllowedError | Response | Ser
 export type DeletePostTags = AuthenticationError | DeletePostTagsValidationError | NotAllowedError | PostTags | PostTagsWarning | RegistrationError | UnknownError;
 
 export type DeletePostTagsValidationError = {
-  __typename?: 'DeletePostTagsValidationError';
-  status: Status;
-  tagIdsError: Scalars['String'];
+  readonly __typename?: 'DeletePostTagsValidationError';
+  readonly status: Status;
+  readonly tagIdsError: Scalars['String'];
 };
 
 export type DraftPostInput = {
-  content?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  postId?: InputMaybe<Scalars['ID']>;
-  slug?: InputMaybe<Scalars['String']>;
-  tags?: InputMaybe<Array<Scalars['ID']>>;
-  title: Scalars['String'];
+  readonly content?: InputMaybe<Scalars['String']>;
+  readonly description?: InputMaybe<Scalars['String']>;
+  readonly postId?: InputMaybe<Scalars['ID']>;
+  readonly slug?: InputMaybe<Scalars['String']>;
+  readonly tags?: InputMaybe<ReadonlyArray<Scalars['ID']>>;
+  readonly title: Scalars['String'];
 };
 
 export type Draft_Edit = DuplicatePostTitleError | NotAllowedError | NotAllowedPostActionError | PostValidationError | SinglePost | UnauthorizedAuthorError | UnknownError;
 
 export type DuplicatePostTagError = BaseResponse & {
-  __typename?: 'DuplicatePostTagError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'DuplicatePostTagError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type DuplicatePostTitleError = BaseResponse & {
-  __typename?: 'DuplicatePostTitleError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'DuplicatePostTitleError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type EditPostInput = {
-  content: Scalars['String'];
-  description: Scalars['String'];
-  postId: Scalars['ID'];
-  slug?: InputMaybe<Scalars['String']>;
-  tags?: InputMaybe<Array<Scalars['ID']>>;
-  title: Scalars['String'];
+  readonly content: Scalars['String'];
+  readonly description: Scalars['String'];
+  readonly postId: Scalars['ID'];
+  readonly slug?: InputMaybe<Scalars['String']>;
+  readonly tags?: InputMaybe<ReadonlyArray<Scalars['ID']>>;
+  readonly title: Scalars['String'];
 };
 
 export type EditPostTag = AuthenticationError | DuplicatePostTagError | EditPostTagValidationError | EditedPostTag | EditedPostTagWarning | NotAllowedError | RegistrationError | UnknownError;
 
 export type EditPostTagValidationError = {
-  __typename?: 'EditPostTagValidationError';
-  nameError?: Maybe<Scalars['String']>;
-  status: Status;
-  tagIdError?: Maybe<Scalars['String']>;
+  readonly __typename?: 'EditPostTagValidationError';
+  readonly nameError?: Maybe<Scalars['String']>;
+  readonly status: Status;
+  readonly tagIdError?: Maybe<Scalars['String']>;
 };
 
 export type EditProfile = AuthenticationError | EditProfileValidationError | EditedProfile | RegistrationError | UnknownError;
 
 export type EditProfileValidationError = {
-  __typename?: 'EditProfileValidationError';
-  firstNameError?: Maybe<Scalars['String']>;
-  imageError?: Maybe<Scalars['String']>;
-  lastNameError?: Maybe<Scalars['String']>;
-  status: Status;
+  readonly __typename?: 'EditProfileValidationError';
+  readonly firstNameError?: Maybe<Scalars['String']>;
+  readonly imageError?: Maybe<Scalars['String']>;
+  readonly lastNameError?: Maybe<Scalars['String']>;
+  readonly status: Status;
 };
 
 export type EditedPostTag = {
-  __typename?: 'EditedPostTag';
-  status: Status;
-  tag: PostTag;
+  readonly __typename?: 'EditedPostTag';
+  readonly status: Status;
+  readonly tag: PostTag;
 };
 
 export type EditedPostTagWarning = BaseResponse & {
-  __typename?: 'EditedPostTagWarning';
-  message: Scalars['String'];
-  status: Status;
-  tag: PostTag;
+  readonly __typename?: 'EditedPostTagWarning';
+  readonly message: Scalars['String'];
+  readonly status: Status;
+  readonly tag: PostTag;
 };
 
 export type EditedProfile = UserData & {
-  __typename?: 'EditedProfile';
-  status: Status;
-  user: User;
+  readonly __typename?: 'EditedProfile';
+  readonly status: Status;
+  readonly user: User;
 };
 
 export type EmailValidationError = {
-  __typename?: 'EmailValidationError';
-  emailError: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'EmailValidationError';
+  readonly emailError: Scalars['String'];
+  readonly status: Status;
 };
 
 export type EmptyBin = EmptyBinWarning | NotAllowedError | Posts;
 
 export type EmptyBinWarning = BaseResponse & {
-  __typename?: 'EmptyBinWarning';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'EmptyBinWarning';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type ForbiddenError = BaseResponse & {
-  __typename?: 'ForbiddenError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'ForbiddenError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type ForgotGeneratePassword = EmailValidationError | NotAllowedError | RegistrationError | Response | ServerError;
@@ -187,80 +187,56 @@ export type GetPostTags = AuthenticationError | PostTags | RegistrationError | U
 export type GetPosts = NotAllowedError | Posts;
 
 export type LoggedInUser = UserData & {
-  __typename?: 'LoggedInUser';
-  accessToken: Scalars['String'];
-  sessionId: Scalars['ID'];
-  status: Status;
-  user: User;
+  readonly __typename?: 'LoggedInUser';
+  readonly accessToken: Scalars['String'];
+  readonly sessionId: Scalars['ID'];
+  readonly status: Status;
+  readonly user: User;
 };
 
 export type Login = LoggedInUser | LoginValidationError | NotAllowedError;
 
 export type LoginValidationError = {
-  __typename?: 'LoginValidationError';
-  emailError?: Maybe<Scalars['String']>;
-  passwordError?: Maybe<Scalars['String']>;
-  sessionIdError?: Maybe<Scalars['String']>;
-  status: Status;
+  readonly __typename?: 'LoginValidationError';
+  readonly emailError?: Maybe<Scalars['String']>;
+  readonly passwordError?: Maybe<Scalars['String']>;
+  readonly sessionIdError?: Maybe<Scalars['String']>;
+  readonly status: Status;
 };
 
 export type Logout = AuthenticationError | NotAllowedError | Response | SessionIdValidationError | UnknownError;
 
 export type Mutation = {
-  __typename?: 'Mutation';
-  /** Move posts to bin */
-  binPosts: Bin_UnBin_Delete;
-  /** Change password of registered and signed in user */
-  changePassword: ChangePassword;
-  /** Create a new post */
-  createPost: CreatePost;
-  /** Create a new post tag or multiple tags */
-  createPostTags: CreatePostTags;
-  /** Create a new user */
-  createUser: CreateUser;
-  /** Delete a post tag or multiple post tags */
-  deletePostTags: DeletePostTags;
-  /** Delete posts from bin */
-  deletePostsFromBin: Bin_UnBin_Delete;
-  /** Draft a post */
-  draftPost: Draft_Edit;
-  /** Edit a created/published post */
-  editPost: Draft_Edit;
-  /** Edit a post tag */
-  editPostTag: EditPostTag;
-  /** Edit user profile */
-  editProfile: EditProfile;
-  /** Empty bin(Delete all posts from bin) */
-  emptyBin: EmptyBin;
-  /** Verify user email and initiate reset password */
-  forgotPassword: ForgotGeneratePassword;
-  /** Generate new password for unregistered user */
-  generatePassword: ForgotGeneratePassword;
-  /** Login a user */
-  login: Login;
-  /** Logout a user */
-  logout: Logout;
-  /** Publish a post */
-  publishPost: Publish_Unpublish;
-  /** Refresh jwt access token */
-  refreshToken: RefreshToken;
-  /** Register newly created user */
-  registerUser: RegisterUser;
-  /** Reset password for registered user */
-  resetPassword: ResetPassword;
-  /** Un-bin posts from bin */
-  unBinPosts: Bin_UnBin_Delete;
-  /** Un-publish a post */
-  unpublishPost: Publish_Unpublish;
-  /** Verify password reset token */
-  verifyResetToken: VerifyResetToken;
-  /** Verify user session */
-  verifySession: VerifySession;
+  readonly __typename?: 'Mutation';
+  readonly binPosts: Bin_UnBin_Delete;
+  readonly changePassword: ChangePassword;
+  readonly createPost: CreatePost;
+  readonly createPostTags: CreatePostTags;
+  readonly createUser: CreateUser;
+  readonly deletePostTags: DeletePostTags;
+  readonly deletePostsFromBin: Bin_UnBin_Delete;
+  readonly draftPost: Draft_Edit;
+  readonly editPost: Draft_Edit;
+  readonly editPostTag: EditPostTag;
+  readonly editProfile: EditProfile;
+  readonly emptyBin: EmptyBin;
+  readonly forgotPassword: ForgotGeneratePassword;
+  readonly generatePassword: ForgotGeneratePassword;
+  readonly login: Login;
+  readonly logout: Logout;
+  readonly publishPost: Publish_Unpublish;
+  readonly refreshToken: RefreshToken;
+  readonly registerUser: RegisterUser;
+  readonly resetPassword: ResetPassword;
+  readonly unBinPosts: Bin_UnBin_Delete;
+  readonly unpublishPost: Publish_Unpublish;
+  readonly verifyResetToken: VerifyResetToken;
+  readonly verifySession: VerifySession;
 };
 
 
 export type MutationBinPostsArgs = {
-  postIds: Array<Scalars['ID']>;
+  postIds: ReadonlyArray<Scalars['ID']>;
 };
 
 
@@ -277,7 +253,7 @@ export type MutationCreatePostArgs = {
 
 
 export type MutationCreatePostTagsArgs = {
-  tags: Array<Scalars['String']>;
+  tags: ReadonlyArray<Scalars['String']>;
 };
 
 
@@ -287,12 +263,12 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeletePostTagsArgs = {
-  tagIds: Array<Scalars['ID']>;
+  tagIds: ReadonlyArray<Scalars['ID']>;
 };
 
 
 export type MutationDeletePostsFromBinArgs = {
-  postIds: Array<Scalars['ID']>;
+  postIds: ReadonlyArray<Scalars['ID']>;
 };
 
 
@@ -364,7 +340,7 @@ export type MutationResetPasswordArgs = {
 
 
 export type MutationUnBinPostsArgs = {
-  postIds: Array<Scalars['ID']>;
+  postIds: ReadonlyArray<Scalars['ID']>;
 };
 
 
@@ -383,111 +359,107 @@ export type MutationVerifySessionArgs = {
 };
 
 export type NotAllowedError = BaseResponse & {
-  __typename?: 'NotAllowedError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'NotAllowedError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type NotAllowedPostActionError = BaseResponse & {
-  __typename?: 'NotAllowedPostActionError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'NotAllowedPostActionError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type Post = {
-  __typename?: 'Post';
-  author: Scalars['String'];
-  content?: Maybe<Scalars['String']>;
-  dateCreated: Scalars['String'];
-  datePublished?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
-  imageBanner?: Maybe<Scalars['String']>;
-  isDeleted: Scalars['Boolean'];
-  isInBin: Scalars['Boolean'];
-  lastModified?: Maybe<Scalars['String']>;
-  likes: Scalars['Int'];
-  slug?: Maybe<Scalars['String']>;
-  status: PostStatus;
-  tags?: Maybe<Array<PostTag>>;
-  title: Scalars['String'];
-  url: Scalars['String'];
-  views: Scalars['Int'];
+  readonly __typename?: 'Post';
+  readonly author: Scalars['String'];
+  readonly content?: Maybe<Scalars['String']>;
+  readonly dateCreated: Scalars['String'];
+  readonly datePublished?: Maybe<Scalars['String']>;
+  readonly description?: Maybe<Scalars['String']>;
+  readonly id: Scalars['ID'];
+  readonly imageBanner?: Maybe<Scalars['String']>;
+  readonly isDeleted: Scalars['Boolean'];
+  readonly isInBin: Scalars['Boolean'];
+  readonly lastModified?: Maybe<Scalars['String']>;
+  readonly likes: Scalars['Int'];
+  readonly slug?: Maybe<Scalars['String']>;
+  readonly status: PostStatus;
+  readonly tags?: Maybe<ReadonlyArray<PostTag>>;
+  readonly title: Scalars['String'];
+  readonly url: Scalars['String'];
+  readonly views: Scalars['Int'];
 };
 
 export type PostIdValidationError = {
-  __typename?: 'PostIdValidationError';
-  postIdError: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'PostIdValidationError';
+  readonly postIdError: Scalars['String'];
+  readonly status: Status;
 };
 
 export type PostIdsValidationError = {
-  __typename?: 'PostIdsValidationError';
-  postIdsError: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'PostIdsValidationError';
+  readonly postIdsError: Scalars['String'];
+  readonly status: Status;
 };
 
-export enum PostStatus {
-  Draft = 'Draft',
-  Published = 'Published',
-  Unpublished = 'Unpublished'
-}
+export type PostStatus =
+  | 'Draft'
+  | 'Published'
+  | 'Unpublished';
 
 export type PostTag = {
-  __typename?: 'PostTag';
-  dateCreated: Scalars['String'];
-  id: Scalars['ID'];
-  lastModified?: Maybe<Scalars['String']>;
-  name: Scalars['String'];
+  readonly __typename?: 'PostTag';
+  readonly dateCreated: Scalars['String'];
+  readonly id: Scalars['ID'];
+  readonly lastModified?: Maybe<Scalars['String']>;
+  readonly name: Scalars['String'];
 };
 
 export type PostTags = {
-  __typename?: 'PostTags';
-  status: Status;
-  tags: Array<PostTag>;
+  readonly __typename?: 'PostTags';
+  readonly status: Status;
+  readonly tags: ReadonlyArray<PostTag>;
 };
 
 export type PostTagsWarning = BaseResponse & {
-  __typename?: 'PostTagsWarning';
-  message: Scalars['String'];
-  status: Status;
-  tags: Array<PostTag>;
+  readonly __typename?: 'PostTagsWarning';
+  readonly message: Scalars['String'];
+  readonly status: Status;
+  readonly tags: ReadonlyArray<PostTag>;
 };
 
 export type PostValidationError = {
-  __typename?: 'PostValidationError';
-  contentError?: Maybe<Scalars['String']>;
-  descriptionError?: Maybe<Scalars['String']>;
-  postIdError?: Maybe<Scalars['String']>;
-  slugError?: Maybe<Scalars['String']>;
-  status: Status;
-  tagsError?: Maybe<Scalars['String']>;
-  titleError?: Maybe<Scalars['String']>;
+  readonly __typename?: 'PostValidationError';
+  readonly contentError?: Maybe<Scalars['String']>;
+  readonly descriptionError?: Maybe<Scalars['String']>;
+  readonly postIdError?: Maybe<Scalars['String']>;
+  readonly slugError?: Maybe<Scalars['String']>;
+  readonly status: Status;
+  readonly tagsError?: Maybe<Scalars['String']>;
+  readonly titleError?: Maybe<Scalars['String']>;
 };
 
 export type Posts = {
-  __typename?: 'Posts';
-  posts: Array<Post>;
-  status: Status;
+  readonly __typename?: 'Posts';
+  readonly posts: ReadonlyArray<Post>;
+  readonly status: Status;
 };
 
 export type PostsWarning = BaseResponse & {
-  __typename?: 'PostsWarning';
-  message: Scalars['String'];
-  posts: Array<Post>;
-  status: Status;
+  readonly __typename?: 'PostsWarning';
+  readonly message: Scalars['String'];
+  readonly posts: ReadonlyArray<Post>;
+  readonly status: Status;
 };
 
 export type Publish_Unpublish = NotAllowedError | NotAllowedPostActionError | PostIdValidationError | SinglePost | UnauthorizedAuthorError | UnknownError;
 
 export type Query = {
-  __typename?: 'Query';
-  /** Get one post */
-  getPost: GetPost;
-  /** Get all post tags */
-  getPostTags: GetPostTags;
-  /** Get all posts */
-  getPosts: GetPosts;
+  readonly __typename?: 'Query';
+  readonly getPost: GetPost;
+  readonly getPostTags: GetPostTags;
+  readonly getPosts: GetPosts;
 };
 
 
@@ -500,127 +472,126 @@ export type RefreshToken = AccessToken | AuthCookieError | ForbiddenError | NotA
 export type RegisterUser = AuthenticationError | RegisterUserValidationError | RegisteredUser | RegistrationError | UnknownError;
 
 export type RegisterUserInput = {
-  confirmPassword: Scalars['String'];
-  firstName: Scalars['String'];
-  lastName: Scalars['String'];
-  password: Scalars['String'];
+  readonly confirmPassword: Scalars['String'];
+  readonly firstName: Scalars['String'];
+  readonly lastName: Scalars['String'];
+  readonly password: Scalars['String'];
 };
 
 export type RegisterUserValidationError = {
-  __typename?: 'RegisterUserValidationError';
-  confirmPasswordError?: Maybe<Scalars['String']>;
-  firstNameError?: Maybe<Scalars['String']>;
-  lastNameError?: Maybe<Scalars['String']>;
-  passwordError?: Maybe<Scalars['String']>;
-  status: Status;
+  readonly __typename?: 'RegisterUserValidationError';
+  readonly confirmPasswordError?: Maybe<Scalars['String']>;
+  readonly firstNameError?: Maybe<Scalars['String']>;
+  readonly lastNameError?: Maybe<Scalars['String']>;
+  readonly passwordError?: Maybe<Scalars['String']>;
+  readonly status: Status;
 };
 
 export type RegisteredUser = UserData & {
-  __typename?: 'RegisteredUser';
-  status: Status;
-  user: User;
+  readonly __typename?: 'RegisteredUser';
+  readonly status: Status;
+  readonly user: User;
 };
 
 export type RegistrationError = BaseResponse & {
-  __typename?: 'RegistrationError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'RegistrationError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type ResetPassword = NotAllowedError | RegistrationError | ResetPasswordValidationError | Response;
 
 export type ResetPasswordValidationError = {
-  __typename?: 'ResetPasswordValidationError';
-  confirmPasswordError?: Maybe<Scalars['String']>;
-  passwordError?: Maybe<Scalars['String']>;
-  status: Status;
-  tokenError?: Maybe<Scalars['String']>;
+  readonly __typename?: 'ResetPasswordValidationError';
+  readonly confirmPasswordError?: Maybe<Scalars['String']>;
+  readonly passwordError?: Maybe<Scalars['String']>;
+  readonly status: Status;
+  readonly tokenError?: Maybe<Scalars['String']>;
 };
 
 export type Response = BaseResponse & {
-  __typename?: 'Response';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'Response';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type ServerError = BaseResponse & {
-  __typename?: 'ServerError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'ServerError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type SessionIdValidationError = {
-  __typename?: 'SessionIdValidationError';
-  sessionIdError: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'SessionIdValidationError';
+  readonly sessionIdError: Scalars['String'];
+  readonly status: Status;
 };
 
 export type SinglePost = {
-  __typename?: 'SinglePost';
-  post: Post;
-  status: Status;
+  readonly __typename?: 'SinglePost';
+  readonly post: Post;
+  readonly status: Status;
 };
 
-export enum Status {
-  Error = 'ERROR',
-  Success = 'SUCCESS',
-  Warn = 'WARN'
-}
+export type Status =
+  | 'ERROR'
+  | 'SUCCESS'
+  | 'WARN';
 
 export type UnauthorizedAuthorError = BaseResponse & {
-  __typename?: 'UnauthorizedAuthorError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'UnauthorizedAuthorError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type UnknownError = BaseResponse & {
-  __typename?: 'UnknownError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'UnknownError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type User = {
-  __typename?: 'User';
-  dateCreated: Scalars['String'];
-  email: Scalars['String'];
-  firstName?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
-  image?: Maybe<Scalars['String']>;
-  isRegistered: Scalars['Boolean'];
-  lastName?: Maybe<Scalars['String']>;
+  readonly __typename?: 'User';
+  readonly dateCreated: Scalars['String'];
+  readonly email: Scalars['String'];
+  readonly firstName?: Maybe<Scalars['String']>;
+  readonly id: Scalars['ID'];
+  readonly image?: Maybe<Scalars['String']>;
+  readonly isRegistered: Scalars['Boolean'];
+  readonly lastName?: Maybe<Scalars['String']>;
 };
 
 export type UserData = {
-  status: Status;
-  user: User;
+  readonly status: Status;
+  readonly user: User;
 };
 
 export type UserSessionError = BaseResponse & {
-  __typename?: 'UserSessionError';
-  message: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'UserSessionError';
+  readonly message: Scalars['String'];
+  readonly status: Status;
 };
 
 export type VerifiedResetToken = {
-  __typename?: 'VerifiedResetToken';
-  email: Scalars['String'];
-  resetToken: Scalars['String'];
-  status: Status;
+  readonly __typename?: 'VerifiedResetToken';
+  readonly email: Scalars['String'];
+  readonly resetToken: Scalars['String'];
+  readonly status: Status;
 };
 
 export type VerifiedSession = UserData & {
-  __typename?: 'VerifiedSession';
-  accessToken: Scalars['String'];
-  status: Status;
-  user: User;
+  readonly __typename?: 'VerifiedSession';
+  readonly accessToken: Scalars['String'];
+  readonly status: Status;
+  readonly user: User;
 };
 
 export type VerifyResetToken = NotAllowedError | RegistrationError | VerifiedResetToken | VerifyResetTokenValidationError;
 
 export type VerifyResetTokenValidationError = {
-  __typename?: 'VerifyResetTokenValidationError';
-  status: Status;
-  tokenError: Scalars['String'];
+  readonly __typename?: 'VerifyResetTokenValidationError';
+  readonly status: Status;
+  readonly tokenError: Scalars['String'];
 };
 
 export type VerifySession = AuthCookieError | ForbiddenError | NotAllowedError | SessionIdValidationError | UnknownError | VerifiedSession;
@@ -1112,7 +1083,7 @@ export type PostResolvers<ContextType = APIContext, ParentType extends Resolvers
   likes?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   slug?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['PostStatus'], ParentType, ContextType>;
-  tags?: Resolver<Maybe<Array<ResolversTypes['PostTag']>>, ParentType, ContextType>;
+  tags?: Resolver<Maybe<ReadonlyArray<ResolversTypes['PostTag']>>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   views?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -1141,14 +1112,14 @@ export type PostTagResolvers<ContextType = APIContext, ParentType extends Resolv
 
 export type PostTagsResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['PostTags'] = ResolversParentTypes['PostTags']> = ResolversObject<{
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
-  tags?: Resolver<Array<ResolversTypes['PostTag']>, ParentType, ContextType>;
+  tags?: Resolver<ReadonlyArray<ResolversTypes['PostTag']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type PostTagsWarningResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['PostTagsWarning'] = ResolversParentTypes['PostTagsWarning']> = ResolversObject<{
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
-  tags?: Resolver<Array<ResolversTypes['PostTag']>, ParentType, ContextType>;
+  tags?: Resolver<ReadonlyArray<ResolversTypes['PostTag']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1164,14 +1135,14 @@ export type PostValidationErrorResolvers<ContextType = APIContext, ParentType ex
 }>;
 
 export type PostsResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['Posts'] = ResolversParentTypes['Posts']> = ResolversObject<{
-  posts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
+  posts?: Resolver<ReadonlyArray<ResolversTypes['Post']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type PostsWarningResolvers<ContextType = APIContext, ParentType extends ResolversParentTypes['PostsWarning'] = ResolversParentTypes['PostsWarning']> = ResolversObject<{
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  posts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
+  posts?: Resolver<ReadonlyArray<ResolversTypes['Post']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

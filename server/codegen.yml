@@ -8,5 +8,9 @@ generates:
     config:
       useIndexSignature: true
       contextType: ".#APIContext"
+      enumsAsTypes: true
+      immutableTypes: true
+      disableDescriptions: true
+      useTypeImports: true
 require:
   - tsconfig-paths/register

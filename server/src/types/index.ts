@@ -13,17 +13,17 @@ export interface IClientUrls {
 
 export type ResolverFunc<T> = NonNullable<Exclude<T, Record<string, unknown>>>;
 
-export type ResolversMapper<T extends Record<string, unknown>> = {
+export type ResolversMapper<T extends object> = {
   readonly [Prop in keyof T]-?: ResolverFunc<T[Prop]>;
 };
 
-export type ObjectMapper<T extends Record<string, unknown>> = {
+export type ObjectMapper<T extends object> = {
   readonly [Prop in keyof T]-?: T[Prop];
 };
 
 export interface TestData<T> {
   readonly data?: T;
-  readonly errors?: Record<string, unknown>[];
+  readonly errors?: object[];
 }
 
 export interface TestUser {
@@ -94,7 +94,7 @@ export interface Cookies {
   sig?: string;
 }
 
-export type ValidationErrorObject<Type extends Record<string, unknown>> = {
+export type ValidationErrorObject<Type extends object> = {
   [Prop in keyof Type as `${string & Prop}Error`]?: string;
 };
 
@@ -102,7 +102,7 @@ export type RemoveNull<T extends object> = {
   [Prop in keyof T]: NonNullable<T[Prop]>;
 };
 
-export type InputErrors<Type extends Record<string, unknown>> = {
+export type InputErrors<Type extends object> = {
   [Prop in keyof Type as `${string & Prop}Error`]: string | null | undefined;
 };
 
