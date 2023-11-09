@@ -9,7 +9,7 @@ import {
 } from "./mocks";
 import dateToISOString from "../dateToISOString";
 
-import { type PostTag, type Post, PostStatus } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 import type { DbFindPost, PostAuthor } from "@types";
 
 interface Params {
@@ -189,9 +189,9 @@ const createBinnedTestPosts = async ({
         tags: mappedTags,
       } as const;
 
-      if (post.status === PostStatus.Draft) {
+      if (post.status === "Draft") {
         draftPosts.push(post);
-      } else if (post.status === PostStatus.Published) {
+      } else if (post.status === "Published") {
         publishedPosts.push(post);
       } else {
         unpublishedPosts.push(post);

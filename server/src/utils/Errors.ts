@@ -1,4 +1,4 @@
-import { type BaseResponse, Status } from "@resolverTypes";
+import type { BaseResponse, Status } from "@resolverTypes";
 
 export class MailError extends Error {}
 
@@ -30,15 +30,12 @@ class ErrorResponse implements BaseResponse {
   readonly status: Status;
 
   constructor(readonly message: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 
 export class Response implements BaseResponse {
-  constructor(
-    readonly message: string,
-    readonly status: Status = Status.Success
-  ) {}
+  constructor(readonly message: string, readonly status: Status = "SUCCESS") {}
 }
 
 export class NotAllowedError extends ErrorResponse {}

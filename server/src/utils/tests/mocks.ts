@@ -1,4 +1,3 @@
-import { PostStatus } from "@resolverTypes";
 import type { TestUser, TestPosts, RemoveNull } from "@types";
 
 type RemoveNullFromTestUser = RemoveNull<TestUser>;
@@ -43,7 +42,7 @@ export const unpublishedTestPosts: TestPosts = {
     title: "Post One Title",
     description: "Post One Description",
     content: "Post One Content",
-    status: PostStatus.Unpublished,
+    status: "Unpublished",
     slug: "Post One Slug",
     imageBanner: null,
     datePublished: null,
@@ -55,7 +54,7 @@ export const unpublishedTestPosts: TestPosts = {
     title: "Post Two Title",
     description: "Post Two Description",
     content: "Post Two Content",
-    status: PostStatus.Unpublished,
+    status: "Unpublished",
     imageBanner: null,
     datePublished: null,
     lastModified: null,
@@ -69,7 +68,7 @@ export const draftTestPosts: TestPosts = {
     title: "First Draft Post Title",
     description: "First Draft Post Description",
     content: "First Draft Post Content",
-    status: PostStatus.Draft,
+    status: "Draft",
     slug: "First Draft post slug",
     imageBanner: null,
     datePublished: null,
@@ -81,7 +80,7 @@ export const draftTestPosts: TestPosts = {
     title: "Second Draft Post Title",
     description: null,
     content: null,
-    status: PostStatus.Draft,
+    status: "Draft",
     imageBanner: null,
     datePublished: null,
     lastModified: null,
@@ -95,7 +94,7 @@ export const publishedTestPosts: TestPosts = {
     title: "First Published Post Title",
     description: "First Published Post Description",
     content: "First Published Post Content",
-    status: PostStatus.Published,
+    status: "Published",
     slug: "First Published post slug",
     imageBanner: null,
     datePublished: null,
@@ -107,7 +106,7 @@ export const publishedTestPosts: TestPosts = {
     title: "Second Published Post Title",
     description: "Second Published Post Description",
     content: "Second Published Post Content",
-    status: PostStatus.Published,
+    status: "Published",
     imageBanner: null,
     datePublished: null,
     lastModified: null,
