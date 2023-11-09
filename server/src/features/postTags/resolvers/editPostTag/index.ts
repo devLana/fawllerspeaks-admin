@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
 import {
   EditedPostTag,
@@ -7,6 +7,7 @@ import {
   EditPostTagValidationError,
 } from "./types";
 import { DuplicatePostTagError } from "../types";
+import { editPostTagValidator } from "./utils/editPostTag.validator";
 import {
   AuthenticationError,
   NotAllowedError,
@@ -22,24 +23,10 @@ import type { ResolverFunc, ValidationErrorObject } from "@types";
 type EditPostTag = ResolverFunc<MutationResolvers["editPostTag"]>;
 
 const editPostTag: EditPostTag = async (_, args, { db, user }) => {
-  const schema = Joi.object<typeof args>({
-    tagId: Joi.string()
-      .required()
-      .trim()
-      .uuid({ version: "uuidv4", separator: "-" })
-      .messages({
-        "string.guid": "Invalid post tag id",
-        "string.empty": "Provide post tag id",
-      }),
-    name: Joi.string().required().trim().messages({
-      "string.empty": "Provide post tag name",
-    }),
-  });
+  if (!user) return new AuthenticationError("Unable to edit post tag");
 
   try {
-    if (!user) return new AuthenticationError("Unable to edit post tag");
-
-    const { name, tagId } = await schema.validateAsync(args, {
+    const { name, tagId } = await editPostTagValidator.validateAsync(args, {
       abortEarly: false,
     });
 

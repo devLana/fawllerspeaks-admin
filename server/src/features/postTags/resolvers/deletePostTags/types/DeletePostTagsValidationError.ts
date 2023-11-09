@@ -1,14 +1,14 @@
-import {
-  type DeletePostTagsValidationError as Error,
-  type DeletePostTagsValidationErrorResolvers as Resolvers,
+import type {
+  DeletePostTagsValidationError as ValidationError,
+  DeletePostTagsValidationErrorResolvers as Resolvers,
   Status,
 } from "@resolverTypes";
 
-export class DeletePostTagsValidationError implements Error {
+export class DeletePostTagsValidationError implements ValidationError {
   readonly status: Status;
 
   constructor(readonly tagIdsError: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

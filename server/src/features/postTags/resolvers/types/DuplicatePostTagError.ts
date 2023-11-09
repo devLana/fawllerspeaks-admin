@@ -1,14 +1,14 @@
-import {
-  type DuplicatePostTagError as Error,
-  type DuplicatePostTagErrorResolvers as Resolvers,
+import type {
+  DuplicatePostTagError as ValidationError,
+  DuplicatePostTagErrorResolvers as Resolvers,
   Status,
 } from "@resolverTypes";
 
-export class DuplicatePostTagError implements Error {
+export class DuplicatePostTagError implements ValidationError {
   readonly status: Status;
 
   constructor(readonly message: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

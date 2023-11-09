@@ -20,7 +20,7 @@ beforeEach(() => {
 
 describe("Test edit post tag resolver", () => {
   describe("Verify user authentication", () => {
-    it("Should return error on logged out user", async () => {
+    it("Should return an error response if the user is not logged in", async () => {
       mockContext.user = null;
 
       const result = await editPostTag({}, tag, mockContext, info);

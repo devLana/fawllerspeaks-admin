@@ -1,14 +1,14 @@
-import {
-  type CreatePostTagsValidationError as Error,
-  type CreatePostTagsValidationErrorResolvers as Resolvers,
+import type {
+  CreatePostTagsValidationError as ValidationError,
+  CreatePostTagsValidationErrorResolvers as Resolvers,
   Status,
 } from "@resolverTypes";
 
-export class CreatePostTagsValidationError implements Error {
+export class CreatePostTagsValidationError implements ValidationError {
   readonly status: Status;
 
   constructor(readonly tagsError: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

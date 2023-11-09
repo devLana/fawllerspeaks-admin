@@ -1,7 +1,7 @@
-import {
-  type PostTags as Tags,
-  type PostTagsResolvers as Resolvers,
-  type PostTag,
+import type {
+  PostTags as Tags,
+  PostTagsResolvers as Resolvers,
+  PostTag,
   Status,
 } from "@resolverTypes";
 
@@ -9,7 +9,7 @@ export class PostTags implements Tags {
   readonly status: Status;
 
   constructor(readonly tags: PostTag[]) {
-    this.status = Status.Success;
+    this.status = "SUCCESS";
   }
 }
 

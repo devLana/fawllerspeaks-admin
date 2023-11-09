@@ -15,7 +15,7 @@ import {
 } from "../utils/createPostTags.testUtils";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTagsWarning, type PostTags, Status } from "@resolverTypes";
+import type { PostTagsWarning, PostTags } from "@resolverTypes";
 
 type CreateTags = TestData<{ createPostTags: Record<string, unknown> }>;
 type CreateTagsSuccess = TestData<{ createPostTags: PostTags }>;
@@ -47,7 +47,7 @@ describe("Create post tags - E2E", () => {
   });
 
   describe("Verify user authentication", () => {
-    it("Should respond with an AuthenticationError if user is not logged in", async () => {
+    it("Should respond with an error response if the user is not logged in", async () => {
       const payload = { query: CREATE_POST_TAGS, variables: { tags: ["tag"] } };
 
       const { data } = await post<CreateTags>(url, payload);
@@ -57,7 +57,7 @@ describe("Create post tags - E2E", () => {
       expect(data.data?.createPostTags).toStrictEqual({
         __typename: "AuthenticationError",
         message: "Unable to create post tag",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -84,13 +84,13 @@ describe("Create post tags - E2E", () => {
       expect(data.data?.createPostTags).toStrictEqual({
         __typename: "CreatePostTagsValidationError",
         tagsError: errorMsg,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify logged in user registration status", () => {
-    it("Should respond with a RegistrationError if the user is unregistered", async () => {
+    it("Should respond with an error response if the user is unregistered", async () => {
       const variables = { tags: ["tag1", "tag2"] };
       const payload = { query: CREATE_POST_TAGS, variables };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
@@ -102,7 +102,7 @@ describe("Create post tags - E2E", () => {
       expect(data.data?.createPostTags).toStrictEqual({
         __typename: "RegistrationError",
         message: "Unable to create post tags",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -142,7 +142,7 @@ describe("Create post tags - E2E", () => {
             lastModified: null,
           },
         ]),
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
 
@@ -173,7 +173,7 @@ describe("Create post tags - E2E", () => {
           },
         ],
         message: errorMsg,
-        status: Status.Warn,
+        status: "WARN",
       });
     });
 
@@ -187,7 +187,7 @@ describe("Create post tags - E2E", () => {
       expect(data.data?.createPostTags).toStrictEqual({
         __typename: "DuplicatePostTagError",
         message: errorMsg,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });

@@ -1,7 +1,7 @@
-import {
-  type EditedPostTag as Tag,
-  type EditedPostTagResolvers as Resolvers,
-  type PostTag,
+import type {
+  EditedPostTag as Tag,
+  EditedPostTagResolvers as Resolvers,
+  PostTag,
   Status,
 } from "@resolverTypes";
 
@@ -9,7 +9,7 @@ export class EditedPostTag implements Tag {
   readonly status: Status;
 
   constructor(readonly tag: PostTag) {
-    this.status = Status.Success;
+    this.status = "SUCCESS";
   }
 }
 

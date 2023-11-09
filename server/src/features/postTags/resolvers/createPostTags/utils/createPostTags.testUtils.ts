@@ -1,8 +1,11 @@
 export const gqlValidations: [string, unknown][] = [
-  ["Should throw a graphql validation error for a null input", null],
-  ["Should throw a graphql validation error for an undefined input", undefined],
-  ["Should throw a graphql validation error for a boolean input", true],
-  ["Should throw a graphql validation error for a number input", 100],
+  ["Should throw a graphql validation error for a null input array", null],
+  [
+    "Should throw a graphql validation error for an undefined input array",
+    undefined,
+  ],
+  ["Should throw a graphql validation error for a boolean input array", true],
+  ["Should throw a graphql validation error for a number input array", 100],
   [
     "Should throw a graphql validation error for an array with invalid inputs",
     [false, 90, {}, []],
@@ -11,22 +14,22 @@ export const gqlValidations: [string, unknown][] = [
 
 export const validations: [string, string[], string][] = [
   [
-    "Returns a validation error for an array input that exceeds the maximum limit of 10",
+    "Should return a validation error for an array input that exceeds the maximum limit of 10",
     ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"],
     "Input tags can only contain at most 10 tags",
   ],
   [
-    "Returns a validation error for an empty input array",
+    "Should return a validation error for an empty input array",
     [],
     "No post tags were provided",
   ],
   [
-    "Returns a validation error for an array of empty strings & empty whitespace strings",
+    "Should return a validation error for an array of empty strings & empty whitespace strings",
     ["", "   "],
     "Input tags cannot contain empty values",
   ],
   [
-    "Returns a validation error for an array of duplicate input strings",
+    "Should return a validation error for an array of duplicate input strings",
     ["tag a", "tagA", "b"],
     "Input tags can only contain unique tags",
   ],
@@ -70,7 +73,7 @@ const existingPostTags = [
 
 export const verify: [string, Record<string, boolean>[], string[], string][] = [
   [
-    "Should return an error response for an unknown user",
+    "Should return an error response if the user is unknown",
     [],
     ["tag1", "tag2"],
     "tags",
@@ -85,13 +88,13 @@ export const verify: [string, Record<string, boolean>[], string[], string][] = [
 
 export const warn: [string, string[], string[], string][] = [
   [
-    "Should create new post tags and return a warning message if only one input post tag already exists",
+    "Should create new post tags and respond with a warning message if only one input post tag already exists",
     ["test POST_tag-3", "tag4", "tag5"],
     ["tag4", "tag5"],
     "2 post tags created. A post tag similar to 'test POST_tag-3' has already been created",
   ],
   [
-    "Should create new post tags and return a warning message if more than one input post tag already exists",
+    "Should create new post tags and respond with a warning message if more than one input post tag already exists",
     ["tag_4", "tag-5", "TAG 6", "tag 7"],
     ["TAG 6", "tag 7"],
     "2 post tags created. Post tags similar to 'tag_4' and 1 other post tag have already been created",
@@ -100,12 +103,12 @@ export const warn: [string, string[], string[], string][] = [
 
 export const duplicate: [string, string[], string][] = [
   [
-    "Should respond with a DuplicatePostTagError if all the provided input post tags already exist",
+    "Should respond with an error if all the provided input post tags already exist",
     ["tag1", "tag2", "tag 4", "tAg_5", "tag-6"],
     "Post tags similar to the ones provided have already been created",
   ],
   [
-    "Should respond with a DuplicatePostTagError if the only provided input post tag already exists",
+    "Should respond with an error if the only provided input post tag already exists",
     ["t_a-g 7"],
     "A post tag similar to the one provided has already been created",
   ],
@@ -127,7 +130,7 @@ export const testWarn: [
     "2 post tags created. Post tags similar to 'tag1' and 1 other post tag have already been created",
   ],
   [
-    "Should create new post tags and return a warning message if only one input post tag already exists",
+    "Should create new post tags and return a warning message if at least one of the provided input post tags already exists",
     [[{ name: tags[0] }], [tag2, tag3, tag4]],
     [tag2, tag3, tag4],
     "3 post tags created. A post tag similar to 'tag1' has already been created",

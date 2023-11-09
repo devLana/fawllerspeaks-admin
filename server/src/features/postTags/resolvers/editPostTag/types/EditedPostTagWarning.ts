@@ -1,7 +1,7 @@
-import {
-  type EditedPostTagWarning as TagWarning,
-  type EditedPostTagWarningResolvers as Resolvers,
-  type PostTag,
+import type {
+  EditedPostTagWarning as TagWarning,
+  EditedPostTagWarningResolvers as Resolvers,
+  PostTag,
   Status,
 } from "@resolverTypes";
 
@@ -9,7 +9,7 @@ export class EditedPostTagWarning implements TagWarning {
   readonly status: Status;
 
   constructor(readonly tag: PostTag, readonly message: string) {
-    this.status = Status.Warn;
+    this.status = "WARN";
   }
 }
 

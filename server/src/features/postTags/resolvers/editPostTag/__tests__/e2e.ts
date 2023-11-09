@@ -16,7 +16,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, Status } from "@resolverTypes";
+import type { PostTag } from "@resolverTypes";
 import { DATE_REGEX } from "@utils";
 import { gqlValidations, validations } from "../utils/editPostTag.testUtils";
 
@@ -51,7 +51,7 @@ describe("Edit post tags - E2E", () => {
   });
 
   describe("Verify user authentication", () => {
-    it("Should return an AuthenticationError if the user is not logged in", async () => {
+    it("Should respond with an error if the user is not logged in", async () => {
       const variables = { tagId: "", name: "" };
       const payload = { query: EDIT_POST_TAG, variables };
 
@@ -62,7 +62,7 @@ describe("Edit post tags - E2E", () => {
       expect(data.data?.editPostTag).toStrictEqual({
         __typename: "AuthenticationError",
         message: "Unable to edit post tag",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -90,13 +90,13 @@ describe("Edit post tags - E2E", () => {
         __typename: "EditPostTagValidationError",
         tagIdError: errors[0],
         nameError: errors[1],
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify user", () => {
-    it("Should return a RegistrationError if the user is unregistered", async () => {
+    it("Should return an error response if the user is unregistered", async () => {
       const variables = { tagId: postTags[0].id, name: postTags[0].name };
       const payload = { query: EDIT_POST_TAG, variables };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
@@ -108,13 +108,13 @@ describe("Edit post tags - E2E", () => {
       expect(data.data?.editPostTag).toStrictEqual({
         __typename: "RegistrationError",
         message: "Unable to edit post tag",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify post tag id", () => {
-    it("Should return an UnknownError if the provided post tag id does not exist", async () => {
+    it("Should respond with an error if the provided post tag id does not exist", async () => {
       const variables = { tagId: randomUUID(), name: "newTag" };
       const payload = { query: EDIT_POST_TAG, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -126,13 +126,13 @@ describe("Edit post tags - E2E", () => {
       expect(data.data?.editPostTag).toStrictEqual({
         __typename: "UnknownError",
         message: "The post tag you are trying to edit does not exist",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify input post tag name, Return a DuplicatePostTagError response", () => {
-    it("Should Return the error response if the post tag name already exists", async () => {
+    it("Should return an error response if the post tag name already exists", async () => {
       const variables = { tagId: postTags[2].id, name: postTags[3].name };
       const payload = { query: EDIT_POST_TAG, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -144,11 +144,11 @@ describe("Edit post tags - E2E", () => {
       expect(data.data?.editPostTag).toStrictEqual({
         __typename: "DuplicatePostTagError",
         message: `A post tag with the name "${variables.name}" already exists`,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
 
-    it("Should return the error response if a similar post tag name already exists", async () => {
+    it("Should return an error response if a similar post tag name already exists", async () => {
       const [, , , { id }, { name }] = postTags;
       const variables = { tagId: id, name: name.toUpperCase() };
       const payload = { query: EDIT_POST_TAG, variables };
@@ -161,7 +161,7 @@ describe("Edit post tags - E2E", () => {
       expect(data.data?.editPostTag).toStrictEqual({
         __typename: "DuplicatePostTagError",
         message: `A similar post tag, "${name}", already exists`,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -179,7 +179,7 @@ describe("Edit post tags - E2E", () => {
       expect(data.data?.editPostTag).toStrictEqual({
         __typename: "EditedPostTagWarning",
         tag: { __typename: "PostTag", ...postTags[0] },
-        status: Status.Warn,
+        status: "WARN",
         message:
           "Post tag not updated. New post tag name is the same as the old one",
       });
@@ -206,7 +206,7 @@ describe("Edit post tags - E2E", () => {
           lastModified: expect.stringMatching(DATE_REGEX),
           dateCreated,
         },
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
 
@@ -228,7 +228,7 @@ describe("Edit post tags - E2E", () => {
           lastModified: expect.stringMatching(DATE_REGEX),
           dateCreated: postTags[0].dateCreated,
         },
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
   });

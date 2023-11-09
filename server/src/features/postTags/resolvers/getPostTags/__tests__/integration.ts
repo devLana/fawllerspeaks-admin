@@ -33,7 +33,7 @@ describe("Test getPostTags resolver", () => {
     });
   });
 
-  it("Returns all post tags", async () => {
+  it("Should return all post tags", async () => {
     const spy = spyDb({ rows: [{ isRegistered: true }] });
     spy.mockReturnValue({ rows: tags });
 

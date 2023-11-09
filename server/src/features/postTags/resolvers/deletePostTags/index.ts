@@ -2,11 +2,12 @@
 // import path from "node:path";
 
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
 // import deletePostTagsWorker from "./deletePostTagsWorker";
 import { PostTags, PostTagsWarning } from "../types";
 import { DeletePostTagsValidationError } from "./types/DeletePostTagsValidationError";
+import { deletePostTagsValidator as schema } from "./utils/deletePostTags.validator";
 import {
   AuthenticationError,
   NotAllowedError,
@@ -20,29 +21,13 @@ import type { ResolverFunc } from "@types";
 type DeletePostTags = ResolverFunc<MutationResolvers["deletePostTags"]>;
 
 const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
-  const schema = Joi.array<typeof tagIds>()
-    .required()
-    .items(
-      Joi.string().trim().guid({ version: "uuidv4", separator: "-" }).messages({
-        "string.empty": "Input tag ids cannot be empty strings",
-        "string.guid": "Invalid post tag id",
-      })
-    )
-    .min(1)
-    .unique()
-    .messages({
-      "array.min": "No post tag provided",
-      "array.unique": "No duplicate tags allowed. Input tag ids must be unique",
-      "array.base": "Post tags input must be an array",
-    });
-
   const tagOrTags = tagIds.length > 1 ? "tags" : "tag";
 
-  try {
-    if (!user) {
-      return new AuthenticationError(`Unable to delete post ${tagOrTags}`);
-    }
+  if (!user) {
+    return new AuthenticationError(`Unable to delete post ${tagOrTags}`);
+  }
 
+  try {
     const validatedTagIds = await schema.validateAsync(tagIds, {
       abortEarly: false,
     });

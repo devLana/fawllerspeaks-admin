@@ -9,9 +9,9 @@ import type { ResolverFunc } from "@types";
 type GetPostTags = ResolverFunc<QueryResolvers["getPostTags"]>;
 
 const getPostTags: GetPostTags = async (_, __, { db, user }) => {
-  try {
-    if (!user) return new AuthenticationError("Unable to get post tags");
+  if (!user) return new AuthenticationError("Unable to get post tags");
 
+  try {
     const { rows: findUser } = await db.query<{ isRegistered: boolean }>(
       `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
       [user]

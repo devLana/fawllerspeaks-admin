@@ -24,7 +24,7 @@ import {
 } from "../utils/deletePostTags.testUtils";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, Status } from "@resolverTypes";
+import type { PostTag } from "@resolverTypes";
 
 type DeleteTags = TestData<{ deletePostTags: Record<string, unknown> }>;
 
@@ -60,7 +60,7 @@ describe("Delete post tags - E2E", () => {
   });
 
   describe("Verify user authentication", () => {
-    it("Should return an AuthenticationError if the user is not logged in", async () => {
+    it("Should respond with an error if the user is not logged in", async () => {
       const payload = { query: DELETE_POST_TAGS, variables: { tagIds: [] } };
 
       const { data } = await post<DeleteTags>(url, payload);
@@ -73,7 +73,7 @@ describe("Delete post tags - E2E", () => {
       expect(data.data?.deletePostTags).toStrictEqual({
         __typename: "AuthenticationError",
         message: "Unable to delete post tag",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -106,13 +106,13 @@ describe("Delete post tags - E2E", () => {
       expect(data.data?.deletePostTags).toStrictEqual({
         __typename: "DeletePostTagsValidationError",
         tagIdsError: errorMsg,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify user verification status", () => {
-    it("Should return a RegistrationError if the user is unregistered", async () => {
+    it("Should return an error response if the user is unregistered", async () => {
       const variables = { tagIds: [uuid, randomUUID()] };
       const payload = { query: DELETE_POST_TAGS, variables };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
@@ -127,7 +127,7 @@ describe("Delete post tags - E2E", () => {
       expect(data.data?.deletePostTags).toStrictEqual({
         __typename: "RegistrationError",
         message: "Unable to delete post tags",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -149,14 +149,14 @@ describe("Delete post tags - E2E", () => {
           { __typename: "PostTag", ...tag1 },
           { __typename: "PostTag", ...tag2 },
         ]),
-        status: Status.Success,
+        status: "SUCCESS",
       });
 
       // expect(Worker).toHaveBeenCalledTimes(1);
       // expect(deletePostTagsWorker).toHaveBeenCalledTimes(1);
     });
 
-    it("Delete post tags, Return a message if at least one post tag could not be deleted", async () => {
+    it("Delete post tags, Respond with a message if at least one post tag could not be deleted", async () => {
       const [tag1, tag2, tag3, tag4] = postTags;
       const variables = { tagIds: [tag1.id, tag2.id, tag3.id, tag4.id] };
       const payload = { query: DELETE_POST_TAGS, variables };
@@ -173,7 +173,7 @@ describe("Delete post tags - E2E", () => {
           { __typename: "PostTag", ...tag4 },
         ]),
         message: `${tag3.name} and 1 other post tag deleted. 2 post tags could not be deleted`,
-        status: Status.Warn,
+        status: "WARN",
       });
 
       // expect(Worker).toHaveBeenCalledTimes(1);
@@ -182,7 +182,7 @@ describe("Delete post tags - E2E", () => {
   });
 
   describe("No post tag could be deleted", () => {
-    it("Should return an UnknownError if no post tag could be deleted", async () => {
+    it("Should respond with an error if no post tag could be deleted", async () => {
       const [tag1, tag2, tag3, tag4] = postTags;
       const variables = { tagIds: [tag1.id, tag2.id, tag3.id, tag4.id] };
       const payload = { query: DELETE_POST_TAGS, variables };
@@ -198,7 +198,7 @@ describe("Delete post tags - E2E", () => {
       expect(data.data?.deletePostTags).toStrictEqual({
         __typename: "UnknownError",
         message: "The provided post tags could not be deleted",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });

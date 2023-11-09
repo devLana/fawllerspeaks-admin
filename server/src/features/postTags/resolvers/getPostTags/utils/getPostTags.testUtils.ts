@@ -7,7 +7,7 @@ export const tags = [
 ];
 
 export const verifyUser: [string, Record<string, boolean>[]][] = [
-  ["Should return an error response for an unknown user", []],
+  ["Should return an error response if the user is unknown", []],
   [
     "Should return an error response if the user is unregistered",
     [{ isRegistered: false }],

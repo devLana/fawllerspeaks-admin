@@ -14,7 +14,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, Status } from "@resolverTypes";
+import type { PostTag } from "@resolverTypes";
 
 type GetPostTags = TestData<{ getPostTags: Record<string, unknown> }>;
 
@@ -47,7 +47,7 @@ describe("Get post tags - E2E", () => {
   });
 
   describe("Verify user authentication", () => {
-    it("Should respond with an AuthenticationError if the user is not logged in", async () => {
+    it("Should respond with an error if the user is not logged in", async () => {
       const { data } = await post<GetPostTags>(url, { query: GET_POST_TAGS });
 
       expect(data.errors).toBeUndefined();
@@ -55,13 +55,13 @@ describe("Get post tags - E2E", () => {
       expect(data.data?.getPostTags).toStrictEqual({
         __typename: "AuthenticationError",
         message: "Unable to get post tags",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify user registration status", () => {
-    it("Should respond with a RegistrationError if the user is unregistered", async () => {
+    it("Should respond with an error if the user is unregistered", async () => {
       const payload = { query: GET_POST_TAGS };
       const options = { authorization: `Bearer ${unregisteredJwt}` };
 
@@ -72,7 +72,7 @@ describe("Get post tags - E2E", () => {
       expect(data.data?.getPostTags).toStrictEqual({
         __typename: "RegistrationError",
         message: "Unable to get post tags",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -89,7 +89,7 @@ describe("Get post tags - E2E", () => {
       expect(data.data?.getPostTags).toStrictEqual({
         __typename: "PostTags",
         tags: expect.arrayContaining(postTags),
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
   });

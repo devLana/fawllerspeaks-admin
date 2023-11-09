@@ -1,10 +1,11 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
 import { PostTags, PostTagsWarning, DuplicatePostTagError } from "../types";
 import { CreatePostTagsValidationError } from "./types";
-import { AuthenticationError, RegistrationError, UnknownError } from "@utils";
+import { createPostTagsValidator } from "./utils/createPostTags.validator";
 import { formatTagName } from "@features/postTags/utils";
+import { AuthenticationError, RegistrationError, UnknownError } from "@utils";
 
 import type { ResolverFunc } from "@types";
 import type { MutationResolvers, PostTag } from "@resolverTypes";
@@ -12,36 +13,14 @@ import type { MutationResolvers, PostTag } from "@resolverTypes";
 type CreatePostTags = ResolverFunc<MutationResolvers["createPostTags"]>;
 
 const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
-  const schema = Joi.array<typeof tags>()
-    .required()
-    .items(
-      Joi.string().trim().messages({
-        "string.empty": "Input tags cannot contain empty values",
-      })
-    )
-    .min(1)
-    .max(10)
-    .unique((a: string, b: string) => {
-      const aStripped = a.replace(/[\s_-]/g, "");
-      const bStripped = b.replace(/[\s_-]/g, "");
-
-      return aStripped.toLowerCase() === bStripped.toLowerCase();
-    })
-    .messages({
-      "array.max": "Input tags can only contain at most {{#limit}} tags",
-      "array.min": "No post tags were provided",
-      "array.unique": "Input tags can only contain unique tags",
-      "array.base": "Post tags input must be an array",
-    });
-
   const tagOrTags = tags.length > 1 ? "tags" : "tag";
 
-  try {
-    if (!user) {
-      return new AuthenticationError(`Unable to create post ${tagOrTags}`);
-    }
+  if (!user) {
+    return new AuthenticationError(`Unable to create post ${tagOrTags}`);
+  }
 
-    const validatedTags = await schema.validateAsync(tags, {
+  try {
+    const validatedTags = await createPostTagsValidator.validateAsync(tags, {
       abortEarly: false,
     });
 

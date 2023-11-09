@@ -28,22 +28,22 @@ export const gqlValidate: [string, unknown][] = [
 
 export const validations: [string, string[], string][] = [
   [
-    "Returns a Validation error for an empty input array",
+    "Should return a validation error if the input array is empty",
     [],
     "No post tag provided",
   ],
   [
-    "Returns a Validation error for an array of empty strings or empty whitespace strings",
+    "Should return a validation error for an array of empty strings or empty whitespace strings",
     ["", "   "],
     "Input tag ids cannot be empty strings",
   ],
   [
-    "Returns a Validation error if the strings in the input array are not unique ids",
+    "Should return a validation error if the strings in the input array are not unique ids",
     [randomUUID(), uuid, uuid],
     "No duplicate tags allowed. Input tag ids must be unique",
   ],
   [
-    "Returns a Validation error if the array input contains an invalid post tag id",
+    "Should return a validation error if the array input contains an invalid post tag id",
     ["id1", "id2"],
     "Invalid post tag id",
   ],
