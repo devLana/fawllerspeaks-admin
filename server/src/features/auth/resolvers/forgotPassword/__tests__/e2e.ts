@@ -14,7 +14,11 @@ import { startServer } from "@server";
 import { db } from "@lib/db";
 
 import forgotPasswordMail from "../utils/forgotPasswordMail";
-import { gqlValidations, validations } from "../utils/forgotPassword.testUtils";
+import {
+  gqlValidations,
+  message,
+  validations,
+} from "../utils/forgotPassword.testUtils";
 import { MailError } from "@utils";
 import {
   unRegisteredUser,
@@ -24,7 +28,6 @@ import {
   testUsers,
 } from "@tests";
 
-import { Status } from "@resolverTypes";
 import type { APIContext, TestData } from "@types";
 
 type ForgotPassword = TestData<{ forgotPassword: Record<string, unknown> }>;
@@ -65,77 +68,68 @@ describe("Forgot password - E2E", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(gqlValidations)(
-      "Should throw a graphql validation error for %s email value",
-      async (_, email) => {
-        const payload = { query: FORGOT_PASSWORD, variables: { email } };
+    test.each(gqlValidations)("%s", async (_, email) => {
+      const payload = { query: FORGOT_PASSWORD, variables: { email } };
 
-        const { data } = await post<ForgotPassword>(url, payload);
+      const { data } = await post<ForgotPassword>(url, payload);
 
-        expect(forgotPasswordMail).not.toHaveBeenCalled();
-        expect(data.errors).toBeDefined();
-        expect(data.data).toBeUndefined();
-      }
-    );
+      expect(forgotPasswordMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeDefined();
+      expect(data.data).toBeUndefined();
+    });
 
-    test.each(validations)(
-      "Return an error for %s email string",
-      async (_, email, errorMsg) => {
-        const payload = { query: FORGOT_PASSWORD, variables: { email } };
+    test.each(validations)("%s", async (_, email, errorMsg) => {
+      const payload = { query: FORGOT_PASSWORD, variables: { email } };
 
-        const { data } = await post<ForgotPassword>(url, payload);
+      const { data } = await post<ForgotPassword>(url, payload);
 
-        expect(forgotPasswordMail).not.toHaveBeenCalled();
-
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.forgotPassword).toStrictEqual({
-          __typename: "EmailValidationError",
-          emailError: errorMsg,
-          status: Status.Error,
-        });
-      }
-    );
+      expect(forgotPasswordMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.forgotPassword).toStrictEqual({
+        __typename: "EmailValidationError",
+        emailError: errorMsg,
+        status: "ERROR",
+      });
+    });
   });
 
   describe("Verify e-mail address", () => {
-    test("Return an error if e-mail address is unknown", async () => {
+    test("Should return an error response if the e-mail address is unknown", async () => {
       const variables = { email: "example_mail@examplemail.com" };
       const payload = { query: FORGOT_PASSWORD, variables };
 
       const { data } = await post<ForgotPassword>(url, payload);
 
       expect(forgotPasswordMail).not.toHaveBeenCalled();
-
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
         __typename: "NotAllowedError",
         message: "Unable to reset the password for this user",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
 
-    test("Returns error for email with unregistered account", async () => {
+    test("Should return an error response if the email is for an unregistered account", async () => {
       const variables = { email: unRegisteredUser.email };
       const payload = { query: FORGOT_PASSWORD, variables };
 
       const { data } = await post<ForgotPassword>(url, payload);
 
       expect(forgotPasswordMail).not.toHaveBeenCalled();
-
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
         __typename: "RegistrationError",
         message: "Unable to reset password for unregistered user",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Generate password reset link", () => {
-    test("Send confirmation mail with the password reset link", async () => {
+    test("Should send a confirmation mail with the generated password reset link", async () => {
       const variables = { email: registeredUser.email };
       const payload = { query: FORGOT_PASSWORD, variables };
 
@@ -144,18 +138,16 @@ describe("Forgot password - E2E", () => {
       jest.runAllTimers();
 
       expect(forgotPasswordMail).toHaveBeenCalledTimes(1);
-
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
         __typename: "Response",
-        message:
-          "Your request is being processed and a mail will be sent to you shortly if that email address exists",
-        status: Status.Success,
+        message,
+        status: "SUCCESS",
       });
     });
 
-    test("Confirmation mail fails to send, Invalidate generated password reset link", async () => {
+    test("Should invalidate the generated password reset link if the confirmation mail fails to send", async () => {
       const variables = { email: registeredUser.email };
       const payload = { query: FORGOT_PASSWORD, variables };
 
@@ -171,13 +163,12 @@ describe("Forgot password - E2E", () => {
       expect(forgotPasswordMail).toHaveBeenCalledTimes(1);
       expect(forgotPasswordMail).toThrow("Unable to send mail");
       expect(forgotPasswordMail).toThrow(MailError);
-
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
         __typename: "ServerError",
         message: "Unable to send mail",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });

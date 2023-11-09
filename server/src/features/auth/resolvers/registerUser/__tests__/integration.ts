@@ -28,7 +28,7 @@ describe("Test register user resolver", () => {
   });
 
   describe("Verify user authentication", () => {
-    test("Return an error response if user is not logged in", async () => {
+    test("Should return an error response if the user is not logged in", async () => {
       mockContext.user = null;
 
       const data = await resolver({}, { userInput: args }, mockContext, info);
@@ -61,14 +61,13 @@ describe("Test register user resolver", () => {
 
       expect(dbSpy).toHaveBeenCalledTimes(1);
       expect(dbSpy).toHaveReturnedWith({ rows: mock });
-
       expect(data).toHaveProperty("message", errorMessage);
       expect(data).toHaveProperty("status", "ERROR");
     });
   });
 
   describe("Register user success", () => {
-    test("Register an unregistered user, Respond with all user details", async () => {
+    test("Register an unregistered user, Should respond with the user's details", async () => {
       const dbSpy = spyDb({ rows: registerMock });
       dbSpy.mockReturnValueOnce({ rows: [] });
 
@@ -77,7 +76,6 @@ describe("Test register user resolver", () => {
       expect(dbSpy).toHaveBeenCalledTimes(2);
       expect(dbSpy).toHaveNthReturnedWith(1, { rows: registerMock });
       expect(dbSpy).toHaveNthReturnedWith(2, { rows: [] });
-
       expect(data).toHaveProperty("user.id", "id_of_this_user");
       expect(data).toHaveProperty("user.email", "test@mail.com");
       expect(data).toHaveProperty("user.firstName", args.firstName);

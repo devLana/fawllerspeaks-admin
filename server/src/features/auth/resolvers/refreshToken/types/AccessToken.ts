@@ -1,6 +1,6 @@
-import {
-  type AccessTokenResolvers as Resolvers,
-  type AccessToken as AccessTokenData,
+import type {
+  AccessTokenResolvers as Resolvers,
+  AccessToken as AccessTokenData,
   Status,
 } from "@resolverTypes";
 
@@ -8,7 +8,7 @@ export class AccessToken implements AccessTokenData {
   readonly status: Status;
 
   constructor(readonly accessToken: string) {
-    this.status = Status.Success;
+    this.status = "SUCCESS";
   }
 }
 

@@ -21,7 +21,6 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { Status } from "@resolverTypes";
 import { MailError } from "@utils";
 
 type Refresh = TestData<{ refreshToken: Record<string, unknown> }>;
@@ -68,38 +67,32 @@ describe("Refresh Token - E2E", () => {
   });
 
   describe("Validate session id string", () => {
-    it.each(gqlValidations)(
-      "Should throw a graphql validation error for %s session id value",
-      async (_, id) => {
-        const payload = { query: REFRESH_TOKEN, variables: { sessionId: id } };
+    it.each(gqlValidations)("%s", async (_, id) => {
+      const payload = { query: REFRESH_TOKEN, variables: { sessionId: id } };
 
-        const { data } = await post<Refresh>(url, payload);
+      const { data } = await post<Refresh>(url, payload);
 
-        expect(data.errors).toBeDefined();
-        expect(data.data).toBeUndefined();
-      }
-    );
+      expect(data.errors).toBeDefined();
+      expect(data.data).toBeUndefined();
+    });
 
-    it.each(validateSession)(
-      "Return an error response if session id is an %s string",
-      async (_, id) => {
-        const payload = { query: REFRESH_TOKEN, variables: { sessionId: id } };
+    it.each(validateSession)("%s", async (_, id) => {
+      const payload = { query: REFRESH_TOKEN, variables: { sessionId: id } };
 
-        const { data } = await post<Refresh>(url, payload);
+      const { data } = await post<Refresh>(url, payload);
 
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.refreshToken).toStrictEqual({
-          __typename: "SessionIdValidationError",
-          sessionIdError: "Invalid session id",
-          status: Status.Error,
-        });
-      }
-    );
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.refreshToken).toStrictEqual({
+        __typename: "SessionIdValidationError",
+        sessionIdError: "Invalid session id",
+        status: "ERROR",
+      });
+    });
   });
 
   describe("Validate cookie header", () => {
-    it("No cookies in the request's cookie header, Should respond with an error", async () => {
+    it("No cookies in the request's cookie header, Should respond with an error response", async () => {
       const variables = { sessionId: registeredSessionId };
       const payload = { query: REFRESH_TOKEN, variables };
 
@@ -110,11 +103,11 @@ describe("Refresh Token - E2E", () => {
       expect(data.data?.refreshToken).toStrictEqual({
         __typename: "AuthCookieError",
         message: "Unable to refresh token",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
 
-    it("Return an error response if request header has a missing cookie", async () => {
+    it("Should return an error response if the request header has a missing cookie", async () => {
       const cookie = registeredCookies.split(";").splice(1, 1).join(";");
       const variables = { sessionId: registeredSessionId };
       const payload = { query: REFRESH_TOKEN, variables };
@@ -126,14 +119,14 @@ describe("Refresh Token - E2E", () => {
       expect(data.data?.refreshToken).toStrictEqual({
         __typename: "ForbiddenError",
         message: "Unable to refresh token",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify cookie refresh token", () => {
     describe("Expired refresh token", () => {
-      it("Session id is unknown, Return an UnknownError response ", async () => {
+      it("Session id is unknown, Return an error response", async () => {
         const variables = { sessionId: "unknown_session_id" };
         const payload = { query: REFRESH_TOKEN, variables };
         const options = { cookie: unregisteredCookies };
@@ -145,11 +138,11 @@ describe("Refresh Token - E2E", () => {
         expect(data.data?.refreshToken).toStrictEqual({
           __typename: "UnknownError",
           message: "Unable to refresh token",
-          status: Status.Error,
+          status: "ERROR",
         });
       });
 
-      it("Current session was not assigned to the user of the cookie refresh token, Return an UnknownError response ", async () => {
+      it("Current session was not assigned to the user of the cookie refresh token, Return an error response", async () => {
         const variables = { sessionId: registeredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
         const options = { cookie: unregisteredCookies };
@@ -161,11 +154,11 @@ describe("Refresh Token - E2E", () => {
         expect(data.data?.refreshToken).toStrictEqual({
           __typename: "UserSessionError",
           message: "Unable to refresh token",
-          status: Status.Error,
+          status: "ERROR",
         });
       });
 
-      it("Should refresh tokens, Renew expired refresh token and send new access token", async () => {
+      it("Should refresh tokens, renew expired refresh token and send a new access token", async () => {
         const variables = { sessionId: unregisteredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
         const options = { cookie: unregisteredCookies };
@@ -177,11 +170,11 @@ describe("Refresh Token - E2E", () => {
         expect(data.data?.refreshToken).toStrictEqual({
           __typename: "AccessToken",
           accessToken: expect.stringMatching(JWT_REGEX),
-          status: Status.Success,
+          status: "SUCCESS",
         });
       });
 
-      it("Session refresh token does not match the cookie refresh token and session mail failed to send, Return a NotAllowedError response", async () => {
+      it("Session refresh token does not match the cookie refresh token and session mail failed to send, Return an error response", async () => {
         const mockSessionMail = sessionMail as MockFunction;
         mockSessionMail.mockImplementation(() => {
           throw new MailError("Unable to send session mail");
@@ -196,19 +189,18 @@ describe("Refresh Token - E2E", () => {
         expect(sessionMail).toHaveBeenCalledTimes(1);
         expect(sessionMail).toHaveBeenCalledWith(unRegisteredTestUser.email);
         expect(sessionMail).toThrow(MailError);
-
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.refreshToken).toStrictEqual({
           __typename: "NotAllowedError",
           message: "Unable to refresh token",
-          status: Status.Error,
+          status: "ERROR",
         });
       });
     });
 
     describe("Refresh token is valid and not expired", () => {
-      it("Session id is unknown, Return an UnknownError response", async () => {
+      it("Session id is unknown, Return an error response", async () => {
         const variables = { sessionId: "unknown_session_id" };
         const payload = { query: REFRESH_TOKEN, variables };
         const options = { cookie: registeredCookies };
@@ -220,11 +212,11 @@ describe("Refresh Token - E2E", () => {
         expect(data.data?.refreshToken).toStrictEqual({
           __typename: "UnknownError",
           message: "Unable to refresh token",
-          status: Status.Error,
+          status: "ERROR",
         });
       });
 
-      it("Current session was not assigned to the user of the cookie refresh token, Return a UserSessionError response", async () => {
+      it("Current session was not assigned to the user of the cookie refresh token, Return an error response", async () => {
         const variables = { sessionId: newRegisteredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
         const options = { cookie: registeredCookies };
@@ -236,11 +228,11 @@ describe("Refresh Token - E2E", () => {
         expect(data.data?.refreshToken).toStrictEqual({
           __typename: "UserSessionError",
           message: "Unable to refresh token",
-          status: Status.Error,
+          status: "ERROR",
         });
       });
 
-      it("Should refresh tokens, Renew refresh token and send new access token", async () => {
+      it("Should refresh tokens, renew refresh token and send a new access token", async () => {
         const variables = { sessionId: registeredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
         const options = { cookie: registeredCookies };
@@ -252,11 +244,11 @@ describe("Refresh Token - E2E", () => {
         expect(data.data?.refreshToken).toStrictEqual({
           __typename: "AccessToken",
           accessToken: expect.stringMatching(JWT_REGEX),
-          status: Status.Success,
+          status: "SUCCESS",
         });
       });
 
-      it("Session refresh token does not match the cookie refresh token, Return a NotAllowedError response and send a notification mail", async () => {
+      it("Session refresh token does not match the cookie refresh token, Return an error response and send a notification mail", async () => {
         const variables = { sessionId: registeredSessionId };
         const payload = { query: REFRESH_TOKEN, variables };
         const options = { cookie: registeredCookies };
@@ -265,13 +257,12 @@ describe("Refresh Token - E2E", () => {
 
         expect(sessionMail).toHaveBeenCalledTimes(1);
         expect(sessionMail).toHaveBeenCalledWith(registeredTestUser.email);
-
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
         expect(data.data?.refreshToken).toStrictEqual({
           __typename: "NotAllowedError",
           message: "Unable to refresh token",
-          status: Status.Error,
+          status: "ERROR",
         });
       });
     });

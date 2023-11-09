@@ -1,6 +1,6 @@
-import {
-  type SessionIdValidationErrorResolvers as Resolvers,
-  type SessionIdValidationError as Errors,
+import type {
+  SessionIdValidationErrorResolvers as Resolvers,
+  SessionIdValidationError as Errors,
   Status,
 } from "@resolverTypes";
 
@@ -8,7 +8,7 @@ export class SessionIdValidationError implements Errors {
   readonly status: Status;
 
   constructor(readonly sessionIdError: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

@@ -1,6 +1,6 @@
-import {
-  type VerifyResetTokenValidationErrorResolvers as Resolvers,
-  type VerifyResetTokenValidationError as Errors,
+import type {
+  VerifyResetTokenValidationErrorResolvers as Resolvers,
+  VerifyResetTokenValidationError as Errors,
   Status,
 } from "@resolverTypes";
 
@@ -8,7 +8,7 @@ export class VerifyResetTokenValidationError implements Errors {
   readonly status: Status;
 
   constructor(readonly tokenError: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

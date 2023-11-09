@@ -12,21 +12,18 @@ describe("Test verify reset token resolver", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(validations)(
-      "Returns error on %s token input",
-      async (_, data) => {
-        const msg = "Provide password reset token";
+    test.each(validations)("%s", async (_, data) => {
+      const msg = "Provide password reset token";
 
-        const result = await resolver({}, { token: data }, mockContext, info);
+      const result = await resolver({}, { token: data }, mockContext, info);
 
-        expect(result).toHaveProperty("tokenError", msg);
-        expect(result).toHaveProperty("status", "ERROR");
-      }
-    );
+      expect(result).toHaveProperty("tokenError", msg);
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
   describe("Verify provided password reset token", () => {
-    test("Return an error object for an unknown password reset token", async () => {
+    test("Should return an error response if the password reset token is unknown", async () => {
       const dbSpy = spyDb({ rows: [] });
       const msg = "Unable to verify password reset token";
 
@@ -38,7 +35,7 @@ describe("Test verify reset token resolver", () => {
       expect(result).toHaveProperty("status", "ERROR");
     });
 
-    test("Return an error object for an unregistered account", async () => {
+    test("Should return an error response if the user account is unregistered", async () => {
       const mockData = [{ isRegistered: false }];
       const msg = "Unable to verify password reset token";
       const dbSpy = spyDb({ rows: mockData }).mockReturnValueOnce({ rows: [] });
@@ -54,7 +51,7 @@ describe("Test verify reset token resolver", () => {
   });
 
   describe("Successfully verify password reset token", () => {
-    test("Respond with e-mail and password reset token", async () => {
+    test("Should respond with the e-mail and password reset token of the user's account", async () => {
       const email = "example_email@mail.com";
       const mockData = [{ isRegistered: true, email }];
       const dbSpy = spyDb({ rows: mockData });

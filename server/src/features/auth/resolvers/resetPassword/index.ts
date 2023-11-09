@@ -1,9 +1,10 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
 import resetPasswordMail from "./utils/resetPasswordMail";
 import { ResetPasswordValidationError } from "./types";
+import { resetPasswordValidator } from "./utils/resetPassword.validator";
 
 import {
   MailError,
@@ -13,7 +14,7 @@ import {
   generateErrorsObject,
 } from "@utils";
 
-import { type MutationResolvers, Status } from "@resolverTypes";
+import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";
 
 type Reset = ResolverFunc<MutationResolvers["resetPassword"]>;
@@ -25,34 +26,11 @@ interface User {
 }
 
 const resetPassword: Reset = async (_, args, { db }) => {
-  const schema = Joi.object<typeof args>({
-    token: Joi.string()
-      .required()
-      .trim()
-      .messages({ "string.empty": "Provide reset token" }),
-    password: Joi.string()
-      .required()
-      .pattern(/\d+/)
-      .pattern(/[a-z]+/)
-      .pattern(/[A-Z]+/)
-      .pattern(/[^a-z\d]+/i)
-      .min(8)
-      .messages({
-        "string.empty": "Enter password",
-        "string.pattern.base":
-          "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol",
-        "string.min": "Password must be at least 8 characters long",
-      }),
-    confirmPassword: Joi.any()
-      .valid(Joi.ref("password"))
-      .required()
-      .messages({ "any.only": "Passwords do not match" }),
-  });
-
   try {
-    const { token, password } = await schema.validateAsync(args, {
+    const validations = await resetPasswordValidator.validateAsync(args, {
       abortEarly: false,
     });
+    const { token, password } = validations;
 
     const generateHash = bcrypt.hash(password, 10);
     const findUser = db.query<User>(
@@ -104,7 +82,7 @@ const resetPassword: Reset = async (_, args, { db }) => {
       );
     }
 
-    if (err instanceof MailError) return new Response(err.message, Status.Warn);
+    if (err instanceof MailError) return new Response(err.message, "WARN");
 
     throw new GraphQLError("Unable to reset password. Please try again later");
   }

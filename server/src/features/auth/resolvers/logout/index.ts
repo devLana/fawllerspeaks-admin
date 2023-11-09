@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
-import { clearCookies } from "@features/auth/utils";
+import { clearCookies, sessionIdValidator } from "@features/auth/utils";
 import { SessionIdValidationError } from "../types";
 import {
   AuthenticationError,
@@ -10,20 +10,16 @@ import {
   UnknownError,
 } from "@utils";
 
-import { Status, type MutationResolvers } from "@resolverTypes";
+import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
 
 type Logout = ResolverFunc<MutationResolvers["logout"]>;
 
 const logout: Logout = async (_, { sessionId }, { db, user, req, res }) => {
-  const schema = Joi.string().required().trim().messages({
-    "string.empty": "Invalid session id",
-  });
+  if (!user) return new AuthenticationError("Unable to logout");
 
   try {
-    if (!user) return new AuthenticationError("Unable to logout");
-
-    const validatedSession = await schema.validateAsync(sessionId);
+    const validatedSession = await sessionIdValidator.validateAsync(sessionId);
 
     const { auth, sig, token } = req.cookies;
 
@@ -43,7 +39,7 @@ const logout: Logout = async (_, { sessionId }, { db, user, req, res }) => {
         validatedSession,
       ]);
 
-      return new Response("User logged out", Status.Warn);
+      return new Response("User logged out", "WARN");
     }
 
     if (!auth || !sig || !token) return new NotAllowedError("Unable to logout");

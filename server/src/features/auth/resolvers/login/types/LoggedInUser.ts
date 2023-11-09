@@ -1,7 +1,7 @@
-import {
-  type LoggedInUser as LoggedInUserResponse,
-  type LoggedInUserResolvers as Resolvers,
-  type User,
+import type {
+  LoggedInUser as LoggedInUserResponse,
+  LoggedInUserResolvers as Resolvers,
+  User,
   Status,
 } from "@resolverTypes";
 
@@ -13,7 +13,7 @@ export class LoggedInUser implements LoggedInUserResponse {
     readonly accessToken: string,
     readonly sessionId: string
   ) {
-    this.status = Status.Success;
+    this.status = "SUCCESS";
   }
 }
 

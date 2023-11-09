@@ -8,7 +8,6 @@ import { db } from "@lib/db";
 import { gqlValidations, validations } from "../utils/logout.testUtils";
 import { LOGOUT, testUsers, loginTestUser, post, testSession } from "@tests";
 
-import { Status } from "@resolverTypes";
 import type { APIContext, TestData } from "@types";
 
 type Logout = TestData<{ logout: Record<string, unknown> }>;
@@ -49,7 +48,7 @@ describe("Logout - E2E", () => {
   });
 
   describe("Validate user authentication", () => {
-    it("Return an error response if user is not logged in", async () => {
+    it("Should return an error response if the user is not logged in", async () => {
       const payload = { query: LOGOUT, variables: { sessionId: "" } };
 
       const { data } = await post<Logout>(url, payload);
@@ -59,7 +58,7 @@ describe("Logout - E2E", () => {
       expect(data.data?.logout).toStrictEqual({
         __typename: "AuthenticationError",
         message: "Unable to logout",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -86,13 +85,13 @@ describe("Logout - E2E", () => {
       expect(data.data?.logout).toStrictEqual({
         __typename: "SessionIdValidationError",
         sessionIdError: "Invalid session id",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Logout request is made with an empty cookie header", () => {
-    it("Return an error response if the session id is unknown", async () => {
+    it("Should return an error response if the session id is unknown", async () => {
       const payload = { query: LOGOUT, variables: { sessionId: "wrong_id" } };
       const options = { authorization: `Bearer ${unregisteredJwt}` };
 
@@ -103,11 +102,11 @@ describe("Logout - E2E", () => {
       expect(data.data?.logout).toStrictEqual({
         __typename: "UnknownError",
         message: "Unable to logout",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
 
-    it("Should return an error if the session was not assigned to the logged in user", async () => {
+    it("Should return an error response if the session was not assigned to the logged in user", async () => {
       const variables = { sessionId: unregisteredSessionId };
       const payload = { query: LOGOUT, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -119,11 +118,11 @@ describe("Logout - E2E", () => {
       expect(data.data?.logout).toStrictEqual({
         __typename: "NotAllowedError",
         message: "Unable to logout",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
 
-    it("Delete session, Log user out", async () => {
+    it("Should delete the current session and log the user out", async () => {
       const variables = { sessionId: unregisteredSessionId };
       const payload = { query: LOGOUT, variables };
       const options = { authorization: `Bearer ${unregisteredJwt}` };
@@ -135,13 +134,13 @@ describe("Logout - E2E", () => {
       expect(data.data?.logout).toStrictEqual({
         __typename: "Response",
         message: "User logged out",
-        status: Status.Warn,
+        status: "WARN",
       });
     });
   });
 
   describe("Validate request cookie", () => {
-    it("Return an error response if request has a missing cookie", async () => {
+    it("Should return an error response if the request has a missing cookie", async () => {
       const cookie = registeredCookie.split(";").splice(1, 1).join(";");
       const variables = { sessionId: registeredSessionId };
       const payload = { query: LOGOUT, variables };
@@ -154,13 +153,13 @@ describe("Logout - E2E", () => {
       expect(data.data?.logout).toStrictEqual({
         __typename: "NotAllowedError",
         message: "Unable to logout",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify user session", () => {
-    it("Should return an error response if user session could not be found", async () => {
+    it("Should return an error response if the user session could not be found", async () => {
       const payload = { query: LOGOUT, variables: { sessionId: "wrong_id" } };
       const jwt = `Bearer ${registeredJwt}`;
       const options = { authorization: jwt, cookie: registeredCookie };
@@ -172,13 +171,13 @@ describe("Logout - E2E", () => {
       expect(data.data?.logout).toStrictEqual({
         __typename: "UnknownError",
         message: "Unable to logout",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Successfully log user out", () => {
-    it("Should log user out and delete user session from db", async () => {
+    it("Should log the user out and delete the user session from the db", async () => {
       const variables = { sessionId: registeredSessionId };
       const jwt = `Bearer ${registeredJwt}`;
       const payload = { query: LOGOUT, variables };
@@ -191,7 +190,7 @@ describe("Logout - E2E", () => {
       expect(data.data?.logout).toStrictEqual({
         __typename: "Response",
         message: "User logged out",
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
   });

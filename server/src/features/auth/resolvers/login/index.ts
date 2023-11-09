@@ -1,8 +1,9 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
 import { LoggedInUser, LoginValidationError } from "./types";
+import { loginValidator } from "./utils/login.validator";
 
 import { NotAllowedError, generateErrorsObject } from "@utils";
 import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
@@ -24,23 +25,11 @@ interface DBUser {
 }
 
 const login: Login = async (_, args, { db, req, res }) => {
-  const schema = Joi.object<typeof args>({
-    email: Joi.string().email().required().trim().messages({
-      "string.empty": "Enter an e-mail address",
-      "string.email": "Invalid e-mail address",
-    }),
-    password: Joi.string().required().messages({
-      "string.empty": "Enter password",
-    }),
-    sessionId: Joi.string().trim().allow(null).messages({
-      "string.empty": "Enter session id",
-    }),
-  });
-
   try {
-    const { email, password, sessionId } = await schema.validateAsync(args, {
+    const validations = await loginValidator.validateAsync(args, {
       abortEarly: false,
     });
+    const { email, password, sessionId } = validations;
 
     const { auth, sig, token } = req.cookies;
 

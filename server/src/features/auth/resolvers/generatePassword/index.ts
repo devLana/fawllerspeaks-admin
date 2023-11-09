@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
 import { EmailValidationError } from "../types";
 
@@ -11,7 +11,7 @@ import {
   Response,
   ServerError,
 } from "@utils";
-import { bytesHash } from "@features/auth/utils";
+import { bytesHash, emailValidator } from "@features/auth/utils";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -19,13 +19,8 @@ import type { ResolverFunc } from "@types";
 type GeneratePassword = ResolverFunc<MutationResolvers["generatePassword"]>;
 
 const generatePassword: GeneratePassword = async (_, arg, { db }) => {
-  const schema = Joi.string().email().required().trim().messages({
-    "string.empty": "Enter an e-mail address",
-    "string.email": "Invalid e-mail address",
-  });
-
   try {
-    const validatedEmail = await schema.validateAsync(arg.email);
+    const validatedEmail = await emailValidator.validateAsync(arg.email);
 
     const passwords = bytesHash();
     const findUser = db.query<{ isRegistered: boolean }>(

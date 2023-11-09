@@ -15,7 +15,6 @@ import {
 import { registeredUser, post, LOGIN, testUsers } from "@tests";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
-import { Status } from "@resolverTypes";
 
 type Login = TestData<{ login: Record<string, unknown> }>;
 
@@ -56,7 +55,7 @@ describe("Login - E2E", () => {
         __typename: "LoginValidationError",
         emailError: errors[0],
         passwordError: errors[1],
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -72,13 +71,13 @@ describe("Login - E2E", () => {
       expect(data.data?.login).toStrictEqual({
         __typename: "NotAllowedError",
         message: "Invalid email or password",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Successfully log in user", () => {
-    test("Log in user and return user details", async () => {
+    test("Should log the user in and return user details", async () => {
       const { email, password } = registeredUser;
       const payload = { query: LOGIN, variables: { email, password } };
 
@@ -90,7 +89,6 @@ describe("Login - E2E", () => {
       expect(responseHeaders["set-cookie"]?.[0]).toMatch(/^auth/);
       expect(responseHeaders["set-cookie"]?.[1]).toMatch(/^token/);
       expect(responseHeaders["set-cookie"]?.[2]).toMatch(/^sig/);
-
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.login).not.toHaveProperty("password");
@@ -108,7 +106,7 @@ describe("Login - E2E", () => {
         },
         accessToken: expect.stringMatching(JWT_REGEX),
         sessionId: expect.stringMatching(SESSION_ID_REGEX),
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
   });

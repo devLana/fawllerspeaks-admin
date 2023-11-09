@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
 import {
@@ -9,6 +9,7 @@ import {
   clearCookies,
   sessionMail,
   setCookies,
+  sessionIdValidator,
 } from "@features/auth/utils";
 
 import { verify } from "@lib/tokenPromise";
@@ -38,22 +39,17 @@ interface DBResponse {
 const refreshToken: Refresh = async (_, args, { db, req, res }) => {
   if (!process.env.REFRESH_TOKEN_SECRET) throw new GraphQLError("Server Error");
 
-  const schema = Joi.string().required().trim().messages({
-    "string.empty": "Invalid session id",
-  });
-
   const SELECT = `
     SELECT refresh_token "refreshToken", "user", email
     FROM sessions LEFT JOIN users ON "user" = user_id
     WHERE session_id = $1
   `;
-
   let payload = "";
   let validatedSession: string | null = null;
   let jwt: string | null = null;
 
   try {
-    validatedSession = await schema.validateAsync(args.sessionId);
+    validatedSession = await sessionIdValidator.validateAsync(args.sessionId);
 
     const { auth, sig, token } = req.cookies;
 

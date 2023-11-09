@@ -25,8 +25,14 @@ export const data = {
 };
 
 export const validations: [string, string][] = [
-  ["empty", ""],
-  ["empty whitespace", "    "],
+  [
+    "Should return a validation error response if the session id is an empty string",
+    "",
+  ],
+  [
+    "Should return a validation error response if the session id is an empty whitespace string",
+    "    ",
+  ],
 ];
 
 export const obj = {
@@ -42,10 +48,19 @@ export const mockObj = {
 };
 
 export const gqlValidations: GQL[] = [
-  ["a null", null],
-  ["an undefined", undefined],
-  ["a number", 59],
-  ["a boolean", true],
-  ["an array", []],
-  ["an object", {}],
+  ["Should throw a graphql validation error for a null session id value", null],
+  [
+    "Should throw a graphql validation error for an undefined session id value",
+    undefined,
+  ],
+  ["Should throw a graphql validation error for a number session id value", 59],
+  [
+    "Should throw a graphql validation error for a boolean session id value",
+    true,
+  ],
+  ["Should throw a graphql validation error for an array session id value", []],
+  [
+    "Should throw a graphql validation error for an object session id value",
+    {},
+  ],
 ];

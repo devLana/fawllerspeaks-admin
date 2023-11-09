@@ -1,13 +1,14 @@
 import { Buffer } from "node:buffer";
 
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
 import { VerifiedSession } from "./types";
 import { SessionIdValidationError } from "../types";
 import {
   clearCookies,
+  sessionIdValidator,
   sessionMail,
   setCookies,
   signTokens,
@@ -42,10 +43,6 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     throw new GraphQLError("Server Error. Please try again later");
   }
 
-  const schema = Joi.string().required().trim().messages({
-    "string.empty": "Invalid session id",
-  });
-
   const SELECT = `
     SELECT
       "user" "userId",
@@ -63,7 +60,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
   let payload = "";
 
   try {
-    validatedSession = await schema.validateAsync(args.sessionId);
+    validatedSession = await sessionIdValidator.validateAsync(args.sessionId);
 
     const { auth, sig, token } = req.cookies;
 

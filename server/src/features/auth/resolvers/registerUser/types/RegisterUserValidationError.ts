@@ -1,6 +1,6 @@
-import {
-  type RegisterUserValidationErrorResolvers as Resolvers,
-  type RegisterUserValidationError as Errors,
+import type {
+  RegisterUserValidationErrorResolvers as Resolvers,
+  RegisterUserValidationError as Errors,
   Status,
 } from "@resolverTypes";
 import type { RemoveNull } from "@types";
@@ -19,7 +19,7 @@ export class RegisterUserValidationError implements Errors {
     this.lastNameError = errors.lastNameError;
     this.passwordError = errors.passwordError;
     this.confirmPasswordError = errors.confirmPasswordError;
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

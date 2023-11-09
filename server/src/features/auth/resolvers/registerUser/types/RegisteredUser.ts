@@ -1,7 +1,7 @@
-import {
-  type RegisteredUser as RegisteredUserResponse,
-  type RegisteredUserResolvers as Resolvers,
-  type User,
+import type {
+  RegisteredUser as RegisteredUserResponse,
+  RegisteredUserResolvers as Resolvers,
+  User,
   Status,
 } from "@resolverTypes";
 
@@ -9,7 +9,7 @@ export class RegisteredUser implements RegisteredUserResponse {
   readonly status: Status;
 
   constructor(readonly user: User) {
-    this.status = Status.Success;
+    this.status = "SUCCESS";
   }
 }
 

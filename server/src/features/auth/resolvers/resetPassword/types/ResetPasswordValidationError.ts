@@ -1,6 +1,6 @@
-import {
-  type ResetPasswordValidationErrorResolvers as Resolvers,
-  type ResetPasswordValidationError as Errors,
+import type {
+  ResetPasswordValidationErrorResolvers as Resolvers,
+  ResetPasswordValidationError as Errors,
   Status,
 } from "@resolverTypes";
 
@@ -12,7 +12,7 @@ export class ResetPasswordValidationError implements Errors {
     readonly passwordError?: string,
     readonly confirmPasswordError?: string
   ) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

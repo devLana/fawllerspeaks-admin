@@ -19,7 +19,6 @@ import {
   unRegisteredUser as unRegisteredTestUser,
 } from "@tests";
 
-import { Status } from "@resolverTypes";
 import type { APIContext, DbTestUser, TestData } from "@types";
 
 type Verify = TestData<{ verifySession: Record<string, unknown> }>;
@@ -68,38 +67,32 @@ describe("Verify Session - E2E", () => {
   });
 
   describe("Validate session id input", () => {
-    it.each(gqlValidations)(
-      "Should throw a graphql validation error for %s session id value",
-      async (_, id) => {
-        const payload = { query: VERIFY_SESSION, variables: { sessionId: id } };
+    it.each(gqlValidations)("%s", async (_, id) => {
+      const payload = { query: VERIFY_SESSION, variables: { sessionId: id } };
 
-        const { data } = await post<Verify>(url, payload);
+      const { data } = await post<Verify>(url, payload);
 
-        expect(data.errors).toBeDefined();
-        expect(data.data).toBeUndefined();
-      }
-    );
+      expect(data.errors).toBeDefined();
+      expect(data.data).toBeUndefined();
+    });
 
-    it.each(validations)(
-      "Return an error response if session id is an %s string",
-      async (_, id) => {
-        const payload = { query: VERIFY_SESSION, variables: { sessionId: id } };
+    it.each(validations)("%s", async (_, id) => {
+      const payload = { query: VERIFY_SESSION, variables: { sessionId: id } };
 
-        const { data } = await post<Verify>(url, payload);
+      const { data } = await post<Verify>(url, payload);
 
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.verifySession).toStrictEqual({
-          __typename: "SessionIdValidationError",
-          sessionIdError: "Invalid session id",
-          status: Status.Error,
-        });
-      }
-    );
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.verifySession).toStrictEqual({
+        __typename: "SessionIdValidationError",
+        sessionIdError: "Invalid session id",
+        status: "ERROR",
+      });
+    });
   });
 
   describe("Validate cookie request header", () => {
-    it("Should return a UserSessionError response if the request has no cookies", async () => {
+    it("Should return an error response if the request has no cookies", async () => {
       const variables = { sessionId: "session_id" };
       const payload = { query: VERIFY_SESSION, variables };
 
@@ -110,13 +103,13 @@ describe("Verify Session - E2E", () => {
       expect(data.data?.verifySession).toStrictEqual({
         __typename: "AuthCookieError",
         message: "Unable to verify session",
-        status: Status.Error,
+        status: "ERROR",
       });
 
       expect(sessionMail).not.toHaveBeenCalled();
     });
 
-    it("Request cookie header has a missing cookie, Return a ForbiddenError response", async () => {
+    it("Request cookie header has a missing cookie, Return an error response", async () => {
       const cookie = registeredCookies.split(";").splice(1, 1).join(";");
       const variables = { sessionId: "session_id" };
       const payload = { query: VERIFY_SESSION, variables };
@@ -128,16 +121,15 @@ describe("Verify Session - E2E", () => {
       expect(data.data?.verifySession).toStrictEqual({
         __typename: "ForbiddenError",
         message: "Unable to verify session",
-        status: Status.Error,
+        status: "ERROR",
       });
-
       expect(sessionMail).not.toHaveBeenCalled();
     });
   });
 
   describe("Verify cookie refresh token", () => {
     describe("Expired refresh token", () => {
-      it("Session id is unknown, Return an UnknownError response ", async () => {
+      it("Session id is unknown, Return an error response", async () => {
         const variables = { sessionId: "unknown_session_id" };
         const payload = { query: VERIFY_SESSION, variables };
         const options = { cookie: unregisteredCookies };
@@ -149,7 +141,7 @@ describe("Verify Session - E2E", () => {
         expect(data.data?.verifySession).toStrictEqual({
           __typename: "UnknownError",
           message: "Unable to verify session",
-          status: Status.Error,
+          status: "ERROR",
         });
       });
 
@@ -175,11 +167,11 @@ describe("Verify Session - E2E", () => {
             dateCreated: unregisteredUser.dateCreated,
           },
           accessToken: expect.stringMatching(JWT_REGEX),
-          status: Status.Success,
+          status: "SUCCESS",
         });
       });
 
-      it("Provided session was not assigned to the user of the cookie refresh token, Return a NotAllowedError and send a notification mail", async () => {
+      it("The provided session was not assigned to the user of the cookie refresh token, Should return an error response and send a notification mail", async () => {
         const variables = { sessionId: unregisteredSessionId };
         const payload = { query: VERIFY_SESSION, variables };
         const options = { cookie: newRegisteredCookies };
@@ -191,16 +183,15 @@ describe("Verify Session - E2E", () => {
         expect(data.data?.verifySession).toStrictEqual({
           __typename: "NotAllowedError",
           message: "Unable to verify session",
-          status: Status.Error,
+          status: "ERROR",
         });
-
         expect(sessionMail).toHaveBeenCalledTimes(1);
         expect(sessionMail).toHaveBeenCalledWith(unRegisteredTestUser.email);
       });
     });
 
     describe("Valid and not expired refresh token", () => {
-      it("Session id is unknown, Return an UnknownError response", async () => {
+      it("Session id is unknown, Return an error response", async () => {
         const variables = { sessionId: "unknown_session_id" };
         const payload = { query: VERIFY_SESSION, variables };
         const options = { cookie: registeredCookies };
@@ -212,11 +203,11 @@ describe("Verify Session - E2E", () => {
         expect(data.data?.verifySession).toStrictEqual({
           __typename: "UnknownError",
           message: "Unable to verify session",
-          status: Status.Error,
+          status: "ERROR",
         });
       });
 
-      it("Provided session was not assigned to the user of the cookie refresh token, Return a NotAllowedError", async () => {
+      it("The provided session was not assigned to the user of the cookie refresh token, Return an error response", async () => {
         const variables = { sessionId: newRegisteredSessionId };
         const payload = { query: VERIFY_SESSION, variables };
         const options = { cookie: registeredCookies };
@@ -228,7 +219,7 @@ describe("Verify Session - E2E", () => {
         expect(data.data?.verifySession).toStrictEqual({
           __typename: "NotAllowedError",
           message: "Unable to verify session",
-          status: Status.Error,
+          status: "ERROR",
         });
         expect(sessionMail).toHaveBeenCalledTimes(1);
         expect(sessionMail).toHaveBeenCalledWith(newTestUser.email);
@@ -256,7 +247,7 @@ describe("Verify Session - E2E", () => {
             dateCreated: registeredUser.dateCreated,
           },
           accessToken: expect.stringMatching(JWT_REGEX),
-          status: Status.Success,
+          status: "SUCCESS",
         });
       });
     });

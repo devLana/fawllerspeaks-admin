@@ -3,11 +3,9 @@ import { describe, test, expect, jest, afterEach } from "@jest/globals";
 import createUser from "..";
 
 import createUserMail from "../utils/createUserMail";
-import { validations } from "../utils/createUser.testUtils";
+import { msg, validations } from "../utils/createUser.testUtils";
 import { MailError } from "@utils";
 import { mockContext, info, spyDb } from "@tests";
-
-const msg = "A confirmation mail has been sent to the email address provided";
 
 jest.mock("../utils/createUserMail", () => {
   return jest.fn().mockName("createUserMail");
@@ -19,52 +17,45 @@ describe("Test create user resolver", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(validations)(
-      "E-mail validation fails, Return an error for %s e-mail string",
-      async (_, email, errorMsg) => {
-        const result = await createUser({}, { email }, mockContext, info);
+    test.each(validations)("%s", async (_, email, errorMsg) => {
+      const result = await createUser({}, { email }, mockContext, info);
 
-        expect(createUserMail).not.toHaveBeenCalled();
-
-        expect(result).toHaveProperty("emailError", errorMsg);
-        expect(result).toHaveProperty("status", "ERROR");
-      }
-    );
+      expect(createUserMail).not.toHaveBeenCalled();
+      expect(result).toHaveProperty("emailError", errorMsg);
+      expect(result).toHaveProperty("status", "ERROR");
+    });
   });
 
-  describe("Create new user", () => {
-    test("Verify e-mail address, Return an error if e-mail already exists", async () => {
+  describe("Create a new user", () => {
+    test("Should verify e-mail address and return an error response if the user e-mail already exists", async () => {
       const email = "test_mail@example.com";
       const spy = spyDb({ rows: [{ email }] });
+
       const result = await createUser({}, { email }, mockContext, info);
 
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveReturnedWith({ rows: [{ email }] });
-
       expect(createUserMail).not.toHaveBeenCalled();
-
       expect(result).toHaveProperty("message", msg);
       expect(result).toHaveProperty("status", "ERROR");
     });
 
-    test("Send a confirmation mail if a new user is created", async () => {
+    test("A new user is created, Should send a confirmation mail", async () => {
       const email = "test_mail@example.com.com";
       const spy = spyDb({ rows: [] }).mockReturnValue({ rows: [] });
+
       const result = await createUser({}, { email }, mockContext, info);
 
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveLastReturnedWith({ rows: [] });
-
       expect(createUserMail).toHaveBeenCalledTimes(1);
-
       expect(result).toHaveProperty("message", msg);
       expect(result).toHaveProperty("status", "SUCCESS");
     });
 
-    test("Confirmation mail fails to send and user is not created, return an error", async () => {
+    test("Should respond with an error if the confirmation mail fails to send", async () => {
       const email = "test_mail@example.com";
       const spy = spyDb({ rows: [] }).mockReturnValue({ rows: [] });
-
       const mock = createUserMail as jest.MockedFunction<() => never>;
       mock.mockImplementation(() => {
         throw new MailError("Unable to send mail");
@@ -74,11 +65,9 @@ describe("Test create user resolver", () => {
 
       expect(spy).toHaveBeenCalledTimes(3);
       expect(spy).toHaveLastReturnedWith({ rows: [] });
-
       expect(createUserMail).toHaveBeenCalledTimes(1);
       expect(createUserMail).toThrow(MailError);
       expect(createUserMail).toThrow("Unable to send mail");
-
       expect(result).toHaveProperty("message", "Unable to send mail");
       expect(result).toHaveProperty("status", "ERROR");
     });

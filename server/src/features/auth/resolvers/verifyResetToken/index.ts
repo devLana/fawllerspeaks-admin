@@ -1,7 +1,8 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
 import { VerifyResetTokenValidationError, VerifiedResetToken } from "./types";
+import { verifyTokenValidator } from "./utils/verifyToken.validator";
 import { NotAllowedError, RegistrationError } from "@utils";
 
 import { type MutationResolvers } from "@resolverTypes";
@@ -15,13 +16,8 @@ interface Verification {
 }
 
 const verifyResetToken: VerifyToken = async (_, { token }, { db }) => {
-  const schema = Joi.string()
-    .required()
-    .trim()
-    .messages({ "string.empty": "Provide password reset token" });
-
   try {
-    const validatedToken = await schema.validateAsync(token);
+    const validatedToken = await verifyTokenValidator.validateAsync(token);
 
     const { rows } = await db.query<Verification>(
       `SELECT email, is_registered "isRegistered" FROM users WHERE reset_token[1] = $1`,

@@ -22,7 +22,6 @@ import { MailError } from "@utils";
 import { unRegisteredUser, post, GENERATE_PASSWORD, testUsers } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { Status } from "@resolverTypes";
 
 type GeneratePassword = TestData<{ generatePassword: Record<string, unknown> }>;
 
@@ -47,62 +46,50 @@ describe("Generate password - E2E", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(gqlValidations)(
-      "Should throw graphql validation error for %s email value",
-      async (_, email) => {
-        const payload = { query: GENERATE_PASSWORD, variables: { email } };
+    test.each(gqlValidations)("%s", async (_, email) => {
+      const payload = { query: GENERATE_PASSWORD, variables: { email } };
 
-        const { data } = await post<GeneratePassword>(url, payload);
+      const { data } = await post<GeneratePassword>(url, payload);
 
-        expect(generatePasswordMail).not.toHaveBeenCalled();
+      expect(generatePasswordMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeDefined();
+      expect(data.data).toBeUndefined();
+    });
 
-        expect(data.errors).toBeDefined();
-        expect(data.data).toBeUndefined();
-      }
-    );
+    test.each(validations)("%s", async (_, email, errorMsg) => {
+      const payload = { query: GENERATE_PASSWORD, variables: { email } };
 
-    test.each(validations)(
-      "Returns error for %s email string",
-      async (_, email, errorMsg) => {
-        const payload = { query: GENERATE_PASSWORD, variables: { email } };
+      const { data } = await post<GeneratePassword>(url, payload);
 
-        const { data } = await post<GeneratePassword>(url, payload);
-
-        expect(generatePasswordMail).not.toHaveBeenCalled();
-
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.generatePassword).toStrictEqual({
-          __typename: "EmailValidationError",
-          emailError: errorMsg,
-          status: Status.Error,
-        });
-      }
-    );
+      expect(generatePasswordMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.generatePassword).toStrictEqual({
+        __typename: "EmailValidationError",
+        emailError: errorMsg,
+        status: "ERROR",
+      });
+    });
   });
 
   describe("Verify e-mail address", () => {
-    test.each(verifyMailE2E)(
-      "Returns error for %s",
-      async (_, email, typename) => {
-        const payload = { query: GENERATE_PASSWORD, variables: { email } };
+    test.each(verifyMailE2E)("%s", async (_, email, typename) => {
+      const payload = { query: GENERATE_PASSWORD, variables: { email } };
 
-        const { data } = await post<GeneratePassword>(url, payload);
+      const { data } = await post<GeneratePassword>(url, payload);
 
-        expect(generatePasswordMail).not.toHaveBeenCalled();
-
-        expect(data.errors).toBeUndefined();
-        expect(data.data?.generatePassword).toStrictEqual({
-          __typename: typename,
-          message: msg,
-          status: Status.Error,
-        });
-      }
-    );
+      expect(generatePasswordMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data?.generatePassword).toStrictEqual({
+        __typename: typename,
+        message: msg,
+        status: "ERROR",
+      });
+    });
   });
 
   describe("Generate new password", () => {
-    test("Send confirmation mail with generated password", async () => {
+    test("Should send a confirmation mail with the generated password", async () => {
       const variables = { email: unRegisteredUser.email };
       const payload = { query: GENERATE_PASSWORD, variables };
 
@@ -110,15 +97,14 @@ describe("Generate password - E2E", () => {
 
       expect(data.errors).toBeUndefined();
       expect(generatePasswordMail).toHaveBeenCalledTimes(1);
-
       expect(data.data?.generatePassword).toStrictEqual({
         __typename: "Response",
         message: msg,
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
 
-    test("Should return error if sending mail fails", async () => {
+    test("Should return an error response if the confirmation mail fails to send", async () => {
       const variables = { email: unRegisteredUser.email };
       const payload = { query: GENERATE_PASSWORD, variables };
 
@@ -130,15 +116,13 @@ describe("Generate password - E2E", () => {
       const { data } = await post<GeneratePassword>(url, payload);
 
       expect(data.errors).toBeUndefined();
-
       expect(generatePasswordMail).toHaveBeenCalledTimes(1);
       expect(generatePasswordMail).toThrow("Unable to send mail");
       expect(generatePasswordMail).toThrow(MailError);
-
       expect(data.data?.generatePassword).toStrictEqual({
         __typename: "ServerError",
         message: "Unable to send mail",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });

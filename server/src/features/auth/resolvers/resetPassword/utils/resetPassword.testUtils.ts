@@ -1,28 +1,23 @@
 import { unRegisteredUser } from "@tests";
+import type { InputErrors } from "@types";
 
 interface Input {
-  [key: string]: string;
   token: string;
   password: string;
   confirmPassword: string;
 }
 
 interface GqlInputErrors {
-  [key: string]: unknown;
-  token?: number | null;
-  password?: boolean | null;
-  confirmPassword?: Record<string, unknown>;
+  token: number | null;
+  password: boolean | null;
+  confirmPassword?: Record<string, never> | undefined;
 }
 
-type InputErrors = {
-  [Prop in keyof Input as `${string & Prop}Error`]: string | null | undefined;
-};
-
-type Validations = [string, Input, InputErrors][];
+type Validations = [string, Input, InputErrors<Input>][];
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [
   [
-    "empty input values",
+    "Should return an error response if the input values are empty strings",
     { token: "", password: "", confirmPassword: "" },
     {
       tokenError: "Provide reset token",
@@ -31,7 +26,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "empty whitespace input values and password mismatch",
+    "Should return an error response if the inputs are empty whitespace strings",
     { token: "   ", password: "             ", confirmPassword: "    " },
     {
       tokenError: "Provide reset token",
@@ -41,7 +36,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "invalid password and password mismatch",
+    "Should return an error response if the password is invalid and the confirm password does not match the password",
     { token: " reset_token  ", password: "h6J^", confirmPassword: "jamming" },
     {
       tokenError: nullOrUndefined,
@@ -50,7 +45,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "password mismatch",
+    "Should return an error response if the password and confirm password do not match",
     {
       token: "token_token_token_token_token_token",
       password: "#fast45CheckHfe",
@@ -66,16 +61,24 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
 
 export const gqlValidations: [string, GqlInputErrors][] = [
   [
-    "null and undefined",
+    "Should throw a graphql validation error for null and undefined input values",
     { token: null, password: null, confirmPassword: undefined },
   ],
   [
-    "number, boolean and object",
+    "Should throw a graphql validation error for number, boolean and object input values",
     { token: 839435, password: false, confirmPassword: {} },
   ],
 ];
 
 export const verifyEmail: [string, string, string][] = [
-  ["unknown reset token", "token_token_token", "NotAllowedError"],
-  ["unregistered account", unRegisteredUser.resetToken[0], "RegistrationError"],
+  [
+    "Should return an error response if the password reset token is unknown",
+    "token_token_token",
+    "NotAllowedError",
+  ],
+  [
+    "Should return an error response if the user is unregistered",
+    unRegisteredUser.resetToken[0],
+    "RegistrationError",
+  ],
 ];

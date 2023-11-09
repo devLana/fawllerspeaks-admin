@@ -4,9 +4,9 @@ type GQL = [
 ];
 
 export const validations: [string, string][] = [
-  ["Return an error response if session id is an empty string", ""],
+  ["Should return an error response if the session id is an empty string", ""],
   [
-    "Return an error response if session id is an empty whitespace string",
+    "Should return an error response if the session id is an empty whitespace string",
     "      ",
   ],
 ];

@@ -1,10 +1,10 @@
-import {
-  type LoginValidationErrorResolvers as Resolvers,
-  type LoginValidationError as Errors,
+import type {
+  LoginValidationErrorResolvers as Resolvers,
+  LoginValidationError as ValidationErrors,
   Status,
 } from "@resolverTypes";
 
-export class LoginValidationError implements Errors {
+export class LoginValidationError implements ValidationErrors {
   readonly status: Status;
 
   constructor(
@@ -12,7 +12,7 @@ export class LoginValidationError implements Errors {
     readonly passwordError?: string,
     readonly sessionIdError?: string
   ) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

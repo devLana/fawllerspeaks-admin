@@ -18,7 +18,6 @@ import { MailError } from "@utils";
 import { CREATE_USER, post } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { Status } from "@resolverTypes";
 
 type CreateUser = TestData<{ createUser: Record<string, unknown> }>;
 
@@ -42,40 +41,34 @@ describe("Create user - E2E", () => {
   });
 
   describe("Validate email input", () => {
-    test.each(gqlValidations)(
-      "Should throw a graphql validation error for %s email value",
-      async (_, email) => {
-        const payload = { query: CREATE_USER, variables: { email } };
+    test.each(gqlValidations)("%s", async (_, email) => {
+      const payload = { query: CREATE_USER, variables: { email } };
 
-        const { data } = await post<CreateUser>(url, payload);
+      const { data } = await post<CreateUser>(url, payload);
 
-        expect(createUserMail).not.toHaveBeenCalled();
-        expect(data.data).toBeUndefined();
-        expect(data.errors).toBeDefined();
-      }
-    );
+      expect(createUserMail).not.toHaveBeenCalled();
+      expect(data.data).toBeUndefined();
+      expect(data.errors).toBeDefined();
+    });
 
-    test.each(validations)(
-      "E-mail validation fails, Return an error for %s e-mail string",
-      async (_, email, errorMsg) => {
-        const payload = { query: CREATE_USER, variables: { email } };
+    test.each(validations)("%s", async (_, email, errorMsg) => {
+      const payload = { query: CREATE_USER, variables: { email } };
 
-        const { data } = await post<CreateUser>(url, payload);
+      const { data } = await post<CreateUser>(url, payload);
 
-        expect(createUserMail).not.toHaveBeenCalled();
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.createUser).toStrictEqual({
-          __typename: "EmailValidationError",
-          emailError: errorMsg,
-          status: Status.Error,
-        });
-      }
-    );
+      expect(createUserMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.createUser).toStrictEqual({
+        __typename: "EmailValidationError",
+        emailError: errorMsg,
+        status: "ERROR",
+      });
+    });
   });
 
-  describe("Create new user", () => {
-    test("Send a confirmation mail if a new user is created", async () => {
+  describe("Create a new user", () => {
+    test("Should create a new user and send a confirmation mail", async () => {
       const variables = { email: "lana_mail@example.org" };
       const payload = { query: CREATE_USER, variables };
 
@@ -87,11 +80,11 @@ describe("Create user - E2E", () => {
       expect(data.data?.createUser).toStrictEqual({
         __typename: "Response",
         message: msg,
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
 
-    test("Return an error if a user with the provided e-mail already exists", async () => {
+    test("Should return an error response if a user with the provided e-mail already exists", async () => {
       const variables = { email: "lana_mail@example.org" };
       const payload = { query: CREATE_USER, variables };
 
@@ -103,11 +96,11 @@ describe("Create user - E2E", () => {
       expect(data.data?.createUser).toStrictEqual({
         __typename: "NotAllowedError",
         message: msg,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
 
-    test("Return an error if the confirmation mail fails to send", async () => {
+    test("Should return an error response if the confirmation mail fails to send after creating a new user", async () => {
       const variables = { email: "lanas_mail@example.org" };
       const payload = { query: CREATE_USER, variables };
       const mock = createUserMail as jest.MockedFunction<() => never>;
@@ -126,7 +119,7 @@ describe("Create user - E2E", () => {
       expect(data.data?.createUser).toStrictEqual({
         __typename: "ServerError",
         message: "Unable to send mail",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });

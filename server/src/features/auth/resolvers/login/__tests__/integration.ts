@@ -55,21 +55,19 @@ describe("Test login resolver", () => {
   });
 
   describe("Verify e-mail and password", () => {
-    test("Return an error if the e-mail address is unknown", async () => {
+    test("Should return an error response if the e-mail address is unknown", async () => {
       const dbSpy = spyDb({ rows: [] });
 
       const result = await login({}, args, mockContext, info);
 
       expect(dbSpy).toHaveBeenCalledTimes(1);
       expect(dbSpy).toHaveReturnedWith({ rows: [] });
-
       expect(setCookies).not.toHaveBeenCalled();
-
       expect(result).toHaveProperty("message", "Invalid email or password");
       expect(result).toHaveProperty("status", "ERROR");
     });
 
-    test("Return an error if the login credentials do not match", async () => {
+    test("Should return an error response if the login credentials do not match", async () => {
       const hash = await bcrypt.hash("noT_password123", 10);
       const user = { userPassword: hash, userId: "user id" };
       const dbSpy = spyDb({ rows: [user] });
@@ -78,9 +76,7 @@ describe("Test login resolver", () => {
 
       expect(dbSpy).toHaveBeenCalledTimes(1);
       expect(dbSpy).toHaveReturnedWith({ rows: [user] });
-
       expect(setCookies).not.toHaveBeenCalled();
-
       expect(result).toHaveProperty("message", "Invalid email or password");
       expect(result).toHaveProperty("status", "ERROR");
     });
@@ -91,7 +87,7 @@ describe("Test login resolver", () => {
       mockContext.req.cookies = {};
     });
 
-    test("Use cookies to delete session from db, Return an error for unknown e-mail address", async () => {
+    test("Should use cookies to delete session from db, Return an error response if the e-mail address is unknown", async () => {
       mockContext.req.cookies = cookies;
 
       const dbSpy = spyDb({ rows: [] }).mockReturnValueOnce({ rows: [] });
@@ -101,14 +97,12 @@ describe("Test login resolver", () => {
       expect(dbSpy).toHaveBeenCalledTimes(2);
       expect(dbSpy).toHaveNthReturnedWith(1, { rows: [] });
       expect(dbSpy).toHaveNthReturnedWith(2, { rows: [] });
-
       expect(setCookies).not.toHaveBeenCalled();
-
       expect(result).toHaveProperty("message", "Invalid email or password");
       expect(result).toHaveProperty("status", "ERROR");
     });
 
-    test("Use session id to delete session from db, Return an error if login credentials do not match", async () => {
+    test("Should use the session id to delete session from db, Return an error response if the login credentials do not match", async () => {
       const hash = await bcrypt.hash("noT_password123", 10);
       const user = { userPassword: hash, userId: "user id" };
       const dbSpy = spyDb({ rows: [] }).mockReturnValueOnce({ rows: [user] });
@@ -119,14 +113,12 @@ describe("Test login resolver", () => {
       expect(dbSpy).toHaveBeenCalledTimes(2);
       expect(dbSpy).toHaveNthReturnedWith(1, { rows: [] });
       expect(dbSpy).toHaveNthReturnedWith(2, { rows: [user] });
-
       expect(setCookies).not.toHaveBeenCalled();
-
       expect(result).toHaveProperty("message", "Invalid email or password");
       expect(result).toHaveProperty("status", "ERROR");
     });
 
-    test("Delete session from db, Log user in again", async () => {
+    test("Should delete session from db, Log the user in again", async () => {
       const hash = await bcrypt.hash(args.password, 10);
       const user = { ...mockUser, userPassword: hash };
       const spy = spyDb({ rows: [] });
@@ -141,9 +133,7 @@ describe("Test login resolver", () => {
       expect(spy).toHaveNthReturnedWith(1, { rows: [] });
       expect(spy).toHaveNthReturnedWith(2, { rows: [user] });
       expect(spy).toHaveNthReturnedWith(3, { rows: [] });
-
       expect(setCookies).toHaveBeenCalledTimes(1);
-
       expect(result).toHaveProperty("user");
       expect(result).toHaveProperty("user.email", user.userEmail);
       expect(result).toHaveProperty("user.id", user.userId);
@@ -165,7 +155,7 @@ describe("Test login resolver", () => {
   });
 
   describe("Successfully log in user", () => {
-    test("Log in user and return user details", async () => {
+    test("Should log the user in and return user details", async () => {
       const hash = await bcrypt.hash(args.password, 10);
       const user = { ...mockUser, userPassword: hash };
 
@@ -176,9 +166,7 @@ describe("Test login resolver", () => {
       expect(spy).toBeCalledTimes(2);
       expect(spy).toHaveNthReturnedWith(1, { rows: [user] });
       expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-
       expect(setCookies).toHaveBeenCalledTimes(1);
-
       expect(result).toHaveProperty("user");
       expect(result).toHaveProperty("user.email", user.userEmail);
       expect(result).toHaveProperty("user.id", user.userId);

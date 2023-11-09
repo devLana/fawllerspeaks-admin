@@ -39,7 +39,7 @@ describe("Test logout resolver", () => {
   });
 
   describe("Verify user authentication", () => {
-    test("Return an error if user is not logged in", async () => {
+    test("Should return an error response if the user is not logged in", async () => {
       mockContext.user = null;
 
       const result = await logout({}, { sessionId }, mockContext, info);
@@ -62,7 +62,7 @@ describe("Test logout resolver", () => {
   });
 
   describe("Request is made with an empty cookie header", () => {
-    test("Should return an error response if user session could not be found", async () => {
+    test("Should return an error response if the user session could not be found", async () => {
       const spy = spyDb({ rows: [] });
       const result = await logout({}, { sessionId }, mockContext, info);
 
@@ -82,7 +82,7 @@ describe("Test logout resolver", () => {
       expect(result).toHaveProperty("status", "ERROR");
     });
 
-    test("Delete session, Log user out", async () => {
+    test("Should delete the current session and log the user out", async () => {
       const spy = spyDb({ rows: [{ user: "new_user_id" }] });
       spy.mockReturnValueOnce({ rows: [] });
       const result = await logout({}, { sessionId }, mockContext, info);
@@ -96,7 +96,7 @@ describe("Test logout resolver", () => {
   });
 
   describe("Validate request cookie", () => {
-    test("Return an error if request has a missing cookie", async () => {
+    test("Should return an error response if the request has a missing cookie", async () => {
       mockContext.req.cookies = { auth: "auth", sig: "sig" };
 
       const result = await logout({}, { sessionId }, mockContext, info);
@@ -109,7 +109,7 @@ describe("Test logout resolver", () => {
   });
 
   describe("Verify user session", () => {
-    test("Return an error if session id is unknown", async () => {
+    test("Should return an error response if the session id is unknown", async () => {
       mockContext.req.cookies = cookies;
 
       const spy = spyDb({ rows: [] });
@@ -124,7 +124,7 @@ describe("Test logout resolver", () => {
   });
 
   describe("Successfully log user out", () => {
-    test("Log user out and delete session", async () => {
+    test("Should log the user out and delete the current session", async () => {
       mockContext.req.cookies = cookies;
 
       const spy = spyDb({ rows: [{}] }).mockReturnValueOnce({ rows: [] });

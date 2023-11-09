@@ -1,9 +1,9 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
 import { EmailValidationError } from "../types";
 import forgotPasswordMail from "./utils/forgotPasswordMail";
-import { generateBytes } from "@features/auth/utils";
+import { generateBytes, emailValidator } from "@features/auth/utils";
 import {
   MailError,
   NotAllowedError,
@@ -18,17 +18,12 @@ import type { ResolverFunc } from "@types";
 type ForgotPassword = ResolverFunc<MutationResolvers["forgotPassword"]>;
 
 const forgotPassword: ForgotPassword = async (_, { email }, { db }) => {
-  const schema = Joi.string().email().required().trim().messages({
-    "string.empty": "Enter an e-mail address",
-    "string.email": "Invalid e-mail address",
-  });
-
   const query = `UPDATE users SET reset_token = $1 WHERE lower(email) = $2`;
   let timerId: number | null = null;
   let validatedEmail: string | null = null;
 
   try {
-    validatedEmail = await schema.validateAsync(email);
+    validatedEmail = await emailValidator.validateAsync(email);
 
     const findUser = db.query<{ isRegistered: boolean }>(
       `SELECT is_registered "isRegistered" FROM users WHERE lower(email) = $1`,

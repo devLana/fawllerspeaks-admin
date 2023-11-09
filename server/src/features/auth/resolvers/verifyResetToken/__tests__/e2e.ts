@@ -18,7 +18,6 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { Status } from "@resolverTypes";
 
 type VerifyResetToken = TestData<{ verifyResetToken: Record<string, unknown> }>;
 
@@ -38,62 +37,51 @@ describe("Verify password reset token - E2E", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(gqlValidations)(
-      "Should throw graphql validation error for %s token value",
-      async (_, token) => {
-        const payload = {
-          query: VERIFY_PASSWORD_RESET_TOKEN,
-          variables: { token },
-        };
+    test.each(gqlValidations)("%s", async (_, token) => {
+      const variables = { token };
+      const payload = { query: VERIFY_PASSWORD_RESET_TOKEN, variables };
 
-        const { data } = await post<VerifyResetToken>(url, payload);
+      const { data } = await post<VerifyResetToken>(url, payload);
 
-        expect(data.errors).toBeDefined();
-        expect(data.data).toBeUndefined();
-      }
-    );
+      expect(data.errors).toBeDefined();
+      expect(data.data).toBeUndefined();
+    });
 
-    test.each(validations)(
-      "Returns error for %s token string",
-      async (_, token) => {
-        const variables = { token };
-        const payload = { query: VERIFY_PASSWORD_RESET_TOKEN, variables };
+    test.each(validations)("%s", async (_, token) => {
+      const variables = { token };
+      const payload = { query: VERIFY_PASSWORD_RESET_TOKEN, variables };
 
-        const { data } = await post<VerifyResetToken>(url, payload);
+      const { data } = await post<VerifyResetToken>(url, payload);
 
-        expect(data.errors).toBeUndefined();
-        expect(data.data?.verifyResetToken).toBeDefined();
-        expect(data.data?.verifyResetToken).toStrictEqual({
-          __typename: "VerifyResetTokenValidationError",
-          tokenError: "Provide password reset token",
-          status: Status.Error,
-        });
-      }
-    );
+      expect(data.errors).toBeUndefined();
+      expect(data.data?.verifyResetToken).toBeDefined();
+      expect(data.data?.verifyResetToken).toStrictEqual({
+        __typename: "VerifyResetTokenValidationError",
+        tokenError: "Provide password reset token",
+        status: "ERROR",
+      });
+    });
   });
 
   describe("Verify provided password reset token", () => {
-    test.each(verifyToken)(
-      "Returns error on %s",
-      async (_, token, typeName) => {
-        const variables = { token };
-        const payload = { query: VERIFY_PASSWORD_RESET_TOKEN, variables };
+    test.each(verifyToken)("%s", async (_, token, typeName) => {
+      const variables = { token };
+      const payload = { query: VERIFY_PASSWORD_RESET_TOKEN, variables };
 
-        const { data } = await post<VerifyResetToken>(url, payload);
+      const { data } = await post<VerifyResetToken>(url, payload);
 
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-        expect(data.data?.verifyResetToken).toStrictEqual({
-          __typename: typeName,
-          message: "Unable to verify password reset token",
-          status: Status.Error,
-        });
-      }
-    );
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.verifyResetToken).toStrictEqual({
+        __typename: typeName,
+        message: "Unable to verify password reset token",
+        status: "ERROR",
+      });
+    });
   });
 
   describe("Successfully verify password reset token", () => {
-    test("Respond with e-mail and password reset token", async () => {
+    test("Should respond with the e-mail and password reset token of the user's account", async () => {
       const variables = { token: registeredUser.resetToken[0] };
       const payload = { query: VERIFY_PASSWORD_RESET_TOKEN, variables };
 
@@ -105,7 +93,7 @@ describe("Verify password reset token - E2E", () => {
         __typename: "VerifiedResetToken",
         email: registeredUser.email,
         resetToken: registeredUser.resetToken[0],
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
   });

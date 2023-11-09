@@ -19,7 +19,6 @@ import {
 } from "@tests";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
-import { Status } from "@resolverTypes";
 
 type RegisterUser = TestData<{ registerUser: Record<string, unknown> }>;
 
@@ -49,7 +48,7 @@ describe("Register user - E2E", () => {
   });
 
   describe("Verify user authentication", () => {
-    test("User is not logged in, Return an AuthenticationError response", async () => {
+    test("User is not logged in, Return an error response", async () => {
       const payload = { query: REGISTER_USER, variables: { userInput } };
 
       const { data } = await post<RegisterUser>(url, payload);
@@ -59,25 +58,22 @@ describe("Register user - E2E", () => {
       expect(data.data?.registerUser).toStrictEqual({
         __typename: "AuthenticationError",
         message: "Unable to register user",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Validate user input", () => {
-    test.each(gqlValidation)(
-      "Should throw a graphql validation error if the input values are %s",
-      async (_, input) => {
-        const variables = { userInput: input };
-        const payload = { query: REGISTER_USER, variables };
-        const options = { authorization: `Bearer ${unregisteredJwt}` };
+    test.each(gqlValidation)("%s", async (_, input) => {
+      const variables = { userInput: input };
+      const payload = { query: REGISTER_USER, variables };
+      const options = { authorization: `Bearer ${unregisteredJwt}` };
 
-        const { data } = await post<RegisterUser>(url, payload, options);
+      const { data } = await post<RegisterUser>(url, payload, options);
 
-        expect(data.errors).toBeDefined();
-        expect(data.data).toBeUndefined();
-      }
-    );
+      expect(data.errors).toBeDefined();
+      expect(data.data).toBeUndefined();
+    });
 
     test.each(validations(null))("%s", async (_, input, errors) => {
       const payload = { query: REGISTER_USER, variables: { userInput: input } };
@@ -93,13 +89,13 @@ describe("Register user - E2E", () => {
         lastNameError: errors.lastNameError,
         passwordError: errors.passwordError,
         confirmPasswordError: errors.confirmPasswordError,
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
 
   describe("Verify user registration status", () => {
-    test("User account already registered, Return a RegistrationError response", async () => {
+    test("User account already registered, Return an error response", async () => {
       const payload = { query: REGISTER_USER, variables: { userInput } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -110,7 +106,7 @@ describe("Register user - E2E", () => {
       expect(data.data?.registerUser).toStrictEqual({
         __typename: "RegistrationError",
         message: "User is already registered",
-        status: Status.Error,
+        status: "ERROR",
       });
     });
   });
@@ -136,7 +132,7 @@ describe("Register user - E2E", () => {
           isRegistered: true,
           dateCreated: user.dateCreated,
         },
-        status: Status.Success,
+        status: "SUCCESS",
       });
     });
   });

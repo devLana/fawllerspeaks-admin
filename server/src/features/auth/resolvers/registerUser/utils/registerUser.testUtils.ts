@@ -1,3 +1,5 @@
+import type { InputErrors } from "@types";
+
 interface Input {
   firstName: string;
   lastName: string;
@@ -5,11 +7,7 @@ interface Input {
   confirmPassword: string;
 }
 
-type InputErrors = {
-  [Prop in keyof Input as `${Prop}Error`]: string | null | undefined;
-};
-
-type Validations = [string, Input, InputErrors][];
+type Validations = [string, Input, InputErrors<Input>][];
 
 interface GQL {
   firstName: number | undefined;
@@ -51,7 +49,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "Return an error response if the input values are empty strings",
+    "Should return an error response if the input values are empty strings",
     {
       firstName: "",
       lastName: "",
@@ -66,7 +64,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "Return an error response if the input values are empty whitespace strings",
+    "Should return an error response if the input values are empty whitespace strings",
     {
       firstName: "  ",
       lastName: "      ",
@@ -82,7 +80,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     },
   ],
   [
-    "Return an error response for a confirm password mismatch",
+    "Should return an error response if the confirm password does not match the password",
     {
       firstName: "Samson",
       lastName: "Jake",
@@ -100,7 +98,7 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
 
 export const verifyUser: [string, Record<string, unknown>[], string][] = [
   [
-    "Return an error response if user is unknown",
+    "Should return an error response if the user is unknown",
     [],
     "Unable to register user",
   ],
@@ -113,7 +111,7 @@ export const verifyUser: [string, Record<string, unknown>[], string][] = [
 
 export const gqlValidation: [string, GQL][] = [
   [
-    "null or undefined",
+    "Should throw a graphql validation error if the input values are null or undefined",
     {
       firstName: undefined,
       lastName: null,
@@ -122,7 +120,7 @@ export const gqlValidation: [string, GQL][] = [
     },
   ],
   [
-    "number or boolean",
+    "Should throw a graphql validation error if the input values are number or boolean",
     { firstName: 698, lastName: true, password: 995, confirmPassword: false },
   ],
 ];

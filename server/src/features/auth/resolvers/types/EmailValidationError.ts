@@ -1,14 +1,14 @@
-import {
-  type EmailValidationErrorResolvers as Resolvers,
-  type EmailValidationError as Errors,
+import type {
+  EmailValidationErrorResolvers as Resolvers,
+  EmailValidationError as ValidationErrors,
   Status,
 } from "@resolverTypes";
 
-export class EmailValidationError implements Errors {
+export class EmailValidationError implements ValidationErrors {
   readonly status: Status;
 
   constructor(readonly emailError: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 
