@@ -2,6 +2,7 @@
   // Top Level
   "include": ["src/**/*"],
   "exclude": [
+    "src/types",
     "src/**/__tests__",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
