@@ -6,9 +6,8 @@ const config: CodegenConfig = {
     "src/types/api/": {
       preset: "client",
       plugins: [],
-      presetConfig: {
-        gqlTagName: "codeGenGQL",
-      },
+      config: { enumsAsTypes: true },
+      presetConfig: { gqlTagName: "codeGenGQL" },
     },
   },
   ignoreNoDocuments: true,
