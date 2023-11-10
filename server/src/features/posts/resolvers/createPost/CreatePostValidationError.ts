@@ -1,6 +1,6 @@
-import {
-  type CreatePostValidationError as Errors,
-  type CreatePostValidationErrorResolvers as Resolvers,
+import type {
+  CreatePostValidationError as Errors,
+  CreatePostValidationErrorResolvers as Resolvers,
   Status,
 } from "@resolverTypes";
 import type { RemoveNull } from "@types";
@@ -21,7 +21,7 @@ export class CreatePostValidationError implements Errors {
     this.contentError = errors.contentError;
     this.tagsError = errors.tagsError;
     this.slugError = errors.slugError;
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

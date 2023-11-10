@@ -1,14 +1,14 @@
-import {
-  type PostIdsValidationError as Error,
-  type PostIdsValidationErrorResolvers,
+import type {
+  PostIdsValidationError as ValidationError,
+  PostIdsValidationErrorResolvers,
   Status,
 } from "@resolverTypes";
 
-export class PostIdsValidationError implements Error {
+export class PostIdsValidationError implements ValidationError {
   readonly status: Status;
 
   constructor(public readonly postIdsError: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

@@ -10,7 +10,7 @@ import {
 import { getPostTags, getPostUrl } from "@features/posts/utils";
 import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
 
-import { type MutationResolvers, PostStatus } from "@resolverTypes";
+import type { MutationResolvers, PostStatus } from "@resolverTypes";
 import type { DbFindPost, ResolverFunc } from "@types";
 
 type UnpublishPost = ResolverFunc<MutationResolvers["unpublishPost"]>;
@@ -71,11 +71,11 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
       );
     }
 
-    if (foundPost[0].status === PostStatus.Unpublished) {
+    if (foundPost[0].status === "Unpublished") {
       return new NotAllowedPostActionError("Post is currently unpublished");
     }
 
-    if (foundPost[0].status !== PostStatus.Published) {
+    if (foundPost[0].status !== "Published") {
       return new NotAllowedPostActionError(
         "Only published posts can be unpublished"
       );
@@ -99,7 +99,7 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
         is_in_bin "isInBin",
         is_deleted "isDeleted",
         tags`,
-      [PostStatus.Unpublished, null, post]
+      ["Unpublished", null, post]
     );
 
     const [updated] = updatePost;
@@ -113,7 +113,7 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
       description: updated.description,
       content: updated.content,
       author: foundPost[0].authorName,
-      status: PostStatus.Unpublished,
+      status: "Unpublished",
       url,
       slug: updated.slug,
       imageBanner: updated.imageBanner,

@@ -22,7 +22,7 @@ import {
 } from "@tests";
 import { DATE_REGEX, urls } from "@utils";
 
-import { type PostTag, type Post, Status } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 import type { APIContext, TestData } from "@types";
 
 type Edit = TestData<{ editPost: Record<string, unknown> }>;
@@ -87,7 +87,7 @@ describe("Edit post - E2E", () => {
     expect(data.data?.editPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to edit post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -117,7 +117,7 @@ describe("Edit post - E2E", () => {
       expect(data.data?.editPost).toStrictEqual({
         __typename: "PostValidationError",
         ...errors,
-        status: Status.Error,
+        status: "ERROR",
       });
     }
   );
@@ -134,7 +134,7 @@ describe("Edit post - E2E", () => {
     expect(data.data?.editPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unknown post tag id provided",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -151,7 +151,7 @@ describe("Edit post - E2E", () => {
     expect(data.data?.editPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unknown post tag id provided",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -167,7 +167,7 @@ describe("Edit post - E2E", () => {
     expect(data.data?.editPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to edit post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -183,7 +183,7 @@ describe("Edit post - E2E", () => {
     expect(data.data?.editPost).toStrictEqual({
       __typename: "UnknownError",
       message: "We could not find the post you are trying to edit",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -200,7 +200,7 @@ describe("Edit post - E2E", () => {
     expect(data.data?.editPost).toStrictEqual({
       __typename: "UnauthorizedAuthorError",
       message: "Unable to edit another author's post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -217,7 +217,7 @@ describe("Edit post - E2E", () => {
     expect(data.data?.editPost).toStrictEqual({
       __typename: "NotAllowedPostActionError",
       message: "Can only edit published or unpublished posts",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -234,7 +234,7 @@ describe("Edit post - E2E", () => {
     expect(data.data?.editPost).toStrictEqual({
       __typename: "DuplicatePostTitleError",
       message: "A post has already been created with that title",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -263,7 +263,7 @@ describe("Edit post - E2E", () => {
         content: postData.content,
         lastModified: expect.stringMatching(DATE_REGEX),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -292,7 +292,7 @@ describe("Edit post - E2E", () => {
         lastModified: expect.stringMatching(DATE_REGEX),
         tags: expect.arrayContaining(postTags),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -322,7 +322,7 @@ describe("Edit post - E2E", () => {
         lastModified: expect.stringMatching(DATE_REGEX),
         tags: expect.arrayContaining(postTags),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -353,7 +353,7 @@ describe("Edit post - E2E", () => {
         lastModified: expect.stringMatching(DATE_REGEX),
         tags: expect.arrayContaining(postTags),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -383,7 +383,7 @@ describe("Edit post - E2E", () => {
         lastModified: expect.stringMatching(DATE_REGEX),
         tags: expect.arrayContaining(postTags),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 });

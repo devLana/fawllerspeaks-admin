@@ -16,11 +16,7 @@ import {
   generateErrorsObject,
 } from "@utils";
 
-import {
-  type MutationResolvers,
-  type PostTag,
-  PostStatus,
-} from "@resolverTypes";
+import type { MutationResolvers, PostTag, PostStatus } from "@resolverTypes";
 import type { ResolverFunc, DbCreatePost, ValidationErrorObject } from "@types";
 
 type DraftPost = ResolverFunc<MutationResolvers["draftPost"]>;
@@ -158,7 +154,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
         );
       }
 
-      if (checkPostId[0].status !== PostStatus.Draft) {
+      if (checkPostId[0].status !== "Draft") {
         return new NotAllowedPostActionError("Can only update a draft post");
       }
 
@@ -202,7 +198,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           title,
           description ?? checkPostId[0].description,
           content ?? checkPostId[0].content,
-          PostStatus.Draft,
+          "Draft",
           slug ?? checkPostId[0].slug,
           dbTags ?? newDbTags,
           postId,
@@ -239,7 +235,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           likes,
           is_in_bin "isInBin",
           is_deleted "isDeleted"`,
-        [title, description, content, user, PostStatus.Draft, slug, dbTags]
+        [title, description, content, user, "Draft", slug, dbTags]
       );
 
       savedPost = newDraft;
@@ -259,7 +255,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
       description: description ?? newDescription,
       content: content ?? newContent,
       author: foundUser[0].name,
-      status: PostStatus.Draft,
+      status: "Draft",
       url: postUrl,
       slug: slug ?? newSlug,
       imageBanner: savedPost.imageBanner,

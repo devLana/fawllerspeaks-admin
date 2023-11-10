@@ -1,7 +1,7 @@
-import {
-  type PostsWarning as BlogPostsWarning,
-  type PostsWarningResolvers,
-  type Post,
+import type {
+  PostsWarning as BlogPostsWarning,
+  PostsWarningResolvers,
+  Post,
   Status,
 } from "@resolverTypes";
 
@@ -9,7 +9,7 @@ export class PostsWarning implements BlogPostsWarning {
   readonly status: Status;
 
   constructor(public readonly posts: Post[], public readonly message: string) {
-    this.status = Status.Warn;
+    this.status = "WARN";
   }
 }
 

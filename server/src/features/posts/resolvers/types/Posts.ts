@@ -1,7 +1,7 @@
-import {
-  type Posts as BlogPosts,
-  type PostsResolvers,
-  type Post,
+import type {
+  Posts as BlogPosts,
+  PostsResolvers,
+  Post,
   Status,
 } from "@resolverTypes";
 
@@ -9,7 +9,7 @@ export class Posts implements BlogPosts {
   readonly status: Status;
 
   constructor(public readonly posts: Post[]) {
-    this.status = Status.Success;
+    this.status = "SUCCESS";
   }
 }
 

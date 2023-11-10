@@ -16,7 +16,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, type Post, Status, PostStatus } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 
 type UnpublishPost = TestData<{ unpublishPost: Record<string, unknown> }>;
 
@@ -75,7 +75,7 @@ describe("Unpublish post - E2E", () => {
     expect(data.data?.unpublishPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to unpublish post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -108,7 +108,7 @@ describe("Unpublish post - E2E", () => {
       expect(data.data?.unpublishPost).toStrictEqual({
         __typename: "PostIdValidationError",
         postIdError: errorMsg,
-        status: Status.Error,
+        status: "ERROR",
       });
     }
   );
@@ -124,7 +124,7 @@ describe("Unpublish post - E2E", () => {
     expect(data.data?.unpublishPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to unpublish post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -139,7 +139,7 @@ describe("Unpublish post - E2E", () => {
     expect(data.data?.unpublishPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unable to unpublish post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -155,7 +155,7 @@ describe("Unpublish post - E2E", () => {
     expect(data.data?.unpublishPost).toStrictEqual({
       __typename: "UnauthorizedAuthorError",
       message: "Cannot unpublish another author's post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -171,7 +171,7 @@ describe("Unpublish post - E2E", () => {
     expect(data.data?.unpublishPost).toStrictEqual({
       __typename: "NotAllowedPostActionError",
       message: "Post is currently unpublished",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -187,7 +187,7 @@ describe("Unpublish post - E2E", () => {
     expect(data.data?.unpublishPost).toStrictEqual({
       __typename: "NotAllowedPostActionError",
       message: "Only published posts can be unpublished",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -207,10 +207,10 @@ describe("Unpublish post - E2E", () => {
       __typename: "SinglePost",
       post: {
         ...testPost,
-        status: PostStatus.Unpublished,
+        status: "Unpublished",
         datePublished: null,
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 });

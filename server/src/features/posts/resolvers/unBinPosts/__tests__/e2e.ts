@@ -18,7 +18,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, type Post, Status } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 import { testTable1 } from "../unBinPosts.testUtils";
 
 type UnBinPost = TestData<{ unBinPosts: Record<string, unknown> }>;
@@ -85,7 +85,7 @@ describe("Un-bin posts - E2E", () => {
     expect(data.data?.unBinPosts).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to remove post from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -117,7 +117,7 @@ describe("Un-bin posts - E2E", () => {
       expect(data.data?.unBinPosts).toStrictEqual({
         __typename: "PostIdsValidationError",
         postIdsError: errorMsg,
-        status: Status.Error,
+        status: "ERROR",
       });
     }
   );
@@ -133,7 +133,7 @@ describe("Un-bin posts - E2E", () => {
     expect(data.data?.unBinPosts).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to remove post from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -150,7 +150,7 @@ describe("Un-bin posts - E2E", () => {
     expect(data.data?.unBinPosts).toStrictEqual({
       __typename: "UnauthorizedAuthorError",
       message: "Cannot remove another author's posts from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -167,7 +167,7 @@ describe("Un-bin posts - E2E", () => {
     expect(data.data?.unBinPosts).toStrictEqual({
       __typename: "Posts",
       posts: expect.arrayContaining([post1, post2]),
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -187,7 +187,7 @@ describe("Un-bin posts - E2E", () => {
       __typename: "PostsWarning",
       posts: expect.arrayContaining([post3, post1, post2]),
       message: msg,
-      status: Status.Warn,
+      status: "WARN",
     });
   });
 
@@ -203,7 +203,7 @@ describe("Un-bin posts - E2E", () => {
     expect(data.data?.unBinPosts).toStrictEqual({
       __typename: "UnknownError",
       message: "The provided posts could not be removed from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 });

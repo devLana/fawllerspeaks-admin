@@ -1,9 +1,9 @@
 import type { Pool } from "pg";
 
-import type { PostTag } from "@resolverTypes";
 import { dateToISOString } from "@utils";
+import type { PostTag } from "@resolverTypes";
 
-const getPostTags = async (db: Pool, tags: string[]) => {
+const getPostTags = async (db: Pool, tags: readonly string[]) => {
   let { rows } = await db.query<PostTag>(
     `SELECT
       tag_id id,

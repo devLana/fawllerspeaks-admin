@@ -16,11 +16,7 @@ import {
   generateErrorsObject,
 } from "@utils";
 
-import {
-  type MutationResolvers,
-  type PostTag,
-  PostStatus,
-} from "@resolverTypes";
+import type { MutationResolvers, PostTag, PostStatus } from "@resolverTypes";
 import type { DbCreatePost, ResolverFunc, ValidationErrorObject } from "@types";
 
 type EditPost = ResolverFunc<MutationResolvers["editPost"]>;
@@ -134,10 +130,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       );
     }
 
-    if (
-      postStatus !== PostStatus.Published &&
-      postStatus !== PostStatus.Unpublished
-    ) {
+    if (postStatus !== "Published" && postStatus !== "Unpublished") {
       return new NotAllowedPostActionError(
         "Can only edit published or unpublished posts"
       );

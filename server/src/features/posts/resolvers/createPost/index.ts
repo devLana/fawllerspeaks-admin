@@ -11,11 +11,7 @@ import {
   generateErrorsObject,
 } from "@utils";
 
-import {
-  type MutationResolvers,
-  type PostTag,
-  PostStatus,
-} from "@resolverTypes";
+import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc, DbCreatePost, ValidationErrorObject } from "@types";
 
 type CreatePost = ResolverFunc<MutationResolvers["createPost"]>;
@@ -129,7 +125,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
         likes,
         is_in_bin "isInBin",
         is_deleted "isDeleted"`,
-      [title, description, content, user, PostStatus.Unpublished, slug, dbTags]
+      [title, description, content, user, "Unpublished", slug, dbTags]
     );
 
     const [saved] = savedPost;
@@ -142,7 +138,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       description,
       content,
       author: loggedInUser[0].name,
-      status: PostStatus.Unpublished,
+      status: "Unpublished",
       url: postUrl,
       slug,
       imageBanner: saved.imageBanner,

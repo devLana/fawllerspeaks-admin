@@ -19,7 +19,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, type Post, Status } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 
 type DeletePosts = TestData<{ deletePostsFromBin: Record<string, unknown> }>;
 
@@ -83,7 +83,7 @@ describe("Delete posts from bin - E2E", () => {
     expect(data.data?.deletePostsFromBin).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to delete post from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -117,7 +117,7 @@ describe("Delete posts from bin - E2E", () => {
       expect(data.data?.deletePostsFromBin).toStrictEqual({
         __typename: "PostIdsValidationError",
         postIdsError: errorMsg,
-        status: Status.Error,
+        status: "ERROR",
       });
     }
   );
@@ -137,7 +137,7 @@ describe("Delete posts from bin - E2E", () => {
     expect(data.data?.deletePostsFromBin).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to delete post from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -158,7 +158,7 @@ describe("Delete posts from bin - E2E", () => {
     expect(data.data?.deletePostsFromBin).toStrictEqual({
       __typename: "UnauthorizedAuthorError",
       message: "Cannot delete another author's posts from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -179,7 +179,7 @@ describe("Delete posts from bin - E2E", () => {
     expect(data.data?.deletePostsFromBin).toStrictEqual({
       __typename: "Posts",
       posts: expect.arrayContaining([post1, post2]),
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -205,7 +205,7 @@ describe("Delete posts from bin - E2E", () => {
       posts: expect.arrayContaining([post3, post1, post2]),
       message:
         "3 posts deleted from bin. 2 other posts could not be deleted from bin",
-      status: Status.Warn,
+      status: "WARN",
     });
   });
 
@@ -225,7 +225,7 @@ describe("Delete posts from bin - E2E", () => {
     expect(data.data?.deletePostsFromBin).toStrictEqual({
       __typename: "UnknownError",
       message: "The provided posts could not be deleted from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 });

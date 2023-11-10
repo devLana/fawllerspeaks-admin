@@ -19,7 +19,7 @@ import {
 import { DATE_REGEX } from "@utils";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, type Post, Status, PostStatus } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 
 type PublishPost = TestData<{ publishPost: Record<string, unknown> }>;
 
@@ -80,7 +80,7 @@ describe("Publish post - E2E", () => {
     expect(data.data?.publishPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to publish post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -113,7 +113,7 @@ describe("Publish post - E2E", () => {
       expect(data.data?.publishPost).toStrictEqual({
         __typename: "PostIdValidationError",
         postIdError: errorMsg,
-        status: Status.Error,
+        status: "ERROR",
       });
     }
   );
@@ -129,7 +129,7 @@ describe("Publish post - E2E", () => {
     expect(data.data?.publishPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to publish post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -144,7 +144,7 @@ describe("Publish post - E2E", () => {
     expect(data.data?.publishPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unable to publish post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -160,7 +160,7 @@ describe("Publish post - E2E", () => {
     expect(data.data?.publishPost).toStrictEqual({
       __typename: "UnauthorizedAuthorError",
       message: "Cannot publish another author's post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -176,7 +176,7 @@ describe("Publish post - E2E", () => {
     expect(data.data?.publishPost).toStrictEqual({
       __typename: "NotAllowedPostActionError",
       message: "Post has already been published",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -193,7 +193,7 @@ describe("Publish post - E2E", () => {
     expect(data.data?.publishPost).toStrictEqual({
       __typename: "NotAllowedPostActionError",
       message: "Only unpublished posts can be published",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -210,10 +210,10 @@ describe("Publish post - E2E", () => {
       __typename: "SinglePost",
       post: {
         ...testPost,
-        status: PostStatus.Published,
+        status: "Published",
         datePublished: expect.stringMatching(DATE_REGEX),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 });

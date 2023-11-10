@@ -1,6 +1,6 @@
-import {
-  type UnauthorizedAuthorError as Error,
-  type UnauthorizedAuthorErrorResolvers as Resolvers,
+import type {
+  UnauthorizedAuthorError as Error,
+  UnauthorizedAuthorErrorResolvers as Resolvers,
   Status,
 } from "@resolverTypes";
 
@@ -8,7 +8,7 @@ export class UnauthorizedAuthorError implements Error {
   readonly status: Status;
 
   constructor(public readonly message: string) {
-    this.status = Status.Error;
+    this.status = "ERROR";
   }
 }
 

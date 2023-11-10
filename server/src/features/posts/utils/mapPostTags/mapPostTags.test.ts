@@ -1,17 +1,18 @@
 import { afterAll, beforeAll, describe, expect, test } from "@jest/globals";
 
 import mapPostTags from ".";
-
 import type { PostTag } from "@resolverTypes";
 
 const map = new Map<string, PostTag>();
+const dateCreated = new Date().toISOString();
+const lastModified = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
 const postTags: PostTag[] = [
-  { id: "1", name: "tag1", dateCreated: 746472, lastModified: null },
-  { id: "2", name: "tag2", dateCreated: 9532, lastModified: 34566 },
-  { id: "3", name: "tag3", dateCreated: 234, lastModified: 12245 },
-  { id: "4", name: "tag4", dateCreated: 7876, lastModified: 123567 },
-  { id: "5", name: "tag5", dateCreated: 123432, lastModified: null },
+  { id: "1", name: "tag1", dateCreated, lastModified: null },
+  { id: "2", name: "tag2", dateCreated, lastModified },
+  { id: "3", name: "tag3", dateCreated, lastModified },
+  { id: "4", name: "tag4", dateCreated, lastModified },
+  { id: "5", name: "tag5", dateCreated, lastModified: null },
 ];
 
 beforeAll(() => {

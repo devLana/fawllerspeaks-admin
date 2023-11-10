@@ -20,7 +20,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, type Post, Status, PostStatus } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 import {
   e2eValidationsTable,
   validationTestsTable,
@@ -108,7 +108,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to save post to draft",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -140,7 +140,7 @@ describe("Draft post - E2E", () => {
       expect(data.data?.draftPost).toStrictEqual({
         __typename: "PostValidationError",
         ...errors,
-        status: Status.Error,
+        status: "ERROR",
       });
     }
   );
@@ -157,7 +157,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to save post to draft",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -173,7 +173,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unknown post tag id provided",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -190,7 +190,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unknown post tag id provided",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -206,7 +206,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unknown post id provided",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -222,7 +222,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "UnauthorizedAuthorError",
       message: "Cannot update another author's draft post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -238,7 +238,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "NotAllowedPostActionError",
       message: "Can only update a draft post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -255,7 +255,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "DuplicatePostTitleError",
       message: "A post with that title has already been created",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -281,7 +281,7 @@ describe("Draft post - E2E", () => {
         description: testPost.description,
         content: testPost.content,
         author: `${postAuthor.firstName} ${postAuthor.lastName}`,
-        status: PostStatus.Draft,
+        status: "Draft",
         slug: testPost.slug,
         url: `${urls.siteUrl}/blog/new-draft-post-slug`,
         imageBanner: null,
@@ -294,7 +294,7 @@ describe("Draft post - E2E", () => {
         isDeleted: false,
         tags: expect.arrayContaining(postTags),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -315,7 +315,7 @@ describe("Draft post - E2E", () => {
         title: "testing New title",
         url: `${urls.siteUrl}/blog/testing-new-title`,
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -331,7 +331,7 @@ describe("Draft post - E2E", () => {
     expect(data.data?.draftPost).toStrictEqual({
       __typename: "DuplicatePostTitleError",
       message: "A post with that title has already been created",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -358,7 +358,7 @@ describe("Draft post - E2E", () => {
         description: testPost.description,
         content: testPost.content,
         author: `${postAuthor.firstName} ${postAuthor.lastName}`,
-        status: PostStatus.Draft,
+        status: "Draft",
         slug: testPost.slug,
         url: `${urls.siteUrl}/blog/new-draft-post-slug`,
         imageBanner: null,
@@ -371,7 +371,7 @@ describe("Draft post - E2E", () => {
         isDeleted: false,
         tags: expect.arrayContaining(postTags),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 });

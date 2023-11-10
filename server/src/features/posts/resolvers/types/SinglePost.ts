@@ -1,7 +1,7 @@
-import {
-  type SinglePost as BlogPost,
-  type SinglePostResolvers,
-  type Post,
+import type {
+  SinglePost as BlogPost,
+  SinglePostResolvers,
+  Post,
   Status,
 } from "@resolverTypes";
 
@@ -9,7 +9,7 @@ export class SinglePost implements BlogPost {
   readonly status: Status;
 
   constructor(public readonly post: Post) {
-    this.status = Status.Success;
+    this.status = "SUCCESS";
   }
 }
 

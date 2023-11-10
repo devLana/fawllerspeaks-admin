@@ -17,7 +17,7 @@ import {
   publishedTestPosts,
 } from "@tests";
 
-import { type PostTag, type Post, Status } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 import type { APIContext, TestData } from "@types";
 
 type GetPost = TestData<{ getPost: Record<string, unknown> }>;
@@ -74,7 +74,7 @@ describe("Get post - E2E", () => {
     expect(data.data?.getPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to retrieve post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -111,7 +111,7 @@ describe("Get post - E2E", () => {
     expect(data.data?.getPost).toStrictEqual({
       __typename: "PostIdValidationError",
       postIdError: expected,
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -126,7 +126,7 @@ describe("Get post - E2E", () => {
     expect(data.data?.getPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to retrieve post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -141,7 +141,7 @@ describe("Get post - E2E", () => {
     expect(data.data?.getPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unable to retrieve a post with that id",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -157,7 +157,7 @@ describe("Get post - E2E", () => {
     expect(data.data?.getPost).toStrictEqual({
       __typename: "SinglePost",
       post: testPost,
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 });

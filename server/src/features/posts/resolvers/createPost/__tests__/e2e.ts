@@ -21,7 +21,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, type Post, Status, PostStatus } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 
 type Create = TestData<{ createPost: Record<string, unknown> }>;
 
@@ -92,7 +92,7 @@ describe("Create post - E2E", () => {
     expect(data.data?.createPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to create post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -142,7 +142,7 @@ describe("Create post - E2E", () => {
       expect(data.data?.createPost).toStrictEqual({
         __typename: "CreatePostValidationError",
         ...errors,
-        status: Status.Error,
+        status: "ERROR",
       });
     }
   );
@@ -164,7 +164,7 @@ describe("Create post - E2E", () => {
     expect(data.data?.createPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unknown post tag id provided",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -188,7 +188,7 @@ describe("Create post - E2E", () => {
     expect(data.data?.createPost).toStrictEqual({
       __typename: "UnknownError",
       message: "Unknown post tag id provided",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -218,7 +218,7 @@ describe("Create post - E2E", () => {
     expect(data.data?.createPost).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to create post",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -249,7 +249,7 @@ describe("Create post - E2E", () => {
     expect(data.data?.createPost).toStrictEqual({
       __typename: "DuplicatePostTitleError",
       message: "A post with that title has already been created",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -286,7 +286,7 @@ describe("Create post - E2E", () => {
         description: testPost.description,
         content: testPost.content,
         author: `${registeredUser.firstName} ${registeredUser.lastName}`,
-        status: PostStatus.Unpublished,
+        status: "Unpublished",
         slug: testPost.slug,
         url: `${urls.siteUrl}/blog/post-slug`,
         imageBanner: null,
@@ -299,7 +299,7 @@ describe("Create post - E2E", () => {
         isDeleted: false,
         tags: expect.arrayContaining(postTags),
       },
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 });

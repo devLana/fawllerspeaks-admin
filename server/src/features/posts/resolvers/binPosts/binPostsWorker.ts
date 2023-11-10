@@ -3,7 +3,6 @@
 import { parentPort } from "node:worker_threads";
 
 import { db } from "@lib/db";
-import { PostStatus } from "@resolverTypes";
 
 parentPort?.on("message", postIds => {
   (async () => {
@@ -15,7 +14,7 @@ parentPort?.on("message", postIds => {
             post_id = ANY ($3)
           AND
             status = $4`,
-      [PostStatus.Unpublished, null, postIds, PostStatus.Published]
+      ["Unpublished", null, postIds, "Published"]
     );
   })()
     .then(() => null)
@@ -42,7 +41,7 @@ parentPort?.on("message", postIds => {
 //             post_id = ANY ($3)
 //           AND
 //             status = $4`,
-//           [PostStatus.Unpublished, null, postIds, PostStatus.Published]
+//           ["Unpublished", null, postIds, "Published"]
 //         );
 //       })()
 //         .then(() => null)

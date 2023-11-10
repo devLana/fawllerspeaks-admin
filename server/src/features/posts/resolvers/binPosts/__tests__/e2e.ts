@@ -29,7 +29,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, type Post, Status } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 
 type BinPosts = TestData<{ binPosts: Record<string, unknown> }>;
 
@@ -101,7 +101,7 @@ describe("Bin posts - E2E", () => {
     expect(data.data?.binPosts).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to move post to bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -141,7 +141,7 @@ describe("Bin posts - E2E", () => {
       expect(data.data?.binPosts).toStrictEqual({
         __typename: "PostIdsValidationError",
         postIdsError: errorMsg,
-        status: Status.Error,
+        status: "ERROR",
       });
     }
   );
@@ -161,7 +161,7 @@ describe("Bin posts - E2E", () => {
     expect(data.data?.binPosts).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to move post to bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -185,7 +185,7 @@ describe("Bin posts - E2E", () => {
     expect(data.data?.binPosts).toStrictEqual({
       __typename: "UnauthorizedAuthorError",
       message: "Cannot move another author's posts to bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -209,7 +209,7 @@ describe("Bin posts - E2E", () => {
     expect(data.data?.binPosts).toStrictEqual({
       __typename: "Posts",
       posts: expect.arrayContaining([post1, post2]),
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 
@@ -237,7 +237,7 @@ describe("Bin posts - E2E", () => {
       __typename: "PostsWarning",
       posts: expect.arrayContaining([post3, post1, post2]),
       message: "3 posts moved to bin. 2 other posts could not be moved to bin",
-      status: Status.Warn,
+      status: "WARN",
     });
   });
 
@@ -259,7 +259,7 @@ describe("Bin posts - E2E", () => {
     expect(data.data?.binPosts).toStrictEqual({
       __typename: "UnknownError",
       message: "The selected posts could not be moved to bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 });

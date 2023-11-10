@@ -15,7 +15,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type Post, type PostTag, Status } from "@resolverTypes";
+import type { Post, PostTag } from "@resolverTypes";
 
 type GetPosts = TestData<{ getPosts: Record<string, unknown> }>;
 
@@ -68,7 +68,7 @@ describe("Get posts - E2E", () => {
     expect(data.data?.getPosts).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to retrieve posts",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -83,7 +83,7 @@ describe("Get posts - E2E", () => {
     expect(data.data?.getPosts).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to retrieve posts",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -98,7 +98,7 @@ describe("Get posts - E2E", () => {
     expect(data.data?.getPosts).toStrictEqual({
       __typename: "Posts",
       posts: expect.arrayContaining(posts),
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 });

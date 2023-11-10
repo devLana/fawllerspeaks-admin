@@ -16,7 +16,7 @@ import {
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
-import { type PostTag, type Post, Status } from "@resolverTypes";
+import type { PostTag, Post } from "@resolverTypes";
 
 type EmptyBin = TestData<{ emptyBin: Record<string, unknown> }>;
 
@@ -81,7 +81,7 @@ describe("Empty bin - E2E", () => {
     expect(data.data?.emptyBin).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to empty all posts from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -96,7 +96,7 @@ describe("Empty bin - E2E", () => {
     expect(data.data?.emptyBin).toStrictEqual({
       __typename: "NotAllowedError",
       message: "Unable to empty all posts from bin",
-      status: Status.Error,
+      status: "ERROR",
     });
   });
 
@@ -111,7 +111,7 @@ describe("Empty bin - E2E", () => {
     expect(data.data?.emptyBin).toStrictEqual({
       __typename: "EmptyBinWarning",
       message: "You have no posts in your bin to delete",
-      status: Status.Warn,
+      status: "WARN",
     });
   });
 
@@ -126,7 +126,7 @@ describe("Empty bin - E2E", () => {
     expect(data.data?.emptyBin).toStrictEqual({
       __typename: "Posts",
       posts: expect.arrayContaining(posts),
-      status: Status.Success,
+      status: "SUCCESS",
     });
   });
 });
