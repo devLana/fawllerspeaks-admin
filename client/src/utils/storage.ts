@@ -7,7 +7,10 @@ export const getStorageTheme = (): AppTheme | null => {
   if (!storageTheme) return null;
 
   try {
-    const defaultTheme = JSON.parse(storageTheme) as Record<string, unknown>;
+    const defaultTheme = JSON.parse(storageTheme) as Record<
+      keyof AppTheme,
+      unknown
+    >;
 
     if (
       !Object.hasOwn(defaultTheme, "themeMode") ||
@@ -31,11 +34,9 @@ export const getStorageTheme = (): AppTheme | null => {
       return null;
     }
 
-    return {
-      themeMode: defaultTheme.themeMode,
-      fontSize: defaultTheme.fontSize,
-      color: defaultTheme.color,
-    };
+    const { color, fontSize, themeMode } = defaultTheme;
+
+    return { themeMode, fontSize, color };
   } catch {
     return null;
   }

@@ -1,12 +1,12 @@
 import type { NextPage } from "next";
-import { type AppProps } from "next/app";
+import type { AppProps } from "next/app";
 
-import { type EmotionCache } from "@emotion/react";
+import type { EmotionCache } from "@emotion/react";
 import type { OverridableComponent } from "@mui/material/OverridableComponent";
 import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
 import type { SxProps } from "@mui/material/styles";
 
-import { type MetaInfo } from "@components/Metadata";
+import type { MetaInfo } from "@components/Metadata";
 import type { Query } from "@apiTypes";
 
 export type ThemeMode = "sunny" | "sunset" | "pitch black";
@@ -46,10 +46,12 @@ export interface RootLayoutProps extends MetaInfo {
   children: React.ReactElement;
 }
 
-type Keys = ((theme: never) => unknown) | Record<string, unknown>;
+type Keys = ((...theme: never[]) => unknown) | Record<string, unknown>;
 export type SxPropsArray = NonNullable<Exclude<SxProps, Keys>>;
 
 type ExtractPostTags = Extract<Query["getPostTags"], { tags: unknown[] }>;
 export interface CachePostTags {
   getPostTags: Omit<ExtractPostTags, "status" | "__typename">;
 }
+
+export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
