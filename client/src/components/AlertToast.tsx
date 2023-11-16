@@ -1,6 +1,6 @@
 import Snackbar, {
   type SnackbarOrigin,
-  type SnackbarCloseReason,
+  type SnackbarCloseReason as Reason,
 } from "@mui/material/Snackbar";
 import Alert, { type AlertColor, type AlertProps } from "@mui/material/Alert";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
@@ -51,10 +51,7 @@ const AlertToast = ({
       transition = Right;
   }
 
-  const handleClose = (
-    _: React.SyntheticEvent | Event,
-    reason: SnackbarCloseReason
-  ) => {
+  const handleClose = (_: React.SyntheticEvent | Event, reason: Reason) => {
     if (reason === "clickaway") return;
     onClose();
   };

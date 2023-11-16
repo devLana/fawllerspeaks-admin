@@ -70,8 +70,6 @@ const PasswordInput = (props: PasswordInputProps) => {
 
   const [isVisible, setIsVisible] = React.useState(false);
 
-  const handleClick = () => setIsVisible(!isVisible);
-
   const ariaId = fieldError ? `${id}-error-message` : undefined;
 
   return (
@@ -100,7 +98,7 @@ const PasswordInput = (props: PasswordInputProps) => {
             position="end"
             title={`${isVisible ? "Hide" : "Show"} password`}
             Icon={isVisible ? VisibilityOffRoundedIcon : VisibilityRoundedIcon}
-            onClick={handleClick}
+            onClick={() => setIsVisible(!isVisible)}
           />
         ),
       }}
