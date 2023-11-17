@@ -19,17 +19,17 @@ describe("Change Password", () => {
 
       await user.click(screen.getByRole("button", btnName));
 
-      expect(screen.getByLabelText(/^current password$/i)).toHaveErrorMessage(
-        "Enter current password"
-      );
+      expect(
+        screen.getByLabelText(/^current password$/i)
+      ).toHaveAccessibleErrorMessage("Enter current password");
 
-      expect(screen.getByLabelText(/^new password$/i)).toHaveErrorMessage(
-        "Enter new password"
-      );
+      expect(
+        screen.getByLabelText(/^new password$/i)
+      ).toHaveAccessibleErrorMessage("Enter new password");
 
       expect(
         screen.getByLabelText(/^confirm new password$/i)
-      ).toHaveErrorMessage("Enter confirm password");
+      ).toHaveAccessibleErrorMessage("Enter confirm password");
     });
 
     it("New password field has an invalid value, Display an error message", async () => {
@@ -40,29 +40,39 @@ describe("Change Password", () => {
 
       await user.type(screen.getByLabelText(/^new password$/i), "pass");
       await user.click(screen.getByRole("button", btnName));
-      expect(screen.getByLabelText(/^new password$/i)).toHaveErrorMessage(
+      expect(
+        screen.getByLabelText(/^new password$/i)
+      ).toHaveAccessibleErrorMessage(
         "New Password must be at least 8 characters long"
       );
 
       await user.clear(screen.getByLabelText(/^new password$/i));
       await user.type(screen.getByLabelText(/^new password$/i), "Pass!WOrd");
       await user.click(screen.getByRole("button", btnName));
-      expect(screen.getByLabelText(/^new password$/i)).toHaveErrorMessage(msg);
+      expect(
+        screen.getByLabelText(/^new password$/i)
+      ).toHaveAccessibleErrorMessage(msg);
 
       await user.clear(screen.getByLabelText(/^new password$/i));
       await user.type(screen.getByLabelText(/^new password$/i), "PASS!W0RD");
       await user.click(screen.getByRole("button", btnName));
-      expect(screen.getByLabelText(/^new password$/i)).toHaveErrorMessage(msg);
+      expect(
+        screen.getByLabelText(/^new password$/i)
+      ).toHaveAccessibleErrorMessage(msg);
 
       await user.clear(screen.getByLabelText(/^new password$/i));
       await user.type(screen.getByLabelText(/^new password$/i), "pass!w0rd");
       await user.click(screen.getByRole("button", btnName));
-      expect(screen.getByLabelText(/^new password$/i)).toHaveErrorMessage(msg);
+      expect(
+        screen.getByLabelText(/^new password$/i)
+      ).toHaveAccessibleErrorMessage(msg);
 
       await user.clear(screen.getByLabelText(/^new password$/i));
       await user.type(screen.getByLabelText(/^new password$/i), "PassW0rd");
       await user.click(screen.getByRole("button", btnName));
-      expect(screen.getByLabelText(/^new password$/i)).toHaveErrorMessage(msg);
+      expect(
+        screen.getByLabelText(/^new password$/i)
+      ).toHaveAccessibleErrorMessage(msg);
     });
 
     it("Display a confirm new password error message if passwords do not match", async () => {
@@ -73,7 +83,9 @@ describe("Change Password", () => {
       await user.type(confirmNewPwd, "password");
       await user.click(screen.getByRole("button", btnName));
 
-      expect(confirmNewPwd).toHaveErrorMessage("Passwords do not match");
+      expect(confirmNewPwd).toHaveAccessibleErrorMessage(
+        "Passwords do not match"
+      );
     });
   });
 
@@ -93,14 +105,16 @@ describe("Change Password", () => {
         expect(screen.getByRole("button", btnName)).toBeDisabled();
 
         await waitFor(() => {
-          expect(currentPassword).toHaveErrorMessage(
+          expect(currentPassword).toHaveAccessibleErrorMessage(
             validation.currentPasswordError
           );
         });
 
-        expect(newPassword).toHaveErrorMessage(validation.newPasswordError);
+        expect(newPassword).toHaveAccessibleErrorMessage(
+          validation.newPasswordError
+        );
 
-        expect(confirmNewPwd).toHaveErrorMessage(
+        expect(confirmNewPwd).toHaveAccessibleErrorMessage(
           validation.confirmNewPasswordError
         );
 

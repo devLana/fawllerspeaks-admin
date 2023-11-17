@@ -10,35 +10,32 @@ import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 
 const Home: NextPageWithLayout = () => {
-  const [statusMessage, setStatusMessage] = React.useState("");
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const router = useRouter();
+  const [alert, setAlert] = React.useState({ open: false, message: "" });
+  const { isReady, query } = useRouter();
 
   React.useEffect(() => {
-    if (router.isReady) {
-      if (router.query.status && !Array.isArray(router.query.status)) {
-        switch (router.query.status) {
-          case "registered":
-            setStatusMessage("Your account has already been registered");
-            setIsOpen(true);
-            break;
+    if (isReady && query.status && !Array.isArray(query.status)) {
+      switch (query.status) {
+        case "registered":
+          setAlert({
+            open: true,
+            message: "Your account has already been registered",
+          });
+          break;
 
-          default:
-            setStatusMessage("");
-        }
+        default:
       }
     }
-  }, [router.isReady, router.query.status]);
+  }, [isReady, query.status]);
 
   return (
     <>
       <Snackbar
-        open={isOpen}
-        onClose={handleCloseAlert<boolean>(false, setIsOpen)}
-        message={statusMessage}
+        open={alert.open}
+        onClose={handleCloseAlert({ ...alert, open: false }, setAlert)}
+        message={alert.message}
       />
-      <Typography variant="h1">Home page</Typography>
+      <Typography variant="h1">Dashboard</Typography>
     </>
   );
 };

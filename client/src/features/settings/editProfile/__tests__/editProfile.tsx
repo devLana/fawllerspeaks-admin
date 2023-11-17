@@ -31,8 +31,8 @@ describe("Edit Profile", () => {
 
         await user.click(screen.getByRole("button", { name: /^edit$/i }));
 
-        expect(firstName).toHaveErrorMessage("Enter first name");
-        expect(lastName).toHaveErrorMessage("Enter last name");
+        expect(firstName).toHaveAccessibleErrorMessage("Enter first name");
+        expect(lastName).toHaveAccessibleErrorMessage("Enter last name");
       });
 
       it("Invalid input fields should have error messages", async () => {
@@ -44,10 +44,12 @@ describe("Edit Profile", () => {
         await user.type(lastName, "Doe2");
         await user.click(screen.getByRole("button", { name: /^edit$/i }));
 
-        expect(firstName).toHaveErrorMessage(
+        expect(firstName).toHaveAccessibleErrorMessage(
           "First name cannot contain numbers"
         );
-        expect(lastName).toHaveErrorMessage("Last name cannot contain numbers");
+        expect(lastName).toHaveAccessibleErrorMessage(
+          "Last name cannot contain numbers"
+        );
       });
     });
 
@@ -104,8 +106,10 @@ describe("Edit Profile", () => {
         const alert = await screen.findByRole("alert");
 
         expect(alert).toHaveTextContent(validation.imageError);
-        expect(firstName).toHaveErrorMessage(validation.firstNameError);
-        expect(lastName).toHaveErrorMessage(validation.lastNameError);
+        expect(firstName).toHaveAccessibleErrorMessage(
+          validation.firstNameError
+        );
+        expect(lastName).toHaveAccessibleErrorMessage(validation.lastNameError);
         expect(firstName).toHaveFocus();
         expect(screen.getByRole("button", { name: /^edit$/i })).toBeEnabled();
       });

@@ -43,11 +43,11 @@ describe("Login Page", () => {
 
       await user.click(screen.getByRole("button", { name: /login/i }));
 
-      expect(screen.getByRole("textbox", emailLabel)).toHaveErrorMessage(
-        "Enter an e-mail address"
-      );
+      expect(
+        screen.getByRole("textbox", emailLabel)
+      ).toHaveAccessibleErrorMessage("Enter an e-mail address");
 
-      expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+      expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
         "Enter password"
       );
     });
@@ -59,13 +59,13 @@ describe("Login Page", () => {
       await user.type(screen.getByLabelText(/^password$/i), "testing_password");
       await user.click(screen.getByRole("button", { name: /login/i }));
 
-      expect(screen.getByRole("textbox", emailLabel)).toHaveErrorMessage(
-        "Invalid e-mail address"
-      );
+      expect(
+        screen.getByRole("textbox", emailLabel)
+      ).toHaveAccessibleErrorMessage("Invalid e-mail address");
 
-      expect(screen.getByLabelText(/^password$/i)).not.toHaveErrorMessage(
-        "Enter password"
-      );
+      expect(
+        screen.getByLabelText(/^password$/i)
+      ).not.toHaveAccessibleErrorMessage("Enter password");
     });
   });
 
@@ -82,16 +82,17 @@ describe("Login Page", () => {
       expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
 
       await waitFor(() => {
-        expect(screen.getByRole("textbox", emailLabel)).toHaveErrorMessage(
-          validation.emailError
-        );
+        expect(
+          screen.getByRole("textbox", emailLabel)
+        ).toHaveAccessibleErrorMessage(validation.emailError);
       });
 
-      expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+      expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
         validation.passwordError
       );
 
       expect(screen.getByRole("alert")).toHaveTextContent(sessionIdError);
+      expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardError");
 
       expect(screen.getByRole("textbox", emailLabel)).toHaveFocus();
       expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();

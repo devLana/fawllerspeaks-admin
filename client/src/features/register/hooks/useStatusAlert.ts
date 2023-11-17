@@ -1,31 +1,29 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-const useStatusAlert = (
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-): [string | null, React.Dispatch<React.SetStateAction<string | null>>] => {
-  const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
-  const router = useRouter();
+const useStatusAlert = () => {
+  const [alert, setAlert] = React.useState({ open: false, message: "" });
+  const { isReady, query } = useRouter();
 
   React.useEffect(() => {
-    if (router.isReady) {
-      if (router.query.status && !Array.isArray(router.query.status)) {
-        switch (router.query.status) {
-          case "unregistered":
-            setIsOpen(true);
-            setStatusMessage(
-              "You need to register your account before you can perform that action"
-            );
-            break;
+    if (isReady && query.status && !Array.isArray(query.status)) {
+      switch (query.status) {
+        case "unregistered":
+          setAlert({
+            open: true,
+            message:
+              "You need to register your account before you can perform that action",
+          });
+          break;
 
-          default:
-            setStatusMessage(null);
-        }
+        default:
       }
     }
-  }, [router.isReady, router.query.status, setIsOpen]);
+  }, [isReady, query.status]);
 
-  return [statusMessage, setStatusMessage];
+  const handleCloseAlert = () => setAlert({ ...alert, open: false });
+
+  return { ...alert, handleCloseAlert };
 };
 
 export default useStatusAlert;

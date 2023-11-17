@@ -18,7 +18,7 @@ import { update } from "./utils/update";
 import { refetchQueries } from "./utils/refetchQueries";
 import type { PostTag } from "@apiTypes";
 
-interface DeletePostTagsProps {
+export interface DeletePostTagsProps {
   open: boolean;
   name: string;
   ids: string[];
@@ -44,55 +44,54 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
   const msg =
     "You are unable to delete post tags at the moment. Please try again later";
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     setIsLoading(true);
 
-    const { data } = await deleteTags({
+    void deleteTags({
       variables: { tagIds: ids },
-      onError: err => handleResponse(err.graphQLErrors[0]?.message ?? msg),
       update,
       refetchQueries,
-    });
+      onError: err => handleResponse(err.graphQLErrors[0]?.message ?? msg),
+      onCompleted(data) {
+        switch (data.deletePostTags.__typename) {
+          case "AuthenticationError":
+            void client.clearStore();
+            void replace("/login?status=unauthenticated");
+            break;
 
-    if (data) {
-      switch (data.deletePostTags.__typename) {
-        case "AuthenticationError":
-          void client.clearStore();
-          void replace("/login?status=unauthenticated");
-          break;
+          case "NotAllowedError":
+            void client.clearStore();
+            void replace("/login?status=unauthorized");
+            break;
 
-        case "NotAllowedError":
-          void client.clearStore();
-          void replace("/login?status=unauthorized");
-          break;
+          case "RegistrationError":
+            void replace("/register?status=unregistered");
+            break;
 
-        case "RegistrationError":
-          void replace("/register?status=unregistered");
-          break;
+          case "DeletePostTagsValidationError":
+            handleResponse(data.deletePostTags.tagIdsError);
+            onClearSelection();
+            break;
 
-        case "DeletePostTagsValidationError":
-          handleResponse(data.deletePostTags.tagIdsError);
-          onClearSelection();
-          break;
+          case "UnknownError":
+          case "PostTagsWarning":
+            handleResponse(data.deletePostTags.message);
+            onClearSelection();
+            break;
 
-        case "UnknownError":
-        case "PostTagsWarning":
-          handleResponse(data.deletePostTags.message);
-          onClearSelection();
-          break;
+          case "PostTags": {
+            const word = data.deletePostTags.tags.length > 1 ? "tags" : "tag";
 
-        case "PostTags": {
-          const word = data.deletePostTags.tags.length > 1 ? "tags" : "tag";
+            handleResponse(`Post ${word} deleted`);
+            onClearSelection(data.deletePostTags.tags);
+            break;
+          }
 
-          handleResponse(`Post ${word} deleted`);
-          onClearSelection(data.deletePostTags.tags);
-          break;
+          default:
+            handleResponse(msg);
         }
-
-        default:
-          handleResponse(msg);
-      }
-    }
+      },
+    });
   };
 
   const tagOrTags = ids.length > 1 ? "Tags" : "Tag";

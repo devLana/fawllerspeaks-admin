@@ -1,25 +1,26 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import { useMutation, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Box from "@mui/material/Box";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Snackbar from "@mui/material/Snackbar";
+import TextField from "@mui/material/TextField";
 
 import { useSession } from "@context/SessionContext";
-import ChangePasswordForm from "@features/settings/changePassword/components/ChangePasswordForm";
-import { changePasswordValidator } from "@features/settings/changePassword/utils/changePasswordValidator";
+import PasswordInput from "@components/PasswordInput";
 import { CHANGE_PASSWORD } from "@features/settings/changePassword/operations/CHANGE_PASSWORD";
-import settingsLayout from "@utils/settings/settingsLayout";
+import { GET_USER_EMAIL } from "@features/settings/changePassword/operations/GET_USER_EMAIL";
+import { changePasswordValidator } from "@features/settings/changePassword/utils/changePasswordValidator";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
-import { type NextPageWithLayout } from "@types";
-import { type MutationChangePasswordArgs } from "@apiTypes";
-
-type Status = "idle" | "submitting" | "error" | "success";
+import settingsLayout from "@utils/settings/settingsLayout";
+import type { MutationChangePasswordArgs } from "@apiTypes";
+import type { FormStatus, NextPageWithLayout } from "@types";
 
 const ChangePassword: NextPageWithLayout = () => {
-  const [formStatus, setFormStatus] = React.useState<Status>("idle");
-
+  const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
   const { replace } = useRouter();
 
   const [password, { data, error, client }] = useMutation(CHANGE_PASSWORD);
@@ -35,73 +36,69 @@ const ChangePassword: NextPageWithLayout = () => {
   });
 
   const { userId } = useSession();
-  const user = client.readFragment<{ email: string }>({
+
+  const user = client.readFragment({
     id: userId ?? "",
-    fragment: gql`
-      fragment GetChangePasswordUser on User {
-        email
-      }
-    `,
+    fragment: GET_USER_EMAIL,
   });
 
-  const submitHandler = async (values: MutationChangePasswordArgs) => {
+  const submitHandler = (values: MutationChangePasswordArgs) => {
     setFormStatus("submitting");
 
-    const { data: response } = await password({
+    void password({
       variables: values,
       onError: () => setFormStatus("error"),
-    });
+      onCompleted(changePasswordData) {
+        switch (changePasswordData.changePassword.__typename) {
+          case "ChangePasswordValidationError": {
+            const fieldErrors = changePasswordData.changePassword;
+            const focus = { shouldFocus: true };
 
-    if (response) {
-      switch (response.changePassword.__typename) {
-        case "ChangePasswordValidationError": {
-          const fieldErrors = response.changePassword;
-          const focus = { shouldFocus: true };
+            if (fieldErrors.confirmNewPasswordError) {
+              const message = fieldErrors.confirmNewPasswordError;
+              setError("confirmNewPassword", { message }, focus);
+            }
 
-          if (fieldErrors.confirmNewPasswordError) {
-            const message = fieldErrors.confirmNewPasswordError;
-            setError("confirmNewPassword", { message }, focus);
+            if (fieldErrors.newPasswordError) {
+              const message = fieldErrors.newPasswordError;
+              setError("newPassword", { message }, focus);
+            }
+
+            if (fieldErrors.currentPasswordError) {
+              const message = fieldErrors.currentPasswordError;
+              setError("currentPassword", { message }, focus);
+            }
+
+            setFormStatus("idle");
+            break;
           }
 
-          if (fieldErrors.newPasswordError) {
-            const message = fieldErrors.newPasswordError;
-            setError("newPassword", { message }, focus);
-          }
+          case "AuthenticationError":
+            void client.clearStore();
+            void replace("/login?status=unauthenticated");
+            break;
 
-          if (fieldErrors.currentPasswordError) {
-            const message = fieldErrors.currentPasswordError;
-            setError("currentPassword", { message }, focus);
-          }
+          case "UnknownError":
+            void client.clearStore();
+            void replace("/login?status=unauthorized");
+            break;
 
-          setFormStatus("idle");
-          break;
+          case "RegistrationError":
+            void replace("/register?status=unregistered");
+            break;
+
+          case "NotAllowedError":
+          case "ServerError":
+          default:
+            setFormStatus("error");
+            break;
+
+          case "Response":
+            setFormStatus("success");
+            reset();
         }
-
-        case "AuthenticationError":
-          void client.clearStore();
-          void replace("/login?status=unauthenticated");
-          break;
-
-        case "UnknownError":
-          void client.clearStore();
-          void replace("/login?status=unauthorized");
-          break;
-
-        case "RegistrationError":
-          void replace("/register?status=unregistered");
-          break;
-
-        case "NotAllowedError":
-        case "ServerError":
-        default:
-          setFormStatus("error");
-          break;
-
-        case "Response":
-          setFormStatus("success");
-          reset();
-      }
-    }
+      },
+    });
   };
 
   let msg =
@@ -124,15 +121,57 @@ const ChangePassword: NextPageWithLayout = () => {
       <Snackbar
         message={msg}
         open={formStatus === "error" || formStatus === "success"}
-        onClose={handleCloseAlert<Status>("idle", setFormStatus)}
+        onClose={handleCloseAlert<FormStatus>("idle", setFormStatus)}
       />
-      <ChangePasswordForm
-        email={user?.email ?? ""}
-        isLoading={formStatus === "submitting"}
-        fieldErrors={errors}
+      <Box
+        component="form"
         onSubmit={handleSubmit(submitHandler)}
-        register={register}
-      />
+        noValidate
+        width="100%"
+        maxWidth={570}
+      >
+        <TextField
+          id="email"
+          autoComplete="email"
+          value={user?.email}
+          inputProps={{ readOnly: true }}
+          sx={{ display: "none" }}
+        />
+        <PasswordInput
+          id="current-password"
+          autoComplete="current-password"
+          label="Current Password"
+          register={register("currentPassword")}
+          fieldError={errors.currentPassword}
+          margin={errors.currentPassword ? "dense" : "normal"}
+        />
+        <PasswordInput
+          id="new-password"
+          autoComplete="new-password"
+          label="New Password"
+          register={register("newPassword")}
+          fieldError={errors.newPassword}
+          margin={errors.newPassword ? "dense" : "normal"}
+        />
+        <PasswordInput
+          id="confirm-new-password"
+          autoComplete="new-password"
+          label="Confirm New Password"
+          register={register("confirmNewPassword")}
+          fieldError={errors.confirmNewPassword}
+          margin={errors.confirmNewPassword ? "dense" : "normal"}
+        />
+        <LoadingButton
+          loading={formStatus === "submitting"}
+          variant="contained"
+          size="large"
+          type="submit"
+          fullWidth
+          sx={{ textTransform: "uppercase", mt: 3 }}
+        >
+          <span>Change Password</span>
+        </LoadingButton>
+      </Box>
     </>
   );
 };

@@ -8,100 +8,113 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Snackbar from "@mui/material/Snackbar";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import { useSession } from "@context/SessionContext";
-import { SESSION_ID } from "@utils/constants";
 import { LOGOUT } from "./LOGOUT";
+import { SESSION_ID } from "@utils/constants";
+import { handleCloseAlert } from "@utils/handleCloseAlert";
+import type { RequestStatus } from "@types";
 
 interface LogoutModalProps {
   isOpen: boolean;
-  onClick: () => void;
-  onApiError: (msg: string) => void;
+  onCloseModal: () => void;
 }
 
-const LogoutModal = ({ isOpen, onClick, onApiError }: LogoutModalProps) => {
-  const [isLoading, setIsLoading] = React.useState(false);
+const LogoutModal = ({ isOpen, onCloseModal }: LogoutModalProps) => {
+  const [requestStatus, setStatus] = React.useState<RequestStatus>("idle");
   const { replace } = useRouter();
 
-  const [logout, { client }] = useMutation(LOGOUT);
-
+  const [logout, { data, error, client }] = useMutation(LOGOUT);
   const { handleClearRefreshTokenTimer } = useSession();
 
-  const msg = "You are unable to logout at the moment. Please try again later";
-
-  const handleLogout = async () => {
+  const handleLogout = () => {
     const sessionId = localStorage.getItem(SESSION_ID);
 
     if (sessionId) {
-      setIsLoading(true);
+      setStatus("loading");
 
-      const { data: response } = await logout({
+      void logout({
         variables: { sessionId },
-        onError: err => onApiError(err.graphQLErrors[0]?.message ?? msg),
+        onError() {
+          onCloseModal();
+          setStatus("error");
+        },
+        onCompleted(logoutData) {
+          switch (logoutData.logout.__typename) {
+            case "NotAllowedError":
+            case "UnknownError":
+            case "SessionIdValidationError":
+            default:
+              onCloseModal();
+              setStatus("error");
+              break;
+
+            case "AuthenticationError":
+              handleClearRefreshTokenTimer();
+              void client.clearStore();
+              void replace("/login?status=unauthenticated");
+              break;
+
+            case "Response":
+              localStorage.removeItem(SESSION_ID);
+              handleClearRefreshTokenTimer();
+              void client.clearStore();
+              void replace("/login");
+          }
+        },
       });
-
-      if (response) {
-        switch (response.logout.__typename) {
-          case "SessionIdValidationError":
-            onApiError(response.logout.sessionIdError);
-            break;
-
-          case "UnknownError":
-            onApiError("The current session could not be verified");
-            break;
-
-          case "NotAllowedError":
-            onApiError("You cannot perform that action right now");
-            break;
-
-          case "AuthenticationError":
-            handleClearRefreshTokenTimer();
-            void client.clearStore();
-            void replace("/login?status=unauthenticated");
-            break;
-
-          case "Response":
-            localStorage.removeItem(SESSION_ID);
-            handleClearRefreshTokenTimer();
-            void client.clearStore();
-            void replace("/login");
-            break;
-
-          default:
-            onApiError(msg);
-        }
-      }
     }
   };
 
+  let alertMessage =
+    "You are unable to logout at the moment. Please try again later";
+
+  if (error?.graphQLErrors[0]) {
+    alertMessage = error.graphQLErrors[0].message;
+  } else if (data?.logout.__typename === "NotAllowedError") {
+    alertMessage = "You cannot perform that action right now";
+  } else if (data?.logout.__typename === "UnknownError") {
+    alertMessage = "The current session could not be verified";
+  } else if (data?.logout.__typename === "SessionIdValidationError") {
+    alertMessage = data.logout.sessionIdError;
+  }
+
   return (
-    <Dialog
-      open={isOpen}
-      onClose={isLoading ? undefined : onClick}
-      aria-labelledby="logout-dialog-title"
-    >
-      <DialogTitle id="logout-dialog-title" sx={{ textAlign: "center" }}>
-        Logout of your account
-      </DialogTitle>
-      <DialogContent>
-        <DialogContentText sx={{ textAlign: "center" }}>
-          Do you want to logout of FawllerSpeaks Admin?
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-        <Button disabled={isLoading} onClick={onClick}>
-          Cancel
-        </Button>
-        <LoadingButton
-          onClick={handleLogout}
-          loading={isLoading}
-          variant="contained"
-        >
-          <span>Logout</span>
-        </LoadingButton>
-      </DialogActions>
-    </Dialog>
+    <>
+      <Snackbar
+        message={alertMessage}
+        open={requestStatus === "error"}
+        onClose={handleCloseAlert<RequestStatus>("idle", setStatus)}
+      />
+      <Dialog
+        open={isOpen}
+        onClose={requestStatus === "loading" ? undefined : onCloseModal}
+        aria-labelledby="logout-dialog-title"
+      >
+        <DialogTitle id="logout-dialog-title" sx={{ textAlign: "center" }}>
+          Logout of your account
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ textAlign: "center" }}>
+            Do you want to logout of FawllerSpeaks Admin?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+          <Button disabled={requestStatus === "loading"} onClick={onCloseModal}>
+            Cancel
+          </Button>
+          <LoadingButton
+            onClick={handleLogout}
+            loading={requestStatus === "loading"}
+            variant="contained"
+          >
+            <span>Logout</span>
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

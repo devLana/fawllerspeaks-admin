@@ -8,12 +8,12 @@ interface UploadImage {
 const useUploadImage = () => {
   const { jwt } = useAuthHeaderHandler();
 
-  const upload = async (file: File, type: "avatar" | "post") => {
+  const upload = async (file: File, fileType: "avatar" | "post") => {
     const headers = new Headers({ authorization: `Bearer ${jwt}` });
 
     const body = new FormData();
     body.append("image", file);
-    body.append("type", type);
+    body.append("type", fileType);
 
     const options: RequestInit = { method: "POST", body, headers };
     const request = new Request("http://localhost:7692/upload-image", options);

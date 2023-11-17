@@ -118,13 +118,13 @@ describe("Reset Password", () => {
 
         await user.click(screen.getByRole("button", resetButton));
 
-        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
-          "Enter password"
-        );
+        expect(
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage("Enter password");
 
-        expect(screen.getByLabelText(/^confirm password$/i)).toHaveErrorMessage(
-          "Enter confirm password"
-        );
+        expect(
+          screen.getByLabelText(/^confirm password$/i)
+        ).toHaveAccessibleErrorMessage("Enter confirm password");
       });
 
       it("When the password field has an invalid value", async () => {
@@ -132,29 +132,39 @@ describe("Reset Password", () => {
 
         await user.type(screen.getByLabelText(/^password$/i), "pass");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+        expect(
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage(
           "Password must be at least 8 characters long"
         );
 
         await user.clear(screen.getByLabelText(/^password$/i));
         await user.type(screen.getByLabelText(/^password$/i), "Pass!WOrd");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(msg);
+        expect(
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage(msg);
 
         await user.clear(screen.getByLabelText(/^password$/i));
         await user.type(screen.getByLabelText(/^password$/i), "PASS!W0RD");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(msg);
+        expect(
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage(msg);
 
         await user.clear(screen.getByLabelText(/^password$/i));
         await user.type(screen.getByLabelText(/^password$/i), "pass!w0rd");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(msg);
+        expect(
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage(msg);
 
         await user.clear(screen.getByLabelText(/^password$/i));
         await user.type(screen.getByLabelText(/^password$/i), "PassW0rd");
         await user.click(screen.getByRole("button", resetButton));
-        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(msg);
+        expect(
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage(msg);
       });
 
       it("If passwords do not match", async () => {
@@ -165,7 +175,9 @@ describe("Reset Password", () => {
         await user.type(confirmPassword, "password");
         await user.click(screen.getByRole("button", resetButton));
 
-        expect(confirmPassword).toHaveErrorMessage("Passwords do not match");
+        expect(confirmPassword).toHaveAccessibleErrorMessage(
+          "Passwords do not match"
+        );
       });
     });
 
@@ -186,9 +198,13 @@ describe("Reset Password", () => {
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
 
-        await waitFor(() => expect(password).toHaveErrorMessage(passwordError));
+        await waitFor(() =>
+          expect(password).toHaveAccessibleErrorMessage(passwordError)
+        );
 
-        expect(confirmPassword).toHaveErrorMessage(confirmPasswordError);
+        expect(confirmPassword).toHaveAccessibleErrorMessage(
+          confirmPasswordError
+        );
         expect(password).toHaveFocus();
         expect(screen.getByRole("button", resetButton)).toBeEnabled();
       });
@@ -247,17 +263,19 @@ describe("Reset Password", () => {
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
 
-        const presentation = await screen.findByRole("presentation");
+        await waitFor(() => {
+          expect(screen.queryByRole("form")).not.toBeInTheDocument();
+        });
 
-        expect(presentation).toBeInTheDocument();
-        expect(presentation).toHaveTextContent(
-          "It appears you are trying to reset the password of an unregistered account."
+        expect(screen.getByRole("alert")).toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          "Unregistered Account"
         );
       });
     });
 
     describe("User password is successfully reset", () => {
-      it.each(resetTableThree)("Display %s", async (_, status, mock) => {
+      it.each(resetTableThree)("Display %s", async (_, className, mock) => {
         const { password } = mock;
 
         const { user } = renderTestUI(
@@ -271,8 +289,14 @@ describe("Reset Password", () => {
 
         expect(screen.getByRole("button", resetButton)).toBeDisabled();
 
-        expect(await screen.findByRole("presentation")).toBeInTheDocument();
-        expect(screen.getByRole("alert")).toHaveClass(status);
+        await waitFor(() => {
+          expect(screen.queryByRole("form")).not.toBeInTheDocument();
+        });
+
+        expect(screen.getByRole("alert")).toHaveClass(className);
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          "Password Reset Successful"
+        );
       });
     });
   });

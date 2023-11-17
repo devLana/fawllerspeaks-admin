@@ -5,14 +5,14 @@ import Typography from "@mui/material/Typography";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 import NextLink from "@components/NextLink";
-import { Status } from "@apiTypes";
+import type { Status } from "@apiTypes";
 
 const ResetPasswordSuccess = ({ status }: { status: Status | null }) => (
   <Card variant="outlined" sx={{ maxWidth: "28rem" }} role="presentation">
     <CardContent>
       <Alert
         iconMapping={{ success: <CheckCircleOutlineIcon fontSize="inherit" /> }}
-        severity={status === Status.Success ? "success" : "info"}
+        severity={status === "SUCCESS" ? "success" : "info"}
       >
         Password Reset Successful
       </Alert>

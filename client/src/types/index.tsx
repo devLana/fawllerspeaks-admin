@@ -55,3 +55,9 @@ export interface CachePostTags {
 }
 
 export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
+
+export type AuthPageView = "form" | "unregistered error" | "success";
+
+type Status = "idle" | "error" | "success";
+export type FormStatus = Status | "submitting";
+export type RequestStatus = Status | "loading";

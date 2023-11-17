@@ -62,19 +62,19 @@ describe("Register User Page", () => {
 
       expect(
         screen.getByRole("textbox", { name: /^first name$/i })
-      ).toHaveErrorMessage("Enter first name");
+      ).toHaveAccessibleErrorMessage("Enter first name");
 
       expect(
         screen.getByRole("textbox", { name: /^last name$/i })
-      ).toHaveErrorMessage("Enter last name");
+      ).toHaveAccessibleErrorMessage("Enter last name");
 
-      expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
+      expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
         "Enter password"
       );
 
-      expect(screen.getByLabelText(/^confirm password$/i)).toHaveErrorMessage(
-        "Enter confirm password"
-      );
+      expect(
+        screen.getByLabelText(/^confirm password$/i)
+      ).toHaveAccessibleErrorMessage("Enter confirm password");
     });
 
     it("Display an error message for invalid password", async () => {
@@ -83,27 +83,27 @@ describe("Register User Page", () => {
 
       await user.type(password, "pass");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveErrorMessage(shortPassword);
+      expect(password).toHaveAccessibleErrorMessage(shortPassword);
 
       await user.clear(password);
       await user.type(password, "Pass!WOrd");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveErrorMessage(invalidPassword);
+      expect(password).toHaveAccessibleErrorMessage(invalidPassword);
 
       await user.clear(password);
       await user.type(password, "PASS!W0RD");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveErrorMessage(invalidPassword);
+      expect(password).toHaveAccessibleErrorMessage(invalidPassword);
 
       await user.clear(password);
       await user.type(password, "pass!w0rd");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveErrorMessage(invalidPassword);
+      expect(password).toHaveAccessibleErrorMessage(invalidPassword);
 
       await user.clear(password);
       await user.type(password, "PassW0rd");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveErrorMessage(invalidPassword);
+      expect(password).toHaveAccessibleErrorMessage(invalidPassword);
     });
 
     it("Display an error message if passwords do not match", async () => {
@@ -114,7 +114,9 @@ describe("Register User Page", () => {
       await user.type(confirmPassword, "PASSWORD");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
 
-      expect(confirmPassword).toHaveErrorMessage("Passwords do not match");
+      expect(confirmPassword).toHaveAccessibleErrorMessage(
+        "Passwords do not match"
+      );
     });
 
     it("Display an error message if first and last names are invalid", async () => {
@@ -126,8 +128,8 @@ describe("Register User Page", () => {
       await user.type(lastName, "4D5o6e7");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
 
-      expect(firstName).toHaveErrorMessage(invalidFirstName);
-      expect(lastName).toHaveErrorMessage(invalidLastName);
+      expect(firstName).toHaveAccessibleErrorMessage(invalidFirstName);
+      expect(lastName).toHaveAccessibleErrorMessage(invalidLastName);
     });
   });
 
@@ -140,16 +142,16 @@ describe("Register User Page", () => {
         await dryEvents(user, validation1.input);
 
         await waitFor(() => {
-          expect(fName).toHaveErrorMessage("Enter first name");
+          expect(fName).toHaveAccessibleErrorMessage("Enter first name");
         });
 
         expect(
           screen.getByRole("textbox", { name: /^last name$/i })
-        ).toHaveErrorMessage("Enter last name");
+        ).toHaveAccessibleErrorMessage("Enter last name");
 
-        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
-          "Enter password"
-        );
+        expect(
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage("Enter password");
 
         expect(fName).toHaveFocus();
 
@@ -165,20 +167,20 @@ describe("Register User Page", () => {
         await dryEvents(user, validation2.input);
 
         await waitFor(() => {
-          expect(fName).toHaveErrorMessage(invalidFirstName);
+          expect(fName).toHaveAccessibleErrorMessage(invalidFirstName);
         });
 
         expect(
           screen.getByRole("textbox", { name: /^last name$/i })
-        ).toHaveErrorMessage(invalidLastName);
+        ).toHaveAccessibleErrorMessage(invalidLastName);
 
-        expect(screen.getByLabelText(/^password$/i)).toHaveErrorMessage(
-          shortPassword
-        );
+        expect(
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage(shortPassword);
 
-        expect(screen.getByLabelText(/^confirm password$/i)).toHaveErrorMessage(
-          "Passwords do not match"
-        );
+        expect(
+          screen.getByLabelText(/^confirm password$/i)
+        ).toHaveAccessibleErrorMessage("Passwords do not match");
 
         expect(fName).toHaveFocus();
 

@@ -28,7 +28,7 @@ const FontSize = ({ appTheme }: { appTheme: AppTheme }) => {
         </Typography>
         <Slider
           aria-label="change font size"
-          getAriaValueText={(value: number) => `font size ${value}`}
+          getAriaValueText={value => `font size ${value}`}
           min={14}
           max={18}
           marks

@@ -1,49 +1,43 @@
 import * as React from "react";
 
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { styled } from "@mui/material/styles";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 
 import EditProfileImagePreview from "./EditProfileImagePreview";
+import { FileInput } from "./FileInput";
 import type { User } from "@hooks/useGetUserInfo";
+import type { FormStatus, StateSetterFn } from "@types";
 
 export interface ImageFile {
   file: File | null;
   error: string;
-  fileUrl: string;
+  blobUrl: string;
 }
 
 interface EditProfileFileInputProps {
-  user: User | null;
   image: ImageFile;
-  setImage: React.Dispatch<React.SetStateAction<ImageFile>>;
-  setRemoveCurrentImage: React.Dispatch<React.SetStateAction<boolean>>;
+  user: User | null;
   removeCurrentImage: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setImage: StateSetterFn<ImageFile>;
+  setRemoveCurrentImage: StateSetterFn<boolean>;
+  setFormStatus: StateSetterFn<FormStatus>;
 }
-
-const FileInput = styled("input")({
-  position: "absolute",
-  height: "1px",
-  width: "1px",
-  overflow: "hidden",
-  opacity: 0,
-});
 
 const EditProfileFileInput = ({
   image,
-  setImage,
   user,
   removeCurrentImage,
+  setImage,
   setRemoveCurrentImage,
-  setIsOpen,
+  setFormStatus,
 }: EditProfileFileInputProps) => {
   const [hasEnteredDropZone, setHasEnteredDropZone] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const handleRemoveImage = () => {
-    if (image.fileUrl) window.URL.revokeObjectURL(image.fileUrl);
-    setImage({ ...image, file: null, fileUrl: "" });
+    if (image.blobUrl) window.URL.revokeObjectURL(image.blobUrl);
+    setImage({ ...image, file: null, blobUrl: "" });
   };
 
   const handleFile = (files: FileList | null) => {
@@ -51,19 +45,20 @@ const EditProfileFileInput = ({
 
     if (!files.item(0)?.type.startsWith("image/")) {
       setImage({ ...image, error: "You can only upload an image file" });
-      setIsOpen(true);
+      setFormStatus("error");
       return;
     }
 
     if (files.item(0)?.name === image.file?.name) return;
 
-    if (image.fileUrl) window.URL.revokeObjectURL(image.fileUrl);
+    if (image.blobUrl) window.URL.revokeObjectURL(image.blobUrl);
 
+    // removeCurrentImage is set to true here, so as to determine what get's rendered in this component below
     setRemoveCurrentImage(true);
     setImage({
       error: "",
       file: files.item(0),
-      fileUrl: window.URL.createObjectURL(files[0]),
+      blobUrl: window.URL.createObjectURL(files[0]),
     });
   };
 
@@ -106,7 +101,7 @@ const EditProfileFileInput = ({
 
   if (user?.image && !removeCurrentImage) {
     return (
-      <>
+      <Box mb={3.3}>
         {input}
         <EditProfileImagePreview
           src={user.image}
@@ -114,26 +109,26 @@ const EditProfileFileInput = ({
           onKeyDown={handleKeyDown}
           alt={`${user.firstName} ${user.lastName} profile image`}
         />
-      </>
+      </Box>
     );
   }
 
   if (image.file) {
     return (
-      <>
+      <Box mb={3.3}>
         {input}
         <EditProfileImagePreview
-          src={image.fileUrl}
+          src={image.blobUrl}
           onClick={handleRemoveImage}
           onKeyDown={handleKeyDown}
           alt="Profile image upload preview"
         />
-      </>
+      </Box>
     );
   }
 
   return (
-    <>
+    <Box mb={3.3}>
       {input}
       <Button
         size="large"
@@ -159,7 +154,7 @@ const EditProfileFileInput = ({
       >
         Select Profile Image
       </Button>
-    </>
+    </Box>
   );
 };
 

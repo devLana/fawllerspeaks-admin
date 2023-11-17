@@ -13,9 +13,7 @@ import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { type NextPageWithLayout } from "@types";
 
 const Me: NextPageWithLayout = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const statusMessage = useStatusAlert(setIsOpen);
+  const { alert, setAlert } = useStatusAlert();
   const user = useGetUserInfo();
 
   return (
@@ -37,9 +35,9 @@ const Me: NextPageWithLayout = () => {
         </Stack>
       </Stack>
       <Snackbar
-        message={statusMessage}
-        open={isOpen}
-        onClose={handleCloseAlert<boolean>(false, setIsOpen)}
+        message={alert.message}
+        open={alert.open}
+        onClose={handleCloseAlert({ ...alert, open: false }, setAlert)}
       />
     </>
   );

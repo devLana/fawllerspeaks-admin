@@ -40,7 +40,7 @@ describe("Forgot Password Page", () => {
 
       await user.click(screen.getByRole("button", { name }));
 
-      expect(screen.getByRole("textbox", textBox)).toHaveErrorMessage(
+      expect(screen.getByRole("textbox", textBox)).toHaveAccessibleErrorMessage(
         "Enter an e-mail address"
       );
     });
@@ -51,7 +51,7 @@ describe("Forgot Password Page", () => {
       await user.type(screen.getByRole("textbox"), "invalid_email");
       await user.click(screen.getByRole("button", { name }));
 
-      expect(screen.getByRole("textbox", textBox)).toHaveErrorMessage(
+      expect(screen.getByRole("textbox", textBox)).toHaveAccessibleErrorMessage(
         "Invalid e-mail address"
       );
     });
@@ -68,9 +68,9 @@ describe("Forgot Password Page", () => {
       expect(screen.getByRole("button", { name })).toBeDisabled();
 
       await waitFor(() => {
-        expect(screen.getByRole("textbox", textBox)).toHaveErrorMessage(
-          emailError
-        );
+        expect(
+          screen.getByRole("textbox", textBox)
+        ).toHaveAccessibleErrorMessage(emailError);
       });
 
       expect(screen.getByRole("textbox")).toHaveFocus();

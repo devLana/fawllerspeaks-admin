@@ -1,7 +1,7 @@
 import { gql, type TypedDocumentNode as Node } from "@apollo/client";
 import type { Mutation, MutationResetPasswordArgs } from "@apiTypes";
 
-type ResetPasswordData = Pick<Mutation, "resetPassword">;
+export type ResetPasswordData = Pick<Mutation, "resetPassword">;
 type ResetPassword = Node<ResetPasswordData, MutationResetPasswordArgs>;
 
 export const RESET_PASSWORD: ResetPassword = gql`
@@ -21,6 +21,9 @@ export const RESET_PASSWORD: ResetPassword = gql`
         confirmPasswordError
       }
       ... on BaseResponse {
+        __typename
+      }
+      ... on Response {
         status
       }
     }

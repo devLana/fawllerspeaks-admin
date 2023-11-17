@@ -147,17 +147,17 @@ export const statusTable: [string, string, string][] = [
   [
     "Display an alert message if an empty password reset token string is provided",
     "empty",
-    "No password reset token provided",
+    "A password reset token is needed to reset an account password",
   ],
   [
     "Display an alert message if a malformed password reset token string is provided",
     "invalid",
-    "Wrong password reset token format provided",
+    "Invalid password reset token",
   ],
   [
     "Display an alert message if a password reset token validation error occurs",
     "validation",
-    "Invalid password reset token provided",
+    "Invalid password reset token",
   ],
   [
     "Display an alert message if the password reset token is unknown or has expired",

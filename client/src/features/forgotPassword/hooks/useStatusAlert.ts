@@ -1,54 +1,50 @@
-import { useRouter } from "next/router";
 import * as React from "react";
+import { useRouter } from "next/router";
 
-const useStatusAlert = (
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
+const useStatusAlert = () => {
+  const [alert, setAlert] = React.useState({ open: false, message: "" });
   const { isReady, query } = useRouter();
 
   React.useEffect(() => {
-    if (isReady) {
-      if (query.status && !Array.isArray(query.status)) {
-        const message = "Unable to verify password reset token";
+    if (isReady && query.status && !Array.isArray(query.status)) {
+      const message = "Unable to verify password reset token";
 
-        switch (query.status) {
-          case "empty":
-            setStatusMessage("No password reset token provided");
-            setIsOpen(true);
-            break;
+      switch (query.status) {
+        case "empty":
+          setAlert({
+            open: true,
+            message:
+              "A password reset token is needed to reset an account password",
+          });
+          break;
 
-          case "invalid":
-            setStatusMessage("Wrong password reset token format provided");
-            setIsOpen(true);
-            break;
+        case "invalid":
+        case "validation":
+          setAlert({ open: true, message: "Invalid password reset token" });
+          break;
 
-          case "validation":
-            setStatusMessage("Invalid password reset token provided");
-            setIsOpen(true);
-            break;
+        case "fail":
+        case "unsupported":
+        case "api":
+          setAlert({ open: true, message });
+          break;
 
-          case "fail":
-          case "unsupported":
-          case "api":
-            setStatusMessage(message);
-            setIsOpen(true);
-            break;
+        case "network":
+        case "error":
+          setAlert({
+            open: true,
+            message: `${message}. Please try again later`,
+          });
+          break;
 
-          case "network":
-          case "error":
-            setStatusMessage(`${message}. Please try again later`);
-            setIsOpen(true);
-            break;
-
-          default:
-            setStatusMessage(null);
-        }
+        default:
       }
     }
-  }, [isReady, query.status, setIsOpen]);
+  }, [isReady, query.status]);
 
-  return { statusMessage, setStatusMessage };
+  const handleCloseAlert = () => setAlert({ ...alert, open: false });
+
+  return { ...alert, handleCloseAlert };
 };
 
 export default useStatusAlert;

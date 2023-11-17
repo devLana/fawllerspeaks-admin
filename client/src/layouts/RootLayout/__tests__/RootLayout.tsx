@@ -94,7 +94,7 @@ describe("Protected Pages Root Layout", () => {
     mock.mockReturnValue(true);
 
     const btnName = { name: /^logout$/i };
-    const cancelName = { name: /^cancel$/i };
+    const cancelBtnName = { name: /^cancel$/i };
     const dialogName = { name: /^logout of your account$/i };
 
     afterAll(() => {
@@ -114,15 +114,15 @@ describe("Protected Pages Root Layout", () => {
           await user.click(screen.getByRole("button", btnName));
 
           const dialog = screen.getByRole("dialog", dialogName);
-          const dialogLogout = within(dialog).getByRole("button", btnName);
-          const cancelBtn = within(dialog).getByRole("button", cancelName);
+          const dialogLogoutBtn = within(dialog).getByRole("button", btnName);
+          const cancelBtn = within(dialog).getByRole("button", cancelBtnName);
 
-          await user.click(dialogLogout);
+          await user.click(dialogLogoutBtn);
 
-          expect(dialogLogout).toBeDisabled();
+          expect(dialogLogoutBtn).toBeDisabled();
           expect(cancelBtn).toBeDisabled();
 
-          expect(await screen.findByRole("alert")).toHaveTextContent(
+          await expect(screen.findByRole("alert")).resolves.toHaveTextContent(
             data.message
           );
           expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -142,12 +142,12 @@ describe("Protected Pages Root Layout", () => {
           await user.click(screen.getByRole("button", btnName));
 
           const dialog = screen.getByRole("dialog", dialogName);
-          const dialogLogout = within(dialog).getByRole("button", btnName);
-          const cancelBtn = within(dialog).getByRole("button", cancelName);
+          const dialogLogoutBtn = within(dialog).getByRole("button", btnName);
+          const cancelBtn = within(dialog).getByRole("button", cancelBtnName);
 
-          await user.click(dialogLogout);
+          await user.click(dialogLogoutBtn);
 
-          expect(dialogLogout).toBeDisabled();
+          expect(dialogLogoutBtn).toBeDisabled();
           expect(cancelBtn).toBeDisabled();
 
           await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
