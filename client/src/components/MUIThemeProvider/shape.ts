@@ -1,7 +1,7 @@
 import type { ThemeOptions } from "@mui/material/styles";
 
-export const shape = (
-  fontSize: number
-): NonNullable<ThemeOptions["shape"]> => ({
-  borderRadius: 15 + fontSize / 6,
+type Shape = NonNullable<ThemeOptions["shape"]>;
+
+export const shape = (fontSize: number): Shape => ({
+  borderRadius: 7 + fontSize / 6,
 });

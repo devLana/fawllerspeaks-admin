@@ -99,6 +99,11 @@ export const components: Components = {
       TransitionComponent: Up,
       transitionDuration: { enter: 220, exit: 100 },
     },
+    styleOverrides: {
+      root: {
+        '&>div[class^="MuiBackdrop-root"]': { backdropFilter: "blur(4px)" },
+      },
+    },
   },
   MuiAlert: { styleOverrides: { root: { display: "inline-flex" } } },
 };
