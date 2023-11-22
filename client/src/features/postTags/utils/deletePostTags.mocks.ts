@@ -94,7 +94,7 @@ const redirects = (id: string, path: string, typename: string) => ({
         request: request([this.tag[1]]),
         result: { data: { deletePostTags: { __typename: typename } } },
       },
-      // getTestPostTags([testPostTag(...this.tag)]),
+      getTestPostTags([testPostTag(...this.tag)]),
     ];
   },
 });
@@ -237,11 +237,7 @@ export const unknown = {
   },
 };
 
-// [
-//   "Should display an alert message if the api responded with a validation error",
-//   validate,
-// ],
-const validate = {
+export const validate = {
   ...alertObjMOck("validate"),
   message: "Post tag id validation error",
   gql(): MockedResponse[] {
@@ -261,7 +257,74 @@ const validate = {
           },
         },
       },
-      getTestPostTags([]),
+      getTestPostTags([testPostTag(...this.tags[1])]),
+    ];
+  },
+};
+
+export const warn = {
+  tagIds: ["warn-id-1", "warn-id-2", "warn-id-3"],
+  tags: [
+    ["tag 1", "warn-id-1"],
+    ["tag 2", "warn-id-2"],
+    ["tag 3", "warn-id-3"],
+  ] as [string, string][],
+  message: "2 post tags deleted. 1 not deleted",
+  gql(): MockedResponse[] {
+    return [
+      getTestPostTags([
+        testPostTag(...this.tags[0]),
+        testPostTag(...this.tags[1]),
+        testPostTag(...this.tags[2]),
+      ]),
+      {
+        request: request(this.tagIds),
+        result: {
+          data: {
+            deletePostTags: {
+              __typename: "PostTagsWarning",
+              message: this.message,
+            },
+          },
+        },
+      },
+      getTestPostTags([testPostTag(...this.tags[0])]),
+    ];
+  },
+};
+
+export const msg =
+  "No post tags have been created yet. Click on 'Create Post Tags' above to get started";
+export const del = {
+  tagIds: ["delete-id-1", "delete-id-2", "delete-id-3"],
+  tags: [
+    ["tag 1", "delete-id-1"],
+    ["tag 2", "delete-id-2"],
+    ["tag 3", "delete-id-3"],
+  ] as [string, string][],
+  message: "Post tags deleted",
+  gql(): MockedResponse[] {
+    return [
+      getTestPostTags([
+        testPostTag(...this.tags[0]),
+        testPostTag(...this.tags[1]),
+        testPostTag(...this.tags[2]),
+      ]),
+      {
+        request: request(this.tagIds),
+        result: {
+          data: {
+            deletePostTags: {
+              __typename: "PostTags",
+              tags: [
+                testPostTag(...this.tags[0]),
+                testPostTag(...this.tags[1]),
+                testPostTag(...this.tags[2]),
+              ],
+            },
+          },
+        },
+      },
     ];
   },
 };

@@ -36,9 +36,9 @@ describe("Post Tags Page", () => {
 
         await user.click(within(modal).getByRole("button", createTagBtn));
 
-        expect(inputBoxes[0]).toHaveErrorMessage("Enter post tag");
-        expect(inputBoxes[1]).toHaveErrorMessage("Enter post tag");
-        expect(inputBoxes[2]).toHaveErrorMessage("Enter post tag");
+        expect(inputBoxes[0]).toHaveAccessibleErrorMessage("Enter post tag");
+        expect(inputBoxes[1]).toHaveAccessibleErrorMessage("Enter post tag");
+        expect(inputBoxes[2]).toHaveAccessibleErrorMessage("Enter post tag");
       });
     });
 
@@ -228,7 +228,9 @@ describe("Post Tags Page", () => {
         await user.clear(inputBox);
         await user.click(within(modal).getByRole("button", editBtn));
 
-        expect(inputBox).toHaveErrorMessage("Enter new post tag name");
+        expect(inputBox).toHaveAccessibleErrorMessage(
+          "Enter new post tag name"
+        );
       });
     });
 
@@ -283,7 +285,9 @@ describe("Post Tags Page", () => {
 
         expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
-        await waitFor(() => expect(inputBox).toHaveErrorMessage(message));
+        await waitFor(() =>
+          expect(inputBox).toHaveAccessibleErrorMessage(message)
+        );
         expect(within(modal).getByRole("button", editBtn)).toBeEnabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeEnabled();
       });
@@ -347,7 +351,7 @@ describe("Post Tags Page", () => {
   });
 
   describe("Delete post tags", () => {
-    const { deleteMenuItem, wrapper, name } = delMocks;
+    const { deleteMenuItem, wrapper, name, tagLabel, toolbarBtn } = delMocks;
 
     describe("Display the delete post tags dialog", () => {
       it("Should display the delete dialog box when a post tag delete menu is clicked", async () => {
@@ -372,7 +376,6 @@ describe("Post Tags Page", () => {
       });
 
       it.each(delMocks.table1)("%s", async (_, mock) => {
-        const { toolbarBtn } = delMocks;
         const { user } = renderTestUI(<PostTagsPage />, mock.gql());
 
         await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
@@ -419,7 +422,7 @@ describe("Post Tags Page", () => {
 
     describe("Close the delete dialog and display a notification alert", () => {
       it.each(delMocks.alertTable)("%s", async (_, mock) => {
-        const { selectAll, toolbarBtn, dialog2, deleteBtn2 } = delMocks;
+        const { selectAll, dialog2, deleteBtn2 } = delMocks;
         const { user } = renderTestUI(<PostTagsPage />, mock.gql());
 
         await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
@@ -431,15 +434,15 @@ describe("Post Tags Page", () => {
 
         await user.click(within(modal).getByRole("button", deleteBtn2));
 
-        // expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
-        // expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
         await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
         expect(screen.getByRole("alert")).toHaveTextContent(mock.message);
         expect(modal).not.toBeInTheDocument();
       });
 
-      it.only("Should display an alert message if no post tags could be deleted", async () => {
-        const { tagLabel, toolbarBtn, dialog2, deleteBtn2, unknown } = delMocks;
+      it("Should display an alert message if no post tags could be deleted", async () => {
+        const { dialog2, deleteBtn2, unknown } = delMocks;
         const { user } = renderTestUI(<PostTagsPage />, unknown.gql());
         const tag1 = wrapper("tag 1");
         const tag2 = wrapper("tag 2");
@@ -456,19 +459,106 @@ describe("Post Tags Page", () => {
 
         await user.click(within(modal).getByRole("button", deleteBtn2));
 
-        // expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
-        // expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
-        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
-        expect(screen.getByRole("alert")).toHaveTextContent(unknown.message);
+        expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+
+        const alerts = await screen.findAllByRole("alert");
+
+        expect(alerts[1]).toHaveTextContent(unknown.message);
         expect(modal).not.toBeInTheDocument();
         expect(screen.queryByLabelText(tag1)).not.toBeInTheDocument();
         expect(screen.queryByLabelText(tag2)).not.toBeInTheDocument();
       });
+
+      it("Should display an alert message if the api responded with a validation error", async () => {
+        const { validate, deleteBtn2, dialog2 } = delMocks;
+        const { user } = renderTestUI(<PostTagsPage />, validate.gql());
+        const tag1 = wrapper("tag 1");
+        const tag2 = wrapper("tag 2");
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+        expect(screen.getByLabelText(tag1)).toBeInTheDocument();
+        expect(screen.getByLabelText(tag2)).toBeInTheDocument();
+
+        await user.click(screen.getByRole("checkbox", tagLabel("tag 1")));
+        await user.click(screen.getByRole("checkbox", tagLabel("tag 2")));
+        await user.click(screen.getByRole("button", toolbarBtn("all", "s")));
+
+        const modal = screen.getByRole("dialog", dialog2);
+
+        await user.click(within(modal).getByRole("button", deleteBtn2));
+
+        expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(validate.message);
+        expect(modal).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(tag1)).not.toBeInTheDocument();
+        expect(screen.getByLabelText(tag2)).toBeInTheDocument();
+      });
     });
 
     describe("Post tags are deleted", () => {
-      it.todo("Should delete some of the selected post tags");
-      it.todo("Should delete all the selected post tags");
+      it("Should delete some of the selected post tags", async () => {
+        const { warn, dialog2, deleteBtn2 } = delMocks;
+        const { user } = renderTestUI(<PostTagsPage />, warn.gql());
+        const tag1 = wrapper("tag 1");
+        const tag2 = wrapper("tag 2");
+        const tag3 = wrapper("tag 3");
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+        expect(screen.getByLabelText(tag1)).toBeInTheDocument();
+        expect(screen.getByLabelText(tag2)).toBeInTheDocument();
+        expect(screen.getByLabelText(tag3)).toBeInTheDocument();
+
+        await user.click(screen.getByRole("checkbox", tagLabel("tag 1")));
+        await user.click(screen.getByRole("checkbox", tagLabel("tag 2")));
+        await user.click(screen.getByRole("checkbox", tagLabel("tag 3")));
+        await user.click(screen.getByRole("button", toolbarBtn("all", "s")));
+
+        const modal = screen.getByRole("dialog", dialog2);
+
+        await user.click(within(modal).getByRole("button", deleteBtn2));
+        expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(warn.message);
+        expect(modal).not.toBeInTheDocument();
+        expect(screen.getByLabelText(tag1)).toBeInTheDocument();
+        expect(screen.queryByLabelText(tag2)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(tag3)).not.toBeInTheDocument();
+      });
+
+      it("Should delete all the selected post tags", async () => {
+        const { del, dialog2, deleteBtn2, selectAll, msg } = delMocks;
+        const { user } = renderTestUI(<PostTagsPage />, del.gql());
+        const tag1 = wrapper("tag 1");
+        const tag2 = wrapper("tag 2");
+        const tag3 = wrapper("tag 3");
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+        expect(screen.getByLabelText(tag1)).toBeInTheDocument();
+        expect(screen.getByLabelText(tag2)).toBeInTheDocument();
+        expect(screen.getByLabelText(tag3)).toBeInTheDocument();
+
+        await user.click(screen.getByRole("checkbox", selectAll));
+        await user.click(screen.getByRole("button", toolbarBtn("all", "s")));
+
+        const modal = screen.getByRole("dialog", dialog2);
+
+        await user.click(within(modal).getByRole("button", deleteBtn2));
+        expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+
+        const alerts = await screen.findAllByRole("alert");
+
+        expect(alerts[0]).toHaveTextContent(msg);
+        expect(alerts[1]).toHaveTextContent(del.message);
+        expect(modal).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(tag1)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(tag2)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(tag3)).not.toBeInTheDocument();
+      });
     });
   });
 });
