@@ -26,8 +26,10 @@ const config = {
     "^@lib/(.*)$": "<rootDir>/src/lib/$1",
     "^@fragments/(.*)$": "<rootDir>/src/fragments/$1",
   },
+  setupFiles: ["./jest.polyfills.js"],
   setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
   testEnvironment: "jest-environment-jsdom",
+  testEnvironmentOptions: { customExportConditions: [""] },
   testTimeout: 10000,
   verbose: true,
 };

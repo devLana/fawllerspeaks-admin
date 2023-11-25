@@ -8,7 +8,7 @@ module.exports = {
     "plugin:@typescript-eslint/strict",
     "next/core-web-vitals",
   ],
-  ignorePatterns: ["jest.config.mjs", "next.config.js"],
+  ignorePatterns: ["jest.config.mjs", "next.config.js", "jest.polyfills.js"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
