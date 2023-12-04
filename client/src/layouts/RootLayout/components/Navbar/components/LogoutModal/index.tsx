@@ -35,37 +35,35 @@ const LogoutModal = ({ isOpen, onCloseModal }: LogoutModalProps) => {
     if (sessionId) {
       setStatus("loading");
 
-      setTimeout(() => {
-        void logout({
-          variables: { sessionId },
-          onError: () => {
-            onCloseModal();
-            setStatus("error");
-          },
-          onCompleted(logoutData) {
-            switch (logoutData.logout.__typename) {
-              case "NotAllowedError":
-              case "UnknownError":
-              case "SessionIdValidationError":
-              default:
-                onCloseModal();
-                setStatus("error");
-                break;
+      void logout({
+        variables: { sessionId },
+        onError: () => {
+          onCloseModal();
+          setStatus("error");
+        },
+        onCompleted(logoutData) {
+          switch (logoutData.logout.__typename) {
+            case "NotAllowedError":
+            case "UnknownError":
+            case "SessionIdValidationError":
+            default:
+              onCloseModal();
+              setStatus("error");
+              break;
 
-              case "AuthenticationError":
-                handleClearRefreshTokenTimer();
-                void client.clearStore();
-                void replace("/login?status=unauthenticated");
-                break;
+            case "AuthenticationError":
+              handleClearRefreshTokenTimer();
+              void client.clearStore();
+              void replace("/login?status=unauthenticated");
+              break;
 
-              case "Response":
-                localStorage.removeItem(SESSION_ID);
-                handleClearRefreshTokenTimer();
-                void client.clearStore();
-                void replace("/login");
-            }
-          },
-        });
+            case "Response":
+              localStorage.removeItem(SESSION_ID);
+              handleClearRefreshTokenTimer();
+              void client.clearStore();
+              void replace("/login");
+          }
+        },
       });
     }
   };

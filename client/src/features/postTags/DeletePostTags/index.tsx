@@ -47,52 +47,50 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
   const handleDelete = () => {
     setIsLoading(true);
 
-    setTimeout(() => {
-      void deleteTags({
-        variables: { tagIds: ids },
-        update,
-        refetchQueries,
-        onError: err => handleResponse(err.graphQLErrors[0]?.message ?? msg),
-        onCompleted(data) {
-          switch (data.deletePostTags.__typename) {
-            case "AuthenticationError":
-              void client.clearStore();
-              void replace("/login?status=unauthenticated");
-              break;
+    void deleteTags({
+      variables: { tagIds: ids },
+      update,
+      refetchQueries,
+      onError: err => handleResponse(err.graphQLErrors[0]?.message ?? msg),
+      onCompleted(data) {
+        switch (data.deletePostTags.__typename) {
+          case "AuthenticationError":
+            void client.clearStore();
+            void replace("/login?status=unauthenticated");
+            break;
 
-            case "NotAllowedError":
-              void client.clearStore();
-              void replace("/login?status=unauthorized");
-              break;
+          case "NotAllowedError":
+            void client.clearStore();
+            void replace("/login?status=unauthorized");
+            break;
 
-            case "RegistrationError":
-              void replace("/register?status=unregistered");
-              break;
+          case "RegistrationError":
+            void replace("/register?status=unregistered");
+            break;
 
-            case "DeletePostTagsValidationError":
-              handleResponse(data.deletePostTags.tagIdsError);
-              onClearSelection();
-              break;
+          case "DeletePostTagsValidationError":
+            handleResponse(data.deletePostTags.tagIdsError);
+            onClearSelection();
+            break;
 
-            case "UnknownError":
-            case "PostTagsWarning":
-              handleResponse(data.deletePostTags.message);
-              onClearSelection();
-              break;
+          case "UnknownError":
+          case "PostTagsWarning":
+            handleResponse(data.deletePostTags.message);
+            onClearSelection();
+            break;
 
-            case "PostTags": {
-              const word = data.deletePostTags.tags.length > 1 ? "tags" : "tag";
+          case "PostTags": {
+            const word = data.deletePostTags.tags.length > 1 ? "tags" : "tag";
 
-              handleResponse(`Post ${word} deleted`);
-              onClearSelection(data.deletePostTags.tags);
-              break;
-            }
-
-            default:
-              handleResponse(msg);
+            handleResponse(`Post ${word} deleted`);
+            onClearSelection(data.deletePostTags.tags);
+            break;
           }
-        },
-      });
+
+          default:
+            handleResponse(msg);
+        }
+      },
     });
   };
 

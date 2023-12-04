@@ -16,7 +16,7 @@ const ForgotPasswordSuccess = () => (
     </CardContent>
     <CardContent>
       <Typography>
-        A reset link has been sent to the e-mail address you provided.
+        A password reset link has been sent to the e-mail address you provided.
       </Typography>
     </CardContent>
   </Card>

@@ -104,7 +104,6 @@ const useVerifySession = (
 
               handleAuthHeader(data.verifySession.accessToken);
               setUserId(`${__typename}:${user.id}`);
-
               break;
             }
 

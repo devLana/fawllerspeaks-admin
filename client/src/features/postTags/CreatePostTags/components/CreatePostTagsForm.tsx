@@ -54,52 +54,51 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
     setInputs(prevState => prevState.filter(val => val !== value));
   };
 
-  const submitHandler = async (values: Record<string, string>) => {
+  const submitHandler = (values: Record<string, string>) => {
     onStatusChange("submitting");
 
-    const { data: createData } = await create({
+    void create({
+      refetchQueries,
       variables: { tags: Object.values(values) },
       onError() {
         onStatusChange("idle");
         setAlertIsOpen(true);
       },
-      refetchQueries,
+      onCompleted(createData) {
+        switch (createData.createPostTags.__typename) {
+          case "AuthenticationError":
+            void client.clearStore();
+            void router.replace("/login?status=unauthenticated");
+            break;
+
+          case "UnknownError":
+            void client.clearStore();
+            void router.replace("/login?status=unauthorized");
+            break;
+
+          case "RegistrationError":
+            void router.replace("/register?status=unregistered");
+            break;
+
+          case "CreatePostTagsValidationError":
+          case "DuplicatePostTagError":
+          default:
+            onStatusChange("idle");
+            setAlertIsOpen(true);
+            break;
+
+          case "PostTagsWarning":
+            onCloseDialog();
+            handleOpenAlert(createData.createPostTags.message);
+            break;
+
+          case "PostTags":
+            onCloseDialog();
+            handleOpenAlert("Post tags created");
+            break;
+        }
+      },
     });
-
-    if (createData) {
-      switch (createData.createPostTags.__typename) {
-        case "AuthenticationError":
-          void client.clearStore();
-          void router.replace("/login?status=unauthenticated");
-          break;
-
-        case "UnknownError":
-          void client.clearStore();
-          void router.replace("/login?status=unauthorized");
-          break;
-
-        case "RegistrationError":
-          void router.replace("/register?status=unregistered");
-          break;
-
-        case "CreatePostTagsValidationError":
-        case "DuplicatePostTagError":
-        default:
-          onStatusChange("idle");
-          setAlertIsOpen(true);
-          break;
-
-        case "PostTagsWarning":
-          onCloseDialog();
-          handleOpenAlert(createData.createPostTags.message);
-          break;
-
-        case "PostTags":
-          onCloseDialog();
-          handleOpenAlert("Post tags created");
-          break;
-      }
-    }
   };
 
   let alertMessage =
