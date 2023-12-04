@@ -5,10 +5,12 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { ApolloContext } from "@context/ApolloContext";
 import { BaseResponse, UserData } from "@utils/cachePossibleTypes";
 
-const cache = new InMemoryCache({ possibleTypes: { BaseResponse, UserData } });
-
 const ApolloContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [jwt, setJwt] = React.useState("");
+
+  const cache = React.useMemo(() => {
+    return new InMemoryCache({ possibleTypes: { BaseResponse, UserData } });
+  }, []);
 
   const client = React.useMemo(() => {
     return new ApolloClient({
@@ -16,9 +18,9 @@ const ApolloContextProvider = ({ children }: { children: React.ReactNode }) => {
       cache,
       credentials: "include",
       ssrMode: typeof window === "undefined",
-      ...(jwt && { headers: { authorization: `Bearer ${jwt}` } }),
+      ...(jwt ? { headers: { authorization: `Bearer ${jwt}` } } : {}),
     });
-  }, [jwt]);
+  }, [jwt, cache]);
 
   return (
     <ApolloContext.Provider
