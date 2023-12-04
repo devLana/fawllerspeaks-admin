@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 
 import settingsLayout from ".";
-import { renderTestUI } from "@utils/renderTestUI";
+import { renderUI } from "../../tests/renderUI";
 
 const heading = "Settings Page";
 const headingName = { name: new RegExp(heading, "i") };
@@ -13,7 +13,7 @@ describe("Settings Layout Utility Function", () => {
     const layout = settingsLayout(heading, { title: "Settings" });
     const ui = layout(page, false, null);
 
-    renderTestUI(ui);
+    renderUI(ui);
 
     expect(screen.queryByText(textNode)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", headingName)).not.toBeInTheDocument();
@@ -25,7 +25,7 @@ describe("Settings Layout Utility Function", () => {
     const layout = settingsLayout(heading, { title: "Settings" });
     const ui = layout(page, true, "An error has occurred");
 
-    renderTestUI(ui);
+    renderUI(ui);
 
     expect(screen.queryByText(textNode)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", headingName)).not.toBeInTheDocument();
@@ -40,7 +40,7 @@ describe("Settings Layout Utility Function", () => {
     const layout = settingsLayout(heading, { title: "Settings" });
     const ui = layout(page, true, null);
 
-    renderTestUI(ui);
+    renderUI(ui);
 
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();

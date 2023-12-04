@@ -1,202 +1,133 @@
 import { GraphQLError } from "graphql";
-import { rest } from "msw";
+import { graphql, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import type { MockedResponse } from "@apollo/client/testing";
 
 import { EDIT_PROFILE } from "../operations/EDIT_PROFILE";
+import { mswData, mswErrors } from "@utils/tests/msw";
 
-interface Input {
-  firstName: string;
-  lastName: string;
-  image?: string | null;
-}
-
-interface ErrorsMock {
-  gql: () => MockedResponse[];
-  input: Input;
-  message: string;
-}
-
+const nameStr = (prefix: string) => `${prefix}_FIRST_NAME`;
 const imageLink = "https://www.mock-image-link/image-name.jpg";
+export const firstNameError = "Provide first name";
+export const lastNameError = "Provide last name";
+export const imageError = "Image string cant be empty";
+const gqlError = "Unable to edit profile. Please try again later";
 
-export const server = setupServer(
-  rest.post("http://localhost:7692/upload-image", (_, res, ctx) => {
-    return res(
-      ctx.status(201),
-      ctx.json({ image: imageLink, status: "SUCCESS" })
-    );
-  })
-);
-
-const FIRST_NAME = "FIRST_NAME";
-const LAST_NAME = "LAST_NAME";
 const msg =
   "You are unable to update your profile at the moment. Please try again later";
 
-const request = (
-  firstName: string,
-  lastName: string,
-  image?: string | null
-): MockedResponse["request"] => {
-  return { query: EDIT_PROFILE, variables: { firstName, lastName, image } };
+const cb1 = () => {
+  return HttpResponse.json(
+    { image: imageLink, status: "SUCCESS" },
+    { status: 201 }
+  );
 };
 
-const inputs = (name: string, image: boolean | null = null): Input => {
-  const names = {
-    firstName: `${name}_${FIRST_NAME}`,
-    lastName: `${name}_${LAST_NAME}`,
-  };
+const cb2 = () => HttpResponse.error();
 
-  if (image === null) return { ...names, image };
-  if (!image) return names;
-  return { ...names, image: imageLink };
+const response = (prefix: string, image: boolean) => {
+  return mswData("editProfile", "EditedProfile", {
+    user: {
+      __typename: "User",
+      id: "SOME_RANDOM_USER_ID",
+      email: "user_mail@example.com",
+      firstName: nameStr(prefix),
+      lastName: "Last Name",
+      image: image ? imageLink : null,
+      isRegistered: true,
+    },
+  });
 };
 
-export const validation = {
-  input: inputs("validation", false),
-  firstNameError: "Provide first name",
-  lastNameError: "Provide last name",
-  imageError: "Image string cant be empty",
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input.firstName, this.input.lastName),
-        result: {
-          data: {
-            editProfile: {
-              __typename: "EditProfileValidationError",
-              firstNameError: this.firstNameError,
-              lastNameError: this.lastNameError,
-              imageError: this.imageError,
-            },
-          },
-        },
-      },
-    ];
-  },
-};
+export const server = setupServer(
+  graphql.mutation(EDIT_PROFILE, ({ variables: { firstName } }) => {
+    if (firstName === nameStr("auth")) {
+      return mswData("editProfile", "AuthenticationError");
+    }
 
-class Mock {
-  constructor(readonly input: Input, readonly typename: string) {}
+    if (firstName === nameStr("validate")) {
+      return mswData("editProfile", "EditProfileValidationError", {
+        firstNameError,
+        lastNameError,
+        imageError,
+      });
+    }
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(
-          this.input.firstName,
-          this.input.lastName,
-          this.input.image
-        ),
-        result: { data: { editProfile: { __typename: this.typename } } },
-      },
-    ];
+    if (firstName === nameStr("unregistered")) {
+      return mswData("editProfile", "RegistrationError");
+    }
+
+    if (firstName === nameStr("unknown")) {
+      return mswData("editProfile", "UnknownError");
+    }
+
+    if (firstName === nameStr("unsupported")) {
+      return mswData("editProfile", "UnsupportedType");
+    }
+
+    if (firstName === nameStr("imageFail")) return response("imageFail", false);
+
+    if (firstName === nameStr("newImage")) return response("newImage", true);
+
+    if (firstName === nameStr("graphql")) {
+      return mswErrors(new GraphQLError(gqlError));
+    }
+
+    if (firstName === nameStr("network")) {
+      return mswErrors(new Error(), { status: 503 });
+    }
+  })
+);
+
+class Mock<T extends string | undefined = undefined> {
+  firstName: string;
+  lastName: string;
+
+  constructor(prefix: string, readonly message: T) {
+    this.firstName = nameStr(prefix);
+    this.lastName = "Last Name";
   }
 }
 
-const auth = new Mock(inputs("auth", false), "AuthenticationError");
-const unknown = new Mock(inputs("unknown", false), "UnknownError");
-const unregistered = new Mock(inputs("registered", false), "RegistrationError");
+export const validate = new Mock("validate", undefined);
+const imageFail = new Mock("imageFail", undefined);
+const newImage = new Mock("newImage", undefined);
+const auth = new Mock("auth", undefined);
+const unknown = new Mock("unknown", undefined);
+const unregistered = new Mock("unregistered", undefined);
+const unsupported = new Mock("unsupported", msg);
+const network = new Mock("network", msg);
+const gql = new Mock("graphql", gqlError);
 
 export const redirects: [string, Mock, string][] = [
   [
-    "If the user is not logged in redirect to the login page",
+    "Should redirect to the login page if the user is not logged in",
     auth,
     "/login?status=unauthenticated",
   ],
   [
-    "If the user could not be verified redirect to the login page",
+    "Should redirect to the login page if the user could not be verified",
     unknown,
     "/login?status=unauthorized",
   ],
   [
-    "If the user is unregistered redirect to the register page",
+    "Should redirect to the register page if the user is unregistered",
     unregistered,
     "/register?status=unregistered",
   ],
 ];
 
-class EditMock {
-  constructor(readonly input: Input) {}
+const text = "Should display an alert message toast if the api";
+export const errors: [string, Mock<string>][] = [
+  [`${text} responded with an unsupported object type`, unsupported],
+  [`${text} throws a graphql error`, gql],
+  [`${text} request fails with a network error`, network],
+];
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(
-          this.input.firstName,
-          this.input.lastName,
-          this.input.image
-        ),
-        result: {
-          data: {
-            editProfile: {
-              __typename: "EditedProfile",
-              user: {
-                __typename: "User",
-                id: "SOME_RANDOM_USER_ID",
-                email: "user_mail@example.com",
-                firstName: this.input.firstName,
-                lastName: this.input.lastName,
-                image: this.input.image
-                  ? this.input.image
-                  : this.input.image === null
-                  ? null
-                  : imageLink,
-                isRegistered: true,
-              },
-            },
-          },
-        },
-      },
-    ];
-  }
-}
-
-export const imageFail = new EditMock(inputs("imageFail", false));
-export const newImage = new EditMock(inputs("newImage", true));
-
-const unsupported = {
-  input: inputs("unsupported", false),
-  message: msg,
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input.firstName, this.input.lastName),
-        result: {
-          data: { editProfile: { __typename: "UnsupportedObjectResponse" } },
-        },
-      },
-    ];
-  },
-};
-
-const network = {
-  message: msg,
-  input: inputs("network", false),
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input.firstName, this.input.lastName),
-        error: new Error(this.message),
-      },
-    ];
-  },
-};
-
-const graphql = {
-  message: "Unable to edit profile. Please try again later",
-  input: inputs("graphql", false),
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input.firstName, this.input.lastName),
-        result: { errors: [new GraphQLError(this.message)] },
-      },
-    ];
-  },
-};
-
-export const errors: [string, ErrorsMock][] = [
-  ["Unsupported object", unsupported],
-  ["Graphql error response", graphql],
-  ["Network error response", network],
+export const upload: [string, Mock, [() => Response, string]][] = [
+  [
+    "Image upload failed, Should update the user profile without an image",
+    imageFail,
+    [cb2, "upload-error"],
+  ],
+  ["Should update user profile with a new image", newImage, [cb1, "upload"]],
 ];

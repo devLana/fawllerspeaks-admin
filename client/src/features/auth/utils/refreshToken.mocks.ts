@@ -1,159 +1,101 @@
 import { GraphQLError } from "graphql";
-import type { MockedResponse } from "@apollo/client/testing";
+import { graphql } from "msw";
+import { setupServer } from "msw/node";
 
-import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
+import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
+import { mswData, mswErrors } from "@utils/tests/msw";
 
-interface Expected {
-  gql: () => MockedResponse[];
-  sessionId: string;
-}
-
-const testUserId = "New_Authenticated_User_Id";
-export const oldAuthToken =
+const accessToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGQ5ZTAzNC0xMWQxLTQ2ZjItOGRmNS1hMmVmOTQ4MDJkOWMiLCJpYXQiOjE2OTU4NDA2ODMsImV4cCI6MTY5NTg0MDY4M30.aiSxMDQYPhsKJ8n8Tfaq1ryJZrpjEwVbn1ADAepOWds";
 
-export const newAuthToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4Njk4ZDI5Yy1kNGVkLTQ4MjUtYWE5NS0zZmQ3NTVlZmEwYmYiLCJpYXQiOjE2OTU5MzA5NTMsImV4cCI6MTY5NTkzMDk1M30.eofsd3QEw-XGNZ-KLldAvxQoVKMrTq5XN5uxQ8cxuSU";
-
-const request = (sessionId: string): MockedResponse["request"] => {
-  return { query: REFRESH_TOKEN, variables: { sessionId } };
-};
-
-const verify = {
-  gql(sessionId: string): MockedResponse[] {
-    return [
-      {
-        request: { query: VERIFY_SESSION, variables: { sessionId } },
-        result: {
-          data: {
-            verifySession: {
-              __typename: "VerifiedSession",
-              accessToken: oldAuthToken,
-              user: {
-                __typename: "User",
-                id: testUserId,
-                email: "mail@example.com",
-                firstName: "first name",
-                lastName: "last name",
-                image: null,
-                isRegistered: false,
-              },
-            },
-          },
-        },
+export const server = setupServer(
+  graphql.mutation(VERIFY_SESSION, () => {
+    return mswData("verifySession", "VerifiedSession", {
+      accessToken,
+      user: {
+        __typename: "User",
+        id: "user_id",
+        email: "mail@example.com",
+        firstName: "first name",
+        lastName: "last name",
+        image: null,
+        isRegistered: true,
       },
-    ];
-  },
-};
+    });
+  }),
 
-class Mocks {
-  sessionId: string;
+  graphql.mutation(REFRESH_TOKEN, ({ variables: { sessionId } }) => {
+    if (sessionId === "USER_SESSION_ID") {
+      return mswData("refreshToken", "UserSessionError");
+    }
 
-  constructor(id: string, readonly typename: string) {
-    this.sessionId = `${id}_SESSION_ID`;
-  }
+    if (sessionId === "VALIDATION_SESSION_ID") {
+      return mswData("refreshToken", "SessionIdValidationError");
+    }
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.sessionId),
-        result: { data: { refreshToken: { __typename: this.typename } } },
-      },
-      ...verify.gql(this.sessionId),
-    ];
-  }
-}
+    if (sessionId === "UNKNOWN_SESSION_ID") {
+      return mswData("refreshToken", "UnknownError");
+    }
 
-class RedirectMock {
-  sessionId: string;
+    if (sessionId === "FORBIDDEN_SESSION_ID") {
+      return mswData("refreshToken", "ForbiddenError");
+    }
 
-  constructor(id: string, readonly typename: string) {
-    this.sessionId = `${id}_SESSION_ID`;
-  }
+    if (sessionId === "UNSUPPORTED_SESSION_ID") {
+      return mswData("refreshToken", "UnsupportedType");
+    }
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.sessionId),
-        result: { data: { refreshToken: { __typename: this.typename } } },
-      },
-      ...verify.gql(this.sessionId),
-    ];
-  }
-}
+    if (sessionId === "NOT_ALLOWED_SESSION_ID") {
+      return mswData("refreshToken", "NotAllowedError");
+    }
 
-const session = new Mocks("SESSION", "UserSessionError");
-const validate = new Mocks("VALIDATion", "SessionIdValidationError");
-const unknown = new Mocks("UNKNOWN", "UnknownError");
-const forbid = new Mocks("FORBIDDEN", "ForbiddenError");
-const unsupported = new Mocks("UNSUPPORTED", "UnrecognisedObject");
+    if (sessionId === "AUTH_COOKIE_SESSION_ID") {
+      return mswData("refreshToken", "AuthCookieError");
+    }
 
-const notAllowed = new RedirectMock("NOT_ALLOWED", "NotAllowedError");
-const authCookie = new RedirectMock("AUTH_COOKIE", "AuthCookieError");
+    if (sessionId === "GRAPHQL_ERROR_SESSION_ID") {
+      return mswErrors(new GraphQLError("Mock graphql error response"));
+    }
 
-const graphql = {
-  sessionId: "GRAPHQL_ERROR_SESSION_ID",
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.sessionId),
-        result: { errors: [new GraphQLError("Mock graphql error response")] },
-      },
-      ...verify.gql(this.sessionId),
-    ];
-  },
-};
+    if (sessionId === "NETWORK_ERROR_SESSION_ID") {
+      return mswErrors(new Error(), { status: 503 });
+    }
 
-const network = {
-  sessionId: "NETWORK_ERROR_SESSION_ID",
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.sessionId),
-        error: new Error("Server is currently unreachable"),
-      },
-      ...verify.gql(this.sessionId),
-    ];
-  },
-};
+    if (sessionId === "REFRESH_SESSION_ID") {
+      return mswData("refreshToken", "AccessToken", {
+        accessToken: "newAuthToken",
+      });
+    }
+  })
+);
 
-export const refresh = {
-  sessionId: "REFRESH_SESSION_ID",
-  mock(): MockedResponse {
-    return {
-      request: request(this.sessionId),
-      result: {
-        data: {
-          refreshToken: {
-            __typename: "AccessToken",
-            accessToken: newAuthToken,
-          },
-        },
-      },
-    };
-  },
-  gql(): MockedResponse[] {
-    return [
-      this.mock(),
-      this.mock(),
-      this.mock(),
-      ...verify.gql(this.sessionId),
-    ];
-  },
-};
+const mock = (label: string) => `${label}_SESSION_ID`;
 
-export const table: [string, Expected][] = [
-  ["User session id is invalid", validate],
-  ["User session is unknown", unknown],
-  ["The user session was not assigned to the current user", session],
-  ["Server response is an unsupported object type", unsupported],
-  ["The current user's access token could not be refreshed", forbid],
-  ["Server resolved with a graphql error", graphql],
-  ["Server request failed with a network error", network],
+export const refresh = mock("REFRESH");
+const session = mock("USER");
+const validate = mock("VALIDATION");
+const unknown = mock("UNKNOWN");
+const forbid = mock("FORBIDDEN");
+const unsupported = mock("UNSUPPORTED");
+const notAllowed = mock("NOT_ALLOWED");
+const authCookie = mock("AUTH_COOKIE");
+const gql = mock("GRAPHQL_ERROR");
+const network = mock("NETWORK_ERROR");
+
+const text = "Should display an alert message toast if the";
+export const table: [string, string][] = [
+  [`${text} user session id is invalid`, validate],
+  [`${text} user session is unknown`, unknown],
+  [`${text} user session was not assigned to the current user`, session],
+  [`${text} user's access token could not be refreshed`, forbid],
+  [`${text} api throws a graphql error`, gql],
+  [`${text} refresh request failed with a network error`, network],
+  [`${text} api response is an unsupported object type`, unsupported],
 ];
 
-export const redirectTable: [string, string, RedirectMock][] = [
-  ["User session could not be verified", "unauthorized", notAllowed],
-  ["User session expired", "expired", authCookie],
+const msg = "Should redirect to the login page if the";
+export const redirectTable: [string, string, string][] = [
+  [`${msg} user session could not be verified`, "unauthorized", notAllowed],
+  [`${msg} user session has expired`, "expired", authCookie],
 ];

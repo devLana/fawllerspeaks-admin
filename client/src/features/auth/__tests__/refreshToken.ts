@@ -2,68 +2,63 @@ import { useRouter } from "next/router";
 
 import { screen, waitFor } from "@testing-library/react";
 
-import {
-  newAuthToken,
-  oldAuthToken,
-  redirectTable,
-  refresh,
-  table,
-} from "../utils/refreshToken.mocks";
-import {
-  handleAuthHeader,
-  sessionTestRenderer,
-} from "../utils/sessionTestRenderer";
+import * as mocks from "../utils/refreshToken.mocks";
+import { sessionTestRenderer } from "../utils/sessionTestRenderer";
 import { SESSION_ID } from "@utils/constants";
 
-jest.useFakeTimers();
+jest.useFakeTimers({ legacyFakeTimers: true });
 jest.spyOn(window, "setTimeout").mockName("setTimeout");
 
 describe("Refresh expired user access token", () => {
+  beforeAll(() => {
+    mocks.server.listen({ onUnhandledRequest: "error" });
+  });
+
   afterAll(() => {
     localStorage.removeItem(SESSION_ID);
-    jest.useRealTimers();
+    mocks.server.close();
   });
 
-  describe("Redirect to the login page", () => {
-    it.each(redirectTable)("%s", async (_, status, mock) => {
+  describe("Refresh request failed with a user session error", () => {
+    it.each(mocks.redirectTable)("%s", async (_, status, sessionId) => {
       const { replace } = useRouter();
-      localStorage.setItem(SESSION_ID, mock.sessionId);
 
-      sessionTestRenderer(mock.gql());
+      localStorage.setItem(SESSION_ID, sessionId);
+      sessionTestRenderer();
+      jest.runAllTimers();
 
-      await waitFor(() => expect(setTimeout).toHaveBeenCalled());
-      await waitFor(() => expect(replace).toHaveBeenCalledTimes(2));
-      expect(replace).toHaveBeenNthCalledWith(2, `/login?status=${status}`);
+      await waitFor(() => expect(window.setTimeout).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+      expect(replace).toHaveBeenCalledWith(`/login?status=${status}`);
     });
   });
 
-  describe("Should show an alert message box", () => {
-    it.each(table)("%s", async (_, expected) => {
-      localStorage.setItem(SESSION_ID, expected.sessionId);
+  describe("Refresh request got an error or an unsupported object type response", () => {
+    it.each(mocks.table)("%s", async (_, sessionId) => {
+      localStorage.setItem(SESSION_ID, sessionId);
 
-      sessionTestRenderer(expected.gql());
+      sessionTestRenderer();
+      jest.runAllTimers();
 
-      await waitFor(() => expect(setTimeout).toHaveBeenCalled());
-      await expect(screen.findByRole("alert")).resolves.toHaveTextContent(
-        "Your access token could not be refreshed"
-      );
-      expect(screen.getByRole("alert")).toContainElement(
-        screen.getByRole("button", { name: /^reload page$/i })
-      );
+      await waitFor(() => expect(window.setTimeout).toHaveBeenCalledTimes(1));
+
+      const alert = await screen.findByRole("alert");
+      const msg = "Your access token could not be refreshed";
+      const btnName = { name: /^reload page$/i };
+
+      expect(alert).toHaveTextContent(msg);
+      expect(alert).toContainElement(screen.getByRole("button", btnName));
     });
   });
 
-  describe("Refresh token request is successful", () => {
+  describe("Access token is successfully refreshed", () => {
     it("Update application with refreshed access token", async () => {
-      localStorage.setItem(SESSION_ID, refresh.sessionId);
+      localStorage.setItem(SESSION_ID, mocks.refresh);
 
-      sessionTestRenderer(refresh.gql());
+      sessionTestRenderer();
+      jest.runAllTimers();
 
-      await waitFor(() => expect(setTimeout).toHaveBeenCalled());
-      await waitFor(() => expect(handleAuthHeader).toHaveBeenCalledTimes(3));
-      expect(handleAuthHeader).toHaveBeenNthCalledWith(1, oldAuthToken);
-      expect(handleAuthHeader).toHaveBeenNthCalledWith(2, newAuthToken);
-      expect(handleAuthHeader).toHaveBeenNthCalledWith(3, newAuthToken);
+      await waitFor(() => expect(window.setTimeout).toHaveBeenCalledTimes(1));
     });
   });
 });

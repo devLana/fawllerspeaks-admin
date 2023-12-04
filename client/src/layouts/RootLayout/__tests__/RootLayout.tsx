@@ -1,24 +1,19 @@
 import { useRouter } from "next/router";
 
 import { screen, waitFor, within } from "@testing-library/react";
-import useMediaQuery from "@mui/material/useMediaQuery";
 
 import RootLayout from "..";
-import { errorsTable, logoutTable, storageTheme } from "../utils/Layout.mocks";
-import { renderTestUI, stopRefreshTokenTimer } from "@utils/renderTestUI";
+import * as mocks from "../utils/Layout.mocks";
+import { renderUI, stopRefreshTokenTimer } from "@utils/tests/renderUI";
 import { DEFAULT_THEME, SESSION_ID } from "@utils/constants";
 
 describe("Protected Pages Root Layout", () => {
   const page = <div>Page Element UI</div>;
-  const props = {
-    clientHasRendered: true,
-    errorMessage: null,
-    title: "Page Title",
-  };
+  const { props } = mocks;
 
   describe("Root Layout page ui", () => {
     it("Should render the Loader ui", () => {
-      renderTestUI(
+      renderUI(
         <RootLayout
           clientHasRendered={false}
           errorMessage={null}
@@ -34,7 +29,7 @@ describe("Protected Pages Root Layout", () => {
     });
 
     it("Should render an Error ui", () => {
-      renderTestUI(
+      renderUI(
         <RootLayout
           clientHasRendered={true}
           errorMessage="An error has occurred"
@@ -53,7 +48,7 @@ describe("Protected Pages Root Layout", () => {
     });
 
     it("Should render the Page ui", () => {
-      renderTestUI(<RootLayout {...props}>{page}</RootLayout>);
+      renderUI(<RootLayout {...props}>{page}</RootLayout>);
 
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -63,97 +58,94 @@ describe("Protected Pages Root Layout", () => {
 
   describe("Root Layout header", () => {
     describe("Header theme button", () => {
-      it("Click theme button to change app theme", async () => {
-        const { user } = renderTestUI(
-          <RootLayout {...props}>{page}</RootLayout>
-        );
+      it("Should change the global app theme when the theme button is clicked", async () => {
+        const { user } = renderUI(<RootLayout {...props}>{page}</RootLayout>);
 
         const name = { name: /^change app theme$/i };
         const button = screen.getByRole("button", name);
 
         await user.click(button);
+
         expect(localStorage.getItem(DEFAULT_THEME)).toBe(
-          storageTheme("sunset")
+          mocks.storageTheme("sunset")
         );
 
         await user.click(button);
+
         expect(localStorage.getItem(DEFAULT_THEME)).toBe(
-          storageTheme("pitch black")
+          mocks.storageTheme("pitch black")
         );
 
         await user.click(button);
-        expect(localStorage.getItem(DEFAULT_THEME)).toBe(storageTheme("sunny"));
+
+        expect(localStorage.getItem(DEFAULT_THEME)).toBe(
+          mocks.storageTheme("sunny")
+        );
 
         localStorage.removeItem(DEFAULT_THEME);
       });
     });
   });
 
-  describe("Root Layout navbar", () => {
-    const mock = useMediaQuery as jest.MockedFunction<() => boolean>;
-    mock.mockReturnValue(true);
-
+  describe("Logout api request", () => {
     const btnName = { name: /^logout$/i };
     const cancelBtnName = { name: /^cancel$/i };
     const dialogName = { name: /^logout of your account$/i };
 
+    beforeAll(() => {
+      mocks.server.listen({ onUnhandledRequest: "error" });
+    });
+
     afterAll(() => {
+      mocks.server.close();
       localStorage.removeItem(SESSION_ID);
     });
 
-    describe("Navbar logout button", () => {
-      describe("Logout request receives an error/unsupported object response", () => {
-        it.each(errorsTable)("%s", async (_, data) => {
-          localStorage.setItem(SESSION_ID, data.sessionId);
+    describe("Api response is an error or an unsupported object type", () => {
+      it.each(mocks.errors)("%s", async (_, data) => {
+        localStorage.setItem(SESSION_ID, data.sessionId);
 
-          const { user } = renderTestUI(
-            <RootLayout {...props}>{page}</RootLayout>,
-            data.gql()
-          );
+        const { user } = renderUI(<RootLayout {...props}>{page}</RootLayout>);
 
-          await user.click(screen.getByRole("button", btnName));
+        await user.click(screen.getByRole("button", btnName));
 
-          const dialog = screen.getByRole("dialog", dialogName);
-          const dialogLogoutBtn = within(dialog).getByRole("button", btnName);
-          const cancelBtn = within(dialog).getByRole("button", cancelBtnName);
+        const dialog = screen.getByRole("dialog", dialogName);
+        const dialogLogoutBtn = within(dialog).getByRole("button", btnName);
+        const cancelBtn = within(dialog).getByRole("button", cancelBtnName);
 
-          await user.click(dialogLogoutBtn);
+        await user.click(dialogLogoutBtn);
 
-          expect(dialogLogoutBtn).toBeDisabled();
-          expect(cancelBtn).toBeDisabled();
+        expect(dialogLogoutBtn).toBeDisabled();
+        expect(cancelBtn).toBeDisabled();
 
-          await expect(screen.findByRole("alert")).resolves.toHaveTextContent(
-            data.message
-          );
-          expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-        });
+        await expect(screen.findByRole("alert")).resolves.toHaveTextContent(
+          data.message
+        );
+
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       });
+    });
 
-      describe("Send logout request, Redirect to the login page if user is not logged in", () => {
-        it.each(logoutTable)("%s", async (_, data, path) => {
-          localStorage.setItem(SESSION_ID, data.sessionId);
+    describe("The user is redirect to the login page", () => {
+      it.each(mocks.logout)("%s", async (_, data, path) => {
+        localStorage.setItem(SESSION_ID, data.sessionId);
 
-          const { replace } = useRouter();
-          const { user } = renderTestUI(
-            <RootLayout {...props}>{page}</RootLayout>,
-            data.gql()
-          );
+        const { replace } = useRouter();
+        const { user } = renderUI(<RootLayout {...props}>{page}</RootLayout>);
 
-          await user.click(screen.getByRole("button", btnName));
+        await user.click(screen.getByRole("button", btnName));
 
-          const dialog = screen.getByRole("dialog", dialogName);
-          const dialogLogoutBtn = within(dialog).getByRole("button", btnName);
-          const cancelBtn = within(dialog).getByRole("button", cancelBtnName);
+        const dialog = screen.getByRole("dialog", dialogName);
+        const dialogLogoutBtn = within(dialog).getByRole("button", btnName);
+        const cancelBtn = within(dialog).getByRole("button", cancelBtnName);
 
-          await user.click(dialogLogoutBtn);
+        await user.click(dialogLogoutBtn);
 
-          expect(dialogLogoutBtn).toBeDisabled();
-          expect(cancelBtn).toBeDisabled();
-
-          await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-          expect(replace).toHaveBeenCalledWith(path);
-          expect(stopRefreshTokenTimer).toHaveBeenCalledTimes(1);
-        });
+        expect(dialogLogoutBtn).toBeDisabled();
+        expect(cancelBtn).toBeDisabled();
+        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+        expect(replace).toHaveBeenCalledWith(path);
+        expect(stopRefreshTokenTimer).toHaveBeenCalledTimes(1);
       });
     });
   });

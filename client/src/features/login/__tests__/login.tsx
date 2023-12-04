@@ -4,44 +4,38 @@ import { screen, waitFor } from "@testing-library/react";
 
 import Login from "@pages/login";
 import {
-  handleAuthHeader,
   refreshTokenHandler,
   userIdHandler,
-  renderTestUI,
-} from "@utils/renderTestUI";
+  renderUI,
+} from "@utils/tests/renderUI";
 import { SESSION_ID } from "@utils/constants";
-import {
-  validation,
-  errorTable,
-  successTable,
-  redirectStatus,
-} from "../utils/login.mocks";
+import * as mocks from "../utils/login.mocks";
 
 describe("Login Page", () => {
-  const emailLabel = { name: /e-?mail/i };
+  const emailLabel = { name: /^e-?mail$/i };
 
-  describe("Redirect from other pages, get status param url query", () => {
+  describe("Get status param url query on redirect from other pages", () => {
     afterAll(() => {
       const router = useRouter();
       router.query = {};
     });
 
-    it.each(redirectStatus)("%s", (_, status, message) => {
+    it.each(mocks.redirectStatus)("%s", (_, status, message) => {
       const router = useRouter();
       router.query = { status };
 
-      renderTestUI(<Login />);
+      renderUI(<Login />);
 
       expect(screen.getByRole("alert")).toHaveTextContent(message);
       expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardInfo");
     });
   });
 
-  describe("On client side validation of login form", () => {
-    it("Display appropriate error messages if input fields are empty", async () => {
-      const { user } = renderTestUI(<Login />);
+  describe("Client side form validation", () => {
+    it("Input fields should have error messages if the values are empty", async () => {
+      const { user } = renderUI(<Login />);
 
-      await user.click(screen.getByRole("button", { name: /login/i }));
+      await user.click(screen.getByRole("button", mocks.loginName));
 
       expect(
         screen.getByRole("textbox", emailLabel)
@@ -52,12 +46,12 @@ describe("Login Page", () => {
       );
     });
 
-    it("Show invalid email error message if email input string is invalid", async () => {
-      const { user } = renderTestUI(<Login />);
+    it("Email field with an invalid value should have an invalid error message", async () => {
+      const { user } = renderUI(<Login />);
 
       await user.type(screen.getByRole("textbox", emailLabel), "invalid_email");
-      await user.type(screen.getByLabelText(/^password$/i), "testing_password");
-      await user.click(screen.getByRole("button", { name: /login/i }));
+      await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
+      await user.click(screen.getByRole("button", mocks.loginName));
 
       expect(
         screen.getByRole("textbox", emailLabel)
@@ -69,80 +63,86 @@ describe("Login Page", () => {
     });
   });
 
-  describe("If server responds with an error object type or an unsupported object type after login request", () => {
-    it("Set error messages on appropriate form input fields", async () => {
-      localStorage.setItem(SESSION_ID, validation.sessionId);
-      const { user } = renderTestUI(<Login />, validation.gql());
-      const { sessionIdError, email, password } = validation;
+  describe("Make a login request to the api", () => {
+    beforeAll(() => {
+      mocks.server.listen({ onUnhandledRequest: "error" });
+    });
 
-      await user.type(screen.getByRole("textbox", emailLabel), email);
-      await user.type(screen.getByLabelText(/^password$/i), password);
-      await user.click(screen.getByRole("button", { name: /login/i }));
+    afterAll(() => {
+      mocks.server.close();
+    });
 
-      expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
+    describe("Api response is an input validation error", () => {
+      it("Should set error messages on the appropriate form input fields", async () => {
+        const { user } = renderUI(<Login />);
+        const { sessionIdError, email } = mocks.validation;
 
-      await waitFor(() => {
+        await user.type(screen.getByRole("textbox", emailLabel), email);
+        await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
+        await user.click(screen.getByRole("button", mocks.loginName));
+
+        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
+
+        await waitFor(() => {
+          expect(
+            screen.getByRole("textbox", emailLabel)
+          ).toHaveAccessibleErrorMessage(mocks.validation.emailError);
+        });
+
         expect(
-          screen.getByRole("textbox", emailLabel)
-        ).toHaveAccessibleErrorMessage(validation.emailError);
+          screen.getByLabelText(/^password$/i)
+        ).toHaveAccessibleErrorMessage(mocks.validation.passwordError);
+
+        expect(screen.getByRole("alert")).toHaveTextContent(sessionIdError);
+        expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardError");
+
+        expect(screen.getByRole("textbox", emailLabel)).toHaveFocus();
+        expect(screen.getByRole("button", mocks.loginName)).toBeEnabled();
+      });
+    });
+
+    describe("The api responded with an error or an unsupported object type", () => {
+      it.each(mocks.errorTable)("%s", async (_, mock) => {
+        const { user } = renderUI(<Login />);
+
+        await user.type(screen.getByRole("textbox", emailLabel), mock.email);
+        await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
+        await user.click(screen.getByRole("button", mocks.loginName));
+
+        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
+
+        const alert = await screen.findByRole("alert");
+
+        expect(alert).toHaveTextContent(mock.message);
+        expect(alert).toHaveClass("MuiAlert-standardError");
+        expect(screen.getByRole("button", mocks.loginName)).toBeEnabled();
+      });
+    });
+
+    describe("Login request success", () => {
+      afterEach(() => {
+        localStorage.removeItem(SESSION_ID);
       });
 
-      expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
-        validation.passwordError
-      );
+      it.each(mocks.successTable)("%s", async (_, page, mock) => {
+        const { user } = renderUI(<Login />);
+        const { replace } = useRouter();
 
-      expect(screen.getByRole("alert")).toHaveTextContent(sessionIdError);
-      expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardError");
+        await user.type(screen.getByRole("textbox", emailLabel), mock.email);
+        await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
+        await user.click(screen.getByRole("button", mocks.loginName));
 
-      expect(screen.getByRole("textbox", emailLabel)).toHaveFocus();
-      expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
-      localStorage.removeItem(SESSION_ID);
-    });
+        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
 
-    it.each(errorTable)("Show an alert message if %s", async (_, error) => {
-      const { user } = renderTestUI(<Login />, error.gql());
-      const { message, email, password } = error;
-
-      await user.type(screen.getByRole("textbox", emailLabel), email);
-      await user.type(screen.getByLabelText(/^password$/i), password);
-      await user.click(screen.getByRole("button", { name: /login/i }));
-
-      expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
-
-      const alert = await screen.findByRole("alert");
-
-      expect(alert).toHaveTextContent(message);
-      expect(alert).toHaveClass("MuiAlert-standardError");
-      expect(screen.getByRole("button", { name: /login/i })).toBeEnabled();
-    });
-  });
-
-  describe("If login request is successful", () => {
-    afterEach(() => {
-      localStorage.removeItem(SESSION_ID);
-    });
-
-    it.each(successTable)("%s", async (_, { mock, page }) => {
-      const { user } = renderTestUI(<Login />, mock.gql());
-      const { replace } = useRouter();
-
-      await user.type(screen.getByRole("textbox", emailLabel), mock.email);
-      await user.type(screen.getByLabelText(/^password$/i), mock.password);
-      await user.click(screen.getByRole("button", { name: /login/i }));
-
-      expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
-
-      await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-      expect(replace).toHaveBeenCalledWith(page);
-
-      expect(localStorage.getItem(SESSION_ID)).toBe(mock.sessionId);
-      expect(handleAuthHeader).toHaveBeenCalledTimes(1);
-      expect(handleAuthHeader).toHaveBeenCalledWith("accessToken");
-      expect(userIdHandler).toHaveBeenCalledTimes(1);
-      expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
-      expect(refreshTokenHandler).toHaveBeenCalledTimes(1);
-      expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
-      expect(screen.getByRole("button", { name: /login/i })).toBeDisabled();
+        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+        expect(replace).toHaveBeenCalledWith(page);
+        expect(localStorage.getItem(SESSION_ID)).toBe("USER_DATA_SESSION_ID");
+        expect(userIdHandler).toHaveBeenCalledTimes(1);
+        expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
+        expect(refreshTokenHandler).toHaveBeenCalledTimes(1);
+        expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
+        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
+      });
     });
   });
 });

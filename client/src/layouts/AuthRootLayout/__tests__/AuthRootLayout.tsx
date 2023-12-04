@@ -1,13 +1,13 @@
 import { screen } from "@testing-library/react";
 
 import AuthRootLayout from "..";
-import { renderTestUI } from "@utils/renderTestUI";
+import { renderUI } from "@utils/tests/renderUI";
 
 describe("Authentication Pages Root Layout", () => {
   const page = <div>Page Element UI</div>;
 
   it("Should render the Loader ui", () => {
-    renderTestUI(
+    renderUI(
       <AuthRootLayout
         clientHasRendered={false}
         errorMessage={null}
@@ -23,7 +23,7 @@ describe("Authentication Pages Root Layout", () => {
   });
 
   it("Should render an Error ui", () => {
-    renderTestUI(
+    renderUI(
       <AuthRootLayout
         clientHasRendered={true}
         errorMessage="An error has occurred"
@@ -42,7 +42,7 @@ describe("Authentication Pages Root Layout", () => {
   });
 
   it("Should render the Page ui", () => {
-    renderTestUI(
+    renderUI(
       <AuthRootLayout
         clientHasRendered={true}
         errorMessage={null}

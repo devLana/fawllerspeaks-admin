@@ -1,9 +1,9 @@
 import { GraphQLError } from "graphql";
-import type { MockedResponse } from "@apollo/client/testing";
+import { graphql } from "msw";
+import { setupServer } from "msw/node";
 
 import { REGISTER_USER } from "../operations/REGISTER_USER";
-
-type SorN = string | null;
+import { mswData, mswErrors } from "@utils/tests/msw";
 
 export interface Input {
   firstName: string;
@@ -12,191 +12,115 @@ export interface Input {
   confirmPassword: string;
 }
 
-interface Errors<T, U, V, X> {
-  firstNameError: T;
-  lastNameError: U;
-  passwordError: V;
-  confirmPasswordError: X;
-}
-
-interface Expected {
-  message: string;
-  gql: () => MockedResponse[];
-  input: Input;
-}
-
+const passwordStr = (prefix: string) => `${prefix}_p@55W0rd`;
+const FIRST_NAME = "FIRST_NAME";
+const LAST_NAME = "LAST_NAME";
 export const invalidFirstName = "First name cannot contain numbers";
 export const invalidLastName = "Last name cannot contain numbers";
 export const shortPassword = "Password must be at least 8 characters long";
+
 export const invalidPassword =
   "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
 
-const FIRST_NAME = "FIRST_NAME";
-const LAST_NAME = "LAST_NAME";
-const USER_ID = "SOME_RANDOM_USER_ID";
-const E_MAIL = "user_mail@example.com";
 const MESSAGE =
   "You are unable to register your account. Please try again later";
 
-const request = (input: Input): MockedResponse["request"] => {
-  return { query: REGISTER_USER, variables: { userInput: input } };
-};
+export const server = setupServer(
+  graphql.mutation(REGISTER_USER, ({ variables: { userInput } }) => {
+    const { password } = userInput as { password: string };
 
-const inputs = (name: string): Input => ({
-  firstName: `${name}_${FIRST_NAME}`,
-  lastName: `${name}_${LAST_NAME}`,
-  password: `${name}_Pass#W0rd`,
-  confirmPassword: `${name}_Pass#W0rd`,
-});
+    if (password === passwordStr("auth")) {
+      return mswData("registerUser", "AuthenticationError");
+    }
 
-class ErrorMock {
-  constructor(readonly input: Input, readonly typename: string) {}
+    if (password === passwordStr("unknown")) {
+      return mswData("registerUser", "UnknownError");
+    }
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input),
-        result: { data: { registerUser: { __typename: this.typename } } },
-      },
-    ];
+    if (password === passwordStr("registered")) {
+      return mswData("registerUser", "RegistrationError");
+    }
+
+    if (password === passwordStr("unsupported")) {
+      return mswData("registerUser", "UnsupportedType");
+    }
+
+    if (password === passwordStr("validation")) {
+      return mswData("registerUser", "RegisterUserValidationError", {
+        firstNameError: invalidFirstName,
+        lastNameError: invalidLastName,
+        passwordError: shortPassword,
+        confirmPasswordError: "Passwords do not match",
+      });
+    }
+
+    if (password === passwordStr("success")) {
+      return mswData("registerUser", "RegisteredUser", {
+        user: {
+          __typename: "User",
+          id: "SOME_RANDOM_USER_ID",
+          email: "user_mail@example.com",
+          firstName: FIRST_NAME,
+          lastName: LAST_NAME,
+          image: null,
+          isRegistered: true,
+        },
+      });
+    }
+
+    if (password === passwordStr("graphql")) {
+      return mswErrors(new GraphQLError(MESSAGE));
+    }
+
+    if (password === passwordStr("network")) {
+      return mswErrors(new Error(), { status: 503 });
+    }
+  })
+);
+
+class Mock<T extends string | undefined = undefined> {
+  input: Input;
+
+  constructor(prefix: string, readonly message: T) {
+    this.input = {
+      firstName: FIRST_NAME,
+      lastName: LAST_NAME,
+      password: passwordStr(prefix),
+      confirmPassword: passwordStr(prefix),
+    };
   }
 }
 
-class ValidationMock<
-  T extends SorN,
-  U extends SorN,
-  V extends SorN,
-  X extends SorN
-> {
-  constructor(readonly input: Input, readonly errors: Errors<T, U, V, X>) {}
+export const success = new Mock("success", undefined);
+export const validation = new Mock("validation", undefined);
+const auth = new Mock("auth", undefined);
+const unknown = new Mock("unknown", undefined);
+const registered = new Mock("registered", undefined);
+const unsupported = new Mock("unsupported", MESSAGE);
+const network = new Mock("network", MESSAGE);
+const gql = new Mock("graphql", MESSAGE);
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input),
-        result: {
-          data: {
-            registerUser: {
-              __typename: "RegisterUserValidationError",
-              firstNameError: this.errors.firstNameError,
-              lastNameError: this.errors.lastNameError,
-              passwordError: this.errors.passwordError,
-              confirmPasswordError: this.errors.confirmPasswordError,
-            },
-          },
-        },
-      },
-    ];
-  }
-}
-
-const auth = new ErrorMock(inputs("auth"), "AuthenticationError");
-const unknown = new ErrorMock(inputs("unknown"), "UnknownError");
-const registered = new ErrorMock(inputs("registered"), "RegistrationError");
-const unsupported = {
-  input: inputs("unsupported"),
-  message: MESSAGE,
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input),
-        result: {
-          data: { registerUser: { __typename: "UnsupportedObjectType" } },
-        },
-      },
-    ];
-  },
-};
-
-export const validation1 = new ValidationMock(inputs("validationOne"), {
-  firstNameError: "Enter first name",
-  lastNameError: "Enter last name",
-  passwordError: "Enter password",
-  confirmPasswordError: null,
-});
-
-export const validation2 = new ValidationMock(inputs("validationTwo"), {
-  firstNameError: "First name cannot contain numbers",
-  lastNameError: "Last name cannot contain numbers",
-  passwordError: "Password must be at least 8 characters long",
-  confirmPasswordError: "Passwords do not match",
-});
-
-export const success = {
-  input: inputs("success"),
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input),
-        result: {
-          data: {
-            registerUser: {
-              __typename: "RegisteredUser",
-              user: {
-                __typename: "User",
-                id: USER_ID,
-                email: E_MAIL,
-                firstName: FIRST_NAME,
-                lastName: LAST_NAME,
-                image: null,
-                isRegistered: true,
-              },
-            },
-          },
-        },
-      },
-    ];
-  },
-};
-
-const network = {
-  message: MESSAGE,
-  input: inputs("network"),
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input),
-        error: new Error("Server responded with a network error"),
-      },
-    ];
-  },
-};
-
-const graphql = {
-  message: MESSAGE,
-  input: inputs("graphql"),
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.input),
-        result: { errors: [new GraphQLError(this.message)] },
-      },
-    ];
-  },
-};
-
-export const table1: [string, Expected][] = [
-  ["Response resolves to a graphql error", graphql],
-  ["Request resolved with a network error", network],
-  ["Response is an unsupported object", unsupported],
+const text = "Should display an alert toast message if the api";
+export const table1: [string, Mock<string>][] = [
+  [`${text} throws a graphql error`, gql],
+  [`${text} failed with a network error`, network],
+  [`${text} responded with an unsupported object type`, unsupported],
 ];
 
-interface ErrorTests {
-  path: string;
-  expected: ErrorMock;
-}
-
-export const table2: [string, ErrorTests][] = [
+export const table2: [string, string, Mock][] = [
   [
-    "Redirect the user to the login page if the user is not logged in",
-    { path: "/login?status=unauthenticated", expected: auth },
+    "Should redirect the user to the login page if the user is not logged in",
+    "/login?status=unauthenticated",
+    auth,
   ],
   [
-    "Redirect the user to the login page if the user's credentials could not be verified",
-    { path: "/login?status=unauthorized", expected: unknown },
+    "Should redirect the user to the login page if the user's credentials could not be verified",
+    "/login?status=unauthorized",
+    unknown,
   ],
   [
-    "Redirect the user to the home(dashboard) page if the user has already registered their account",
-    { path: "/?status=registered", expected: registered },
+    "Should redirect the user to the home(dashboard) page if the user has already registered their account",
+    "/?status=registered",
+    registered,
   ],
 ];

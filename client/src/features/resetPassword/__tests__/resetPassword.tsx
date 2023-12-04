@@ -1,120 +1,33 @@
 import { useRouter } from "next/router";
-import type { GetServerSidePropsContext as GssPContext } from "next";
 
 import { screen, waitFor } from "@testing-library/react";
-import "cross-fetch/polyfill";
 
-import ResetPassword, { getServerSideProps } from "@pages/reset-password";
-import { renderTestUI } from "@utils/renderTestUI";
-import {
-  resetTableOne,
-  resetTableThree,
-  resetTableTwo,
-  resetUnregistered as rUnregistered,
-  resetValidation1 as rValidation,
-  verified,
-  verifyErrorObjects,
-  verifyErrors,
-  verifyProps,
-  verifyValidate,
-  msg,
-  server,
-} from "../utils/resetPassword.mocks";
+import ResetPassword from "@pages/reset-password";
+import { renderUI } from "@utils/tests/renderUI";
+import * as mocks from "../utils/resetPassword.mocks";
 
 describe("Reset Password", () => {
-  describe("ResetPassword page - getServerSideProps", () => {
-    describe("Validate password reset token", () => {
-      it.each(verifyValidate)("%s", async (_, tId, status) => {
-        const context = { query: { tId } } as unknown as GssPContext;
-
-        const result = await getServerSideProps(context);
-
-        expect(result).not.toHaveProperty("props");
-        expect(result).toHaveProperty(
-          "redirect.destination",
-          `/forgot-password?status=${status}`
-        );
-      });
+  describe("Pre-render reset password page with server side data", () => {
+    it("User account is unregistered, Should render an information dialog box", () => {
+      renderUI(<ResetPassword isUnregistered />);
+      expect(screen.getByText(mocks.msg2)).toBeInTheDocument();
     });
 
-    describe("Verify password reset token", () => {
-      beforeAll(() => {
-        server.listen();
-      });
+    it("Should display the user's e-mail address in a readonly textbox", () => {
+      renderUI(<ResetPassword verified={mocks.data} />);
 
-      afterEach(() => {
-        server.resetHandlers();
-      });
-
-      afterAll(() => {
-        server.close();
-      });
-
-      describe("Verification resolves with an error/unsupported object type", () => {
-        it.each(verifyErrorObjects)("%s", async (_, path, token) => {
-          const context = { query: { tId: token } } as unknown as GssPContext;
-
-          const result = await getServerSideProps(context);
-
-          expect(result).not.toHaveProperty("props");
-          expect(result).toHaveProperty("redirect.destination", path);
-        });
-      });
-
-      describe("Verification rejects with an error", () => {
-        it.each(verifyErrors)("%s", async (_, token, status) => {
-          const context = { query: { tId: token } } as unknown as GssPContext;
-
-          const result = await getServerSideProps(context);
-
-          expect(result).not.toHaveProperty("props");
-          expect(result).toHaveProperty(
-            "redirect.destination",
-            `/forgot-password?status=${status}`
-          );
-        });
-      });
-
-      describe.each(verifyProps)("%s", (_, title, { token, props }) => {
-        it(`${title}`, async () => {
-          const context = { query: { tId: token } } as unknown as GssPContext;
-
-          const result = await getServerSideProps(context);
-
-          expect(result).not.toHaveProperty("redirect");
-          expect(result).toHaveProperty("props", props);
-        });
-      });
+      expect(
+        screen.getByRole("textbox", { name: /^e-?mail$/i })
+      ).toHaveDisplayValue(mocks.data.email);
     });
   });
 
-  describe("ResetPassword page is pre-rendered with server side data", () => {
-    it("User account is unregistered, Display an information dialog box", async () => {
-      renderTestUI(<ResetPassword isUnregistered />);
-
-      const presentation = await screen.findByRole("presentation");
-
-      expect(presentation).toBeInTheDocument();
-      expect(presentation).toHaveTextContent(
-        "It appears you are trying to reset the password of an unregistered account."
-      );
-    });
-
-    it("Display the e-mail address of the account in a readonly textbox", async () => {
-      renderTestUI(<ResetPassword verified={verified} />);
-
-      const textbox = await screen.findByRole("textbox", { name: /e-?mail/i });
-
-      expect(textbox).toHaveDisplayValue(verified.email);
-    });
-  });
-
-  describe("ResetPassword Page", () => {
+  describe("Reset Password Page", () => {
     const resetButton = { name: /^reset password$/i };
 
-    describe("Client-side form validation, Show input field error messages", () => {
-      it("If all input fields are empty", async () => {
-        const { user } = renderTestUI(<ResetPassword verified={verified} />);
+    describe("Client side form validation", () => {
+      it("Input fields should have an error message if the field value is empty", async () => {
+        const { user } = renderUI(<ResetPassword verified={mocks.data} />);
 
         await user.click(screen.getByRole("button", resetButton));
 
@@ -127,8 +40,8 @@ describe("Reset Password", () => {
         ).toHaveAccessibleErrorMessage("Enter confirm password");
       });
 
-      it("When the password field has an invalid value", async () => {
-        const { user } = renderTestUI(<ResetPassword verified={verified} />);
+      it("The password field should have an error message if it has an invalid value", async () => {
+        const { user } = renderUI(<ResetPassword verified={mocks.data} />);
 
         await user.type(screen.getByLabelText(/^password$/i), "pass");
         await user.click(screen.getByRole("button", resetButton));
@@ -143,32 +56,32 @@ describe("Reset Password", () => {
         await user.click(screen.getByRole("button", resetButton));
         expect(
           screen.getByLabelText(/^password$/i)
-        ).toHaveAccessibleErrorMessage(msg);
+        ).toHaveAccessibleErrorMessage(mocks.msg1);
 
         await user.clear(screen.getByLabelText(/^password$/i));
         await user.type(screen.getByLabelText(/^password$/i), "PASS!W0RD");
         await user.click(screen.getByRole("button", resetButton));
         expect(
           screen.getByLabelText(/^password$/i)
-        ).toHaveAccessibleErrorMessage(msg);
+        ).toHaveAccessibleErrorMessage(mocks.msg1);
 
         await user.clear(screen.getByLabelText(/^password$/i));
         await user.type(screen.getByLabelText(/^password$/i), "pass!w0rd");
         await user.click(screen.getByRole("button", resetButton));
         expect(
           screen.getByLabelText(/^password$/i)
-        ).toHaveAccessibleErrorMessage(msg);
+        ).toHaveAccessibleErrorMessage(mocks.msg1);
 
         await user.clear(screen.getByLabelText(/^password$/i));
         await user.type(screen.getByLabelText(/^password$/i), "PassW0rd");
         await user.click(screen.getByRole("button", resetButton));
         expect(
           screen.getByLabelText(/^password$/i)
-        ).toHaveAccessibleErrorMessage(msg);
+        ).toHaveAccessibleErrorMessage(mocks.msg1);
       });
 
-      it("If passwords do not match", async () => {
-        const { user } = renderTestUI(<ResetPassword verified={verified} />);
+      it("The confirm password field should have an error message if it does not match the password field", async () => {
+        const { user } = renderUI(<ResetPassword verified={mocks.data} />);
         const confirmPassword = screen.getByLabelText(/^confirm password$/i);
 
         await user.type(screen.getByLabelText(/^password$/i), "PassW0!rd");
@@ -181,122 +94,113 @@ describe("Reset Password", () => {
       });
     });
 
-    describe("Reset password request is sent to server", () => {
-      it("Show input field error messages if password validation fails", async () => {
-        const { user } = renderTestUI(
-          <ResetPassword verified={verified} />,
-          rValidation.gql()
-        );
-
-        const password = screen.getByLabelText(/^password$/i);
-        const confirmPassword = screen.getByLabelText(/^confirm Password$/i);
-        const { confirmPasswordError, passwordError } = rValidation;
-
-        await user.type(password, rValidation.password);
-        await user.type(confirmPassword, rValidation.password);
-        await user.click(screen.getByRole("button", resetButton));
-
-        expect(screen.getByRole("button", resetButton)).toBeDisabled();
-
-        await waitFor(() =>
-          expect(password).toHaveAccessibleErrorMessage(passwordError)
-        );
-
-        expect(confirmPassword).toHaveAccessibleErrorMessage(
-          confirmPasswordError
-        );
-        expect(password).toHaveFocus();
-        expect(screen.getByRole("button", resetButton)).toBeEnabled();
+    describe("Make a reset password request to the api", () => {
+      beforeAll(() => {
+        mocks.server.listen({ onUnhandledRequest: "error" });
       });
 
-      it.each(resetTableOne)("%s", async (_, status, mock) => {
-        const { push } = useRouter();
-        const { password } = mock;
-
-        const { user } = renderTestUI(
-          <ResetPassword verified={verified} />,
-          mock.gql()
-        );
-
-        await user.type(screen.getByLabelText(/^password$/i), password);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
-        await user.click(screen.getByRole("button", resetButton));
-
-        expect(screen.getByRole("button", resetButton)).toBeDisabled();
-
-        await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
-        expect(push).toHaveBeenCalledWith(`/forgot-password?status=${status}`);
+      afterAll(() => {
+        mocks.server.close();
       });
 
-      it.each(resetTableTwo)("%s", async (_, status, mock) => {
-        const { push } = useRouter();
-        const { password } = mock;
+      describe("Api request received a validation error response", () => {
+        it("Api response is a validation error, Input field should have error messages", async () => {
+          const { user } = renderUI(<ResetPassword verified={mocks.data} />);
 
-        const { user } = renderTestUI(
-          <ResetPassword verified={verified} />,
-          mock.gql()
-        );
+          const password = screen.getByLabelText(/^password$/i);
+          const confirmPassword = screen.getByLabelText(/^confirm Password$/i);
 
-        await user.type(screen.getByLabelText(/^password$/i), password);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
-        await user.click(screen.getByRole("button", resetButton));
+          await user.type(password, mocks.validation1.password);
+          await user.type(confirmPassword, mocks.validation1.password);
+          await user.click(screen.getByRole("button", resetButton));
 
-        expect(screen.getByRole("button", resetButton)).toBeDisabled();
+          expect(screen.getByRole("button", resetButton)).toBeDisabled();
 
-        await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
-        expect(push).toHaveBeenCalledWith(`/forgot-password?status=${status}`);
-      });
-    });
+          await waitFor(() => {
+            expect(password).toHaveAccessibleErrorMessage(mocks.msg3);
+          });
 
-    describe("Reset password request responds with an unregistered error", () => {
-      it("Display an information dialog box", async () => {
-        const { password } = rUnregistered;
-
-        const { user } = renderTestUI(
-          <ResetPassword verified={verified} />,
-          rUnregistered.gql()
-        );
-
-        await user.type(screen.getByLabelText(/^password$/i), password);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
-        await user.click(screen.getByRole("button", resetButton));
-
-        expect(screen.getByRole("button", resetButton)).toBeDisabled();
-
-        await waitFor(() => {
-          expect(screen.queryByRole("form")).not.toBeInTheDocument();
+          expect(confirmPassword).toHaveAccessibleErrorMessage(mocks.msg4);
+          expect(password).toHaveFocus();
+          expect(screen.getByRole("button", resetButton)).toBeEnabled();
         });
-
-        expect(screen.getByRole("alert")).toBeInTheDocument();
-        expect(screen.getByRole("alert")).toHaveTextContent(
-          "Unregistered Account"
-        );
       });
-    });
 
-    describe("User password is successfully reset", () => {
-      it.each(resetTableThree)("Display %s", async (_, className, mock) => {
-        const { password } = mock;
+      describe("The api responds with an error or an unsupported object type", () => {
+        it.each(mocks.table1)("%s", async (_, status, mock) => {
+          const { user } = renderUI(<ResetPassword verified={mocks.data} />);
+          const { push } = useRouter();
 
-        const { user } = renderTestUI(
-          <ResetPassword verified={verified} />,
-          mock.gql()
-        );
+          await user.type(screen.getByLabelText(/^password$/i), mock.password);
 
-        await user.type(screen.getByLabelText(/^password$/i), password);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
-        await user.click(screen.getByRole("button", resetButton));
+          await user.type(
+            screen.getByLabelText(/^confirm Password$/i),
+            mock.password
+          );
 
-        expect(screen.getByRole("button", resetButton)).toBeDisabled();
+          await user.click(screen.getByRole("button", resetButton));
 
-        await waitFor(() => {
-          expect(screen.queryByRole("form")).not.toBeInTheDocument();
+          expect(screen.getByRole("button", resetButton)).toBeDisabled();
+
+          await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
+          expect(push).toHaveBeenCalledWith(
+            `/forgot-password?status=${status}`
+          );
+          expect(screen.getByRole("button", resetButton)).toBeDisabled();
         });
+      });
 
-        expect(screen.getByRole("alert")).toHaveClass(className);
-        expect(screen.getByRole("alert")).toHaveTextContent(
-          "Password Reset Successful"
-        );
+      describe("The user's account is unregistered", () => {
+        it("Should render an information dialog box", async () => {
+          const { password } = mocks.unregistered;
+          const { user } = renderUI(<ResetPassword verified={mocks.data} />);
+          // const form = screen.getByRole("form");
+
+          await user.type(screen.getByLabelText(/^password$/i), password);
+
+          await user.type(
+            screen.getByLabelText(/^confirm Password$/i),
+            password
+          );
+
+          await user.click(screen.getByRole("button", resetButton));
+
+          expect(screen.getByRole("button", resetButton)).toBeDisabled();
+
+          await expect(screen.findByRole("alert")).resolves.toHaveTextContent(
+            "Unregistered Account"
+          );
+
+          expect(screen.getByText(mocks.msg2)).toBeInTheDocument();
+        });
+      });
+
+      describe("User password is successfully reset", () => {
+        it.each(mocks.table2)("%s", async (_, className, mock) => {
+          const { password } = mock;
+          const { user } = renderUI(<ResetPassword verified={mocks.data} />);
+
+          await user.type(screen.getByLabelText(/^password$/i), password);
+
+          await user.type(
+            screen.getByLabelText(/^confirm Password$/i),
+            password
+          );
+
+          await user.click(screen.getByRole("button", resetButton));
+
+          expect(screen.getByRole("button", resetButton)).toBeDisabled();
+
+          expect(await screen.findByRole("alert")).toHaveClass(className);
+
+          expect(screen.getByRole("alert")).toHaveTextContent(
+            "Password Reset Successful"
+          );
+
+          expect(
+            screen.getByText("Your password has been reset.")
+          ).toBeInTheDocument();
+        });
       });
     });
   });

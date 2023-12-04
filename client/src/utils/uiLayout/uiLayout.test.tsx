@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 
 import uiLayout from ".";
 import TestLayout from "@layouts/TestLayout";
-import { renderTestUI } from "@utils/renderTestUI";
+import { renderUI } from "../tests/renderUI";
 
 const page = <div>Testing Page</div>;
 
@@ -11,7 +11,7 @@ describe("Page Layout Utility Function", () => {
     const layout = uiLayout(TestLayout, { title: "Testing" });
     const ui = layout(page, false, null);
 
-    renderTestUI(ui);
+    renderUI(ui);
 
     expect(screen.queryByText("Testing Page")).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -22,7 +22,7 @@ describe("Page Layout Utility Function", () => {
     const layout = uiLayout(TestLayout, { title: "Testing" });
     const ui = layout(page, true, "An error has occurred");
 
-    renderTestUI(ui);
+    renderUI(ui);
 
     expect(screen.queryByText("Testing Page")).not.toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("Page Layout Utility Function", () => {
     const layout = uiLayout(TestLayout, { title: "Testing" });
     const ui = layout(page, true, null);
 
-    renderTestUI(ui);
+    renderUI(ui);
 
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();

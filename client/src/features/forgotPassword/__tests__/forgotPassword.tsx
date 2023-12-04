@@ -3,40 +3,33 @@ import { useRouter } from "next/router";
 import { screen, waitFor } from "@testing-library/react";
 
 import ForgotPassword from "@pages/forgot-password";
-import { renderTestUI } from "@utils/renderTestUI";
-import {
-  registration,
-  statusTable,
-  success,
-  testTable,
-  unsupported,
-  validation,
-} from "../utils/forgotPassword.mocks";
+import { renderUI } from "@utils/tests/renderUI";
+import * as mocks from "../utils/forgotPassword.mocks";
 
 describe("Forgot Password Page", () => {
   const textBox = { name: /e-?mail/i };
   const name = "Send Reset Link";
 
-  describe("After redirect from reset password page, get status token from page url query", () => {
+  describe("On redirect from the reset password page", () => {
     afterAll(() => {
       const router = useRouter();
       router.query = {};
     });
 
-    it.each(statusTable)("%s", (_, status, message) => {
+    it.each(mocks.statusTable)("%s", (_, status, message) => {
       const router = useRouter();
       router.query = { status };
 
-      renderTestUI(<ForgotPassword />);
+      renderUI(<ForgotPassword />);
 
       expect(screen.getByRole("alert")).toHaveTextContent(message);
       expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardInfo");
     });
   });
 
-  describe("On client side validation of the forgot password form", () => {
-    it("Display email error message if email field is empty", async () => {
-      const { user } = renderTestUI(<ForgotPassword />);
+  describe("Client side forgot password form validation", () => {
+    it("Should display an email error message if the email field has an empty value", async () => {
+      const { user } = renderUI(<ForgotPassword />);
 
       await user.click(screen.getByRole("button", { name }));
 
@@ -45,8 +38,8 @@ describe("Forgot Password Page", () => {
       );
     });
 
-    it("Display invalid email error message when user enters an invalid email", async () => {
-      const { user } = renderTestUI(<ForgotPassword />);
+    it("Should display an invalid email error message when the user enters an invalid email", async () => {
+      const { user } = renderUI(<ForgotPassword />);
 
       await user.type(screen.getByRole("textbox"), "invalid_email");
       await user.click(screen.getByRole("button", { name }));
@@ -57,83 +50,81 @@ describe("Forgot Password Page", () => {
     });
   });
 
-  describe("Server responds with an error object type", () => {
-    it("Set an error on the email field if error is a validation error", async () => {
-      const { user } = renderTestUI(<ForgotPassword />, validation.gql());
-      const { emailError } = validation;
+  describe("Make forgot password api request", () => {
+    beforeAll(() => {
+      mocks.server.listen({ onUnhandledRequest: "error" });
+    });
 
-      await user.type(screen.getByRole("textbox", textBox), validation.email);
-      await user.click(screen.getByRole("button", { name }));
+    afterAll(() => {
+      mocks.server.close();
+    });
 
-      expect(screen.getByRole("button", { name })).toBeDisabled();
+    describe("Api response is a validation error", () => {
+      it("Should set an error message on the email input field", async () => {
+        const { user } = renderUI(<ForgotPassword />);
+        const { message, email } = mocks.validation;
 
-      await waitFor(() => {
-        expect(
-          screen.getByRole("textbox", textBox)
-        ).toHaveAccessibleErrorMessage(emailError);
+        await user.type(screen.getByRole("textbox", textBox), email);
+        await user.click(screen.getByRole("button", { name }));
+
+        expect(screen.getByRole("button", { name })).toBeDisabled();
+
+        await waitFor(() => {
+          expect(
+            screen.getByRole("textbox", textBox)
+          ).toHaveAccessibleErrorMessage(message);
+        });
+
+        expect(screen.getByRole("textbox")).toHaveFocus();
+        expect(screen.getByRole("button", { name })).toBeEnabled();
       });
-
-      expect(screen.getByRole("textbox")).toHaveFocus();
-      expect(screen.getByRole("button", { name })).toBeEnabled();
     });
 
-    it.each(testTable)("Show an alert message if %s", async (_, expected) => {
-      const { user } = renderTestUI(<ForgotPassword />, expected.gql());
+    describe("Api response is an error or an unsupported object type", () => {
+      it.each(mocks.testTable)("%s", async (_, expected) => {
+        const { user } = renderUI(<ForgotPassword />);
 
-      await user.type(screen.getByRole("textbox", textBox), expected.email);
-      await user.click(screen.getByRole("button", { name }));
+        await user.type(screen.getByRole("textbox", textBox), expected.email);
+        await user.click(screen.getByRole("button", { name }));
 
-      expect(screen.getByRole("button", { name })).toBeDisabled();
+        expect(screen.getByRole("button", { name })).toBeDisabled();
 
-      const alert = await screen.findByRole("alert");
+        const alert = await screen.findByRole("alert");
 
-      expect(alert).toHaveTextContent(expected.message);
-      expect(alert).toHaveClass("MuiAlert-standardError");
-      expect(screen.getByRole("button", { name })).toBeEnabled();
+        expect(alert).toHaveTextContent(expected.message);
+        expect(alert).toHaveClass("MuiAlert-standardError");
+        expect(screen.getByRole("button", { name })).toBeEnabled();
+      });
     });
 
-    it("Show an info dialog box if email is for an unregistered account", async () => {
-      const { user } = renderTestUI(<ForgotPassword />, registration.gql());
+    describe("Provided email belongs to an unregistered account", () => {
+      it("Should render an info dialog box", async () => {
+        const { user } = renderUI(<ForgotPassword />);
+        const { email, message } = mocks.registration;
 
-      await user.type(screen.getByRole("textbox", textBox), registration.email);
-      await user.click(screen.getByRole("button", { name }));
+        await user.type(screen.getByRole("textbox", textBox), email);
+        await user.click(screen.getByRole("button", { name }));
 
-      expect(screen.getByRole("button", { name })).toBeDisabled();
-      expect(await screen.findByRole("presentation")).toBeInTheDocument();
-      expect(screen.getByRole("presentation")).toHaveTextContent(
-        "It appears the account belonging to the e-mail address you provided has not been registered yet"
-      );
+        expect(screen.getByRole("button", { name })).toBeDisabled();
+        await expect(screen.findByText(message)).resolves.toBeInTheDocument();
+      });
     });
-  });
 
-  describe("On success response from the server", () => {
-    it("Display a success dialog box", async () => {
-      const { user } = renderTestUI(<ForgotPassword />, success.gql());
-      const alertMessage = "Request Link Sent";
+    describe("On forgot password request success", () => {
+      it("Should render a success dialog box", async () => {
+        const { user } = renderUI(<ForgotPassword />);
+        const { email, message } = mocks.success;
 
-      await user.type(screen.getByRole("textbox", textBox), success.email);
-      await user.click(screen.getByRole("button", { name }));
+        await user.type(screen.getByRole("textbox", textBox), email);
+        await user.click(screen.getByRole("button", { name }));
 
-      expect(screen.getByRole("button", { name })).toBeDisabled();
-      expect(await screen.findByRole("presentation")).toBeInTheDocument();
-      expect(screen.getByRole("alert")).toHaveTextContent(alertMessage);
-    });
-  });
+        expect(screen.getByRole("button", { name })).toBeDisabled();
 
-  describe("If server responds with an unsupported object type", () => {
-    it("Show an error alert message", async () => {
-      const { user } = renderTestUI(<ForgotPassword />, unsupported.gql());
+        const alert = await screen.findByRole("alert");
 
-      await user.type(screen.getByRole("textbox", textBox), unsupported.email);
-      await user.click(screen.getByRole("button", { name }));
-
-      expect(screen.getByRole("button", { name })).toBeDisabled();
-
-      const alert = await screen.findByRole("alert");
-
-      expect(alert).toHaveTextContent(unsupported.message);
-      expect(alert).toHaveClass("MuiAlert-standardError");
-      expect(screen.getByRole("button", { name })).toBeEnabled();
+        expect(alert).toHaveTextContent("Request Link Sent");
+        expect(screen.getByText(message)).toBeInTheDocument();
+      });
     });
   });
 });

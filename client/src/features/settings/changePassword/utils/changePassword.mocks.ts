@@ -1,217 +1,125 @@
 import { GraphQLError } from "graphql";
-import type { MockedResponse } from "@apollo/client/testing";
+import { graphql } from "msw";
+import { setupServer } from "msw/node";
 
 import { CHANGE_PASSWORD } from "../operations/CHANGE_PASSWORD";
+import { mswData, mswErrors } from "@utils/tests/msw";
 
-interface Data {
-  message: string;
-  typename: string;
-  status?: "ERROR" | "SUCCESS" | "WARN";
-}
+const passwordStr = (prefix: string) => `${prefix}_N3w_p@55w0rD`;
 
-interface RedirectTable {
-  gql: () => MockedResponse[];
-  currentPassword: string;
-  password: string;
-}
+export const currentPassword = "us3r_currenT_P@ssw0rd";
+export const currentErrorMsg = "Provide current password";
+export const newErrorMsg = "Password must be at least 8 characters long";
+export const confirmErrorMsg = "Passwords do not match";
+const responseMsg = "Password changed";
+const serverMsg = "Unable to change password";
+const gqlErrorMsg = "Something went wrong. Please try again later";
 
-interface AlertTable extends RedirectTable {
-  message: string;
-}
-
-const CURRENT_PASSWORD = "current_password";
-const PASSWORD = "Pass!W0rd";
-const notAllowedMsg =
+const notAllowedErrorMsg =
   "Unable to change password. 'current password' does not match your account";
+
 const msg =
   "You are unable to change your password at the moment. Please try again later";
 
-const request = (
-  currentPassword: string,
-  password: string
-): MockedResponse["request"] => {
-  return {
-    query: CHANGE_PASSWORD,
-    variables: {
-      currentPassword,
-      newPassword: password,
-      confirmNewPassword: password,
-    },
-  };
-};
+export const server = setupServer(
+  graphql.mutation(CHANGE_PASSWORD, ({ variables: { newPassword } }) => {
+    if (newPassword === passwordStr("validate")) {
+      return mswData("changePassword", "ChangePasswordValidationError", {
+        currentPasswordError: currentErrorMsg,
+        newPasswordError: newErrorMsg,
+        confirmNewPasswordError: confirmErrorMsg,
+      });
+    }
 
-class MockOne {
-  currentPassword: string;
-  password: string;
+    if (newPassword === passwordStr("auth")) {
+      return mswData("changePassword", "AuthenticationError");
+    }
 
-  constructor(name: string, readonly typename: string) {
-    this.currentPassword = `${name}_${CURRENT_PASSWORD}`;
-    this.password = `${name}_${PASSWORD}`;
-  }
+    if (newPassword === passwordStr("not_allowed")) {
+      return mswData("changePassword", "NotAllowedError");
+    }
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.currentPassword, this.password),
-        result: { data: { changePassword: { __typename: this.typename } } },
-      },
-    ];
-  }
-}
+    if (newPassword === passwordStr("register")) {
+      return mswData("changePassword", "RegistrationError");
+    }
 
-class MockTwo {
-  currentPassword: string;
-  password: string;
-  message: string;
-  typename: string;
+    if (newPassword === passwordStr("response")) {
+      return mswData("changePassword", "Response", { message: responseMsg });
+    }
 
-  constructor(name: string, data: Data) {
-    this.currentPassword = `${name}_${CURRENT_PASSWORD}`;
-    this.password = `${name}_${PASSWORD}`;
-    this.message = data.message;
-    this.typename = data.typename;
-  }
+    if (newPassword === passwordStr("server")) {
+      return mswData("changePassword", "ServerError", { message: serverMsg });
+    }
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.currentPassword, this.password),
-        result: { data: { changePassword: { __typename: this.typename } } },
-      },
-    ];
-  }
-}
+    if (newPassword === passwordStr("unknown")) {
+      return mswData("changePassword", "UnknownError");
+    }
 
-class MockThree {
-  currentPassword: string;
-  password: string;
-  message: string;
-  typename: string;
+    if (newPassword === passwordStr("unsupported")) {
+      return mswData("changePassword", "UnsupportedType");
+    }
 
-  constructor(name: string, data: Data) {
-    this.currentPassword = `${name}_${CURRENT_PASSWORD}`;
-    this.password = `${name}_${PASSWORD}`;
-    this.message = data.message;
-    this.typename = data.typename;
-  }
+    if (newPassword === passwordStr("network")) {
+      return mswErrors(new Error(), { status: 503 });
+    }
 
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.currentPassword, this.password),
-        result: {
-          data: {
-            changePassword: {
-              __typename: this.typename,
-              message: this.message,
-            },
-          },
-        },
-      },
-    ];
-  }
-}
+    if (newPassword === passwordStr("graphql")) {
+      return mswErrors(new GraphQLError(gqlErrorMsg));
+    }
+  })
+);
 
-const auth = new MockOne("auth", "AuthenticationError");
-const unknown = new MockOne("unknown", "UnknownError");
-const register = new MockOne("register", "RegistrationError");
-
-const notAllowed = new MockTwo("notAllowed", {
-  message: notAllowedMsg,
-  typename: "NotAllowedError",
+const mock = <T extends string | undefined = undefined>(
+  prefix: string,
+  message: T
+) => ({
+  message,
+  password: passwordStr(prefix),
 });
 
-const unsupported = new MockTwo("unsupported", {
-  message: msg,
-  typename: "UnsupportedType",
-});
+export const validation = mock("validate", undefined);
+const response = mock("response", responseMsg);
+const auth = mock("auth", undefined);
+const unknown = mock("unknown", undefined);
+const register = mock("register", undefined);
+const allow = mock("not_allowed", notAllowedErrorMsg);
+const serverError = mock("server", serverMsg);
+const gql = mock("graphql", gqlErrorMsg);
+const network = mock("network", msg);
+const unsupported = mock("unsupported", msg);
 
-const server = new MockThree("server", {
-  message: "Unable to change password",
-  typename: "ServerError",
-});
-
-const response = new MockThree("response", {
-  message: "Password changed",
-  typename: "Response",
-});
-
-export const validation = {
-  currentPassword: `validation_${CURRENT_PASSWORD}`,
-  password: `validation_${PASSWORD}`,
-  currentPasswordError: "Provide current password",
-  newPasswordError: "Password must be at least 8 characters long",
-  confirmNewPasswordError: "Passwords do not match",
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.currentPassword, this.password),
-        result: {
-          data: {
-            changePassword: {
-              __typename: "ChangePasswordValidationError",
-              currentPasswordError: this.currentPasswordError,
-              newPasswordError: this.newPasswordError,
-              confirmNewPasswordError: this.confirmNewPasswordError,
-            },
-          },
-        },
-      },
-    ];
-  },
-};
-
-const network = {
-  currentPassword: `network_${CURRENT_PASSWORD}`,
-  password: `network_${PASSWORD}`,
-  message: msg,
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.currentPassword, this.password),
-        error: new Error(this.message),
-      },
-    ];
-  },
-};
-
-const graphql = {
-  currentPassword: `graphql_${CURRENT_PASSWORD}`,
-  password: `graphql_${PASSWORD}`,
-  message: "Something went wrong. Please try again later",
-  gql(): MockedResponse[] {
-    return [
-      {
-        request: request(this.currentPassword, this.password),
-        result: { errors: [new GraphQLError(this.message)] },
-      },
-    ];
-  },
-};
-
-export const redirectTable: [string, string[], RedirectTable][] = [
+export const table: [string, [string, string], ReturnType<typeof mock>][] = [
   [
-    "Redirect to the login page if the user is not logged in",
+    "Should redirect the user to the login page if the user is not logged in",
     ["/login", "unauthenticated"],
     auth,
   ],
   [
-    "Redirect to register page if the user is unregistered",
+    "Should redirect the user to the register page if the user is unregistered",
     ["/register", "unregistered"],
     register,
   ],
   [
-    "Redirect to the login page if the user could not be verified",
+    "Should redirect the user to the login page if the user could not be verified",
     ["/login", "unauthorized"],
     unknown,
   ],
 ];
 
-export const alertTable: [string, AlertTable][] = [
-  ["If the provided password does not match the account password", notAllowed],
-  ["If the user's password could not be changed", server],
-  ["If the request throws a graphql error response", graphql],
-  ["If the request resolves with a network error", network],
-  ["If the server responds with an unsupported object type", unsupported],
-  ["If the change password request is successful", response],
+const text = "Should display an alert toast if the";
+export const alerts: [string, [string, ReturnType<typeof mock<string>>][]][] = [
+  [
+    "Api response is an error or an unsupported object type",
+    [
+      [`${text} current password does not match the account password`, allow],
+      [`${text} user's password could not be changed`, serverError],
+      [`${text} api throws a graphql error`, gql],
+      [`${text} request failed with a network error`, network],
+      [`${text} api responded with an unsupported object type`, unsupported],
+    ],
+  ],
+  [
+    "Password successfully changed",
+    [[`${text} change password request was successful`, response]],
+  ],
 ];

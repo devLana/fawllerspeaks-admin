@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 
 import Personalize from "@pages/settings/personalization";
-import { renderTestUI } from "@utils/renderTestUI";
+import { renderUI } from "@utils/tests/renderUI";
 import { DEFAULT_THEME } from "@utils/constants";
 import type { AppTheme } from "@types";
 
@@ -21,8 +21,8 @@ describe("Personalization Settings", () => {
   });
 
   describe("App theme", () => {
-    it("Should read default theme mode from storage and save new theme mode to storage", async () => {
-      const { user } = renderTestUI(<Personalize />);
+    it("Should read the default theme mode from localStorage and save the new theme mode to localStorage", async () => {
+      const { user } = renderUI(<Personalize />);
 
       expect(screen.getByRole("radio", { name: /^sunset$/i })).toBeChecked();
 
@@ -49,8 +49,8 @@ describe("Personalization Settings", () => {
   });
 
   describe("Font size", () => {
-    it("Should read default font size from localStorage", () => {
-      renderTestUI(<Personalize />);
+    it("Should read the default font size from localStorage", () => {
+      renderUI(<Personalize />);
 
       expect(
         screen.getByRole("slider", { name: /^change font size$/i })
@@ -59,8 +59,8 @@ describe("Personalization Settings", () => {
   });
 
   describe("Default color", () => {
-    it("Should read default color from storage and save new color to localStorage", async () => {
-      const { user } = renderTestUI(<Personalize />);
+    it("Should read the default color from localStorage and save the new color to localStorage", async () => {
+      const { user } = renderUI(<Personalize />);
 
       expect(screen.getByRole("button", { name: /^gray$/i })).toContainElement(
         screen.getByTestId("CheckIcon")

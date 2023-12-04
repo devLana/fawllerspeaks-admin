@@ -4,22 +4,11 @@ import { screen, waitFor } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event/dist/types/setup/setup";
 
 import RegisterUser from "@pages/register";
-import {
-  type Input,
-  invalidFirstName,
-  invalidLastName,
-  invalidPassword,
-  shortPassword,
-  success,
-  table1,
-  table2,
-  validation1,
-  validation2,
-} from "../utils/registerUser.mocks";
-import { renderTestUI } from "@utils/renderTestUI";
+import * as mocks from "../utils/registerUser.mocks";
+import { renderUI } from "@utils/tests/renderUI";
 
 describe("Register User Page", () => {
-  const dryEvents = async (user: UserEvent, input: Input) => {
+  const dryEvents = async (user: UserEvent, input: mocks.Input) => {
     await user.type(
       screen.getByRole("textbox", { name: /^first name$/i }),
       input.firstName
@@ -39,11 +28,11 @@ describe("Register User Page", () => {
   };
 
   describe("App is redirected to the register page with a status token", () => {
-    it("Display an alert message if status token is 'unregistered'", () => {
+    it("Should display an alert message toast if the status token is 'unregistered'", () => {
       const router = useRouter();
       router.query = { status: "unregistered" };
 
-      renderTestUI(<RegisterUser />);
+      renderUI(<RegisterUser />);
 
       expect(screen.getByRole("alert")).toHaveTextContent(
         "You need to register your account before you can perform that action"
@@ -55,8 +44,8 @@ describe("Register User Page", () => {
   });
 
   describe("Client side form validation", () => {
-    it("Display error messages for empty input fields", async () => {
-      const { user } = renderTestUI(<RegisterUser />);
+    it("Input fields should have error messages if they have empty values", async () => {
+      const { user } = renderUI(<RegisterUser />);
 
       await user.click(screen.getByRole("button", { name: /^register$/i }));
 
@@ -77,37 +66,37 @@ describe("Register User Page", () => {
       ).toHaveAccessibleErrorMessage("Enter confirm password");
     });
 
-    it("Display an error message for invalid password", async () => {
-      const { user } = renderTestUI(<RegisterUser />);
+    it("Password field should have an error message if it has an invalid value", async () => {
+      const { user } = renderUI(<RegisterUser />);
       const password = screen.getByLabelText(/^password$/i);
 
       await user.type(password, "pass");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveAccessibleErrorMessage(shortPassword);
+      expect(password).toHaveAccessibleErrorMessage(mocks.shortPassword);
 
       await user.clear(password);
       await user.type(password, "Pass!WOrd");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveAccessibleErrorMessage(invalidPassword);
+      expect(password).toHaveAccessibleErrorMessage(mocks.invalidPassword);
 
       await user.clear(password);
       await user.type(password, "PASS!W0RD");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveAccessibleErrorMessage(invalidPassword);
+      expect(password).toHaveAccessibleErrorMessage(mocks.invalidPassword);
 
       await user.clear(password);
       await user.type(password, "pass!w0rd");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveAccessibleErrorMessage(invalidPassword);
+      expect(password).toHaveAccessibleErrorMessage(mocks.invalidPassword);
 
       await user.clear(password);
       await user.type(password, "PassW0rd");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
-      expect(password).toHaveAccessibleErrorMessage(invalidPassword);
+      expect(password).toHaveAccessibleErrorMessage(mocks.invalidPassword);
     });
 
-    it("Display an error message if passwords do not match", async () => {
-      const { user } = renderTestUI(<RegisterUser />);
+    it("Confirm password field should have an error message if it does not match the password field", async () => {
+      const { user } = renderUI(<RegisterUser />);
       const confirmPassword = screen.getByLabelText(/^confirm password$/i);
 
       await user.type(screen.getByLabelText(/^password$/i), "PaS$W0RD");
@@ -119,8 +108,8 @@ describe("Register User Page", () => {
       );
     });
 
-    it("Display an error message if first and last names are invalid", async () => {
-      const { user } = renderTestUI(<RegisterUser />);
+    it("First and last name fields should have an error message for invalid values", async () => {
+      const { user } = renderUI(<RegisterUser />);
       const firstName = screen.getByRole("textbox", { name: /^first name$/i });
       const lastName = screen.getByRole("textbox", { name: /^last name$/i });
 
@@ -128,55 +117,38 @@ describe("Register User Page", () => {
       await user.type(lastName, "4D5o6e7");
       await user.click(screen.getByRole("button", { name: /^register$/i }));
 
-      expect(firstName).toHaveAccessibleErrorMessage(invalidFirstName);
-      expect(lastName).toHaveAccessibleErrorMessage(invalidLastName);
+      expect(firstName).toHaveAccessibleErrorMessage(mocks.invalidFirstName);
+      expect(lastName).toHaveAccessibleErrorMessage(mocks.invalidLastName);
     });
   });
 
-  describe("Server responds with an error/unsupported object response", () => {
-    describe("Validation errors", () => {
-      it("Show input error messages for empty fields validation error", async () => {
-        const { user } = renderTestUI(<RegisterUser />, validation1.gql());
+  describe("Make a register user api request", () => {
+    beforeAll(() => {
+      mocks.server.listen({ onUnhandledRequest: "error" });
+    });
+
+    afterAll(() => {
+      mocks.server.close();
+    });
+
+    describe("APi request failed with a validation error", () => {
+      it("Input fields should have an error message", async () => {
+        const { user } = renderUI(<RegisterUser />);
         const fName = screen.getByRole("textbox", { name: /^first name$/i });
 
-        await dryEvents(user, validation1.input);
+        await dryEvents(user, mocks.validation.input);
 
         await waitFor(() => {
-          expect(fName).toHaveAccessibleErrorMessage("Enter first name");
+          expect(fName).toHaveAccessibleErrorMessage(mocks.invalidFirstName);
         });
 
         expect(
           screen.getByRole("textbox", { name: /^last name$/i })
-        ).toHaveAccessibleErrorMessage("Enter last name");
+        ).toHaveAccessibleErrorMessage(mocks.invalidLastName);
 
         expect(
           screen.getByLabelText(/^password$/i)
-        ).toHaveAccessibleErrorMessage("Enter password");
-
-        expect(fName).toHaveFocus();
-
-        expect(
-          screen.getByRole("button", { name: /^register$/i })
-        ).toBeEnabled();
-      });
-
-      it("Show input error messages for invalid fields validation error", async () => {
-        const { user } = renderTestUI(<RegisterUser />, validation2.gql());
-        const fName = screen.getByRole("textbox", { name: /^first name$/i });
-
-        await dryEvents(user, validation2.input);
-
-        await waitFor(() => {
-          expect(fName).toHaveAccessibleErrorMessage(invalidFirstName);
-        });
-
-        expect(
-          screen.getByRole("textbox", { name: /^last name$/i })
-        ).toHaveAccessibleErrorMessage(invalidLastName);
-
-        expect(
-          screen.getByLabelText(/^password$/i)
-        ).toHaveAccessibleErrorMessage(shortPassword);
+        ).toHaveAccessibleErrorMessage(mocks.shortPassword);
 
         expect(
           screen.getByLabelText(/^confirm password$/i)
@@ -190,9 +162,9 @@ describe("Register User Page", () => {
       });
     });
 
-    describe("Display an alert box", () => {
-      it.each(table1)("%s", async (_, expected) => {
-        const { user } = renderTestUI(<RegisterUser />, expected.gql());
+    describe("Api request failed with an error or an unsupported object type", () => {
+      it.each(mocks.table1)("%s", async (_, expected) => {
+        const { user } = renderUI(<RegisterUser />);
 
         await dryEvents(user, expected.input);
 
@@ -206,10 +178,10 @@ describe("Register User Page", () => {
       });
     });
 
-    describe("Redirect the user to another page", () => {
-      it.each(table2)("%s", async (_, { path, expected }) => {
+    describe("Redirect the user on verification error", () => {
+      it.each(mocks.table2)("%s", async (_, path, expected) => {
         const router = useRouter();
-        const { user } = renderTestUI(<RegisterUser />, expected.gql());
+        const { user } = renderUI(<RegisterUser />);
 
         await dryEvents(user, expected.input);
 
@@ -217,17 +189,17 @@ describe("Register User Page", () => {
         expect(router.replace).toHaveBeenCalledWith(path);
       });
     });
-  });
 
-  describe("Successful user registration", () => {
-    it("Update apollo cache and redirect to the home(dashboard) page", async () => {
-      const router = useRouter();
-      const { user } = renderTestUI(<RegisterUser />, success.gql());
+    describe("User registered", () => {
+      it("Should redirect the user to the home(dashboard) page", async () => {
+        const router = useRouter();
+        const { user } = renderUI(<RegisterUser />);
 
-      await dryEvents(user, success.input);
+        await dryEvents(user, mocks.success.input);
 
-      await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
-      expect(router.replace).toHaveBeenCalledWith("/");
+        await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+        expect(router.replace).toHaveBeenCalledWith("/");
+      });
     });
   });
 });

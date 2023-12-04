@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 
 import AuthLayoutThemeButton from "../components/AuthLayoutThemeButton";
-import { renderTestUI } from "@utils/renderTestUI";
+import { renderUI } from "@utils/tests/renderUI";
 import { DEFAULT_THEME } from "@utils/constants";
 
 const storageTheme = (theme: string) => {
@@ -17,8 +17,8 @@ describe("Auth Root Layout Theme Button", () => {
     localStorage.removeItem(DEFAULT_THEME);
   });
 
-  it("Change app theme when theme menu item is clicked", async () => {
-    const { user } = renderTestUI(<AuthLayoutThemeButton />);
+  it("Should change app theme when theme menu item is clicked", async () => {
+    const { user } = renderUI(<AuthLayoutThemeButton />);
 
     expect(
       screen.getByRole("button", { name: /^sunny$/i })
@@ -48,9 +48,9 @@ describe("Auth Root Layout Theme Button", () => {
     expect(screen.getAllByRole("menuitem")[2]).toHaveClass("Mui-selected");
   });
 
-  it("On initial render read default theme from local storage", async () => {
+  it("Should read default theme from localStorage on initial render", async () => {
     localStorage.setItem(DEFAULT_THEME, storageTheme("sunset"));
-    const { user } = renderTestUI(<AuthLayoutThemeButton />);
+    const { user } = renderUI(<AuthLayoutThemeButton />);
 
     expect(
       screen.getByRole("button", { name: /^sunset$/i })
