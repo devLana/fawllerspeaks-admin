@@ -31,9 +31,42 @@ const getPostTags: GetPostTags = async (_, __, { db, user }) => {
         tag_id id,
         date_created "dateCreated",
         last_Modified "lastModified"
-      FROM post_tags
-      ORDER BY name`
+      FROM post_tags`
     );
+
+    tags.sort(({ name: tagName1 }, { name: tagName2 }) => {
+      const match1 = tagName1.match(/^\d+/);
+
+      if (match1) {
+        const match = tagName2.match(/^\d+/);
+
+        if (!match) return -1;
+
+        return +match1[0] - +match[0];
+      }
+
+      const match2 = tagName1.match(/\d+$/);
+
+      if (match2) {
+        if (/^\d+/.test(tagName2)) return 1;
+
+        const match = tagName2.match(/\d+$/);
+
+        if (match) return +match2[0] - +match[0];
+
+        return 1;
+      }
+
+      if (/^\d+/.test(tagName2)) return 1;
+
+      if (/\d+$/.test(tagName2)) return -1;
+
+      if (tagName1.toLowerCase() < tagName2.toLowerCase()) return -1;
+
+      if (tagName1.toLowerCase() > tagName2.toLowerCase()) return 1;
+
+      return 0;
+    });
 
     return new PostTags(tags);
   } catch {
