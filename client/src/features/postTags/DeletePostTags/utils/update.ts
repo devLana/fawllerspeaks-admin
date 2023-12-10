@@ -1,9 +1,17 @@
+import type { Reference } from "@apollo/client";
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
+
 import type { Mutation } from "@apiTypes";
-import type { CachePostTags } from "@types";
 
 type Update = MutationBaseOptions<Pick<Mutation, "deletePostTags">>["update"];
-type GetPostTagsRef = CachePostTags["getPostTags"];
+
+interface PostTagRefs {
+  tags: Reference[];
+}
+
+interface CachePostTags {
+  getPostTags: PostTagRefs;
+}
 
 export const update: Update = (cache, { data }) => {
   if (data?.deletePostTags.__typename === "PostTags") {
@@ -13,10 +21,10 @@ export const update: Update = (cache, { data }) => {
       deletedPostTagsIds.add(tag.id);
     });
 
-    cache.modify({
+    cache.modify<CachePostTags>({
       fields: {
-        getPostTags(getPostTagsRef: GetPostTagsRef, { readField }) {
-          const updatedTags = getPostTagsRef.tags.filter(tagRef => {
+        getPostTags(getPostTagsRef, { readField }) {
+          const tags = (getPostTagsRef as PostTagRefs).tags.filter(tagRef => {
             const id = readField("id", tagRef);
 
             if (typeof id !== "string") return false;
@@ -24,7 +32,7 @@ export const update: Update = (cache, { data }) => {
             return !deletedPostTagsIds.has(id);
           });
 
-          return { ...getPostTagsRef, tags: updatedTags };
+          return { ...getPostTagsRef, tags };
         },
       },
     });

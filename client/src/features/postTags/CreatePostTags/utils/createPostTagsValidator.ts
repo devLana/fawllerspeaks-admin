@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 export const createPostTagsValidator = (inputs: number[]) => {
-  const schemaObject: Record<string, yup.StringSchema> = {};
+  const schemaObject: Record<string, yup.StringSchema<string>> = {};
 
   for (const val of inputs) {
     const key = `post-tag-${val}`;
