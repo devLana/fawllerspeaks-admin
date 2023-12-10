@@ -7,7 +7,6 @@ import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
 import type { SxProps } from "@mui/material/styles";
 
 import type { MetaInfo } from "@components/Metadata";
-import type { Query } from "@apiTypes";
 
 export type ThemeMode = "sunny" | "sunset" | "pitch black";
 export type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";
@@ -48,11 +47,6 @@ export interface RootLayoutProps extends MetaInfo {
 
 type Keys = ((...theme: never[]) => unknown) | Record<string, unknown>;
 export type SxPropsArray = NonNullable<Exclude<SxProps, Keys>>;
-
-type ExtractPostTags = Extract<Query["getPostTags"], { tags: unknown[] }>;
-export interface CachePostTags {
-  getPostTags: Omit<ExtractPostTags, "status" | "__typename">;
-}
 
 export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
 
