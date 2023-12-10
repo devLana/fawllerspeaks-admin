@@ -111,7 +111,6 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
           <Typography variant="caption" fontSize="1em" fontWeight="bold">
             {name}
           </Typography>
-          &nbsp;
           {formatText(ids.length)}
         </DialogContentText>
         <DialogContentText sx={{ textAlign: "center" }}>
