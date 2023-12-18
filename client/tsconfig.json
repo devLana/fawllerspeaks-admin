@@ -27,7 +27,8 @@
       "@utils/*": ["utils/*"],
       "@lib/*": ["lib/*"],
       "@fragments/*": ["fragments/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".eslintrc.js"],
   "exclude": ["node_modules"]

@@ -8,7 +8,7 @@ module.exports = {
     "plugin:@typescript-eslint/strict",
     "next/core-web-vitals",
   ],
-  ignorePatterns: ["jest.config.mjs", "next.config.js", "jest.polyfills.js"],
+  ignorePatterns: ["next.config.js", "vitest.config.mts"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
@@ -18,27 +18,6 @@ module.exports = {
   },
   plugins: ["@typescript-eslint"],
   overrides: [
-    {
-      files: [
-        "**/__tests__/**/*.[jt]s?(x)",
-        "**/?(*.)+(spec|test).[jt]s?(x)",
-        "__mocks__/**/*",
-      ],
-      extends: ["plugin:jest/recommended", "plugin:jest/style"],
-      settings: { jest: { version: 29.5 } },
-      rules: {
-        /** Disable TypeScript ESLint Rules for {Jest ESLint Rules} Below */
-        "@typescript-eslint/unbound-method": 0,
-
-        /**Jest ESlint Rules */
-        "jest/no-untyped-mock-factory": 1,
-        "jest/prefer-comparison-matcher": 1,
-        "jest/prefer-equality-matcher": 1,
-        "jest/prefer-mock-promise-shorthand": 1,
-        "jest/prefer-todo": 1,
-        "jest/unbound-method": 2,
-      },
-    },
     {
       files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
       extends: ["plugin:testing-library/react"],
