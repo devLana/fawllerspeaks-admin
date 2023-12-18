@@ -51,7 +51,7 @@ describe("Verify user session", () => {
     });
 
     describe("Api response is either an error or an unsupported object type", () => {
-      it.each(mocks.tableOne)("%s", async (_, expected) => {
+      it.each(mocks.alerts)("%s", async (_, expected) => {
         localStorage.setItem(SESSION_ID, expected.sessionId);
 
         const { reload, replace } = useRouter();
@@ -91,8 +91,8 @@ describe("Verify user session", () => {
       });
     });
 
-    describe("Redirect the user based on the current route and the user authentication status", () => {
-      it.each(mocks.tableTwo)("%s", async (_, mock) => {
+    describe("Redirect the user to the login page if the current route is a protected route and the user's session could not be verified", () => {
+      it.each(mocks.redirects1)("%s", async (_, mock) => {
         const { replace } = useRouter();
 
         localStorage.setItem(SESSION_ID, mock.sessionId);
@@ -107,8 +107,10 @@ describe("Verify user session", () => {
         expect(screen.getByText(mocks.TEXT_NODE)).toBeInTheDocument();
         expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
       });
+    });
 
-      it.each(mocks.tableThree)("%s", async (_, pathname, mock) => {
+    describe("Render the authentication page at the current route if there was an error verifying the user's session", () => {
+      it.each(mocks.renders1)("%s", async (_, pathname, mock) => {
         const router = useRouter();
 
         router.pathname = pathname;
@@ -126,8 +128,8 @@ describe("Verify user session", () => {
     });
 
     describe("User session successfully verified", () => {
-      describe("User is redirected to one of the protected routes", () => {
-        it.each(mocks.tableFour)("%s", async (_, expected) => {
+      describe("Redirect the user to a protected route", () => {
+        it.each(mocks.redirects2)("%s", async (_, expected) => {
           const router = useRouter();
 
           localStorage.setItem(SESSION_ID, expected.mock.sessionId);
@@ -140,15 +142,15 @@ describe("Verify user session", () => {
           await waitFor(() => {
             expect(router.replace).toHaveBeenCalledTimes(1);
           });
-          expect(router.replace).toHaveBeenCalledWith(expected.to);
 
+          expect(router.replace).toHaveBeenCalledWith(expected.to);
           expect(screen.getByText(mocks.TEXT_NODE)).toBeInTheDocument();
           expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
         });
       });
 
-      describe("The page at the current protected route is rendered", () => {
-        it.each(mocks.tableFive)("%s", async (_, pathname, mock) => {
+      describe("Render the page at the current protected route", () => {
+        it.each(mocks.renders2)("%s", async (_, pathname, mock) => {
           const router = useRouter();
 
           localStorage.setItem(SESSION_ID, mock.sessionId);

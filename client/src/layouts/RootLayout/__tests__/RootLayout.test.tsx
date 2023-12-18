@@ -126,7 +126,7 @@ describe("Protected Pages Root Layout", () => {
       });
     });
 
-    describe("The user is redirect to the login page", () => {
+    describe("The user is redirected to the login page", () => {
       it.each(mocks.logout)("%s", async (_, data, path) => {
         localStorage.setItem(SESSION_ID, data.sessionId);
 

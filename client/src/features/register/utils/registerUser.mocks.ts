@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql } from "msw";
+import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { REGISTER_USER } from "../operations/REGISTER_USER";
@@ -26,8 +26,10 @@ const MESSAGE =
   "You are unable to register your account. Please try again later";
 
 export const server = setupServer(
-  graphql.mutation(REGISTER_USER, ({ variables: { userInput } }) => {
+  graphql.mutation(REGISTER_USER, async ({ variables: { userInput } }) => {
     const { password } = userInput as { password: string };
+
+    await delay();
 
     if (password === passwordStr("auth")) {
       return mswData("registerUser", "AuthenticationError");
@@ -91,8 +93,8 @@ class Mock<T extends string | undefined = undefined> {
   }
 }
 
-export const success = new Mock("success", undefined);
 export const validation = new Mock("validation", undefined);
+const success = new Mock("success", undefined);
 const auth = new Mock("auth", undefined);
 const unknown = new Mock("unknown", undefined);
 const registered = new Mock("registered", undefined);
@@ -101,26 +103,35 @@ const network = new Mock("network", MESSAGE);
 const gql = new Mock("graphql", MESSAGE);
 
 const text = "Should display an alert toast message if the api";
-export const table1: [string, Mock<string>][] = [
+export const alerts: [string, Mock<string>][] = [
   [`${text} throws a graphql error`, gql],
   [`${text} failed with a network error`, network],
   [`${text} responded with an unsupported object type`, unsupported],
 ];
 
-export const table2: [string, string, Mock][] = [
+export const redirects: [string, [string, string, Mock][]][] = [
   [
-    "Should redirect the user to the login page if the user is not logged in",
-    "/login?status=unauthenticated",
-    auth,
+    "Redirect the user on user verification error",
+    [
+      [
+        "Should redirect the user to the login page if the user is not logged in",
+        "/login?status=unauthenticated",
+        auth,
+      ],
+      [
+        "Should redirect the user to the login page if the user's credentials could not be verified",
+        "/login?status=unauthorized",
+        unknown,
+      ],
+      [
+        "Should redirect the user to the home(dashboard) page if the user has already registered their account",
+        "/?status=registered",
+        registered,
+      ],
+    ],
   ],
   [
-    "Should redirect the user to the login page if the user's credentials could not be verified",
-    "/login?status=unauthorized",
-    unknown,
-  ],
-  [
-    "Should redirect the user to the home(dashboard) page if the user has already registered their account",
-    "/?status=registered",
-    registered,
+    "User registered",
+    [["Should redirect the user to the home(dashboard) page", "/", success]],
   ],
 ];

@@ -163,7 +163,7 @@ describe("Register User Page", () => {
     });
 
     describe("Api request failed with an error or an unsupported object type", () => {
-      it.each(mocks.table1)("%s", async (_, expected) => {
+      it.each(mocks.alerts)("%s", async (_, expected) => {
         const { user } = renderUI(<RegisterUser />);
 
         await dryEvents(user, expected.input);
@@ -178,27 +178,15 @@ describe("Register User Page", () => {
       });
     });
 
-    describe("Redirect the user on verification error", () => {
-      it.each(mocks.table2)("%s", async (_, path, expected) => {
+    describe.each(mocks.redirects)("%s", (_, mockData) => {
+      it.each(mockData)("%s", async (__, path, mock) => {
         const router = useRouter();
         const { user } = renderUI(<RegisterUser />);
 
-        await dryEvents(user, expected.input);
+        await dryEvents(user, mock.input);
 
         await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
         expect(router.replace).toHaveBeenCalledWith(path);
-      });
-    });
-
-    describe("User registered", () => {
-      it("Should redirect the user to the home(dashboard) page", async () => {
-        const router = useRouter();
-        const { user } = renderUI(<RegisterUser />);
-
-        await dryEvents(user, mocks.success.input);
-
-        await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
-        expect(router.replace).toHaveBeenCalledWith("/");
       });
     });
   });

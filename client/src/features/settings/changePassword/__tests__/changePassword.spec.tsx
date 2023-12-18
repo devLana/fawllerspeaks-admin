@@ -122,10 +122,9 @@ describe("Change Password", () => {
     });
 
     describe("Redirect the user to an authentication page", () => {
-      it.each(mocks.table)("%s", async (_, [pathname, status], mock) => {
+      it.each(mocks.redirects)("%s", async (_, [pathname, status], mock) => {
         const { user } = renderUI(<ChangePassword />);
         const { replace } = useRouter();
-
         const currentPassword = screen.getByLabelText(/^current password$/i);
         const newPassword = screen.getByLabelText(/^new password$/i);
         const confirmNewPwd = screen.getByLabelText(/^confirm new password$/i);
@@ -157,10 +156,7 @@ describe("Change Password", () => {
         await user.click(screen.getByRole("button", btnName));
 
         expect(screen.getByRole("button", btnName)).toBeDisabled();
-
-        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
-
-        expect(screen.getByRole("alert")).toHaveTextContent(mock.message);
+        expect(await screen.findByRole("alert")).toHaveTextContent(mock.msg);
         expect(screen.getByRole("button", btnName)).toBeEnabled();
       });
     });

@@ -3,7 +3,6 @@ import { graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
-import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
 export const TEXT_NODE = "Testing User Authentication";
@@ -14,7 +13,7 @@ export const msg1 =
 const msg2 = "Current logged in session could not be verified";
 
 export const jwt =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGQ5ZTAzNC0xMWQxLTQ2ZjItOGRmNS1hMmVmOTQ4MDJkOWMiLCJpYXQiOjE2OTU4NDA2ODMsImV4cCI6MTY5NTg0MDY4M30.aiSxMDQYPhsKJ8n8Tfaq1ryJZrpjEwVbn1ADAepOWds";
 
 const response = (accessToken = jwt, isRegistered = true) => {
   return mswData("verifySession", "VerifiedSession", {
@@ -32,7 +31,7 @@ const response = (accessToken = jwt, isRegistered = true) => {
 };
 
 export const server = setupServer(
-  graphql.mutation(REFRESH_TOKEN, () => {
+  graphql.mutation("RefreshToken", () => {
     return mswData("refreshToken", "UnsupportedType");
   }),
 
@@ -114,7 +113,7 @@ const gql = new Mock(
 );
 
 const text = "Should render an alert message box if the";
-export const tableOne: [string, Mock<string>][] = [
+export const alerts: [string, Mock<string>][] = [
   [`${text} session id is invalid`, validate],
   [`${text} session id is unknown`, unknown],
   [`${text} api response is an unsupported object type`, unsupported],
@@ -123,55 +122,50 @@ export const tableOne: [string, Mock<string>][] = [
   [`${text} session verification fails with a Network error`, network],
 ];
 
-export const tableTwo: [string, Mock][] = [
+export const redirects1: [string, Mock][] = [
   [
-    "The current route is a protected route and the api response is a NotAllowedError response, Should redirect the user to the login page",
+    "Should redirect the user to the login page if there was an error verifying the user's session",
     notAllowed,
   ],
   [
-    "The current route is a protected route but the user's session has expired, Should redirect the user to the login page",
+    "Should redirect the user to the login page uf the user's session has expired",
     authCookie,
   ],
 ];
 
-export const tableThree: [string, string, Mock][] = [
+export const renders1: [string, string, Mock][] = [
   [
-    "The current route is not a protected route and the api response is a NotAllowedError response, Should render the (authentication)page at the current route",
+    "Should render the (authentication)page at the current route if there was na error verifying the user's session",
     "/forgot-password",
     notAllowed,
   ],
   [
-    "The current route is not a protected route and the user's session has expired, Should render the current(authentication) page",
+    "Should render the current(authentication) page if the user's session has expired, ",
     "/login",
     authCookie,
   ],
 ];
 
-interface TableTwo {
-  from: string;
-  to: string;
-  mock: Mock;
-}
+export const redirects2: [string, { from: string; to: string; mock: Mock }][] =
+  [
+    [
+      "Should redirect the user to the home(dashboard) page if the user is registered and the current route is not a protected route",
+      { from: "/login", to: "/", mock: registered },
+    ],
+    [
+      "Should redirect the user to the register page if the user is unregistered and the current route is not the register route",
+      { from: "/", to: "/register", mock: unregistered },
+    ],
+  ];
 
-export const tableFour: [string, TableTwo][] = [
+export const renders2: [string, string, Mock][] = [
   [
-    "The user is registered and the current route is not a protected route, Should redirect the user to the home(dashboard) page",
-    { from: "/login", to: "/", mock: registered },
-  ],
-  [
-    "The user is unregistered and the current route is not the register route, Should redirect the user to the register page",
-    { from: "/", to: "/register", mock: unregistered },
-  ],
-];
-
-export const tableFive: [string, string, Mock][] = [
-  [
-    "The user is registered and the current route is a protected route, Should render the page at the current route",
+    "Should render the page at the current route if the user is registered and the current route is a protected route",
     "/",
     registered,
   ],
   [
-    "The user is unregistered and the current route is the register route, Should render the register page",
+    "Should render the register page if the user is unregistered and the current route is the register route",
     "/register",
     unregistered,
   ],

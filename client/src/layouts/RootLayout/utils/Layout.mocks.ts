@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql } from "msw";
+import { graphql, delay } from "msw";
 import { setupServer } from "msw/node";
 
 import { LOGOUT } from "../components/Navbar/components/LogoutModal/LOGOUT";
@@ -28,7 +28,9 @@ const msg4 = "Unable to logout right now. Please try again later";
 const sessionIdError = "Invalid session id";
 
 export const server = setupServer(
-  graphql.mutation(LOGOUT, ({ variables: { sessionId } }) => {
+  graphql.mutation(LOGOUT, async ({ variables: { sessionId } }) => {
+    await delay();
+
     if (sessionId === sessionIdStr("validate")) {
       return mswData("logout", "SessionIdValidationError", { sessionIdError });
     }

@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql, HttpResponse } from "msw";
+import { delay, graphql, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
 import { EDIT_PROFILE } from "../operations/EDIT_PROFILE";
@@ -39,7 +39,9 @@ const response = (prefix: string, image: boolean) => {
 };
 
 export const server = setupServer(
-  graphql.mutation(EDIT_PROFILE, ({ variables: { firstName } }) => {
+  graphql.mutation(EDIT_PROFILE, async ({ variables: { firstName } }) => {
+    await delay();
+
     if (firstName === nameStr("auth")) {
       return mswData("editProfile", "AuthenticationError");
     }

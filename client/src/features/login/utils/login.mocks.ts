@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql } from "msw";
+import { graphql, delay } from "msw";
 import { setupServer } from "msw/node";
 
 import { LOGIN_USER } from "../operations/LOGIN_USER";
@@ -29,7 +29,9 @@ const response = (isRegistered: boolean) => {
 };
 
 export const server = setupServer(
-  graphql.mutation(LOGIN_USER, ({ variables: { email } }) => {
+  graphql.mutation(LOGIN_USER, async ({ variables: { email } }) => {
+    await delay();
+
     if (email === emailStr("validation")) {
       return mswData("login", "LoginValidationError", {
         emailError: "Invalid e-mail address",

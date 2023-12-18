@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql } from "msw";
+import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
@@ -43,13 +43,17 @@ export const edit = new Mock("edit", "Post tag edited");
 const tag = testPostTag(edit.name, tagId);
 
 export const server = setupServer(
-  graphql.query("GetPostTags", () => {
+  graphql.query("GetPostTags", async () => {
+    await delay();
+
     return mswData("getPostTags", "PostTags", {
       tags: [testPostTag(tagName, tagId)],
     });
   }),
 
-  graphql.mutation(EDIT_POST_TAG, ({ variables: { name } }) => {
+  graphql.mutation(EDIT_POST_TAG, async ({ variables: { name } }) => {
+    await delay();
+
     if (name === nameStr("auth")) {
       return mswData("editPostTag", "AuthenticationError");
     }

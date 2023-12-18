@@ -5,30 +5,29 @@ const routerObject = {
   query: {},
   isReady: true,
   events: {
-    on: jest
+    on: vi
       .fn((_, callback: () => void) => {
         handler = callback;
       })
       .mockName("router.events.on"),
-    off: jest
+    off: vi
       .fn()
       .mockImplementation(() => {
         handler = null;
       })
       .mockName("router.events.off"),
   },
-  push: jest
+  push: vi
     .fn(() => {
       if (handler) handler();
     })
     .mockName("router.push"),
-  replace: jest
+  replace: vi
     .fn(() => {
       if (handler) handler();
     })
     .mockName("router.replace"),
-  reload: jest.fn().mockName("router.reload"),
-  beforePopState: jest.fn().mockName("router.beforePopState"),
+  reload: vi.fn().mockName("router.reload"),
 };
 
-export const useRouter = jest.fn(() => routerObject);
+export const useRouter = vi.fn(() => routerObject);

@@ -11,12 +11,6 @@ describe("Edit Profile", () => {
   const fName = { name: /^first name$/i };
   const lName = { name: /^last name$/i };
 
-  global.URL.createObjectURL = jest.fn(() => "data:blob-image-url");
-  global.URL.revokeObjectURL = jest.fn(() => undefined);
-
-  // new describe block
-  // ---- assert that form fields are loaded with user details
-
   describe("Client side form validation", () => {
     describe("Validate text input fields", () => {
       it("Input fields should have an error message if their value is an empty string", async () => {

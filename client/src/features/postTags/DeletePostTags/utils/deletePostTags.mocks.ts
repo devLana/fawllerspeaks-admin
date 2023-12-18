@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql } from "msw";
+import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { DELETE_POST_TAGS } from "../operations/DELETE_POST_TAGS";
@@ -78,7 +78,9 @@ const network = mock("network", 2, message);
 const unsupported = mock("unsupported", 2, message);
 
 export const server = setupServer(
-  graphql.mutation(DELETE_POST_TAGS, ({ variables: { tagIds } }) => {
+  graphql.mutation(DELETE_POST_TAGS, async ({ variables: { tagIds } }) => {
+    await delay();
+
     if (tagIds[0].startsWith("auth")) {
       return mswData("deletePostTags", "AuthenticationError");
     }

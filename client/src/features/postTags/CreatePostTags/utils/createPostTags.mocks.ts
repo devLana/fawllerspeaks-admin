@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql } from "msw";
+import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
@@ -56,7 +56,9 @@ export const server = setupServer(
     return mswData("getPostTags", "PostTags", { tags: [] });
   }),
 
-  graphql.mutation(CREATE_POST_TAGS, ({ variables: { tags } }) => {
+  graphql.mutation(CREATE_POST_TAGS, async ({ variables: { tags } }) => {
+    await delay();
+
     if (tags[0].startsWith("auth")) {
       return mswData("createPostTags", "AuthenticationError");
     }

@@ -2,7 +2,6 @@ import { GraphQLError } from "graphql";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
 
-import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
@@ -10,7 +9,7 @@ const accessToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGQ5ZTAzNC0xMWQxLTQ2ZjItOGRmNS1hMmVmOTQ4MDJkOWMiLCJpYXQiOjE2OTU4NDA2ODMsImV4cCI6MTY5NTg0MDY4M30.aiSxMDQYPhsKJ8n8Tfaq1ryJZrpjEwVbn1ADAepOWds";
 
 export const server = setupServer(
-  graphql.mutation(VERIFY_SESSION, () => {
+  graphql.mutation("VerifySession", () => {
     return mswData("verifySession", "VerifiedSession", {
       accessToken,
       user: {
@@ -72,7 +71,7 @@ export const server = setupServer(
 
 const mock = (label: string) => `${label}_SESSION_ID`;
 
-export const refresh = mock("REFRESH");
+const refresh = mock("REFRESH");
 const session = mock("USER");
 const validate = mock("VALIDATION");
 const unknown = mock("UNKNOWN");
@@ -83,19 +82,28 @@ const authCookie = mock("AUTH_COOKIE");
 const gql = mock("GRAPHQL_ERROR");
 const network = mock("NETWORK_ERROR");
 
-const text = "Should display an alert message toast if the";
-export const table: [string, string][] = [
-  [`${text} user session id is invalid`, validate],
-  [`${text} user session is unknown`, unknown],
-  [`${text} user session was not assigned to the current user`, session],
-  [`${text} user's access token could not be refreshed`, forbid],
-  [`${text} api throws a graphql error`, gql],
-  [`${text} refresh request failed with a network error`, network],
-  [`${text} api response is an unsupported object type`, unsupported],
-];
-
 const msg = "Should redirect to the login page if the";
-export const redirectTable: [string, string, string][] = [
+export const redirects: [string, string, string][] = [
   [`${msg} user session could not be verified`, "unauthorized", notAllowed],
   [`${msg} user session has expired`, "expired", authCookie],
+];
+
+const text = "Should display an alert message toast if the";
+export const alerts: [string, [string, string][]][] = [
+  [
+    "Refresh request got an error or an unsupported object type response",
+    [
+      [`${text} user session id is invalid`, validate],
+      [`${text} user session is unknown`, unknown],
+      [`${text} user session was not assigned to the current user`, session],
+      [`${text} user's access token could not be refreshed`, forbid],
+      [`${text} api throws a graphql error`, gql],
+      [`${text} refresh request failed with a network error`, network],
+      [`${text} api response is an unsupported object type`, unsupported],
+    ],
+  ],
+  [
+    "Access token is successfully refreshed",
+    [["Update application with refreshed access token", refresh]],
+  ],
 ];

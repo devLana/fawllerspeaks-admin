@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql, type StrictResponse } from "msw";
+import { delay, graphql, type StrictResponse } from "msw";
 import { setupServer } from "msw/node";
 
 import { testPostTag } from "../../utils/testPostTag";
@@ -28,7 +28,8 @@ const tags = [
 ];
 
 export const server = setupServer(
-  graphql.query("GetPostTags", () => {
+  graphql.query("GetPostTags", async () => {
+    await delay();
     return mswData("getPostTags", "PostTags", { tags });
   })
 );

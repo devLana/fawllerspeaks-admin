@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql } from "msw";
+import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { FORGOT_PASSWORD } from "../operations/FORGOT_PASSWORD";
@@ -21,7 +21,9 @@ const msg6 =
   "It appears the account belonging to the e-mail address you provided has not been registered yet.";
 
 export const server = setupServer(
-  graphql.mutation(FORGOT_PASSWORD, ({ variables: { email } }) => {
+  graphql.mutation(FORGOT_PASSWORD, async ({ variables: { email } }) => {
+    await delay();
+
     if (email === emailStr("not_allowed")) {
       return mswData("forgotPassword", "NotAllowedError", { message: msg2 });
     }

@@ -106,7 +106,6 @@ describe("Reset Password", () => {
       describe("Api request received a validation error response", () => {
         it("Api response is a validation error, Input field should have error messages", async () => {
           const { user } = renderUI(<ResetPassword verified={mocks.data} />);
-
           const password = screen.getByLabelText(/^password$/i);
           const confirmPassword = screen.getByLabelText(/^confirm Password$/i);
 
@@ -127,7 +126,7 @@ describe("Reset Password", () => {
       });
 
       describe("The api responds with an error or an unsupported object type", () => {
-        it.each(mocks.table1)("%s", async (_, status, mock) => {
+        it.each(mocks.redirects)("%s", async (_, status, mock) => {
           const { user } = renderUI(<ResetPassword verified={mocks.data} />);
           const { push } = useRouter();
 
@@ -143,9 +142,11 @@ describe("Reset Password", () => {
           expect(screen.getByRole("button", resetButton)).toBeDisabled();
 
           await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
+
           expect(push).toHaveBeenCalledWith(
             `/forgot-password?status=${status}`
           );
+
           expect(screen.getByRole("button", resetButton)).toBeDisabled();
         });
       });
@@ -154,7 +155,6 @@ describe("Reset Password", () => {
         it("Should render an information dialog box", async () => {
           const { password } = mocks.unregistered;
           const { user } = renderUI(<ResetPassword verified={mocks.data} />);
-          // const form = screen.getByRole("form");
 
           await user.type(screen.getByLabelText(/^password$/i), password);
 
@@ -176,7 +176,7 @@ describe("Reset Password", () => {
       });
 
       describe("User password is successfully reset", () => {
-        it.each(mocks.table2)("%s", async (_, className, mock) => {
+        it.each(mocks.alerts)("%s", async (_, className, mock) => {
           const { password } = mock;
           const { user } = renderUI(<ResetPassword verified={mocks.data} />);
 
@@ -190,7 +190,6 @@ describe("Reset Password", () => {
           await user.click(screen.getByRole("button", resetButton));
 
           expect(screen.getByRole("button", resetButton)).toBeDisabled();
-
           expect(await screen.findByRole("alert")).toHaveClass(className);
 
           expect(screen.getByRole("alert")).toHaveTextContent(

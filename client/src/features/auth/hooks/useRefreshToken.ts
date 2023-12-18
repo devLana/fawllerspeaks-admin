@@ -59,11 +59,9 @@ const useRefreshToken = () => {
     const sessionId = localStorage.getItem(SESSION_ID);
 
     if (sessionId && timer) {
-      const delay = timer < 0 ? 0 : timer;
-
       refreshTokenTimerId.current = window.setTimeout(() => {
         void refreshToken(sessionId);
-      }, delay);
+      }, timer);
     }
 
     return () => {

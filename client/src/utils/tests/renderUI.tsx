@@ -5,9 +5,9 @@ import { SessionContext } from "@context/SessionContext";
 import ApolloContextProvider from "@components/ApolloContextProvider";
 import MUIThemeProvider from "@components/MUIThemeProvider";
 
-export const userIdHandler = jest.fn().mockName("handleUserId");
-export const refreshTokenHandler = jest.fn().mockName("handleRefreshToken");
-export const stopRefreshTokenTimer = jest
+export const userIdHandler = vi.fn().mockName("handleUserId");
+export const refreshTokenHandler = vi.fn().mockName("handleRefreshToken");
+export const stopRefreshTokenTimer = vi
   .fn()
   .mockName("handleClearRefreshTokenTimer");
 

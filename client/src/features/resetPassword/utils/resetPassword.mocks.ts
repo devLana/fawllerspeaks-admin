@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { graphql } from "msw";
+import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { RESET_PASSWORD } from "../operations/RESET_PASSWORD";
@@ -27,7 +27,9 @@ const errorMessage = "Unable to verify password reset token";
 const passwordStr = (prefix: string) => `${prefix}_p@5Sw0Rd`;
 
 export const server = setupServer(
-  graphql.mutation(RESET_PASSWORD, ({ variables: { password } }) => {
+  graphql.mutation(RESET_PASSWORD, async ({ variables: { password } }) => {
+    await delay();
+
     if (password === passwordStr("notAllowed")) {
       return mswData("resetPassword", "NotAllowedError");
     }
@@ -93,7 +95,7 @@ const gql = mock("graphql", undefined);
 const validation2 = mock("validation2", undefined);
 
 const text = "Should redirect to the forgot password page if the";
-export const table1: [string, string, ReturnType<typeof mock>][] = [
+export const redirects: [string, string, ReturnType<typeof mock>][] = [
   [`${text} api request fails a network error`, "network", network],
   [`${text} api throws a graphql error`, "api", gql],
   [
@@ -113,7 +115,7 @@ export const table1: [string, string, ReturnType<typeof mock>][] = [
   ],
 ];
 
-export const table2: [string, string, ReturnType<typeof mock<Status>>][] = [
+export const alerts: [string, string, ReturnType<typeof mock<Status>>][] = [
   [
     "Should render a success dialog box if the api response status is 'SUCCESS'",
     "MuiAlert-standardSuccess",

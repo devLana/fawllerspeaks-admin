@@ -191,10 +191,9 @@ describe("Delete post tags", () => {
       expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
       expect(within(modal).getByRole("button", mocks.cancelBtn)).toBeDisabled();
 
-      const alerts = await screen.findAllByRole("alert");
+      const elem = await screen.findByRole("presentation");
 
-      expect(alerts[0]).toHaveTextContent(mocks.deleteMsg);
-      expect(alerts[1]).toHaveTextContent(msg);
+      expect(within(elem).getByRole("alert")).toHaveTextContent(msg);
       expect(modal).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[0]))).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[1]))).not.toBeInTheDocument();
