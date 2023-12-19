@@ -10,7 +10,7 @@ type RefetchQueries = Extract<
 export const refetchQueries: RefetchQueries = result => {
   if (
     result.data?.createPostTags.__typename === "PostTags" ||
-    result.data?.createPostTags.__typename === "PostTagsWarning"
+    result.data?.createPostTags.__typename === "CreatedPostTagsWarning"
   ) {
     return ["GetPostTags"];
   }

@@ -92,18 +92,14 @@ const PostTags = ({ id: titleId }: { id: string }) => {
     setSelectedTags(data);
   };
 
-  const handleClearSelection = (deletedTags?: PostTagData[]) => {
+  const handleClearSelection = (deletedTags?: string[]) => {
     const data: SelectedTags = { name: "", tagIds: [], tagsMap: {} };
 
     if (deletedTags) {
-      const deletedTagsIds = new Set<string>();
-
-      deletedTags.forEach(tag => {
-        deletedTagsIds.add(tag.id);
-      });
+      const deletedTagIdsSet = new Set<string>(deletedTags);
 
       selectedTags.tagIds.forEach(tagId => {
-        if (!deletedTagsIds.has(tagId)) {
+        if (!deletedTagIdsSet.has(tagId)) {
           data.tagIds.push(tagId);
           data.tagsMap[tagId] = selectedTags.tagsMap[tagId];
         }

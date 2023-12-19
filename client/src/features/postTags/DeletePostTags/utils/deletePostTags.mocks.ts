@@ -42,14 +42,19 @@ const mock = <T extends string | undefined = undefined>(
   msg: T
 ) => {
   const tagNames: string[] = [];
+  const tagIds: string[] = [];
 
   const tags = new Array<string>(total).fill("").map((_, idx) => {
     const tagName = `post tag ${idx + 1}`;
+    const tagId = `${prefix}-id-${idx + 1}`;
+
     tagNames.push(tagName);
-    return testPostTag(tagName, `${prefix}-id-${idx + 1}`);
+    tagIds.push(tagId);
+
+    return testPostTag(tagName, tagId);
   });
 
-  return { tags, msg, tagNames, resolver: dataCb(tags) };
+  return { tags, tagIds, msg, tagNames, resolver: dataCb(tags) };
 };
 
 const gqlMsg = "Delete post tag graphql error";
@@ -108,11 +113,15 @@ export const server = setupServer(
     }
 
     if (tagIds[0].startsWith("warn")) {
-      return mswData("deletePostTags", "PostTagsWarning", { message: warnMsg });
+      return mswData("deletePostTags", "DeletedPostTagsWarning", {
+        message: warnMsg,
+      });
     }
 
     if (tagIds[0].startsWith("delete")) {
-      return mswData("deletePostTags", "PostTags", { tags: del.tags });
+      return mswData("deletePostTags", "DeletedPostTags", {
+        tagIds: del.tagIds,
+      });
     }
 
     if (tagIds[0].startsWith("network")) {

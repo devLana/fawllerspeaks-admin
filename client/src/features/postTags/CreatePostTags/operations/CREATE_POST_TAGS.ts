@@ -24,7 +24,7 @@ export const CREATE_POST_TAGS: CreatePostTags = gql`
           ...PostTagFields
         }
       }
-      ... on PostTagsWarning {
+      ... on CreatedPostTagsWarning {
         message
         tags {
           ...PostTagFields

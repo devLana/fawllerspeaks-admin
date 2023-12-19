@@ -90,7 +90,7 @@ export const server = setupServer(
     }
 
     if (tags[0].startsWith("warn")) {
-      return mswData("createPostTags", "PostTagsWarning", {
+      return mswData("createPostTags", "CreatedPostTagsWarning", {
         message: warnMsg,
         tags: [testPostTag(warn.tags[0], "1"), testPostTag(warn.tags[2], "3")],
       });

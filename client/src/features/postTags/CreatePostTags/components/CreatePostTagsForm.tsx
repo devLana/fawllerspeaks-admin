@@ -87,7 +87,7 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
             setAlertIsOpen(true);
             break;
 
-          case "PostTagsWarning":
+          case "CreatedPostTagsWarning":
             onCloseDialog();
             handleOpenAlert(createData.createPostTags.message);
             break;

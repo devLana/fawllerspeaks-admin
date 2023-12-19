@@ -16,14 +16,13 @@ import { DELETE_POST_TAGS } from "./operations/DELETE_POST_TAGS";
 import { formatText } from "./utils/formatText";
 import { update } from "./utils/update";
 import { refetchQueries } from "./utils/refetchQueries";
-import type { PostTagData } from "@types";
 
 export interface DeletePostTagsProps {
   open: boolean;
   name: string;
   ids: string[];
   onCloseDelete: () => void;
-  onClearSelection: (deletedTags?: PostTagData[]) => void;
+  onClearSelection: (deletedTags?: string[]) => void;
 }
 
 const DeletePostTags = (props: DeletePostTagsProps) => {
@@ -74,16 +73,16 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
             break;
 
           case "UnknownError":
-          case "PostTagsWarning":
+          case "DeletedPostTagsWarning":
             handleResponse(data.deletePostTags.message);
             onClearSelection();
             break;
 
-          case "PostTags": {
-            const word = data.deletePostTags.tags.length > 1 ? "tags" : "tag";
+          case "DeletedPostTags": {
+            const word = data.deletePostTags.tagIds.length > 1 ? "tags" : "tag";
 
             handleResponse(`Post ${word} deleted`);
-            onClearSelection(data.deletePostTags.tags);
+            onClearSelection(data.deletePostTags.tagIds);
             break;
           }
 

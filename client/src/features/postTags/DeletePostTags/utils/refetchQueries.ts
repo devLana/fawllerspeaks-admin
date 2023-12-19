@@ -11,7 +11,7 @@ export const refetchQueries: RefetchQueries = ({ data }) => {
   if (
     data?.deletePostTags.__typename === "DeletePostTagsValidationError" ||
     data?.deletePostTags.__typename === "UnknownError" ||
-    data?.deletePostTags.__typename === "PostTagsWarning"
+    data?.deletePostTags.__typename === "DeletedPostTagsWarning"
   ) {
     return ["GetPostTags"];
   }

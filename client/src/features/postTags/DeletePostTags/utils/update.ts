@@ -14,12 +14,8 @@ interface CachePostTags {
 }
 
 export const update: Update = (cache, { data }) => {
-  if (data?.deletePostTags.__typename === "PostTags") {
-    const deletedPostTagsIds = new Set<string>();
-
-    data.deletePostTags.tags.forEach(tag => {
-      deletedPostTagsIds.add(tag.id);
-    });
+  if (data?.deletePostTags.__typename === "DeletedPostTags") {
+    const deletedPostTagIdsSet = new Set<string>(data.deletePostTags.tagIds);
 
     cache.modify<CachePostTags>({
       fields: {
@@ -29,7 +25,7 @@ export const update: Update = (cache, { data }) => {
 
             if (typeof id !== "string") return false;
 
-            return !deletedPostTagsIds.has(id);
+            return !deletedPostTagIdsSet.has(id);
           });
 
           return { ...getPostTagsRef, tags };
