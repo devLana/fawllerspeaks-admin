@@ -4,7 +4,5 @@ export const POST_TAG_FIELDS = gql`
   fragment PostTagFields on PostTag {
     id
     name
-    dateCreated
-    lastModified
   }
 `;

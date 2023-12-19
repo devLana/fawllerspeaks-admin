@@ -9,7 +9,7 @@ import PostTagsToolbar from "./PostTagsToolbar";
 import PostTag from "./PostTag";
 import PostTagMenu from "./PostTagMenu";
 import { GET_CACHED_POST_TAGS } from "@features/postTags/GetPostTags/operations/GET_CACHED_POST_TAGS";
-import type { PostTag as Tag } from "@apiTypes";
+import type { PostTagData } from "@types";
 
 interface PostTagsListProps {
   selectedTagsMap: Record<string, string>;
@@ -18,7 +18,7 @@ interface PostTagsListProps {
   onClickDeleteButton: () => void;
   onClickDeleteMenu: (name: string, id: string) => void;
   onSelectOne: (checked: boolean, id: string, name: string) => void;
-  onSelectAll: (value: boolean, cachedTags: Tag[]) => void;
+  onSelectAll: (value: boolean, cachedTags: PostTagData[]) => void;
 }
 
 const PostTagsList = ({

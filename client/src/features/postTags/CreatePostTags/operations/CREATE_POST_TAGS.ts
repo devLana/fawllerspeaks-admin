@@ -1,9 +1,9 @@
 import { gql, type TypedDocumentNode as Node } from "@apollo/client";
 
 import { POST_TAG_FIELDS } from "@fragments/PostTag";
-import type { Mutation, MutationCreatePostTagsArgs as Args } from "@apiTypes";
+import type { MutationCreatePostTagsArgs as Args } from "@apiTypes";
+import type { CreatePostTagsData } from "../types";
 
-type CreatePostTagsData = Pick<Mutation, "createPostTags">;
 type CreatePostTags = Node<CreatePostTagsData, Args>;
 
 export const CREATE_POST_TAGS: CreatePostTags = gql`

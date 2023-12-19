@@ -5,7 +5,7 @@ import { setupServer } from "msw/node";
 import { DELETE_POST_TAGS } from "../operations/DELETE_POST_TAGS";
 import { testPostTag } from "../../utils/testPostTag";
 import { mswData, mswErrors } from "@utils/tests/msw";
-import type { PostTag } from "@apiTypes";
+import type { PostTagData } from "@types";
 
 export const deleteMenuItem = { name: /^delete$/i };
 export const dialog1 = { name: /^Delete post tag$/i };
@@ -32,7 +32,7 @@ export const toolbarBtn = (text: string, letter = "") => ({
   name: new RegExp(`delete ${text} post tag${letter}`, "i"),
 });
 
-const dataCb = (tags: PostTag[]) => {
+const dataCb = (tags: PostTagData[]) => {
   return () => mswData("getPostTags", "PostTags", { tags });
 };
 

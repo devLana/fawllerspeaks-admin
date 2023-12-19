@@ -1,9 +1,9 @@
 import type { Reference } from "@apollo/client";
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
-import type { Mutation } from "@apiTypes";
+import type { DeletePostTagsData } from "../types";
 
-type Update = MutationBaseOptions<Pick<Mutation, "deletePostTags">>["update"];
+type Update = MutationBaseOptions<DeletePostTagsData>["update"];
 
 interface PostTagRefs {
   tags: Reference[];

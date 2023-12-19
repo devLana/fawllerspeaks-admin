@@ -16,14 +16,14 @@ import { DELETE_POST_TAGS } from "./operations/DELETE_POST_TAGS";
 import { formatText } from "./utils/formatText";
 import { update } from "./utils/update";
 import { refetchQueries } from "./utils/refetchQueries";
-import type { PostTag } from "@apiTypes";
+import type { PostTagData } from "@types";
 
 export interface DeletePostTagsProps {
   open: boolean;
   name: string;
   ids: string[];
   onCloseDelete: () => void;
-  onClearSelection: (deletedTags?: PostTag[]) => void;
+  onClearSelection: (deletedTags?: PostTagData[]) => void;
 }
 
 const DeletePostTags = (props: DeletePostTagsProps) => {

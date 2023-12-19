@@ -2,9 +2,12 @@ import { gql, type TypedDocumentNode } from "@apollo/client";
 
 import { POST_TAG_FIELDS } from "@fragments/PostTag";
 import type { PostTags } from "@apiTypes";
+import type { PostTagData } from "@types";
+
+type Tags = Omit<PostTags, "status" | "tags"> & { tags: PostTagData[] };
 
 interface CachePostTags {
-  getPostTags: Omit<PostTags, "status">;
+  getPostTags: Tags;
 }
 
 type CachedPostTagsData = TypedDocumentNode<CachePostTags>;

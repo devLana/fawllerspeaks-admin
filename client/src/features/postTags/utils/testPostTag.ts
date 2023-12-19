@@ -1,9 +1,7 @@
-import type { PostTag } from "@apiTypes";
+import type { PostTagData } from "@types";
 
-export const testPostTag = (name: string, id: string): PostTag => ({
+export const testPostTag = (name: string, id: string): PostTagData => ({
   __typename: "PostTag",
   id,
   name,
-  dateCreated: new Date().toISOString(),
-  lastModified: null,
 });

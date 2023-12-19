@@ -1,9 +1,9 @@
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
-import type { Mutation } from "@apiTypes";
+import type { DeletePostTagsData } from "../types";
 
 type FunctionLike = (...args: never[]) => unknown;
 type RefetchQueries = Extract<
-  MutationBaseOptions<Pick<Mutation, "deletePostTags">>["refetchQueries"],
+  MutationBaseOptions<DeletePostTagsData>["refetchQueries"],
   FunctionLike
 >;
 

@@ -7,7 +7,7 @@ import EditPostTag from "@features/postTags/EditPostTag";
 import DeletePostTags from "@features/postTags/DeletePostTags";
 import PostTagsWrapper from "../PostTagsWrapper";
 import PostTagsList from "./components/PostTagsList";
-import type { PostTag } from "@apiTypes";
+import type { PostTagData } from "@types";
 
 interface SelectedTags {
   name: string;
@@ -78,7 +78,7 @@ const PostTags = ({ id: titleId }: { id: string }) => {
     [selectedTags]
   );
 
-  const handleSelectAll = (checked: boolean, cachedTags: PostTag[]) => {
+  const handleSelectAll = (checked: boolean, cachedTags: PostTagData[]) => {
     const data: SelectedTags = { name: "", tagIds: [], tagsMap: {} };
 
     if (checked) {
@@ -92,7 +92,7 @@ const PostTags = ({ id: titleId }: { id: string }) => {
     setSelectedTags(data);
   };
 
-  const handleClearSelection = (deletedTags?: PostTag[]) => {
+  const handleClearSelection = (deletedTags?: PostTagData[]) => {
     const data: SelectedTags = { name: "", tagIds: [], tagsMap: {} };
 
     if (deletedTags) {

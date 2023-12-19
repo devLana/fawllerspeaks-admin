@@ -7,6 +7,7 @@ import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
 import type { SxProps } from "@mui/material/styles";
 
 import type { MetaInfo } from "@components/Metadata";
+import type { PostTag } from "@apiTypes";
 
 export type ThemeMode = "sunny" | "sunset" | "pitch black";
 export type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";
@@ -55,3 +56,15 @@ export type AuthPageView = "form" | "unregistered error" | "success";
 type Status = "idle" | "error" | "success";
 export type FormStatus = Status | "submitting";
 export type RequestStatus = Status | "loading";
+
+export type PostTagData = Omit<PostTag, "dateCreated" | "lastModified">;
+
+type PostTagHelper<T extends object> = T extends { tags: PostTag[] }
+  ? Omit<T, "tags"> & { tags: PostTagData[] }
+  : T extends { tag: PostTag }
+  ? Omit<T, "tag"> & { tag: PostTagData }
+  : T;
+
+export type PostTagsDataUnionMapper<T extends Record<string, object>> = {
+  [Key in keyof T]: PostTagHelper<T[Key]>;
+};
