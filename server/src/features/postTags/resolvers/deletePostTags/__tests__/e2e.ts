@@ -144,11 +144,8 @@ describe("Delete post tags - E2E", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.deletePostTags).toStrictEqual({
-        __typename: "PostTags",
-        tags: expect.arrayContaining([
-          { __typename: "PostTag", ...tag1 },
-          { __typename: "PostTag", ...tag2 },
-        ]),
+        __typename: "DeletedPostTags",
+        tagIds: expect.arrayContaining([tag1.id, tag2.id]),
         status: "SUCCESS",
       });
 
@@ -167,11 +164,8 @@ describe("Delete post tags - E2E", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.deletePostTags).toStrictEqual({
-        __typename: "PostTagsWarning",
-        tags: expect.arrayContaining([
-          { __typename: "PostTag", ...tag3 },
-          { __typename: "PostTag", ...tag4 },
-        ]),
+        __typename: "DeletedPostTagsWarning",
+        tagIds: expect.arrayContaining([tag3.id, tag4.id]),
         message: `${tag3.name} and 1 other post tag deleted. 2 post tags could not be deleted`,
         status: "WARN",
       });

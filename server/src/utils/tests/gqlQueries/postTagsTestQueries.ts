@@ -20,14 +20,11 @@ export const CREATE_POST_TAGS = `#graphql
         status
       }
 
-      ... on PostTagsWarning {
-        __typename
+      ... on CreatedPostTagsWarning {
         tags {
           __typename
           ...postTagFields
         }
-        message
-        status
       }
 
       ... on CreatePostTagsValidationError {
@@ -46,24 +43,16 @@ export const CREATE_POST_TAGS = `#graphql
 `;
 
 export const DELETE_POST_TAGS = `#graphql
-  ${POST_TAG_FIELDS}
   mutation DeletePostTags($tagIds: [ID!]!) {
     deletePostTags(tagIds: $tagIds) {
-      ... on PostTags {
+      ... on DeletedPostTags {
         __typename
-        tags {
-          __typename
-          ...postTagFields
-        }
+        tagIds
         status
       }
 
-      ... on PostTagsWarning {
-        __typename
-        tags {
-          __typename
-          ...postTagFields
-        }
+      ... on DeletedPostTagsWarning {
+        tagIds
       }
 
       ... on DeletePostTagsValidationError {

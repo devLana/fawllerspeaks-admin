@@ -5,8 +5,11 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
 // import deletePostTagsWorker from "./deletePostTagsWorker";
-import { PostTags, PostTagsWarning } from "../types";
-import { DeletePostTagsValidationError } from "./types/DeletePostTagsValidationError";
+import {
+  DeletedPostTags,
+  DeletedPostTagsWarning,
+  DeletePostTagsValidationError,
+} from "./types";
 import { deletePostTagsValidator as schema } from "./utils/deletePostTags.validator";
 import {
   AuthenticationError,
@@ -15,7 +18,7 @@ import {
   UnknownError,
 } from "@utils";
 
-import type { MutationResolvers, PostTag } from "@resolverTypes";
+import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
 
 type DeletePostTags = ResolverFunc<MutationResolvers["deletePostTags"]>;
@@ -45,52 +48,56 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
       return new RegistrationError(`Unable to delete post ${tagOrTags}`);
     }
 
-    const { rows: deletedTags } = await db.query<PostTag>(
-      `DELETE FROM post_tags WHERE
+    const { rows: allDeletedTags } = await db.query<{
+      id: string;
+      name: string;
+    }>(
+      `DELETE FROM post_tags
+      WHERE
         tag_id = ANY ($1)
       RETURNING
         tag_id id,
-        name,
-        date_created "dateCreated",
-        last_Modified "lastModified"`,
+        name`,
       [validatedTagIds]
     );
 
     // Set up an event or worker to delete each deleted post tag from every post they were assigned to
-    // if (deletedTags.length > 0) {
-    //   // deletePostTagsWorker(deletedTags);
+    // if (allDeletedTags.length > 0) {
+    //   // deletePostTagsWorker(allDeletedTags);
     //   const worker = new Worker(
     //     path.join(__dirname, "deletePostTagsWorker.ts")
     //   );
-    //   worker.postMessage(deletedTags);
+    //   worker.postMessage(allDeletedTags);
     //   worker.on("error", err => {
     //     console.log("Delete post tags worker thread error", err);
     //   });
     // }
 
-    const set = new Set<string>();
+    const deletedTagIdsSet = new Set<string>();
+    const deletedTagIds: string[] = [];
     const notDeletedTags: string[] = [];
 
-    deletedTags.forEach(deletedTag => {
-      set.add(deletedTag.id);
+    allDeletedTags.forEach(deletedTag => {
+      deletedTagIdsSet.add(deletedTag.id);
+      deletedTagIds.push(deletedTag.id);
     });
 
     for (const validatedTagId of validatedTagIds) {
-      if (set.has(validatedTagId)) continue;
+      if (deletedTagIdsSet.has(validatedTagId)) continue;
       notDeletedTags.push(validatedTagId);
     }
 
     if (notDeletedTags.length > 0) {
       const _tagOrTags = notDeletedTags.length > 1 ? "tags" : "tag";
 
-      if (deletedTags.length === 0) {
+      if (allDeletedTags.length === 0) {
         return new UnknownError(
           `The provided post ${_tagOrTags} could not be deleted`
         );
       }
 
-      const [{ name }] = deletedTags;
-      const remainingTags = deletedTags.length - 1;
+      const [{ name }] = allDeletedTags;
+      const remainingTags = allDeletedTags.length - 1;
       const __tagOrTags = remainingTags > 1 ? "tags" : "tag";
 
       const msg =
@@ -99,10 +106,10 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
           : `${name} and ${remainingTags} other post ${__tagOrTags} deleted`;
 
       const message = `${msg}. ${notDeletedTags.length} post ${_tagOrTags} could not be deleted`;
-      return new PostTagsWarning(deletedTags, message);
+      return new DeletedPostTagsWarning(deletedTagIds, message);
     }
 
-    return new PostTags(deletedTags);
+    return new DeletedPostTags(deletedTagIds);
   } catch (err) {
     if (err instanceof ValidationError) {
       return new DeletePostTagsValidationError(err.details[0].message);

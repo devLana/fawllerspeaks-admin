@@ -88,6 +88,7 @@ describe("Test delete post tags resolver", () => {
   describe("Delete post tags", () => {
     it("Should delete all post tags provided in the input array", async () => {
       const mock = [tag1, tag2, tag3, tag4];
+      const returnMock = [tag1.id, tag2.id, tag3.id, tag4.id];
       const spy = spyDb({ rows: [{ isRegistered: true }] });
       spy.mockReturnValueOnce({ rows: mock });
 
@@ -96,7 +97,7 @@ describe("Test delete post tags resolver", () => {
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
       expect(spy).toHaveNthReturnedWith(2, { rows: mock });
-      expect(result).toHaveProperty("tags", mock);
+      expect(result).toHaveProperty("tagIds", returnMock);
       expect(result).toHaveProperty("status", "SUCCESS");
 
       // expect(Worker).toHaveBeenCalledTimes(1);
@@ -105,16 +106,15 @@ describe("Test delete post tags resolver", () => {
     });
 
     it("Delete post tags, Return a message if at least one post tag could not be deleted", async () => {
-      const mock = [tag2, tag4];
       const spy = spyDb({ rows: [{ isRegistered: true }] });
-      spy.mockReturnValueOnce({ rows: mock });
+      spy.mockReturnValueOnce({ rows: [tag2, tag4] });
 
       const result = await deletePostTags({}, { tagIds }, mockContext, info);
 
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-      expect(spy).toHaveNthReturnedWith(2, { rows: mock });
-      expect(result).toHaveProperty("tags", [tag2, tag4]);
+      expect(spy).toHaveNthReturnedWith(2, { rows: [tag2, tag4] });
+      expect(result).toHaveProperty("tagIds", [tag2.id, tag4.id]);
       expect(result).toHaveProperty("status", "WARN");
       expect(result).toHaveProperty(
         "message",

@@ -6,18 +6,25 @@ import getPostTags from "./getPostTags";
 import {
   PostTag,
   PostTagsResolvers,
-  PostTagsWarningResolvers,
   DuplicatePostTagErrorResolvers,
 } from "./types";
+
+import {
+  CreatedPostTagsWarningResolvers,
+  CreatePostTagsValidationErrorResolvers,
+} from "./createPostTags/types";
+
+import {
+  DeletedPostTagsResolvers,
+  DeletedPostTagsWarningResolvers,
+  DeletePostTagsValidationErrorResolvers,
+} from "./deletePostTags/types";
 
 import {
   EditedPostTagResolvers,
   EditedPostTagWarningResolvers,
   EditPostTagValidationErrorResolvers,
 } from "./editPostTag/types";
-
-import { CreatePostTagsValidationErrorResolvers } from "./createPostTags/types";
-import { DeletePostTagsValidationErrorResolvers } from "./deletePostTags/types";
 
 import type {
   QueryResolvers,
@@ -29,7 +36,9 @@ import type { ResolversMapper, ObjectMapper } from "@types";
 type TypeKeys =
   | "PostTag"
   | "PostTags"
-  | "PostTagsWarning"
+  | "CreatedPostTagsWarning"
+  | "DeletedPostTags"
+  | "DeletedPostTagsWarning"
   | "EditedPostTag"
   | "EditedPostTagWarning"
   | "DuplicatePostTagError"
@@ -53,7 +62,9 @@ export const postTagsResolvers: PostTagsSchemaResolvers = {
   Types: {
     PostTag,
     PostTags: PostTagsResolvers,
-    PostTagsWarning: PostTagsWarningResolvers,
+    CreatedPostTagsWarning: CreatedPostTagsWarningResolvers,
+    DeletedPostTags: DeletedPostTagsResolvers,
+    DeletedPostTagsWarning: DeletedPostTagsWarningResolvers,
     EditedPostTag: EditedPostTagResolvers,
     EditedPostTagWarning: EditedPostTagWarningResolvers,
     DuplicatePostTagError: DuplicatePostTagErrorResolvers,

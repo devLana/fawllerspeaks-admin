@@ -1,8 +1,8 @@
 import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
-import { PostTags, PostTagsWarning, DuplicatePostTagError } from "../types";
-import { CreatePostTagsValidationError } from "./types";
+import { PostTags, DuplicatePostTagError } from "../types";
+import { CreatedPostTagsWarning, CreatePostTagsValidationError } from "./types";
 import { createPostTagsValidator } from "./utils/createPostTags.validator";
 import { formatTagName } from "@features/postTags/utils";
 import { AuthenticationError, RegistrationError, UnknownError } from "@utils";
@@ -111,7 +111,7 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
           : `Post tags similar to '${name}' and ${remainingTags} other post ${_tagOrTags} have already been created`;
 
       const msg = `${createdPostTags.length} post ${createdTagOrTags} created. ${tagsMsg}`;
-      return new PostTagsWarning(createdPostTags, msg);
+      return new CreatedPostTagsWarning(createdPostTags, msg);
     }
 
     return new PostTags(createdPostTags);

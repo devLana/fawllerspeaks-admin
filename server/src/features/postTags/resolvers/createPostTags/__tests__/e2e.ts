@@ -15,11 +15,11 @@ import {
 } from "../utils/createPostTags.testUtils";
 
 import type { APIContext, TestData } from "@types";
-import type { PostTagsWarning, PostTags } from "@resolverTypes";
+import type { CreatedPostTagsWarning, PostTags } from "@resolverTypes";
 
 type CreateTags = TestData<{ createPostTags: Record<string, unknown> }>;
 type CreateTagsSuccess = TestData<{ createPostTags: PostTags }>;
-type CreateTagsWarning = TestData<{ createPostTags: PostTagsWarning }>;
+type CreateTagsWarning = TestData<{ createPostTags: CreatedPostTagsWarning }>;
 
 describe("Create post tags - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
@@ -155,7 +155,7 @@ describe("Create post tags - E2E", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPostTags).toStrictEqual({
-        __typename: "PostTagsWarning",
+        __typename: "CreatedPostTagsWarning",
         tags: [
           {
             __typename: "PostTag",

@@ -11,8 +11,19 @@ export const postTagsTypeDefs = `#graphql
     status: Status!
   }
 
-  type PostTagsWarning implements BaseResponse {
+  type CreatedPostTagsWarning implements BaseResponse {
     tags: [PostTag!]!
+    message: String!
+    status: Status!
+  }
+
+  type DeletedPostTags {
+    tagIds: [String!]!
+    status: Status!
+  }
+
+  type DeletedPostTagsWarning implements BaseResponse {
+    tagIds: [String!]!
     message: String!
     status: Status!
   }
@@ -49,9 +60,9 @@ export const postTagsTypeDefs = `#graphql
     status: Status!
   }
 
-  union CreatePostTags = PostTags | PostTagsWarning | CreatePostTagsValidationError | DuplicatePostTagError | UnknownError | AuthenticationError | RegistrationError
+  union CreatePostTags = PostTags | CreatedPostTagsWarning | CreatePostTagsValidationError | DuplicatePostTagError | UnknownError | AuthenticationError | RegistrationError
 
-  union DeletePostTags = PostTags | PostTagsWarning | DeletePostTagsValidationError | NotAllowedError | UnknownError | AuthenticationError | RegistrationError
+  union DeletePostTags = DeletedPostTags | DeletedPostTagsWarning | DeletePostTagsValidationError | NotAllowedError | UnknownError | AuthenticationError | RegistrationError
 
   union EditPostTag = EditedPostTag | EditedPostTagWarning | EditPostTagValidationError | AuthenticationError | RegistrationError | DuplicatePostTagError | NotAllowedError | UnknownError
 
