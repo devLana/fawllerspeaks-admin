@@ -47,10 +47,12 @@ const PostTag = ({
           />
         }
         label={name}
-        sx={{
+        sx={theme => ({
           mr: 0,
-          width: "80%",
+          width: "75%",
           columnGap: 0.25,
+          flex: 0,
+          [theme.breakpoints.up("md")]: { width: "80%" },
           "&>.MuiFormControlLabel-label": {
             textOverflow: "ellipsis",
             lineHeight: 1,
@@ -64,7 +66,7 @@ const PostTag = ({
             bgcolor: "action.selected",
             userSelect: "none",
           },
-        }}
+        })}
       />
       <PostTagMenu
         name={name}
