@@ -3,17 +3,17 @@ import Checkbox from "@mui/material/Checkbox";
 import Toolbar from "@mui/material/Toolbar";
 
 interface PostTagsToolbarProps {
-  onSelectAll: (checked: boolean) => void;
-  onClick: () => void;
-  numberOfSelectedPostTags: number;
   totalNumberOfPostTags: number;
+  numberOfSelectedPostTags: number;
+  onClick: () => void;
+  onAllCheckboxChange: (checked: boolean) => void;
 }
 
 const PostTagsToolbar = ({
-  onSelectAll,
-  onClick,
-  numberOfSelectedPostTags: numSelected,
   totalNumberOfPostTags: numTags,
+  numberOfSelectedPostTags: numSelected,
+  onClick,
+  onAllCheckboxChange,
 }: PostTagsToolbarProps) => {
   const label = numSelected === numTags ? "Deselect" : "Select";
   let buttonText: string;
@@ -39,7 +39,7 @@ const PostTagsToolbar = ({
         id="all-post-tags-checkbox"
         size="small"
         inputProps={{ "aria-label": `${label} all post tags` }}
-        onChange={e => onSelectAll(e.target.checked)}
+        onChange={e => onAllCheckboxChange(e.target.checked)}
         checked={numSelected === numTags}
         indeterminate={isIndeterminate}
       />

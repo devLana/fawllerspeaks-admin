@@ -18,6 +18,7 @@ interface SelectedTags {
 const PostTags = ({ id: titleId }: { id: string }) => {
   const [edit, setEdit] = React.useState({ open: false, name: "", id: "" });
   const [deleteTags, setDeleteTags] = React.useState(false);
+  const [tagToDelete, setTagToDelete] = React.useState({ name: "", id: "" });
 
   const [selectedTags, setSelectedTags] = React.useState<SelectedTags>({
     name: "",
@@ -25,60 +26,54 @@ const PostTags = ({ id: titleId }: { id: string }) => {
     tagsMap: {},
   });
 
-  const [menuSelectedTag, setMenuSelectedTag] = React.useState({
-    name: "",
-    id: "",
-  });
-
-  const handleOpenEdit = React.useCallback((name: string, tagId: string) => {
-    setEdit({ open: true, name, id: tagId });
+  const handleMenuEdit = React.useCallback((name: string, id: string) => {
+    setEdit({ open: true, name, id });
   }, []);
 
-  const handleClickDeleteButton = () => setDeleteTags(true);
+  const handleMenuDelete = React.useCallback((name: string, id: string) => {
+    setDeleteTags(true);
+    setTagToDelete({ name, id });
+  }, []);
 
-  const handleClickDeleteMenu = React.useCallback(
-    (name: string, id: string) => {
-      setDeleteTags(true);
-      setMenuSelectedTag({ name, id });
+  const handleTagCheckbox = React.useCallback(
+    (checked: boolean, id: string, name: string) => {
+      setSelectedTags(prevState => {
+        const data: SelectedTags = { name: "", tagIds: [], tagsMap: {} };
+
+        if (checked) {
+          data.name = prevState.name || name;
+          data.tagIds = [...prevState.tagIds, id];
+          data.tagsMap = { ...prevState.tagsMap, [id]: name };
+        } else {
+          const { tagsMap, tagIds, name: tagName } = prevState;
+          data.name = tagName;
+
+          if (tagName === name) {
+            data.name = tagIds.length > 1 ? tagsMap[tagIds[1]] : "";
+          }
+
+          for (const tagId in tagsMap) {
+            if (tagId === id) continue;
+
+            data.tagIds.push(tagId);
+            data.tagsMap[tagId] = tagsMap[tagId];
+          }
+        }
+
+        return data;
+      });
     },
     []
   );
 
-  const handleCloseDelete = () => {
+  const handleToolbarDeleteButton = () => setDeleteTags(true);
+
+  const handleCloseDeleteModal = () => {
     setDeleteTags(false);
-    setMenuSelectedTag({ id: "", name: "" });
+    setTagToDelete({ id: "", name: "" });
   };
 
-  const handleSelectOne = React.useCallback(
-    (checked: boolean, id: string, name: string) => {
-      const data: SelectedTags = { name: "", tagIds: [], tagsMap: {} };
-
-      if (checked) {
-        data.name = selectedTags.name || name;
-        data.tagIds = [...selectedTags.tagIds, id];
-        data.tagsMap = { ...selectedTags.tagsMap, [id]: name };
-      } else {
-        const { tagsMap, tagIds } = selectedTags;
-        data.name = selectedTags.name;
-
-        if (selectedTags.name === name) {
-          data.name = tagIds.length > 1 ? tagsMap[tagIds[1]] : "";
-        }
-
-        for (const tagId in tagsMap) {
-          if (tagId === id) continue;
-
-          data.tagIds.push(tagId);
-          data.tagsMap[tagId] = tagsMap[tagId];
-        }
-      }
-
-      setSelectedTags(data);
-    },
-    [selectedTags]
-  );
-
-  const handleSelectAll = (checked: boolean, cachedTags: PostTagData[]) => {
+  const handleAllCheckbox = (checked: boolean, cachedTags: PostTagData[]) => {
     const data: SelectedTags = { name: "", tagIds: [], tagsMap: {} };
 
     if (checked) {
@@ -114,9 +109,10 @@ const PostTags = ({ id: titleId }: { id: string }) => {
 
   const msg =
     "There was an error trying to display the list of post tags. Please try again later";
+
   const alertProps = { severity: "error", "aria-busy": false } as const;
-  const name = menuSelectedTag.name || selectedTags.name;
-  const ids = menuSelectedTag.id ? [menuSelectedTag.id] : selectedTags.tagIds;
+  const name = tagToDelete.name || selectedTags.name;
+  const ids = tagToDelete.id ? [tagToDelete.id] : selectedTags.tagIds;
 
   return (
     <>
@@ -125,11 +121,11 @@ const PostTags = ({ id: titleId }: { id: string }) => {
           <PostTagsList
             selectedTagsMap={selectedTags.tagsMap}
             selectedTagIdsLength={selectedTags.tagIds.length}
-            onOpenEdit={handleOpenEdit}
-            onClickDeleteButton={handleClickDeleteButton}
-            onClickDeleteMenu={handleClickDeleteMenu}
-            onSelectOne={handleSelectOne}
-            onSelectAll={handleSelectAll}
+            onClickMenuEdit={handleMenuEdit}
+            onClickToolbarDeleteButton={handleToolbarDeleteButton}
+            onClickMenuDelete={handleMenuDelete}
+            onTagCheckboxChange={handleTagCheckbox}
+            onAllCheckboxChange={handleAllCheckbox}
           />
         </ErrorBoundary>
       </PostTagsWrapper>
@@ -141,7 +137,7 @@ const PostTags = ({ id: titleId }: { id: string }) => {
         open={deleteTags}
         name={name}
         ids={ids}
-        onCloseDelete={handleCloseDelete}
+        onCloseDelete={handleCloseDeleteModal}
         onClearSelection={handleClearSelection}
       />
     </>

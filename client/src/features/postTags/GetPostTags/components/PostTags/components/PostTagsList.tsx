@@ -7,36 +7,37 @@ import List from "@mui/material/List";
 
 import PostTagsToolbar from "./PostTagsToolbar";
 import PostTag from "./PostTag";
-import PostTagMenu from "./PostTagMenu";
-import { GET_CACHED_POST_TAGS } from "@features/postTags/GetPostTags/operations/GET_CACHED_POST_TAGS";
+import { GET_CACHED_POST_TAGS } from "../../../operations/GET_CACHED_POST_TAGS";
 import type { PostTagData } from "@types";
 
 interface PostTagsListProps {
   selectedTagsMap: Record<string, string>;
   selectedTagIdsLength: number;
-  onOpenEdit: (name: string, tagId: string) => void;
-  onClickDeleteButton: () => void;
-  onClickDeleteMenu: (name: string, id: string) => void;
-  onSelectOne: (checked: boolean, id: string, name: string) => void;
-  onSelectAll: (value: boolean, cachedTags: PostTagData[]) => void;
+  onClickMenuEdit: (name: string, tagId: string) => void;
+  onClickToolbarDeleteButton: () => void;
+  onClickMenuDelete: (name: string, id: string) => void;
+  onTagCheckboxChange: (checked: boolean, id: string, name: string) => void;
+  onAllCheckboxChange: (value: boolean, cachedTags: PostTagData[]) => void;
 }
 
 const PostTagsList = ({
   selectedTagsMap,
   selectedTagIdsLength,
-  onOpenEdit,
-  onClickDeleteButton,
-  onClickDeleteMenu,
-  onSelectOne,
-  onSelectAll,
+  onClickMenuEdit,
+  onClickToolbarDeleteButton,
+  onClickMenuDelete,
+  onTagCheckboxChange,
+  onAllCheckboxChange,
 }: PostTagsListProps) => {
   const client = useApolloClient();
   const cachedTags = client.readQuery({ query: GET_CACHED_POST_TAGS });
 
   if (!cachedTags) throw new Error();
 
+  const { tags } = cachedTags.getPostTags;
+
   const tagsList = React.useMemo(() => {
-    return cachedTags.getPostTags.tags.map(({ id, name }) => {
+    return tags.map(({ id, name }) => {
       const idName = name.replace(/[\s_.]/g, "-");
 
       return (
@@ -45,35 +46,28 @@ const PostTagsList = ({
           id={id}
           idName={idName}
           name={name}
-          tagsMap={selectedTagsMap}
-          onSelectOne={onSelectOne}
-          postTagMenu={
-            <PostTagMenu
-              name={name}
-              id={id}
-              idName={idName}
-              onOpenEdit={onOpenEdit}
-              onOpenDelete={onClickDeleteMenu}
-            />
-          }
+          isChecked={!!selectedTagsMap[id]}
+          onTagCheckboxChange={onTagCheckboxChange}
+          onClickMenuEdit={onClickMenuEdit}
+          onClickMenuDelete={onClickMenuDelete}
         />
       );
     });
   }, [
-    cachedTags.getPostTags.tags,
+    tags,
     selectedTagsMap,
-    onOpenEdit,
-    onClickDeleteMenu,
-    onSelectOne,
+    onClickMenuEdit,
+    onClickMenuDelete,
+    onTagCheckboxChange,
   ]);
 
   return (
     <div aria-busy={false}>
       <PostTagsToolbar
         numberOfSelectedPostTags={selectedTagIdsLength}
-        totalNumberOfPostTags={cachedTags.getPostTags.tags.length}
-        onSelectAll={value => onSelectAll(value, cachedTags.getPostTags.tags)}
-        onClick={onClickDeleteButton}
+        totalNumberOfPostTags={tags.length}
+        onAllCheckboxChange={value => onAllCheckboxChange(value, tags)}
+        onClick={onClickToolbarDeleteButton}
       />
       <Divider sx={{ mt: 1, mb: 3.5 }} />
       <Grid

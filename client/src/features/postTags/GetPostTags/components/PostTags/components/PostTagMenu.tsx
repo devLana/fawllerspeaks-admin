@@ -11,15 +11,15 @@ interface PostTagMenuProps {
   id: string;
   name: string;
   idName: string;
-  onOpenEdit: (tagName: string, tagId: string) => void;
-  onOpenDelete: (name: string, id: string) => void;
+  onClickMenuEdit: (name: string, id: string) => void;
+  onClickMenuDelete: (name: string, id: string) => void;
 }
 
 const PostTagMenu = (props: PostTagMenuProps) => {
-  const { id, name, idName, onOpenEdit, onOpenDelete } = props;
+  const { id, name, idName, onClickMenuEdit, onClickMenuDelete } = props;
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
 
-  const handleAction = (cb: (...args: unknown[]) => void) => () => {
+  const handleAction = (cb: () => void) => () => {
     cb();
     setAnchor(null);
   };
@@ -58,7 +58,7 @@ const PostTagMenu = (props: PostTagMenuProps) => {
           dense
           sx={{ columnGap: 3 }}
           aria-haspopup="dialog"
-          onClick={handleAction(() => onOpenEdit(name, id))}
+          onClick={handleAction(() => onClickMenuEdit(name, id))}
         >
           <ModeEditIcon fontSize="small" /> Edit
         </MenuItem>
@@ -66,7 +66,7 @@ const PostTagMenu = (props: PostTagMenuProps) => {
           dense
           sx={{ columnGap: 3, color: "error.main" }}
           aria-haspopup="dialog"
-          onClick={handleAction(() => onOpenDelete(name, id))}
+          onClick={handleAction(() => onClickMenuDelete(name, id))}
         >
           <DeleteForeverRoundedIcon color="error" fontSize="small" /> Delete
         </MenuItem>
@@ -75,4 +75,4 @@ const PostTagMenu = (props: PostTagMenuProps) => {
   );
 };
 
-export default PostTagMenu;
+export default React.memo(PostTagMenu);
