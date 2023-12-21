@@ -54,16 +54,16 @@ const getPostTags: GetPostTags = async (_, __, { db, user }) => {
 
         if (match) return +match2[0] - +match[0];
 
-        return 1;
+        if (tagName1.toUpperCase() < tagName2.toUpperCase()) return -1;
+
+        if (tagName1.toUpperCase() > tagName2.toUpperCase()) return 1;
+
+        return 0;
       }
 
-      if (/^\d+/.test(tagName2)) return 1;
+      if (tagName1.toUpperCase() < tagName2.toUpperCase()) return -1;
 
-      if (/\d+$/.test(tagName2)) return -1;
-
-      if (tagName1.toLowerCase() < tagName2.toLowerCase()) return -1;
-
-      if (tagName1.toLowerCase() > tagName2.toLowerCase()) return 1;
+      if (tagName1.toUpperCase() > tagName2.toUpperCase()) return 1;
 
       return 0;
     });
