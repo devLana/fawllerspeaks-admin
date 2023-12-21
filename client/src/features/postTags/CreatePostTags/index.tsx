@@ -28,7 +28,7 @@ const CreatePostTags = () => {
       <PostTagsDialog
         open={open}
         onClose={status === "submitting" ? undefined : () => setOpen(false)}
-        title="Create new post tags"
+        modalTitle="Create new post tags"
         contentText="You can create up to 10 post tags at a time."
         fullWidth
       >

@@ -12,7 +12,7 @@ describe("Edit a post tag", () => {
   const wrapper = new RegExp(`^${mocks.tagName} post tag container$`, "i");
   const name = { name: new RegExp(`^${mocks.tagName} post tag$`, "i") };
   const editMenuItem = { name: /^edit$/i };
-  const dialog = { name: /^edit post tag$/i };
+  const dialog = { name: /^edit post tag - /i };
   const editBtn = { name: /^edit tag$/i };
   const textbox = { name: /^post tag$/i };
 
