@@ -67,9 +67,9 @@ const PostTags = ({ id: titleId }: { id: string }) => {
   );
 
   const handleToolbarDeleteButton = () => setDeleteTags(true);
+  const handleCloseDeleteModal = () => setDeleteTags(false);
 
-  const handleCloseDeleteModal = () => {
-    setDeleteTags(false);
+  const handleClearMenuDeleteSelection = () => {
     setTagToDelete({ id: "", name: "" });
   };
 
@@ -87,11 +87,11 @@ const PostTags = ({ id: titleId }: { id: string }) => {
     setSelectedTags(data);
   };
 
-  const handleClearSelection = (deletedTags?: string[]) => {
+  const handleClearCheckboxSelections = (deletedTags?: string[]) => {
     const data: SelectedTags = { name: "", tagIds: [], tagsMap: {} };
 
     if (deletedTags) {
-      const deletedTagIdsSet = new Set<string>(deletedTags);
+      const deletedTagIdsSet = new Set(deletedTags);
 
       selectedTags.tagIds.forEach(tagId => {
         if (!deletedTagIdsSet.has(tagId)) {
@@ -101,7 +101,7 @@ const PostTags = ({ id: titleId }: { id: string }) => {
       });
 
       const [firstId] = data.tagIds;
-      data.name = firstId ? data.tagsMap[firstId] : "";
+      data.name = data.tagsMap[firstId] || "";
     }
 
     setSelectedTags(data);
@@ -138,7 +138,8 @@ const PostTags = ({ id: titleId }: { id: string }) => {
         name={name}
         ids={ids}
         onCloseDelete={handleCloseDeleteModal}
-        onClearSelection={handleClearSelection}
+        onClearMenuDeleteSelection={handleClearMenuDeleteSelection}
+        onClearCheckboxSelections={handleClearCheckboxSelections}
       />
     </>
   );

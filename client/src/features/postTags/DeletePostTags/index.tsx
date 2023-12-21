@@ -22,11 +22,18 @@ export interface DeletePostTagsProps {
   name: string;
   ids: string[];
   onCloseDelete: () => void;
-  onClearSelection: (deletedTags?: string[]) => void;
+  onClearMenuDeleteSelection: () => void;
+  onClearCheckboxSelections: (deletedTags?: string[]) => void;
 }
 
-const DeletePostTags = (props: DeletePostTagsProps) => {
-  const { open, ids, name, onCloseDelete, onClearSelection } = props;
+const DeletePostTags = ({
+  open,
+  ids,
+  name,
+  onCloseDelete,
+  onClearMenuDeleteSelection,
+  onClearCheckboxSelections,
+}: DeletePostTagsProps) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const { replace } = useRouter();
 
@@ -34,14 +41,15 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
 
   const { handleOpenAlert } = usePostTags();
 
+  const msg =
+    "You are unable to delete post tags at the moment. Please try again later";
+
   const handleResponse = (message: string) => {
     onCloseDelete();
+    onClearMenuDeleteSelection();
     handleOpenAlert(message);
     setIsLoading(false);
   };
-
-  const msg =
-    "You are unable to delete post tags at the moment. Please try again later";
 
   const handleDelete = () => {
     setIsLoading(true);
@@ -69,20 +77,21 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
 
           case "DeletePostTagsValidationError":
             handleResponse(data.deletePostTags.tagIdsError);
-            onClearSelection();
+            onClearCheckboxSelections();
             break;
 
           case "UnknownError":
           case "DeletedPostTagsWarning":
             handleResponse(data.deletePostTags.message);
-            onClearSelection();
+            onClearCheckboxSelections();
             break;
 
           case "DeletedPostTags": {
             const word = data.deletePostTags.tagIds.length > 1 ? "tags" : "tag";
 
             handleResponse(`Post ${word} deleted`);
-            onClearSelection(data.deletePostTags.tagIds);
+            onClearMenuDeleteSelection();
+            onClearCheckboxSelections(data.deletePostTags.tagIds);
             break;
           }
 

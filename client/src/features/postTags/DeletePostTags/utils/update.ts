@@ -6,6 +6,7 @@ import type { DeletePostTagsData } from "../types";
 type Update = MutationBaseOptions<DeletePostTagsData>["update"];
 
 interface PostTagRefs {
+  __typename?: "PostTags";
   tags: Reference[];
 }
 
@@ -15,7 +16,7 @@ interface CachePostTags {
 
 export const update: Update = (cache, { data }) => {
   if (data?.deletePostTags.__typename === "DeletedPostTags") {
-    const deletedPostTagIdsSet = new Set<string>(data.deletePostTags.tagIds);
+    const deletedPostTagIdsSet = new Set(data.deletePostTags.tagIds);
 
     cache.modify<CachePostTags>({
       fields: {
