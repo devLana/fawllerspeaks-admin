@@ -9,10 +9,12 @@ interface EditPostTagProps {
   open: boolean;
   name: string;
   id: string;
+  onEdit: (tagName: string, tagId: string) => void;
   onCloseEdit: () => void;
 }
 
-const EditPostTag = ({ open, name, id, onCloseEdit }: EditPostTagProps) => {
+const EditPostTag = (props: EditPostTagProps) => {
+  const { open, name, id, onEdit, onCloseEdit } = props;
   const [status, setStatus] = React.useState<Status>("idle");
 
   return (
@@ -27,6 +29,7 @@ const EditPostTag = ({ open, name, id, onCloseEdit }: EditPostTagProps) => {
         name={name}
         id={id}
         status={status}
+        onEdit={onEdit}
         onCloseEdit={onCloseEdit}
         onStatusChange={(newStatus: Status) => setStatus(newStatus)}
       />

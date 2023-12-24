@@ -23,12 +23,13 @@ interface EditPostTagFormProps {
   name: string;
   id: string;
   status: "idle" | "submitting";
+  onEdit: (tagName: string, tagId: string) => void;
   onCloseEdit: () => void;
   onStatusChange: (nextStatus: "idle" | "submitting") => void;
 }
 
 const EditPostTagForm = (props: EditPostTagFormProps) => {
-  const { name, id, status, onCloseEdit, onStatusChange } = props;
+  const { name, id, status, onEdit, onCloseEdit, onStatusChange } = props;
 
   const [alertIsOpen, setAlertIsOpen] = React.useState(false);
   const router = useRouter();
@@ -103,10 +104,14 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
           setAlertIsOpen(true);
           break;
 
-        case "EditedPostTag":
+        case "EditedPostTag": {
+          const { id: tagId, name: tagName } = editData.editPostTag.tag;
+
           handleOpenAlert("Post tag edited");
           onStatusChange("idle");
           onCloseEdit();
+          onEdit(tagName, tagId);
+        }
       }
     }
   };

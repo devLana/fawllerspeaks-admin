@@ -15,7 +15,7 @@ const PostTagsToolbar = ({
   onClick,
   onAllCheckboxChange,
 }: PostTagsToolbarProps) => {
-  const label = numSelected === numTags ? "Deselect" : "Select";
+  const label = numSelected === numTags ? "Unselect" : "Select";
   let buttonText: string;
   let isIndeterminate: boolean;
 

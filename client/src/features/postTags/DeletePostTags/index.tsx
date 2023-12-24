@@ -8,12 +8,11 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import { usePostTags } from "@features/postTags/context/PostTagsContext";
+import DeletePostTagsTextFormatter from "./components/DeletePostTagsTextFormatter";
 import { DELETE_POST_TAGS } from "./operations/DELETE_POST_TAGS";
-import { formatText } from "./utils/formatText";
 import { update } from "./utils/update";
 import { refetchQueries } from "./utils/refetchQueries";
 
@@ -22,17 +21,15 @@ export interface DeletePostTagsProps {
   name: string;
   ids: string[];
   onCloseDelete: () => void;
-  onClearMenuDeleteSelection: () => void;
-  onClearCheckboxSelections: (deletedTags?: string[]) => void;
+  onClearSelection: (deletedTags?: string[]) => void;
 }
 
 const DeletePostTags = ({
   open,
-  ids,
   name,
+  ids,
   onCloseDelete,
-  onClearMenuDeleteSelection,
-  onClearCheckboxSelections,
+  onClearSelection,
 }: DeletePostTagsProps) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const { replace } = useRouter();
@@ -46,7 +43,6 @@ const DeletePostTags = ({
 
   const handleResponse = (message: string) => {
     onCloseDelete();
-    onClearMenuDeleteSelection();
     handleOpenAlert(message);
     setIsLoading(false);
   };
@@ -77,21 +73,20 @@ const DeletePostTags = ({
 
           case "DeletePostTagsValidationError":
             handleResponse(data.deletePostTags.tagIdsError);
-            onClearCheckboxSelections();
+            onClearSelection();
             break;
 
           case "UnknownError":
           case "DeletedPostTagsWarning":
             handleResponse(data.deletePostTags.message);
-            onClearCheckboxSelections();
+            onClearSelection();
             break;
 
           case "DeletedPostTags": {
             const word = data.deletePostTags.tagIds.length > 1 ? "tags" : "tag";
 
             handleResponse(`Post ${word} deleted`);
-            onClearMenuDeleteSelection();
-            onClearCheckboxSelections(data.deletePostTags.tagIds);
+            onClearSelection(data.deletePostTags.tagIds);
             break;
           }
 
@@ -116,10 +111,7 @@ const DeletePostTags = ({
       <DialogContent sx={{ textAlign: "center" }}>
         <DialogContentText gutterBottom>
           Are you sure you want to delete&nbsp;
-          <Typography variant="caption" fontSize="1em" fontWeight="bold">
-            {name}
-          </Typography>
-          {formatText(ids.length)}
+          <DeletePostTagsTextFormatter name={name} idsLength={ids.length} />?
         </DialogContentText>
         <DialogContentText sx={{ textAlign: "center" }}>
           Any post tag you delete will also be deleted from posts it was
