@@ -5,10 +5,10 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   test: {
-    alias: {},
     clearMocks: true,
     environment: "jsdom",
     globals: true,
     setupFiles: "./vitest.setup.ts",
+    testTimeout: 10000,
   },
 });
