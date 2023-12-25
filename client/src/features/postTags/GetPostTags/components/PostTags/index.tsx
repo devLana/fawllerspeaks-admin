@@ -93,6 +93,7 @@ const PostTags = ({ id: titleId }: { id: string }) => {
           <PostTagsList
             selectedTags={selectedTags}
             tagIdsLength={selectedTagsIds.length}
+            setSelectedTags={setSelectedTags}
             onClickMenuEdit={handleMenuEdit}
             onClickMenuDelete={handleMenuDelete}
             onTagCheckboxChange={handleTagCheckbox}

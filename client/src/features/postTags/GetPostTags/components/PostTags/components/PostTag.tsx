@@ -15,6 +15,7 @@ interface PostTagProps {
   onTagCheckboxChange: (checked: boolean, id: string, name: string) => void;
   onClickMenuEdit: (name: string, id: string) => void;
   onClickMenuDelete: (name: string, id: string) => void;
+  onClickLabel: (shiftKey: boolean, id: string) => void;
 }
 
 const PostTag = ({
@@ -24,6 +25,7 @@ const PostTag = ({
   onTagCheckboxChange,
   onClickMenuDelete,
   onClickMenuEdit,
+  onClickLabel,
 }: PostTagProps) => {
   const idName = name.replace(/[\s_.]/g, "-");
 
@@ -39,6 +41,7 @@ const PostTag = ({
         sx={{ "&:hover>.MuiIconButton-root": { opacity: 1 } }}
       >
         <FormControlLabel
+          onClick={e => onClickLabel(e.shiftKey, id)}
           control={
             <Checkbox
               id={`${idName}-checkbox`}
