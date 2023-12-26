@@ -11,8 +11,9 @@ import type { PostTagData, StateSetterFn } from "@types";
 
 interface PostTagsListProps {
   selectedTags: Record<string, string>;
-  setSelectedTags: StateSetterFn<Record<string, string>>;
   tagIdsLength: number;
+  isDeleting: boolean;
+  setSelectedTags: StateSetterFn<Record<string, string>>;
   onClickMenuEdit: (name: string, tagId: string) => void;
   onClickToolbarDeleteButton: () => void;
   onClickMenuDelete: (name: string, id: string) => void;
@@ -23,6 +24,7 @@ interface PostTagsListProps {
 const PostTagsList = ({
   selectedTags,
   tagIdsLength,
+  isDeleting,
   setSelectedTags,
   onClickMenuEdit,
   onClickMenuDelete,
@@ -34,6 +36,34 @@ const PostTagsList = ({
   const cachedTags = useGetCachePostTags();
 
   if (!cachedTags) throw new Error();
+
+  React.useEffect(() => {
+    const handleControlPlusA = (e: KeyboardEvent) => {
+      if (!isDeleting && e.ctrlKey && (e.key === "A" || e.key === "a")) {
+        const data: Record<string, string> = {};
+
+        if (tagIdsLength !== cachedTags.length) {
+          cachedTags.forEach(cachedTag => {
+            data[cachedTag.id] = cachedTag.name;
+          });
+        }
+
+        setSelectedTags(data);
+      }
+    };
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && (e.key === "A" || e.key === "a")) e.preventDefault();
+    };
+
+    window.addEventListener("keyup", handleControlPlusA);
+    window.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      window.removeEventListener("keyup", handleControlPlusA);
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, [cachedTags, isDeleting, tagIdsLength, setSelectedTags]);
 
   const handleShiftClick = React.useCallback(
     (shiftKey: boolean, id: string) => {

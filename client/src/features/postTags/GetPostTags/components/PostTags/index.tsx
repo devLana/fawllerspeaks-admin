@@ -85,6 +85,7 @@ const PostTags = ({ id: titleId }: { id: string }) => {
 
   const alertProps = { severity: "error", "aria-busy": false } as const;
   const selectedTagsIds = Object.keys(selectedTags);
+  const isDeleting = deleteTag.open || deleteTags;
 
   return (
     <>
@@ -93,6 +94,7 @@ const PostTags = ({ id: titleId }: { id: string }) => {
           <PostTagsList
             selectedTags={selectedTags}
             tagIdsLength={selectedTagsIds.length}
+            isDeleting={isDeleting}
             setSelectedTags={setSelectedTags}
             onClickMenuEdit={handleMenuEdit}
             onClickMenuDelete={handleMenuDelete}
