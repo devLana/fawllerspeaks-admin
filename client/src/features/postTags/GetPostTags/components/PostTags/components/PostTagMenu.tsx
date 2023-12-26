@@ -41,6 +41,7 @@ const PostTagMenu = (props: PostTagMenuProps) => {
           transition: ({ transitions: { create, easing } }) => {
             return create("opacity", { easing: easing.easeInOut });
           },
+          "&:focus": { opacity: 1 },
         }}
       >
         <MoreVertIcon />
