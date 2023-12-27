@@ -12,7 +12,7 @@ interface Res {
   errors?: object[];
 }
 
-export const getTags = ["Tag 1", "Tag 2", "Tag 3"];
+export const getTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5"];
 const gqlMsg = "Unable to get post tags. Please try again later";
 
 const message =
@@ -25,6 +25,8 @@ const tags = [
   testPostTag(getTags[0], "1"),
   testPostTag(getTags[1], "2"),
   testPostTag(getTags[2], "3"),
+  testPostTag(getTags[3], "4"),
+  testPostTag(getTags[4], "5"),
 ];
 
 export const server = setupServer(

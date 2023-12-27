@@ -139,7 +139,7 @@ describe("Delete post tags", () => {
   });
 
   describe("Post tags are deleted", () => {
-    const { deleteBtn2, dialog2, wrapper, toolbarBtn } = mocks;
+    const { deleteBtn2, dialog2, wrapper, toolbarBtn, tagLabel } = mocks;
 
     // Attempt the delete operation by clicking each 'post tag checkbox'
     it("Should delete some of the selected post tags", async () => {
@@ -171,7 +171,7 @@ describe("Delete post tags", () => {
 
     // Attempt the delete operation by clicking the 'select all checkbox'
     it("Should delete all the selected post tags", async () => {
-      const { msg, tagNames: tags, resolver } = mocks.del;
+      const { msg, tagNames: tags, resolver } = mocks.allDel1;
       mocks.server.use(graphql.query("GetPostTags", resolver));
 
       const { user } = renderUI(<PostTagsPage />);
@@ -198,6 +198,73 @@ describe("Delete post tags", () => {
       expect(screen.queryByLabelText(wrapper(tags[0]))).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[1]))).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[2]))).not.toBeInTheDocument();
+    });
+
+    // Attempt the delete operation by selecting each post tag checkbox individually
+    it("Should delete some post tags post tags from the list of post tags", async () => {
+      const { msg, tagNames: tags, resolver } = mocks.allDel2;
+      mocks.server.use(graphql.query("GetPostTags", resolver));
+      const label = tagLabel;
+
+      const { user } = renderUI(<PostTagsPage />);
+
+      await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+      expect(screen.getByRole("checkbox", label(tags[1]))).toBeInTheDocument();
+      expect(screen.getByRole("checkbox", label(tags[3]))).toBeInTheDocument();
+
+      await user.click(screen.getByRole("checkbox", label(tags[0])));
+      await user.click(screen.getByRole("checkbox", label(tags[2])));
+      await user.click(screen.getByRole("checkbox", label(tags[4])));
+      await user.click(screen.getByRole("button", toolbarBtn("3", "s")));
+
+      const modal = screen.getByRole("dialog", dialog2);
+      await user.click(within(modal).getByRole("button", deleteBtn2));
+
+      expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
+      expect(within(modal).getByRole("button", mocks.cancelBtn)).toBeDisabled();
+
+      const elem = await screen.findByRole("presentation");
+
+      expect(within(elem).getByRole("alert")).toHaveTextContent(msg);
+      expect(modal).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(wrapper(tags[0]))).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(wrapper(tags[2]))).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(wrapper(tags[4]))).not.toBeInTheDocument();
+      expect(screen.getByRole("checkbox", label(tags[1]))).toBeInTheDocument();
+      expect(screen.getByRole("checkbox", label(tags[3]))).toBeInTheDocument();
+    });
+
+    // Attempt the delete operation by clicking a 'post tag menu'
+    it("Should delete a post tag, remove it from the post tags list and preserve the selected post tags", async () => {
+      const { msg, tagNames: tags, resolver } = mocks.someDel;
+      const { deleteMenuItem, deleteBtn1 } = mocks;
+      mocks.server.use(graphql.query("GetPostTags", resolver));
+
+      const { user } = renderUI(<PostTagsPage />);
+
+      await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+      await user.click(screen.getByRole("checkbox", tagLabel(tags[1])));
+      await user.click(screen.getByRole("checkbox", tagLabel(tags[2])));
+      await user.click(screen.getByRole("checkbox", tagLabel(tags[3])));
+      await user.hover(screen.getByLabelText(wrapper(tags[2])));
+      await user.click(screen.getByRole("button", mocks.name(tags[2])));
+
+      const tagMenu = screen.getByRole("menu", mocks.name(tags[2]));
+      await user.click(within(tagMenu).getByRole("menuitem", deleteMenuItem));
+
+      const modal = screen.getByRole("dialog", mocks.dialog1);
+      await user.click(within(modal).getByRole("button", deleteBtn1));
+
+      expect(within(modal).getByRole("button", deleteBtn1)).toBeDisabled();
+      expect(within(modal).getByRole("button", mocks.cancelBtn)).toBeDisabled();
+
+      const elem = await screen.findByRole("presentation");
+
+      expect(within(elem).getByRole("alert")).toHaveTextContent(msg);
+      expect(modal).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(wrapper(tags[2]))).not.toBeInTheDocument();
+      expect(screen.getByRole("checkbox", tagLabel(tags[1]))).toBeChecked();
+      expect(screen.getByRole("checkbox", tagLabel(tags[3]))).toBeChecked();
     });
   });
 });

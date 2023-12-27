@@ -74,7 +74,9 @@ export const validate = mock("validate", 2, validateMsg);
 export const validateResolver = dataCb([validate.tags[1]]);
 export const warn = mock("warn", 3, warnMsg);
 export const warnResolver = dataCb([warn.tags[0]]);
-export const del = mock("delete", 3, "Post tags deleted");
+export const someDel = mock("some-delete", 4, "Post tag deleted");
+export const allDel1 = mock("all-delete-one", 3, "Post tags deleted");
+export const allDel2 = mock("all-delete-two", 5, "Post tags deleted");
 const auth = mock("auth", 1, undefined);
 const notAllowed = mock("not-allowed", 1, undefined);
 const unregister = mock("unregister", 1, undefined);
@@ -118,9 +120,21 @@ export const server = setupServer(
       });
     }
 
-    if (tagIds[0].startsWith("delete")) {
+    if (tagIds[0].startsWith("some-delete")) {
       return mswData("deletePostTags", "DeletedPostTags", {
-        tagIds: del.tagIds,
+        tagIds: [someDel.tagIds[2]],
+      });
+    }
+
+    if (tagIds[0].startsWith("all-delete-one")) {
+      return mswData("deletePostTags", "DeletedPostTags", {
+        tagIds: allDel1.tagIds,
+      });
+    }
+
+    if (tagIds[0].startsWith("all-delete-two")) {
+      return mswData("deletePostTags", "DeletedPostTags", {
+        tagIds: [allDel2.tagIds[0], allDel2.tagIds[2], allDel2.tagIds[4]],
       });
     }
 
