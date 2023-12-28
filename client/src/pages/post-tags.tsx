@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import RootLayout from "@layouts/RootLayout";
-import { PostTagsContext } from "@features/postTags/context/PostTagsContext";
+import { PostTagsPageContext } from "@features/postTags/context/PostTagsPageContext";
 import CreatePostTags from "@features/postTags/CreatePostTags";
 import GetPostTags from "@features/postTags/GetPostTags";
 import uiLayout from "@utils/uiLayout";
@@ -20,7 +20,7 @@ const PostTagsPage: NextPageWithLayout = () => {
   };
 
   return (
-    <PostTagsContext.Provider value={{ handleOpenAlert }}>
+    <PostTagsPageContext.Provider value={{ handleOpenAlert }}>
       <Stack
         direction="row"
         flexWrap="wrap"
@@ -40,7 +40,7 @@ const PostTagsPage: NextPageWithLayout = () => {
         open={alert.open}
         onClose={handleCloseAlert({ ...alert, open: false }, setAlert)}
       />
-    </PostTagsContext.Provider>
+    </PostTagsPageContext.Provider>
   );
 };
 

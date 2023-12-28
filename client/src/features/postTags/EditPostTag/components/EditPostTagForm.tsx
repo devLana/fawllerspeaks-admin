@@ -10,7 +10,8 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTags } from "@features/postTags/context/PostTagsContext";
+import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
+import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
 import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
 import { editPostTagValidator } from "../utils/editPostTagValidator";
 import { refetchQueries } from "../utils/refetchQueries";
@@ -23,13 +24,12 @@ interface EditPostTagFormProps {
   name: string;
   id: string;
   status: "idle" | "submitting";
-  onEdit: (tagName: string, tagId: string) => void;
-  onCloseEdit: () => void;
+  onClick: () => void;
   onStatusChange: (nextStatus: "idle" | "submitting") => void;
 }
 
 const EditPostTagForm = (props: EditPostTagFormProps) => {
-  const { name, id, status, onEdit, onCloseEdit, onStatusChange } = props;
+  const { name, id, status, onClick, onStatusChange } = props;
 
   const [alertIsOpen, setAlertIsOpen] = React.useState(false);
   const router = useRouter();
@@ -46,7 +46,8 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
     defaultValues: { name },
   });
 
-  const { handleOpenAlert } = usePostTags();
+  const { handleOpenAlert } = usePostTagsPage();
+  const dispatch = usePostTagsListDispatch();
 
   const submitHandler = async (values: OmitTagId) => {
     onStatusChange("submitting");
@@ -105,12 +106,11 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
           break;
 
         case "EditedPostTag": {
-          const { id: tagId, name: tagName } = editData.editPostTag.tag;
+          const { __typename, ...rest } = editData.editPostTag.tag;
 
           handleOpenAlert("Post tag edited");
           onStatusChange("idle");
-          onCloseEdit();
-          onEdit(tagName, tagId);
+          dispatch({ type: "POST_TAG_EDITED", payload: rest });
         }
       }
     }
@@ -153,7 +153,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
           }}
         />
         <Stack direction="row" justifyContent="center" mt={3} columnGap={2}>
-          <Button onClick={onCloseEdit} disabled={status === "submitting"}>
+          <Button onClick={onClick} disabled={status === "submitting"}>
             Cancel
           </Button>
           <LoadingButton

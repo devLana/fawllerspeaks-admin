@@ -6,28 +6,23 @@ import Grid from "@mui/material/Grid";
 import ListItem from "@mui/material/ListItem";
 import Stack from "@mui/material/Stack";
 
+import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
 import PostTagMenu from "./PostTagMenu";
 
 interface PostTagProps {
   id: string;
   name: string;
   isChecked: boolean;
-  onTagCheckboxChange: (checked: boolean, id: string, name: string) => void;
-  onClickMenuEdit: (name: string, id: string) => void;
-  onClickMenuDelete: (name: string, id: string) => void;
   onClickLabel: (shiftKey: boolean, id: string) => void;
 }
 
-const PostTag = ({
-  id,
-  name,
-  isChecked,
-  onTagCheckboxChange,
-  onClickMenuDelete,
-  onClickMenuEdit,
-  onClickLabel,
-}: PostTagProps) => {
+const PostTag = ({ id, name, isChecked, onClickLabel }: PostTagProps) => {
   const idName = name.replace(/[\s_.]/g, "-");
+  const dispatch = usePostTagsListDispatch();
+
+  const handleChange = (checked: boolean) => {
+    dispatch({ type: "CLICK_POST_TAG", payload: { checked, id, name } });
+  };
 
   return (
     <Grid component={ListItem} disableGutters item xs={6} md={4} lg={3}>
@@ -46,7 +41,7 @@ const PostTag = ({
             <Checkbox
               id={`${idName}-checkbox`}
               size="small"
-              onChange={e => onTagCheckboxChange(e.target.checked, id, name)}
+              onChange={e => handleChange(e.target.checked)}
               checked={isChecked}
             />
           }
@@ -72,13 +67,7 @@ const PostTag = ({
             },
           })}
         />
-        <PostTagMenu
-          id={id}
-          name={name}
-          idName={idName}
-          onClickMenuEdit={onClickMenuEdit}
-          onClickMenuDelete={onClickMenuDelete}
-        />
+        <PostTagMenu id={id} name={name} idName={idName} />
       </Stack>
     </Grid>
   );

@@ -169,7 +169,7 @@ describe("View/Get post tags", () => {
       expect(screen.getByRole("checkbox", name(3))).not.toBeChecked();
       expect(screen.getByRole("checkbox", name(4))).not.toBeChecked();
 
-      await user.keyboard("{control>}a{/Control}");
+      await user.keyboard("{Control>}a{/Control}");
       expect(screen.getByRole("checkbox", unselectAll)).toBeChecked();
       expect(screen.getByRole("button", btn("all"))).toBeInTheDocument();
       expect(screen.getByRole("checkbox", name(0))).toBeChecked();
@@ -187,7 +187,7 @@ describe("View/Get post tags", () => {
       expect(screen.getByRole("checkbox", name(4))).not.toBeChecked();
       expect(screen.queryByRole("button", btn("all"))).not.toBeInTheDocument();
 
-      await user.keyboard("{control>}A{/Control}");
+      await user.keyboard("{Control>}A{/Control}");
       expect(screen.getByRole("checkbox", unselectAll)).toBeChecked();
       expect(screen.getByRole("button", btn("all"))).toBeInTheDocument();
       expect(screen.getByRole("checkbox", name(0))).toBeChecked();

@@ -10,7 +10,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTags } from "@features/postTags/context/PostTagsContext";
+import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
+import { usePostTagsListDispatch } from "../context/PostTagsListDispatchContext";
 import DeletePostTagsTextFormatter from "./components/DeletePostTagsTextFormatter";
 import { DELETE_POST_TAGS } from "./operations/DELETE_POST_TAGS";
 import { update } from "./utils/update";
@@ -20,29 +21,23 @@ export interface DeletePostTagsProps {
   open: boolean;
   name: string;
   ids: string[];
-  onCloseDelete: () => void;
-  onClearSelection: (deletedTags?: string[]) => void;
+  onClose: () => void;
 }
 
-const DeletePostTags = ({
-  open,
-  name,
-  ids,
-  onCloseDelete,
-  onClearSelection,
-}: DeletePostTagsProps) => {
+const DeletePostTags = ({ open, name, ids, onClose }: DeletePostTagsProps) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const { replace } = useRouter();
 
   const [deleteTags, { client }] = useMutation(DELETE_POST_TAGS);
 
-  const { handleOpenAlert } = usePostTags();
+  const { handleOpenAlert } = usePostTagsPage();
+  const dispatch = usePostTagsListDispatch();
 
   const msg =
     "You are unable to delete post tags at the moment. Please try again later";
 
   const handleResponse = (message: string) => {
-    onCloseDelete();
+    onClose();
     handleOpenAlert(message);
     setIsLoading(false);
   };
@@ -73,20 +68,21 @@ const DeletePostTags = ({
 
           case "DeletePostTagsValidationError":
             handleResponse(data.deletePostTags.tagIdsError);
-            onClearSelection();
+            dispatch({ type: "CLEAR_SELECTION" });
             break;
 
           case "UnknownError":
           case "DeletedPostTagsWarning":
             handleResponse(data.deletePostTags.message);
-            onClearSelection();
+            dispatch({ type: "CLEAR_SELECTION" });
             break;
 
           case "DeletedPostTags": {
-            const word = data.deletePostTags.tagIds.length > 1 ? "tags" : "tag";
+            const { tagIds: deletedTags } = data.deletePostTags;
+            const word = deletedTags.length > 1 ? "tags" : "tag";
 
             handleResponse(`Post ${word} deleted`);
-            onClearSelection(data.deletePostTags.tagIds);
+            dispatch({ type: "CLEAR_SELECTION", payload: { deletedTags } });
             break;
           }
 
@@ -102,7 +98,7 @@ const DeletePostTags = ({
   return (
     <Dialog
       open={open}
-      onClose={isLoading ? undefined : onCloseDelete}
+      onClose={isLoading ? undefined : onClose}
       aria-labelledby="delete-post-tags-dialog"
     >
       <DialogTitle id="delete-post-tags-dialog" sx={{ textAlign: "center" }}>
@@ -119,7 +115,7 @@ const DeletePostTags = ({
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-        <Button disabled={isLoading} onClick={onCloseDelete}>
+        <Button disabled={isLoading} onClick={onClose}>
           Cancel
         </Button>
         <LoadingButton

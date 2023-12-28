@@ -5,50 +5,32 @@ import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 
 import { useGetCachePostTags } from "@features/postTags/hooks/useGetCachePostTags";
+import { usePostTagsList } from "@features/postTags/context/PostTagsListContext";
+import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
 import PostTagsToolbar from "./PostTagsToolbar";
 import PostTag from "./PostTag";
-import type { PostTagData, StateSetterFn } from "@types";
 
-interface PostTagsListProps {
-  selectedTags: Record<string, string>;
-  tagIdsLength: number;
-  isDeleting: boolean;
-  setSelectedTags: StateSetterFn<Record<string, string>>;
-  onClickMenuEdit: (name: string, tagId: string) => void;
-  onClickToolbarDeleteButton: () => void;
-  onClickMenuDelete: (name: string, id: string) => void;
-  onTagCheckboxChange: (checked: boolean, id: string, name: string) => void;
-  onAllCheckboxChange: (value: boolean, cachedTags: PostTagData[]) => void;
-}
-
-const PostTagsList = ({
-  selectedTags,
-  tagIdsLength,
-  isDeleting,
-  setSelectedTags,
-  onClickMenuEdit,
-  onClickMenuDelete,
-  onTagCheckboxChange,
-  onAllCheckboxChange,
-  onClickToolbarDeleteButton,
-}: PostTagsListProps) => {
+const PostTagsList = ({ tagIdsLength }: { tagIdsLength: number }) => {
   const anchorTag = React.useRef<string | null>(null);
+
   const cachedTags = useGetCachePostTags();
+  const { selectedTags, deleteTag, deleteTags } = usePostTagsList();
+  const dispatch = usePostTagsListDispatch();
 
   if (!cachedTags) throw new Error();
 
   React.useEffect(() => {
     const handleControlPlusA = (e: KeyboardEvent) => {
+      const isDeleting = deleteTag.open || deleteTags;
+
       if (!isDeleting && e.ctrlKey && (e.key === "A" || e.key === "a")) {
-        const data: Record<string, string> = {};
-
-        if (tagIdsLength !== cachedTags.length) {
-          cachedTags.forEach(cachedTag => {
-            data[cachedTag.id] = cachedTag.name;
-          });
-        }
-
-        setSelectedTags(data);
+        dispatch({
+          type: "CTRL_A_SELECT_ALL",
+          payload: {
+            tags: cachedTags,
+            isNotAllSelected: tagIdsLength !== cachedTags.length,
+          },
+        });
       }
     };
 
@@ -63,7 +45,7 @@ const PostTagsList = ({
       window.removeEventListener("keyup", handleControlPlusA);
       window.removeEventListener("keydown", handleKeydown);
     };
-  }, [cachedTags, isDeleting, tagIdsLength, setSelectedTags]);
+  }, [cachedTags, deleteTags, deleteTag.open, tagIdsLength, dispatch]);
 
   const handleShiftClick = React.useCallback(
     (shiftKey: boolean, id: string) => {
@@ -73,43 +55,13 @@ const PostTagsList = ({
       }
 
       if (anchorTag.current && anchorTag.current !== id) {
-        const indexes: number[] = [];
-        const anchorTagId = anchorTag.current;
-
-        for (let i = 0; i < cachedTags.length; i++) {
-          const { id: tagId } = cachedTags[i];
-
-          if (tagId === anchorTagId || tagId === id) {
-            indexes.push(i);
-
-            if (indexes.length === 2) {
-              indexes.sort((a, b) => a - b);
-              break;
-            }
-          }
-        }
-
-        const [start, end] = indexes;
-
-        setSelectedTags(prevState => {
-          const data = prevState;
-
-          if (prevState[anchorTagId]) {
-            for (let i = start; i <= end; i++) {
-              data[cachedTags[i].id] = cachedTags[i].name;
-            }
-          } else {
-            for (let i = start; i <= end; i++) {
-              // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-              delete data[cachedTags[i].id];
-            }
-          }
-
-          return data;
+        dispatch({
+          type: "SHIFT_PLUS_CLICK",
+          payload: { anchorTagId: anchorTag.current, id, tags: cachedTags },
         });
       }
     },
-    [cachedTags, setSelectedTags]
+    [cachedTags, dispatch]
   );
 
   const tagsList = React.useMemo(() => {
@@ -119,28 +71,24 @@ const PostTagsList = ({
         id={id}
         name={name}
         isChecked={!!selectedTags[id]}
-        onTagCheckboxChange={onTagCheckboxChange}
-        onClickMenuEdit={onClickMenuEdit}
-        onClickMenuDelete={onClickMenuDelete}
         onClickLabel={handleShiftClick}
       />
     ));
-  }, [
-    cachedTags,
-    selectedTags,
-    handleShiftClick,
-    onClickMenuEdit,
-    onClickMenuDelete,
-    onTagCheckboxChange,
-  ]);
+  }, [cachedTags, selectedTags, handleShiftClick]);
+
+  const handleAllCheckboxChange = (checked: boolean) => {
+    dispatch({
+      type: "SELECT_UNSELECT_ALL_CHECKBOX",
+      payload: { checked, tags: cachedTags },
+    });
+  };
 
   return (
     <div aria-busy={false}>
       <PostTagsToolbar
         numberOfSelectedPostTags={tagIdsLength}
         totalNumberOfPostTags={cachedTags.length}
-        onAllCheckboxChange={value => onAllCheckboxChange(value, cachedTags)}
-        onClick={onClickToolbarDeleteButton}
+        onAllCheckboxChange={value => handleAllCheckboxChange(value)}
       />
       <Divider sx={{ mt: 1, mb: 3.5 }} />
       <Grid

@@ -7,20 +7,23 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
 
+import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
+
+type ActionType = "OPEN_MENU_EDIT" | "OPEN_MENU_DELETE";
+
 interface PostTagMenuProps {
   id: string;
   name: string;
   idName: string;
-  onClickMenuEdit: (name: string, id: string) => void;
-  onClickMenuDelete: (name: string, id: string) => void;
 }
 
-const PostTagMenu = (props: PostTagMenuProps) => {
-  const { id, name, idName, onClickMenuEdit, onClickMenuDelete } = props;
+const PostTagMenu = ({ id, name, idName }: PostTagMenuProps) => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
 
-  const handleAction = (cb: () => void) => () => {
-    cb();
+  const dispatch = usePostTagsListDispatch();
+
+  const handleAction = (type: ActionType) => () => {
+    dispatch({ type, payload: { name, id } });
     setAnchor(null);
   };
 
@@ -59,7 +62,7 @@ const PostTagMenu = (props: PostTagMenuProps) => {
           dense
           sx={{ columnGap: 3 }}
           aria-haspopup="dialog"
-          onClick={handleAction(() => onClickMenuEdit(name, id))}
+          onClick={handleAction("OPEN_MENU_EDIT")}
         >
           <ModeEditIcon fontSize="small" /> Edit
         </MenuItem>
@@ -67,7 +70,7 @@ const PostTagMenu = (props: PostTagMenuProps) => {
           dense
           sx={{ columnGap: 3, color: "error.main" }}
           aria-haspopup="dialog"
-          onClick={handleAction(() => onClickMenuDelete(name, id))}
+          onClick={handleAction("OPEN_MENU_DELETE")}
         >
           <DeleteForeverRoundedIcon color="error" fontSize="small" /> Delete
         </MenuItem>

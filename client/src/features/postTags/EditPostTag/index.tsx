@@ -1,37 +1,34 @@
 import * as React from "react";
 
+import { usePostTagsList } from "../context/PostTagsListContext";
+import { usePostTagsListDispatch } from "../context/PostTagsListDispatchContext";
 import PostTagsDialog from "../components/PostTagsDialog";
 import EditPostTagForm from "./components/EditPostTagForm";
 
 type Status = "idle" | "submitting";
 
-interface EditPostTagProps {
-  open: boolean;
-  name: string;
-  id: string;
-  onEdit: (tagName: string, tagId: string) => void;
-  onCloseEdit: () => void;
-}
-
-const EditPostTag = (props: EditPostTagProps) => {
-  const { open, name, id, onEdit, onCloseEdit } = props;
+const EditPostTag = () => {
   const [status, setStatus] = React.useState<Status>("idle");
+
+  const { edit } = usePostTagsList();
+  const dispatch = usePostTagsListDispatch();
+
+  const handleClose = () => dispatch({ type: "CLOSE_MENU_EDIT" });
 
   return (
     <PostTagsDialog
-      open={open}
-      onClose={status === "submitting" ? undefined : onCloseEdit}
-      modalTitle={`Edit post tag - ${name}`}
+      open={edit.open}
+      onClose={status === "submitting" ? undefined : handleClose}
+      modalTitle={`Edit post tag - ${edit.name}`}
       fullWidth
       maxWidth="xs"
     >
       <EditPostTagForm
-        name={name}
-        id={id}
+        name={edit.name}
+        id={edit.id}
         status={status}
-        onEdit={onEdit}
-        onCloseEdit={onCloseEdit}
         onStatusChange={(newStatus: Status) => setStatus(newStatus)}
+        onClick={handleClose}
       />
     </PostTagsDialog>
   );

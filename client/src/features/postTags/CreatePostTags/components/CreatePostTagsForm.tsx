@@ -11,7 +11,7 @@ import Stack from "@mui/material/Stack";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTags } from "../../context/PostTagsContext";
+import { usePostTagsPage } from "../../context/PostTagsPageContext";
 import CreatePostTagsInput from "./CreatePostTagsInput";
 import { createPostTagsValidator } from "../utils/createPostTagsValidator";
 import { refetchQueries } from "../utils/refetchQueries";
@@ -42,7 +42,7 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
     resolver: yupResolver(createPostTagsValidator(inputs)),
   });
 
-  const { handleOpenAlert } = usePostTags();
+  const { handleOpenAlert } = usePostTagsPage();
 
   const handleAddMore = () => {
     const lastInputValue = inputs.at(-1) ?? 0;

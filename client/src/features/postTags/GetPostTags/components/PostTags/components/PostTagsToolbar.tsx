@@ -2,19 +2,21 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Toolbar from "@mui/material/Toolbar";
 
+import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
+
 interface PostTagsToolbarProps {
   totalNumberOfPostTags: number;
   numberOfSelectedPostTags: number;
-  onClick: () => void;
   onAllCheckboxChange: (checked: boolean) => void;
 }
 
 const PostTagsToolbar = ({
   totalNumberOfPostTags: numTags,
   numberOfSelectedPostTags: numSelected,
-  onClick,
   onAllCheckboxChange,
 }: PostTagsToolbarProps) => {
+  const dispatch = usePostTagsListDispatch();
+
   const label = numSelected === numTags ? "Unselect" : "Select";
   let buttonText: string;
   let isIndeterminate: boolean;
@@ -44,7 +46,11 @@ const PostTagsToolbar = ({
         indeterminate={isIndeterminate}
       />
       {numSelected > 0 && (
-        <Button color="error" onClick={onClick} sx={{ ml: 2 }}>
+        <Button
+          color="error"
+          onClick={() => dispatch({ type: "OPEN_MULTI_DELETE" })}
+          sx={{ ml: 2 }}
+        >
           {buttonText}
         </Button>
       )}
