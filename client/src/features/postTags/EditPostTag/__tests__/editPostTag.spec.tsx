@@ -142,10 +142,15 @@ describe("Edit a post tag", () => {
         mocks.server.resetHandlers();
       });
 
-      it("Should edit a post tag with the ne post tag name", async () => {
+      const name1 = { name: new RegExp(`^${mocks.tagName}$`, "i") };
+      const name2 = { name: new RegExp(`^${mocks.edit.name}$`, "i") };
+
+      it("Should edit a post tag with the new post tag name", async () => {
         const { user } = renderUI(<PostTagsPage />);
 
         await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+        expect(screen.getByRole("checkbox", name1)).toBeInTheDocument();
+
         await user.hover(screen.getByLabelText(wrapper));
         await user.click(screen.getByRole("button", name));
 
@@ -168,7 +173,49 @@ describe("Edit a post tag", () => {
         await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
         expect(screen.getByRole("alert")).toHaveTextContent(mocks.edit.msg);
         expect(modal).not.toBeInTheDocument();
-        expect(screen.getByText(mocks.edit.name)).toBeInTheDocument();
+        expect(screen.queryByRole("checkbox", name1)).not.toBeInTheDocument();
+        expect(screen.getByRole("checkbox", name2)).toBeInTheDocument();
+      });
+
+      it("Should update the name of a selected post tag after editing", async () => {
+        const btnName = { name: /^delete all post tags$/i };
+        const dialogName = { name: /^delete post tag$/i };
+        const { user } = renderUI(<PostTagsPage />);
+
+        await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
+        await user.click(screen.getByRole("checkbox", name1));
+        await user.hover(screen.getByLabelText(wrapper));
+        await user.click(screen.getByRole("button", name));
+
+        const tagMenu = screen.getByRole("menu", name);
+
+        await user.click(within(tagMenu).getByRole("menuitem", editMenuItem));
+
+        const modal = screen.getByRole("dialog", dialog);
+        const inputBox = within(modal).getByRole("textbox", textbox);
+
+        await user.clear(inputBox);
+        await user.type(inputBox, mocks.edit.name);
+        await user.click(within(modal).getByRole("button", editBtn));
+
+        expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
+        expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
+
+        mocks.server.use(graphql.query("GetPostTags", mocks.resolver));
+
+        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(mocks.edit.msg);
+        expect(modal).not.toBeInTheDocument();
+        expect(screen.queryByRole("checkbox", name1)).not.toBeInTheDocument();
+        expect(screen.getByRole("checkbox", name2)).toBeInTheDocument();
+
+        await user.click(screen.getByRole("button", btnName));
+
+        const delModal = screen.getByRole("dialog", dialogName);
+
+        expect(
+          within(delModal).getByText(content => content === mocks.edit.name)
+        ).toBeInTheDocument();
       });
     });
   });
