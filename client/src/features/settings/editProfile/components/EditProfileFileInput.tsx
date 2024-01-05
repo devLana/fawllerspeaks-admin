@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 
 import EditProfileImagePreview from "./EditProfileImagePreview";
-import { FileInput } from "./FileInput";
+import { FileInput } from "@components/FileInput";
 import type { User } from "@hooks/useGetUserInfo";
 import type { FormStatus, StateSetterFn } from "@types";
 
