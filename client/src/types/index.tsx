@@ -68,3 +68,13 @@ type PostTagHelper<T extends object> = T extends { tags: PostTag[] }
 export type PostTagsDataUnionMapper<T extends Record<string, object>> = {
   [Key in keyof T]: PostTagHelper<T[Key]>;
 };
+
+export type PostView = "metadata" | "content" | "preview";
+
+export interface PostData {
+  title: string;
+  description: string;
+  content: string;
+  imageBanner?: File;
+  tags?: string[];
+}
