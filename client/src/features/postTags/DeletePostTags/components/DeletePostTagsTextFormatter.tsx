@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography";
-import { useGetCachePostTags } from "../../hooks/useGetCachePostTags";
+import { useGetCachePostTags } from "@hooks/useGetCachePostTags";
 
 interface FormatTextProps {
   name: string;

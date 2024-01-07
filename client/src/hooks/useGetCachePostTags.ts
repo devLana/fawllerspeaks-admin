@@ -1,4 +1,4 @@
-import { gql, type TypedDocumentNode } from "@apollo/client";
+import { useApolloClient, gql, type TypedDocumentNode } from "@apollo/client";
 
 import { POST_TAG_FIELDS } from "@fragments/PostTag";
 import type { PostTags } from "@apiTypes";
@@ -12,7 +12,7 @@ interface CachePostTags {
 
 type CachedPostTagsData = TypedDocumentNode<CachePostTags>;
 
-export const GET_CACHED_POST_TAGS: CachedPostTagsData = gql`
+const GET_CACHED_POST_TAGS: CachedPostTagsData = gql`
   ${POST_TAG_FIELDS}
   query GetCachedPostTags {
     getPostTags {
@@ -22,3 +22,10 @@ export const GET_CACHED_POST_TAGS: CachedPostTagsData = gql`
     }
   }
 `;
+
+export const useGetCachePostTags = () => {
+  const client = useApolloClient();
+  const cachedTags = client.readQuery({ query: GET_CACHED_POST_TAGS });
+
+  return cachedTags?.getPostTags.tags;
+};

@@ -1,15 +1,17 @@
 import { useRouter } from "next/router";
 
-import { useQuery } from "@apollo/client";
+import { useApolloClient } from "@apollo/client";
 
+import useGetPostTags from "@hooks/useGetPostTags";
 import PostTags from "./components/PostTags";
 import PostTagsLoading from "./components/PostTagsLoading";
 import PostTagsTextContent from "./components/PostTagsTextContent";
-import { GET_POST_TAGS } from "./operations/GET_POST_TAGS";
 
 const GetPostTags = () => {
   const { replace } = useRouter();
-  const { data, loading, error, client } = useQuery(GET_POST_TAGS);
+
+  const client = useApolloClient();
+  const { data, loading, error } = useGetPostTags();
 
   const id = "post-tags";
   const msg =

@@ -4,7 +4,7 @@ import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 
-import { useGetCachePostTags } from "@features/postTags/hooks/useGetCachePostTags";
+import { useGetCachePostTags } from "@hooks/useGetCachePostTags";
 import { usePostTagsList } from "@features/postTags/context/PostTagsListContext";
 import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
 import PostTagsToolbar from "./PostTagsToolbar";
