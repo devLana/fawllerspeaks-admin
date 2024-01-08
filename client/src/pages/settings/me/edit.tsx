@@ -11,22 +11,20 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 import useUploadImage from "@hooks/useUploadImage";
 import useGetUserInfo from "@hooks/useGetUserInfo";
-import EditProfileFileInput, {
-  type ImageFile,
-} from "@features/settings/editProfile/components/EditProfileFileInput";
+import EditProfileFileInput from "@features/settings/editProfile/components/EditProfileFileInput";
 import { EDIT_PROFILE } from "@features/settings/editProfile/operations/EDIT_PROFILE";
 import { editProfileValidator } from "@features/settings/editProfile/utils/editProfileValidator";
 import settingsLayout from "@utils/settings/settingsLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { MutationEditProfileArgs } from "@apiTypes";
-import type { FormStatus, NextPageWithLayout } from "@types";
+import type { EditProfileImage, FormStatus, NextPageWithLayout } from "@types";
 
 type EditProfile = Omit<MutationEditProfileArgs, "image">;
 
 const EditMe: NextPageWithLayout = () => {
   const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
   const [removeCurrentImage, setRemoveCurrentImage] = React.useState(false);
-  const [image, setImage] = React.useState<ImageFile>({
+  const [image, setImage] = React.useState<EditProfileImage>({
     error: "",
     file: null,
     blobUrl: "",

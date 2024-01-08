@@ -86,3 +86,9 @@ export interface PostData {
   imageBanner?: File;
   tags?: string[];
 }
+
+export interface EditProfileImage {
+  file: File | null;
+  error: string;
+  blobUrl: string;
+}

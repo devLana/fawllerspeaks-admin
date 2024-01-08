@@ -7,19 +7,13 @@ import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternate
 import EditProfileImagePreview from "./EditProfileImagePreview";
 import { FileInput } from "@components/FileInput";
 import type { User } from "@hooks/useGetUserInfo";
-import type { FormStatus, StateSetterFn } from "@types";
-
-export interface ImageFile {
-  file: File | null;
-  error: string;
-  blobUrl: string;
-}
+import type { EditProfileImage, FormStatus, StateSetterFn } from "@types";
 
 interface EditProfileFileInputProps {
-  image: ImageFile;
+  image: EditProfileImage;
   user: User | null;
   removeCurrentImage: boolean;
-  setImage: StateSetterFn<ImageFile>;
+  setImage: StateSetterFn<EditProfileImage>;
   setRemoveCurrentImage: StateSetterFn<boolean>;
   setFormStatus: StateSetterFn<FormStatus>;
 }
@@ -53,8 +47,6 @@ const EditProfileFileInput = ({
 
     if (image.blobUrl) window.URL.revokeObjectURL(image.blobUrl);
 
-    // removeCurrentImage is set to true here, so as to determine what get's rendered in this component below
-    setRemoveCurrentImage(true);
     setImage({
       error: "",
       file: files.item(0),
@@ -99,61 +91,49 @@ const EditProfileFileInput = ({
     />
   );
 
-  if (user?.image && !removeCurrentImage) {
-    return (
-      <Box mb={3.3}>
-        {input}
-        <EditProfileImagePreview
-          src={user.image}
-          onClick={() => setRemoveCurrentImage(true)}
-          onKeyDown={handleKeyDown}
-          alt={`${user.firstName} ${user.lastName} profile image`}
-        />
-      </Box>
-    );
-  }
-
-  if (image.file) {
-    return (
-      <Box mb={3.3}>
-        {input}
+  return (
+    <Box mb={3.3}>
+      {input}
+      {image.file ? (
         <EditProfileImagePreview
           src={image.blobUrl}
           onClick={handleRemoveImage}
           onKeyDown={handleKeyDown}
           alt="Profile image upload preview"
         />
-      </Box>
-    );
-  }
-
-  return (
-    <Box mb={3.3}>
-      {input}
-      <Button
-        size="large"
-        component="label"
-        htmlFor="image-avatar"
-        onDrop={handleDrop}
-        onDragOver={handleDragEvent()}
-        onDragEnter={handleDragEvent(true)}
-        onDragLeave={handleDragEvent(false)}
-        onKeyDown={handleKeyDown}
-        startIcon={<AddPhotoAlternateOutlinedIcon />}
-        sx={theme => ({
-          [theme.breakpoints.up("md")]: {
-            color: "text.primary",
-            width: "100%",
-            height: 180,
-            border: 1,
-            borderColor: hasEnteredDropZone ? "primary.main" : "divider",
-            ...(hasEnteredDropZone && { borderStyle: "dashed" }),
-            "&:hover": { borderColor: "text.primary" },
-          },
-        })}
-      >
-        Select Profile Image
-      </Button>
+      ) : user?.image && !removeCurrentImage ? (
+        <EditProfileImagePreview
+          src={user.image}
+          onClick={() => setRemoveCurrentImage(true)}
+          onKeyDown={handleKeyDown}
+          alt={`${user.firstName} ${user.lastName} profile image`}
+        />
+      ) : (
+        <Button
+          size="large"
+          component="label"
+          htmlFor="image-avatar"
+          onDrop={handleDrop}
+          onDragOver={handleDragEvent()}
+          onDragEnter={handleDragEvent(true)}
+          onDragLeave={handleDragEvent(false)}
+          onKeyDown={handleKeyDown}
+          startIcon={<AddPhotoAlternateOutlinedIcon />}
+          sx={theme => ({
+            [theme.breakpoints.up("md")]: {
+              color: "text.primary",
+              width: "100%",
+              height: 180,
+              border: 1,
+              borderColor: hasEnteredDropZone ? "primary.main" : "divider",
+              ...(hasEnteredDropZone && { borderStyle: "dashed" }),
+              "&:hover": { borderColor: "text.primary" },
+            },
+          })}
+        >
+          Select Profile Image
+        </Button>
+      )}
     </Box>
   );
 };
