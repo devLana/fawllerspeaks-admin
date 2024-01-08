@@ -25,7 +25,7 @@ interface DbFindPost {
   authorId: string;
   authorName: string;
   postStatus: PostStatus;
-  foundSlug: string | null;
+  foundImageBanner: string | null;
   foundTags: string[] | null;
 }
 
@@ -65,14 +65,23 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
         "array.min": "No post tags were provided",
         "array.base": "Post tags input must be an array",
       }),
-    slug: Joi.string().trim().messages({ "string.empty": "Provide post slug" }),
+    imageBanner: Joi.string()
+      .trim()
+      .messages({ "string.empty": "Provide post image banner link" }),
   });
 
   try {
     if (!user) return new NotAllowedError("Unable to edit post");
 
     const input = await schema.validateAsync(post, { abortEarly: false });
-    const { postId, title, description, content, tags, slug = null } = input;
+    const {
+      postId,
+      title,
+      description,
+      content,
+      tags,
+      imageBanner = null,
+    } = input;
 
     let postTags: PostTag[] = [];
 
@@ -96,7 +105,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
         author "authorId",
         first_name || ' ' || last_name "authorName",
         status "postStatus",
-        slug "foundSlug",
+        image_banner "foundImageBanner",
         tags "foundTags"
       FROM posts LEFT JOIN users ON author = user_id
       WHERE post_id = $1`,
@@ -121,7 +130,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       );
     }
 
-    const [{ authorId, authorName, postStatus, foundSlug, foundTags }] =
+    const [{ authorId, authorName, postStatus, foundImageBanner, foundTags }] =
       foundPost;
 
     if (authorId !== user) {
@@ -147,7 +156,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       postTags = gottenTags ?? [];
     }
 
-    const dbSlug = slug ?? foundSlug;
+    const dbImageBanner = imageBanner ?? foundImageBanner;
     const tagsToSave = tags ?? foundTags;
     const dbTags = tagsToSave ? `{${tagsToSave.join(", ")}}` : null;
 
@@ -156,12 +165,12 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
         title = $1,
         description = $2,
         content = $3,
-        slug = $4,
+        image_banner = $4,
         last_modified = $5,
         tags = $6
       WHERE post_id = $7
       RETURNING
-        image_banner "imageBanner",
+        slug,
         date_created "dateCreated",
         date_published "datePublished",
         last_modified "lastModified",
@@ -173,7 +182,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
         title,
         description,
         content,
-        dbSlug,
+        dbImageBanner,
         new Date().toISOString(),
         dbTags,
         postId,
@@ -181,7 +190,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
     );
 
     const [edited] = editedPost;
-    const postUrl = getPostUrl(dbSlug ?? title);
+    const postUrl = getPostUrl(dbImageBanner ?? title);
     const returnTags = postTags.length === 0 ? null : postTags;
 
     return new SinglePost({
@@ -193,7 +202,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       author: authorName,
       status: postStatus,
       url: postUrl,
-      slug: dbSlug,
+      imageBanner: dbImageBanner,
       dateCreated: dateToISOString(edited.dateCreated),
       datePublished: edited.datePublished
         ? dateToISOString(edited.datePublished)

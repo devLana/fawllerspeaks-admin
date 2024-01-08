@@ -13,7 +13,7 @@ export class PostValidationError implements Errors {
   readonly descriptionError?: string;
   readonly contentError?: string;
   readonly tagsError?: string;
-  readonly slugError?: string;
+  readonly imageBannerError?: string;
   readonly status: Status;
 
   constructor(errors: ValidationErrors) {
@@ -22,7 +22,7 @@ export class PostValidationError implements Errors {
     this.descriptionError = errors.descriptionError;
     this.contentError = errors.contentError;
     this.tagsError = errors.tagsError;
-    this.slugError = errors.slugError;
+    this.imageBannerError = errors.imageBannerError;
     this.status = "ERROR";
   }
 }

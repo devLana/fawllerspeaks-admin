@@ -32,7 +32,7 @@ interface DbPost {
   content: string | null;
   status: PostStatus;
   tags: string[] | null;
-  slug: string | null;
+  imageBanner: string | null;
 }
 
 const draftPost: DraftPost = async (_, { post }, { db, user }) => {
@@ -70,7 +70,9 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
         "array.min": "No post tags were provided",
         "array.base": "Post tags input must be an array",
       }),
-    slug: Joi.string().trim().messages({ "string.empty": "Provide post slug" }),
+    imageBanner: Joi.string()
+      .trim()
+      .messages({ "string.empty": "Provide post image banner link" }),
   });
 
   try {
@@ -83,7 +85,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
       description = null,
       content = null,
       tags,
-      slug = null,
+      imageBanner = null,
     } = result;
 
     const findUser = db.query<DBUser>(
@@ -128,7 +130,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
     let newDescription: string | null = null;
     let newContent: string | null = null;
     let newTags: string[] | null = null;
-    let newSlug: string | null = null;
+    let newImageBanner: string | null = null;
 
     if (postId) {
       const { rows: checkPostId } = await db.query<DbPost>(
@@ -138,7 +140,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           content,
           status,
           tags,
-          slug
+          image_banner "imageBanner"
         FROM posts
         WHERE post_id = $1`,
         [postId]
@@ -171,7 +173,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
       newDescription = checkPostId[0].description;
       newContent = checkPostId[0].content;
       newTags = checkPostId[0].tags;
-      newSlug = checkPostId[0].slug;
+      newImageBanner = checkPostId[0].imageBanner;
 
       const {
         rows: [updateDraft],
@@ -181,7 +183,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           description = $2,
           content = $3,
           status = $4,
-          slug = $5,
+          image_banner = $5,
           tags = $6
         WHERE post_id = $7
         RETURNING
@@ -190,6 +192,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           date_created "dateCreated",
           date_published "datePublished",
           last_modified "lastModified",
+          slug,
           views,
           likes,
           is_in_bin "isInBin",
@@ -199,7 +202,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           description ?? checkPostId[0].description,
           content ?? checkPostId[0].content,
           "Draft",
-          slug ?? checkPostId[0].slug,
+          imageBanner ?? checkPostId[0].imageBanner,
           dbTags ?? newDbTags,
           postId,
         ]
@@ -222,7 +225,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           content,
           author,
           status,
-          slug,
+          image_banner,
           tags
         ) VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING
@@ -235,7 +238,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
           likes,
           is_in_bin "isInBin",
           is_deleted "isDeleted"`,
-        [title, description, content, user, "Draft", slug, dbTags]
+        [title, description, content, user, "Draft", imageBanner, dbTags]
       );
 
       savedPost = newDraft;
@@ -246,7 +249,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
       postTags = gottenTags ?? [];
     }
 
-    const postUrl = getPostUrl(slug ?? newSlug ?? title);
+    const postUrl = getPostUrl(title);
     const returnTags = postTags.length === 0 ? null : postTags;
 
     return new SinglePost({
@@ -257,8 +260,8 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
       author: foundUser[0].name,
       status: "Draft",
       url: postUrl,
-      slug: slug ?? newSlug,
-      imageBanner: savedPost.imageBanner,
+      slug: savedPost.slug,
+      imageBanner: savedPost.imageBanner ?? newImageBanner,
       dateCreated: dateToISOString(savedPost.dateCreated),
       datePublished: savedPost.datePublished
         ? dateToISOString(savedPost.datePublished)

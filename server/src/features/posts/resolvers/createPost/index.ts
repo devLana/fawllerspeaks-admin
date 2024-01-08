@@ -52,14 +52,16 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
         "array.min": "No post tags were provided",
         "array.base": "Post tags input must be an array",
       }),
-    slug: Joi.string().trim().messages({ "string.empty": "Provide post slug" }),
+    imageBanner: Joi.string()
+      .trim()
+      .messages({ "string.empty": "Provide image banner link" }),
   });
 
   try {
     if (!user) return new NotAllowedError("Unable to create post");
 
     const result = await schema.validateAsync(post, { abortEarly: false });
-    const { title, description, content, tags, slug = null } = result;
+    const { title, description, content, tags, imageBanner = null } = result;
 
     let postTags: PostTag[] = [];
 
@@ -112,12 +114,13 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
         content,
         author,
         status,
-        slug,
+        image_banner,
         tags
       ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING
         post_id "postId",
         image_banner "imageBanner",
+        slug,
         date_created "dateCreated",
         date_published "datePublished",
         last_modified "lastModified",
@@ -125,11 +128,11 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
         likes,
         is_in_bin "isInBin",
         is_deleted "isDeleted"`,
-      [title, description, content, user, "Unpublished", slug, dbTags]
+      [title, description, content, user, "Unpublished", imageBanner, dbTags]
     );
 
     const [saved] = savedPost;
-    const postUrl = getPostUrl(slug ?? title);
+    const postUrl = getPostUrl(title);
     const returnTags = tags ? postTags : null;
 
     return new SinglePost({
@@ -140,7 +143,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       author: loggedInUser[0].name,
       status: "Unpublished",
       url: postUrl,
-      slug,
+      slug: saved.slug,
       imageBanner: saved.imageBanner,
       dateCreated: dateToISOString(saved.dateCreated),
       datePublished: saved.datePublished

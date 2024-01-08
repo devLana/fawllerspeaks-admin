@@ -61,7 +61,7 @@ export const postsTypeDefs = `#graphql
     descriptionError: String
     contentError: String
     tagsError: String
-    slugError: String
+    imageBannerError: String
     status: Status!
   }
 
@@ -80,7 +80,7 @@ export const postsTypeDefs = `#graphql
     descriptionError: String
     contentError: String
     tagsError: String
-    slugError: String
+    imageBannerError: String
     status: Status!
   }
 
@@ -109,7 +109,7 @@ export const postsTypeDefs = `#graphql
     description: String!
     content: String!
     tags: [ID!]
-    slug: String
+    imageBanner: String
   }
 
   input DraftPostInput {
@@ -118,7 +118,7 @@ export const postsTypeDefs = `#graphql
     description: String
     content: String
     tags: [ID!]
-    slug: String
+    imageBanner: String
   }
 
   input EditPostInput {
@@ -127,6 +127,6 @@ export const postsTypeDefs = `#graphql
     description: String!
     content: String!
     tags: [ID!]
-    slug: String
+    imageBanner: String
   }
 `;

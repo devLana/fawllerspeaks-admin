@@ -45,6 +45,7 @@ export interface DbTestUser {
 export interface DbCreatePost {
   readonly postId: string;
   readonly imageBanner: string | null;
+  readonly slug: string | null;
   readonly dateCreated: string;
   readonly datePublished: string | null;
   readonly lastModified: string | null;
