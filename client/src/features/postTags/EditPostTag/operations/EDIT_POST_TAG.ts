@@ -2,7 +2,7 @@ import { gql, type TypedDocumentNode as Node } from "@apollo/client";
 
 import { POST_TAG_FIELDS } from "@fragments/PostTag";
 import type { MutationEditPostTagArgs } from "@apiTypes";
-import type { EditPostTagData } from "../types";
+import type { EditPostTagData } from "@types";
 
 type EditPostTag = Node<EditPostTagData, MutationEditPostTagArgs>;
 

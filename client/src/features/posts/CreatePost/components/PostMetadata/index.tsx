@@ -49,7 +49,7 @@ const PostMetadata = ({
   };
 
   return (
-    <Box>
+    <section>
       <Typography>Provide post metadata for the following:</Typography>
       <MetadataList />
       <Box
@@ -98,7 +98,7 @@ const PostMetadata = ({
           </Button>
         </Stack>
       </Box>
-    </Box>
+    </section>
   );
 };
 

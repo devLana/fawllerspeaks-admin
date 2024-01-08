@@ -7,7 +7,7 @@ import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
 import type { SxProps } from "@mui/material/styles";
 
 import type { MetaInfo } from "@components/Metadata";
-import type { PostTag } from "@apiTypes";
+import type { Mutation, PostTag, Query } from "@apiTypes";
 
 export type ThemeMode = "sunny" | "sunset" | "pitch black";
 export type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";
@@ -59,18 +59,26 @@ export type RequestStatus = Status | "loading";
 
 export type PostTagData = Omit<PostTag, "dateCreated" | "lastModified">;
 
-type PostTagHelper<T extends object> = T extends { tags: PostTag[] }
+type PostTagDataHelper<T extends object> = T extends { tags: PostTag[] }
   ? Omit<T, "tags"> & { tags: PostTagData[] }
   : T extends { tag: PostTag }
   ? Omit<T, "tag"> & { tag: PostTagData }
   : T;
 
-export type PostTagsDataUnionMapper<T extends Record<string, object>> = {
-  [Key in keyof T]: PostTagHelper<T[Key]>;
+type PostTagDataMapper<T extends Record<string, object>> = {
+  [Key in keyof T]: PostTagDataHelper<T[Key]>;
 };
 
-export type PostView = "metadata" | "content" | "preview";
+export type EditPostTagData = PostTagDataMapper<Pick<Mutation, "editPostTag">>;
+export type GetPostTagsData = PostTagDataMapper<Pick<Query, "getPostTags">>;
+export type CreatePostTagsData = PostTagDataMapper<
+  Pick<Mutation, "createPostTags">
+>;
+export type DeletePostTagsData = PostTagDataMapper<
+  Pick<Mutation, "deletePostTags">
+>;
 
+export type PostView = "metadata" | "content" | "preview";
 export interface PostData {
   title: string;
   description: string;

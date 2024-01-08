@@ -1,7 +1,7 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
 import { POST_TAG_FIELDS } from "@fragments/PostTag";
-import type { GetPostTagsData } from "../types";
+import type { GetPostTagsData } from "@types";
 
 type GetPostTags = TypedDocumentNode<GetPostTagsData>;
 

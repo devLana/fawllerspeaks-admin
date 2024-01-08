@@ -23,7 +23,7 @@
       "@layouts/*": ["layouts/*"],
       "@hooks/*": ["hooks/*"],
       "@types": ["types"],
-      "@apiTypes": ["types/api/graphql"],
+      "@apiTypes": ["types/graphql"],
       "@utils/*": ["utils/*"],
       "@lib/*": ["lib/*"],
       "@fragments/*": ["fragments/*"]
