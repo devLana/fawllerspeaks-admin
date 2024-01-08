@@ -5,14 +5,15 @@ import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternate
 import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
 
 interface EditProfileImagePreviewProps {
+  id: string;
   src: string;
+  alt: string;
   onClick: () => void;
   onKeyDown: React.KeyboardEventHandler<HTMLLabelElement>;
-  alt: string;
 }
 
 const EditProfileImagePreview = (props: EditProfileImagePreviewProps) => {
-  const { src, onClick, onKeyDown, alt } = props;
+  const { id, src, alt, onClick, onKeyDown } = props;
 
   return (
     <div>
@@ -39,7 +40,7 @@ const EditProfileImagePreview = (props: EditProfileImagePreviewProps) => {
           variant="outlined"
           size="small"
           component="label"
-          htmlFor="image-avatar"
+          htmlFor={id}
           startIcon={<AddPhotoAlternateOutlinedIcon />}
           onKeyDown={onKeyDown}
         >
