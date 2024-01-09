@@ -9,7 +9,7 @@ import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded";
 export const topLinks = [
   {
     primary: true,
-    href: "/post/new",
+    href: "/posts/new",
     label: "New Post",
     Icon: PostAddIcon,
   },

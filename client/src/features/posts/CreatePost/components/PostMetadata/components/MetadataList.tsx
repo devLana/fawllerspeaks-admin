@@ -10,7 +10,7 @@ const MetadataList = () => (
       <ListItemIcon>
         <CircleIcon sx={{ fontSize: 8 }} />
       </ListItemIcon>
-      <ListItemText primary="Post Title" />
+      <ListItemText secondary="Blog post title">Post Title</ListItemText>
     </ListItem>
     <ListItem>
       <ListItemIcon>
