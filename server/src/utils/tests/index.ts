@@ -1,7 +1,6 @@
 export { default as spyDb } from "./spyDb";
 export { default as post } from "./post";
 export { default as authUsers } from "./createTestUsers/authUsers";
-export { default as postsUsers } from "./createTestUsers/postsUsers";
 export { default as testUsers } from "./createTestUsers/testUsers";
 export { default as loginTestUser } from "./loginTestUser";
 export { default as createTestPostTags } from "./createTestPostTags";

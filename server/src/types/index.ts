@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import type { Pool } from "pg";
 import type { BaseContext } from "@apollo/server";
 
-import type { PostStatus } from "@resolverTypes";
+import type { Author, PostStatus } from "@resolverTypes";
 
 export interface IClientUrls {
   readonly login: string;
@@ -29,6 +29,7 @@ export interface TestData<T> {
 export interface TestUser {
   readonly firstName: string | null;
   readonly lastName: string | null;
+  readonly image: string | null;
   readonly email: string;
   readonly password: string;
   readonly registered: boolean;
@@ -36,41 +37,35 @@ export interface TestUser {
 }
 
 export interface DbTestUser {
-  // readonly image: string | null;
   readonly userId: string;
   readonly dateCreated: string;
-  readonly resetToken: [string, string] | null;
 }
 
-export interface DbCreatePost {
+export interface PostDBData {
+  readonly id: string;
   readonly postId: string;
-  readonly imageBanner: string | null;
-  readonly slug: string | null;
   readonly dateCreated: string;
   readonly datePublished: string | null;
   readonly lastModified: string | null;
   readonly views: number;
-  readonly likes: number;
   readonly isInBin: boolean;
   readonly isDeleted: boolean;
 }
 
-export interface DbFindPost extends DbCreatePost {
+export interface GetPostDBData extends PostDBData {
   readonly title: string;
   readonly description: string;
   readonly content: string;
-  readonly author: string;
+  readonly author: Omit<Author, "__typename">;
   readonly status: PostStatus;
-  readonly slug: string | null;
-  readonly tags: string[] | null;
+  readonly imageBanner: string | null;
 }
 
-interface TestPost {
+export interface TestPost {
   readonly title: string;
   readonly description: string | null;
   readonly content: string | null;
   readonly status: PostStatus;
-  readonly slug: string | null;
   readonly imageBanner: string | null;
   readonly datePublished: number | null;
   readonly lastModified: number | null;
@@ -78,15 +73,11 @@ interface TestPost {
   readonly isDeleted: boolean;
 }
 
-export interface TestPosts {
-  readonly first: TestPost;
-  readonly second: Omit<TestPost, "slug">;
-}
-
 export interface PostAuthor {
   readonly userId: string;
   readonly firstName: string;
   readonly lastName: string;
+  readonly image: string | null;
 }
 
 export interface Cookies {

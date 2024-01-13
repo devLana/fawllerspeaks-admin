@@ -20,7 +20,7 @@ export const data = {
   email: "mail@mail.com",
   firstName: "first_name",
   lastName: "last_name",
-  image: null,
+  image: "/user/image/storage/path",
   dateCreated,
 };
 

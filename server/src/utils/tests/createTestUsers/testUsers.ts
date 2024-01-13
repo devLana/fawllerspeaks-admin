@@ -27,13 +27,12 @@ const testUsers = async (db: Pool): Promise<Users> => {
         first_name,
         last_name,
         is_registered,
-        reset_token
-      ) VALUES ($1, $2, $3, $4, $5, $6)
+        reset_token,
+        image
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING
-        image,
         user_id "userId",
-        date_created "dateCreated",
-        reset_token "resetToken"`,
+        date_created "dateCreated"`,
       [
         registeredUser.email,
         registerHash,
@@ -41,6 +40,7 @@ const testUsers = async (db: Pool): Promise<Users> => {
         registeredUser.lastName,
         registeredUser.registered,
         `{${registeredUser.resetToken[0]}, ${registeredUser.resetToken[1]}}`,
+        registeredUser.image,
       ]
     );
 
@@ -52,10 +52,8 @@ const testUsers = async (db: Pool): Promise<Users> => {
         reset_token
       ) VALUES ($1, $2, $3, $4)
       RETURNING
-        image,
         user_id "userId",
-        date_created "dateCreated",
-        reset_token "resetToken"`,
+        date_created "dateCreated"`,
       [
         unRegisteredUser.email,
         unRegisterHash,

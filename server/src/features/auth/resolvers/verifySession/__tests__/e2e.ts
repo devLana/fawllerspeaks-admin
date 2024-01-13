@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 
 import type { ApolloServer } from "@apollo/server";
 
+import supabase from "@lib/supabase/supabaseClient";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
@@ -227,6 +228,8 @@ describe("Verify Session - E2E", () => {
 
       it("Should verify session, Sign a new access token and send user details", async () => {
         const variables = { sessionId: registeredSessionId };
+
+        const { storageUrl } = supabase();
         const payload = { query: VERIFY_SESSION, variables };
         const options = { cookie: registeredCookies };
 
@@ -242,7 +245,7 @@ describe("Verify Session - E2E", () => {
             id: registeredUser.userId,
             firstName: registeredTestUser.firstName,
             lastName: registeredTestUser.lastName,
-            image: null,
+            image: `${storageUrl}${registeredTestUser.image}`,
             isRegistered: registeredTestUser.registered,
             dateCreated: registeredUser.dateCreated,
           },

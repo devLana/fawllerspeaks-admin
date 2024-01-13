@@ -1,4 +1,5 @@
 import supabase from "@lib/supabase/supabaseClient";
+import { registeredUser } from "@tests";
 import type { InputErrors } from "@types";
 
 interface Input {
@@ -75,7 +76,11 @@ export const editSuccess: [string, Input, string | null][] = [
 ];
 
 export const edit: [string, Input, string | null][] = [
-  ["Should edit the user's profile without an image", args, null],
+  [
+    "Should edit the user's profile without an image",
+    args,
+    `${storageUrl}${registeredUser.image}`,
+  ],
   [
     "Should edit the user's profile with an image",
     { ...args, image },

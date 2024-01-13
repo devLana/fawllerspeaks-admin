@@ -30,19 +30,19 @@ const authUsers = async (db: Pool): Promise<Users> => {
         first_name,
         last_name,
         is_registered,
-        reset_token
-      ) VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING
         image,
+        reset_token
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING
         user_id "userId",
-        date_created "dateCreated",
-        reset_token "resetToken"`,
+        date_created "dateCreated"`,
       [
         registeredUser.email,
         registerHash,
         registeredUser.firstName,
         registeredUser.lastName,
         registeredUser.registered,
+        registeredUser.image,
         `{${registeredUser.resetToken[0]}, ${registeredUser.resetToken[1]}}`,
       ]
     );
@@ -54,19 +54,19 @@ const authUsers = async (db: Pool): Promise<Users> => {
         first_name,
         last_name,
         is_registered,
-        reset_token
-      ) VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING
         image,
+        reset_token
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING
         user_id "userId",
-        date_created "dateCreated",
-        reset_token "resetToken"`,
+        date_created "dateCreated"`,
       [
         newRegisteredUser.email,
         newRegisterHash,
         newRegisteredUser.firstName,
         newRegisteredUser.lastName,
         newRegisteredUser.registered,
+        newRegisteredUser.image,
         `{${newRegisteredUser.resetToken[0]}, ${newRegisteredUser.resetToken[1]}}`,
       ]
     );
@@ -79,10 +79,8 @@ const authUsers = async (db: Pool): Promise<Users> => {
         reset_token
       ) VALUES ($1, $2, $3, $4)
       RETURNING
-        image,
         user_id "userId",
-        date_created "dateCreated",
-        reset_token "resetToken"`,
+        date_created "dateCreated"`,
       [
         unRegisteredUser.email,
         unRegisterHash,

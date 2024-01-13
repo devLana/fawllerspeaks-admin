@@ -2,6 +2,7 @@ import { test, expect, describe, beforeAll, afterAll } from "@jest/globals";
 
 import type { ApolloServer } from "@apollo/server";
 
+import supabase from "@lib/supabase/supabaseClient";
 import { JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
 
 import { startServer } from "@server";
@@ -79,6 +80,7 @@ describe("Login - E2E", () => {
   describe("Successfully log in user", () => {
     test("Should log the user in and return user details", async () => {
       const { email, password } = registeredUser;
+      const { storageUrl } = supabase();
       const payload = { query: LOGIN, variables: { email, password } };
 
       const { data, responseHeaders } = await post<Login>(url, payload);
@@ -100,7 +102,7 @@ describe("Login - E2E", () => {
           id: user.userId,
           firstName: registeredUser.firstName,
           lastName: registeredUser.lastName,
-          image: null,
+          image: `${storageUrl}${registeredUser.image}`,
           isRegistered: registeredUser.registered,
           dateCreated: user.dateCreated,
         },
