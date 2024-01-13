@@ -2,14 +2,14 @@ import { mkdir } from "node:fs";
 
 import type { Request, Response, NextFunction } from "express";
 
-import { uploadDir } from "@utils";
+import { UPLOAD_DIR } from "@utils";
 
 export const createTempDirectory = (
   _: Request,
   __: Response,
   next: NextFunction
 ) => {
-  mkdir(uploadDir, { recursive: true }, () => {
+  mkdir(UPLOAD_DIR, { recursive: true }, () => {
     next();
   });
 };

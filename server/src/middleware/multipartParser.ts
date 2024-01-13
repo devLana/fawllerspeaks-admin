@@ -2,7 +2,7 @@ import formidable from "formidable";
 import type { Response, NextFunction } from "express";
 
 import { removeFile } from "@events/removeFile";
-import { ApiError, BadRequestError, uploadDir } from "@utils";
+import { ApiError, BadRequestError, UPLOAD_DIR } from "@utils";
 import type { UploadRequest } from "@types";
 
 export const multipartParser = async (
@@ -16,7 +16,7 @@ export const multipartParser = async (
   }
 
   try {
-    const form = formidable({ uploadDir });
+    const form = formidable({ uploadDir: UPLOAD_DIR });
     const [fields, files] = await form.parse<"type", "image">(req);
 
     if (!files.image) {
@@ -56,7 +56,7 @@ export const multipartParser = async (
 
     next();
   } catch (err) {
-    removeFile.emit("remove", uploadDir);
+    removeFile.emit("remove", UPLOAD_DIR);
 
     if (err instanceof ApiError) return next(err);
 

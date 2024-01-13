@@ -13,6 +13,7 @@ export { default as postFormData } from "./postFormData";
 
 export * from "./resolverArguments";
 export * from "./mocks";
+export * from "./constants";
 export * from "./gqlQueries/authTestQueries";
 export * from "./gqlQueries/postsTestQueries";
 export * from "./gqlQueries/postTagsTestQueries";

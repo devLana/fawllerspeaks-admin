@@ -13,11 +13,11 @@ import {
   testUsers,
   loginTestUser,
   createTestPostTags,
+  DATE_REGEX,
 } from "@tests";
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag } from "@resolverTypes";
-import { DATE_REGEX } from "@utils";
 import { gqlValidations, validations } from "../utils/editPostTag.testUtils";
 
 type EditTag = TestData<{ editPostTag: Record<string, unknown> }>;

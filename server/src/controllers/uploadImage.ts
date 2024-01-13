@@ -4,7 +4,7 @@ import type { Response, NextFunction } from "express";
 
 import supabase from "@lib/supabase/supabaseClient";
 import { removeFile } from "@events/removeFile";
-import { ApiError, generateSupabasePath, upload, uploadDir } from "@utils";
+import { ApiError, generateSupabasePath, upload, UPLOAD_DIR } from "@utils";
 import type { UploadRequest } from "@types";
 
 export const uploadImage = async (
@@ -34,7 +34,7 @@ export const uploadImage = async (
       imageFile
     );
 
-    removeFile.emit("remove", uploadDir);
+    removeFile.emit("remove", UPLOAD_DIR);
 
     if (supabaseErr) {
       throw new ApiError(
