@@ -1,19 +1,23 @@
 export const postsTypeDefs = `#graphql
+  type Author {
+    name: String!
+    image: String
+  }
+
   type Post {
     id: ID!
     title: String!
     description: String
     content: String
-    author: String!
+    author: Author!
     status: PostStatus!
-    slug: String
+    slug: String!
     url: String!
     imageBanner: String
     dateCreated: String!
     datePublished: String
     lastModified: String
     views: Int!
-    likes: Int!
     isInBin: Boolean!
     isDeleted: Boolean!
     tags: [PostTag!]
@@ -86,7 +90,7 @@ export const postsTypeDefs = `#graphql
 
   union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
 
-  union CreatePost = SinglePost | CreatePostValidationError | DuplicatePostTitleError | NotAllowedError | UnknownError
+  union CreatePost = SinglePost | CreatePostValidationError | DuplicatePostTitleError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
 
   union Draft_Edit = SinglePost | PostValidationError | DuplicatePostTitleError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
 

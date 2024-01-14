@@ -12,6 +12,8 @@ import deletePostsFromBin from "./deletePostsFromBin";
 import emptyBin from "./emptyBin";
 
 import {
+  PostResolvers,
+  AuthorResolvers,
   SinglePostResolver,
   PostsResolver,
   PostsWarningResolver,
@@ -24,7 +26,7 @@ import {
 } from "./types";
 
 import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
-import { CreatePostValidationErrorResolver } from "./createPost/CreatePostValidationError";
+import { CreatePostValidationErrorResolver } from "./createPost/types";
 
 import type {
   MutationResolvers,
@@ -45,6 +47,8 @@ type MutationsKeys =
   | "emptyBin";
 
 type TypeKeys =
+  | "Post"
+  | "Author"
   | "SinglePost"
   | "Posts"
   | "PostsWarning"
@@ -82,6 +86,8 @@ export const postsResolvers: PostsResolvers = {
   },
 
   Types: {
+    Post: PostResolvers,
+    Author: AuthorResolvers,
     SinglePost: SinglePostResolver,
     Posts: PostsResolver,
     PostsWarning: PostsWarningResolver,

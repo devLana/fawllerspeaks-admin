@@ -4,6 +4,7 @@ export { default as authUsers } from "./createTestUsers/authUsers";
 export { default as testUsers } from "./createTestUsers/testUsers";
 export { default as loginTestUser } from "./loginTestUser";
 export { default as createTestPostTags } from "./createTestPostTags";
+export { default as createTestPost } from "./createTestPost";
 export { default as createTestPosts } from "./createTestPosts";
 export { default as createAllTestPosts } from "./createAllTestPosts";
 export { default as createBinnedTestPosts } from "./createBinnedTestPosts";

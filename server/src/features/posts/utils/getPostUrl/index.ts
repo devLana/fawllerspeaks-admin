@@ -1,18 +1,17 @@
 import { urls } from "@utils";
 
-const getPostUrl = (slug: string) => {
-  const slugged = slug
-    .split(/[^a-zÀ-ȕ\d]/gi)
-    .filter(Boolean)
+const getPostUrl = (title: string) => {
+  const slug = title
+    .toLowerCase()
+    .split(/[\s_-]/g)
     .reduce((result, word, index, arr) => {
-      const delim = index === arr.length - 1 ? "" : "-";
-      const lowercaseWord = word.toLowerCase();
-      const str = `${lowercaseWord}${delim}`;
+      const delimiter = index === arr.length - 1 ? "" : "-";
+      const str = `${word}${delimiter}`;
 
       return `${result}${str}`;
     }, "");
 
-  return `${urls.siteUrl}/blog/${slugged}`;
+  return { url: `${urls.siteUrl}/blog/${slug}`, slug };
 };
 
 export default getPostUrl;

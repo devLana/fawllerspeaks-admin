@@ -1,67 +1,58 @@
-import { randomUUID } from "node:crypto";
-
-import { afterAll, beforeAll, describe, test, expect } from "@jest/globals";
+import { afterAll, beforeAll, describe, it, expect, jest } from "@jest/globals";
 import { type ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@lib/db";
+import { supabaseEvent } from "@lib/supabase/supabaseEvent";
+import supabase from "@lib/supabase/supabaseClient";
 
-import { validationTestsTable } from "../createPost.testUtils";
-import { DATE_REGEX, UUID_REGEX, urls } from "@utils";
-import {
-  registeredUser,
-  post,
-  CREATE_POST,
-  loginTestUser,
-  postAuthor,
-  createTestPostTags,
-  createTestPosts,
-  unpublishedTestPosts,
-  postsUsers,
-} from "@tests";
+import * as mocks from "../utils/createPost.testUtils";
+import { urls } from "@utils";
+import * as tests from "@tests";
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag, Post } from "@resolverTypes";
 
 type Create = TestData<{ createPost: Record<string, unknown> }>;
 
-describe("Create post - E2E", () => {
-  const UUID = randomUUID();
-  const testPost = {
-    title: "post title",
-    description: "post description",
-    content: "post content",
-    slug: "post/slug",
-  };
+jest.mock("@lib/supabase/supabaseEvent");
 
+const mockEvent = jest.spyOn(supabaseEvent, "emit");
+mockEvent.mockImplementation(() => true);
+
+describe("Create post - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
-  let registeredUserAccessToken: string, unRegisteredUserAccessToken: string;
-  let postTags: PostTag[], unpublishedPosts: Post[];
+  let registeredJwt: string, unRegisteredJwt: string;
+  let postTags: PostTag[], dbPost: Post;
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
     const {
-      postAuthor: user,
+      newRegisteredUser: user,
       registeredUser: userRegistered,
       unregisteredUser,
-    } = await postsUsers(db);
+    } = await tests.authUsers(db);
 
-    const registered = loginTestUser(userRegistered.userId);
-    const unRegistered = loginTestUser(unregisteredUser.userId);
-    const createPostTags = createTestPostTags(db);
+    const registered = tests.loginTestUser(userRegistered.userId);
+    const unRegistered = tests.loginTestUser(unregisteredUser.userId);
+    const createPostTags = tests.createTestPostTags(db);
 
-    [registeredUserAccessToken, unRegisteredUserAccessToken, postTags] =
-      await Promise.all([registered, unRegistered, createPostTags]);
+    [registeredJwt, unRegisteredJwt, postTags] = await Promise.all([
+      registered,
+      unRegistered,
+      createPostTags,
+    ]);
 
-    unpublishedPosts = await createTestPosts({
+    dbPost = await tests.createTestPost({
       db,
       postTags,
-      author: {
+      postAuthor: {
         userId: user.userId,
-        firstName: postAuthor.firstName,
-        lastName: postAuthor.lastName,
+        firstName: tests.newRegisteredUser.firstName,
+        lastName: tests.newRegisteredUser.lastName,
+        image: tests.newRegisteredUser.image,
       },
-      posts: unpublishedTestPosts,
+      postData: tests.testPostData(),
     });
   });
 
@@ -74,68 +65,41 @@ describe("Create post - E2E", () => {
     await db.end();
   });
 
-  test("Returns error on logged out user", async () => {
-    const payload = {
-      query: CREATE_POST,
-      variables: {
-        post: {
-          ...testPost,
-          tags: [postTags[0].id, postTags[1].id, postTags[2].id],
-        },
-      },
-    };
+  describe("Verify user authentication", () => {
+    it("Should send an error response if the user is not logged in", async () => {
+      const variables = { post: { ...mocks.argsWithNoImage, tags: null } };
+      const payload = { query: tests.CREATE_POST, variables };
 
-    const { data } = await post<Create>(url, payload);
+      const { data } = await tests.post<Create>(url, payload);
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.createPost).toStrictEqual({
-      __typename: "NotAllowedError",
-      message: "Unable to create post",
-      status: "ERROR",
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.createPost).toStrictEqual({
+        __typename: "AuthenticationError",
+        message: "Unable to create post",
+        status: "ERROR",
+      });
     });
   });
 
-  test.each([
-    [
-      "null and undefined",
-      {
-        title: null,
-        description: undefined,
-        content: null,
-        tags: undefined,
-        slug: undefined,
-      },
-    ],
-    [
-      "boolean and number",
-      {
-        title: false,
-        description: 34646,
-        content: true,
-        tags: [9877, true],
-        slug: 21314,
-      },
-    ],
-  ])("Throws graphql validation error for %s inputs", async (_, postData) => {
-    const options = { authorization: `Bearer ${unRegisteredUserAccessToken}` };
-    const payload = { query: CREATE_POST, variables: { post: postData } };
+  describe("Validate user input", () => {
+    it.each(mocks.gqlValidations)("%s", async (_, postData) => {
+      const options = { authorization: `Bearer ${unRegisteredJwt}` };
+      const variables = { post: postData };
+      const payload = { query: tests.CREATE_POST, variables };
 
-    const { data } = await post<Create>(url, payload, options);
+      const { data } = await tests.post<Create>(url, payload, options);
 
-    expect(data.errors).toBeDefined();
-    expect(data.data).toBeUndefined();
-  });
+      expect(data.errors).toBeDefined();
+      expect(data.data).toBeUndefined();
+    });
 
-  test.each(validationTestsTable(null))(
-    "Returns error for %s",
-    async (_, postData, errors) => {
-      const options = {
-        authorization: `Bearer ${unRegisteredUserAccessToken}`,
-      };
-      const payload = { query: CREATE_POST, variables: { post: postData } };
+    it.each(mocks.validations(null))("%s", async (_, postData, errors) => {
+      const options = { authorization: `Bearer ${unRegisteredJwt}` };
+      const variables = { post: postData };
+      const payload = { query: tests.CREATE_POST, variables };
 
-      const { data } = await post<Create>(url, payload, options);
+      const { data } = await tests.post<Create>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -144,162 +108,141 @@ describe("Create post - E2E", () => {
         ...errors,
         status: "ERROR",
       });
-    }
-  );
-
-  test("Returns error for unknown post tag id(s)", async () => {
-    const options = { authorization: `Bearer ${registeredUserAccessToken}` };
-
-    const payload = {
-      query: CREATE_POST,
-      variables: {
-        post: { ...testPost, tags: [UUID, randomUUID(), randomUUID()] },
-      },
-    };
-
-    const { data } = await post<Create>(url, payload, options);
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.createPost).toStrictEqual({
-      __typename: "UnknownError",
-      message: "Unknown post tag id provided",
-      status: "ERROR",
     });
   });
 
-  test("Returns error for one or more unknown post tag ids", async () => {
-    const options = { authorization: `Bearer ${registeredUserAccessToken}` };
+  describe("Verify logged in user", () => {
+    it("Should respond with an error if the user is unregistered", async () => {
+      const options = { authorization: `Bearer ${unRegisteredJwt}` };
+      const variables = { post: { ...mocks.argsWithImage } };
+      const payload = { query: tests.CREATE_POST, variables };
 
-    const payload = {
-      query: CREATE_POST,
-      variables: {
-        post: {
-          ...testPost,
-          tags: [postTags[0].id, postTags[1].id, UUID, randomUUID()],
-        },
-      },
-    };
+      const { data } = await tests.post<Create>(url, payload, options);
 
-    const { data } = await post<Create>(url, payload, options);
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.createPost).toStrictEqual({
-      __typename: "UnknownError",
-      message: "Unknown post tag id provided",
-      status: "ERROR",
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.createPost).toStrictEqual({
+        __typename: "RegistrationError",
+        message: "Unable to create post",
+        status: "ERROR",
+      });
     });
   });
 
-  test("Returns error for unregistered user", async () => {
-    const options = { authorization: `Bearer ${unRegisteredUserAccessToken}` };
+  describe("Verify post title", () => {
+    it("Should respond with an error if the provided post title already exists", async () => {
+      const { title } = dbPost;
+      const variables = { post: { ...mocks.argsWithNoImage, title } };
+      const payload = { query: tests.CREATE_POST, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
 
-    const payload = {
-      query: CREATE_POST,
-      variables: {
-        post: {
-          ...testPost,
-          tags: [
-            postTags[0].id,
-            postTags[1].id,
-            postTags[2].id,
-            postTags[3].id,
-            postTags[4].id,
-          ],
-        },
-      },
-    };
+      const { data } = await tests.post<Create>(url, payload, options);
 
-    const { data } = await post<Create>(url, payload, options);
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.createPost).toStrictEqual({
-      __typename: "NotAllowedError",
-      message: "Unable to create post",
-      status: "ERROR",
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.createPost).toStrictEqual({
+        __typename: "DuplicatePostTitleError",
+        message: "A post with that title has already been created",
+        status: "ERROR",
+      });
     });
   });
 
-  test("Returns error if post title already exists", async () => {
-    const options = { authorization: `Bearer ${registeredUserAccessToken}` };
+  describe("Verify post tag ids", () => {
+    it("Should respond with an error if at least one unknown post tag id was passed", async () => {
+      const options = { authorization: `Bearer ${registeredJwt}` };
+      const tags = [mocks.UUID];
+      const variables = { post: { ...mocks.argsWithNoImage, tags } };
+      const payload = { query: tests.CREATE_POST, variables };
 
-    const payload = {
-      query: CREATE_POST,
-      variables: {
-        post: {
-          ...testPost,
-          title: unpublishedPosts[0].title,
-          tags: [
-            postTags[0].id,
-            postTags[1].id,
-            postTags[2].id,
-            postTags[3].id,
-            postTags[4].id,
-          ],
-        },
-      },
-    };
+      const { data } = await tests.post<Create>(url, payload, options);
 
-    const { data } = await post<Create>(url, payload, options);
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.createPost).toStrictEqual({
-      __typename: "DuplicatePostTitleError",
-      message: "A post with that title has already been created",
-      status: "ERROR",
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.createPost).toStrictEqual({
+        __typename: "UnknownError",
+        message: "Unknown post tag id provided",
+        status: "ERROR",
+      });
     });
   });
 
-  test("Create new post", async () => {
-    const options = { authorization: `Bearer ${registeredUserAccessToken}` };
+  describe("Create post", () => {
+    const { storageUrl } = supabase();
 
-    const payload = {
-      query: CREATE_POST,
-      variables: {
-        post: {
-          ...testPost,
-          tags: [
-            postTags[0].id,
-            postTags[1].id,
-            postTags[2].id,
-            postTags[3].id,
-            postTags[4].id,
-          ],
-        },
-      },
+    const author = {
+      name: `${tests.registeredUser.firstName} ${tests.registeredUser.lastName}`,
+      image: `${storageUrl}${tests.registeredUser.image}`,
     };
 
-    const { data } = await post<Create>(url, payload, options);
+    it("Should create a new post with an image banner and post tags", async () => {
+      const [tag1, tag2, tag3, tag4, tag5] = postTags;
+      const tags = [tag1.id, tag2.id, tag3.id, tag4.id, tag5.id];
+      const variables = { post: { ...mocks.argsWithImage, tags } };
+      const payload = { query: tests.CREATE_POST, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
+      const { data } = await tests.post<Create>(url, payload, options);
 
-    expect(data.data?.createPost).toStrictEqual({
-      __typename: "SinglePost",
-      post: {
-        __typename: "Post",
-        id: expect.stringMatching(UUID_REGEX),
-        title: testPost.title,
-        description: testPost.description,
-        content: testPost.content,
-        author: `${registeredUser.firstName} ${registeredUser.lastName}`,
-        status: "Unpublished",
-        slug: testPost.slug,
-        url: `${urls.siteUrl}/blog/post-slug`,
-        imageBanner: null,
-        dateCreated: expect.stringMatching(DATE_REGEX),
-        datePublished: null,
-        lastModified: null,
-        views: 0,
-        likes: 0,
-        isInBin: false,
-        isDeleted: false,
-        tags: expect.arrayContaining(postTags),
-      },
-      status: "SUCCESS",
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.createPost).toStrictEqual({
+        __typename: "SinglePost",
+        post: {
+          __typename: "Post",
+          id: expect.stringMatching(tests.UUID_REGEX),
+          title: mocks.argsWithImage.title,
+          description: mocks.argsWithImage.description,
+          content: mocks.argsWithImage.content,
+          author,
+          status: "Published",
+          slug: "blog-post-title",
+          url: `${urls.siteUrl}/blog/blog-post-title`,
+          imageBanner: `${storageUrl}${mocks.imageBanner}`,
+          dateCreated: expect.stringMatching(tests.DATE_REGEX),
+          datePublished: expect.stringMatching(tests.DATE_REGEX),
+          lastModified: null,
+          views: 0,
+          isInBin: false,
+          isDeleted: false,
+          tags: expect.arrayContaining(postTags),
+        },
+        status: "SUCCESS",
+      });
+    });
+
+    it("Should create a new post without an image banner and post tags", async () => {
+      const variables = { post: { ...mocks.argsWithNoImage, tags: null } };
+      const payload = { query: tests.CREATE_POST, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await tests.post<Create>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.createPost).toStrictEqual({
+        __typename: "SinglePost",
+        post: {
+          __typename: "Post",
+          id: expect.stringMatching(tests.UUID_REGEX),
+          title: mocks.argsWithNoImage.title,
+          description: mocks.argsWithNoImage.description,
+          content: mocks.argsWithNoImage.content,
+          author,
+          status: "Published",
+          slug: "another-blog-post-title",
+          url: `${urls.siteUrl}/blog/another-blog-post-title`,
+          imageBanner: null,
+          dateCreated: expect.stringMatching(tests.DATE_REGEX),
+          datePublished: expect.stringMatching(tests.DATE_REGEX),
+          lastModified: null,
+          views: 0,
+          isInBin: false,
+          isDeleted: false,
+          tags: null,
+        },
+        status: "SUCCESS",
+      });
     });
   });
 });

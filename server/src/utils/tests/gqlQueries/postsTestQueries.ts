@@ -5,7 +5,10 @@ const POST_FIELDS = `#graphql
     title
     description
     content
-    author
+    author {
+      name
+      image
+    }
     status
     url
     slug
@@ -14,7 +17,6 @@ const POST_FIELDS = `#graphql
     datePublished
     lastModified
     views
-    likes
     isInBin
     isDeleted
     tags {
@@ -51,7 +53,7 @@ export const CREATE_POST = `#graphql
         descriptionError
         contentError
         tagsError
-        slugError
+        imageBannerError
         status
       }
     }
@@ -83,7 +85,7 @@ export const EDIT_POST = `#graphql
         descriptionError
         contentError
         tagsError
-        slugError
+        imageBannerError
         status
       }
     }
@@ -115,7 +117,7 @@ export const DRAFT_POST = `#graphql
         descriptionError
         contentError
         tagsError
-        slugError
+        imageBannerError
         status
       }
     }
