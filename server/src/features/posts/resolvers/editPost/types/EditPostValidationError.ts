@@ -1,13 +1,14 @@
 import type {
-  CreatePostValidationError as Errors,
-  CreatePostValidationErrorResolvers as Resolvers,
+  EditPostValidationError as Errors,
+  EditPostValidationErrorResolvers as Resolvers,
   Status,
 } from "@resolverTypes";
 import type { RemoveNull } from "@types";
 
 type ValidationErrors = RemoveNull<Omit<Errors, "status">>;
 
-export class CreatePostValidationError implements Errors {
+export class EditPostValidationError implements Errors {
+  readonly postIdError?: string;
   readonly titleError?: string;
   readonly descriptionError?: string;
   readonly contentError?: string;
@@ -16,6 +17,7 @@ export class CreatePostValidationError implements Errors {
   readonly status: Status;
 
   constructor(errors: ValidationErrors) {
+    this.postIdError = errors.postIdError;
     this.titleError = errors.titleError;
     this.descriptionError = errors.descriptionError;
     this.contentError = errors.contentError;
@@ -25,6 +27,6 @@ export class CreatePostValidationError implements Errors {
   }
 }
 
-export const CreatePostValidationErrorResolver: Resolvers = {
-  __isTypeOf: parent => parent instanceof CreatePostValidationError,
+export const EditPostValidationErrorResolver: Resolvers = {
+  __isTypeOf: parent => parent instanceof EditPostValidationError,
 };

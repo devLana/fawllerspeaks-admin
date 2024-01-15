@@ -104,7 +104,7 @@ describe("Create post - E2E", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
-        __typename: "CreatePostValidationError",
+        __typename: "PostValidationError",
         ...errors,
         status: "ERROR",
       });

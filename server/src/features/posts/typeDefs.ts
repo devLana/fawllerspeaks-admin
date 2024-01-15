@@ -59,7 +59,16 @@ export const postsTypeDefs = `#graphql
     status: Status!
   }
 
-  type PostValidationError {
+  type DraftPostValidationError {
+    titleError: String
+    descriptionError: String
+    contentError: String
+    tagsError: String
+    imageBannerError: String
+    status: Status!
+  }
+
+  type EditPostValidationError {
     postIdError: String
     titleError: String
     descriptionError: String
@@ -79,7 +88,7 @@ export const postsTypeDefs = `#graphql
     status: Status!
   }
 
-  type CreatePostValidationError {
+  type PostValidationError {
     titleError: String
     descriptionError: String
     contentError: String
@@ -90,9 +99,11 @@ export const postsTypeDefs = `#graphql
 
   union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
 
-  union CreatePost = SinglePost | CreatePostValidationError | DuplicatePostTitleError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
+  union CreatePost = SinglePost | PostValidationError | DuplicatePostTitleError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
 
-  union Draft_Edit = SinglePost | PostValidationError | DuplicatePostTitleError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
+  union DraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
+
+  union EditPost = SinglePost | EditPostValidationError | DuplicatePostTitleError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
 
   union EmptyBin = Posts | EmptyBinWarning | NotAllowedError
 
@@ -117,7 +128,6 @@ export const postsTypeDefs = `#graphql
   }
 
   input DraftPostInput {
-    postId: ID
     title: String!
     description: String
     content: String

@@ -3,9 +3,12 @@ import { ValidationError } from "joi";
 
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import { getPostTags, getPostUrl } from "@features/posts/utils";
-import { SinglePost, DuplicatePostTitleError } from "../types";
-import { CreatePostValidationError } from "./types";
-import { createPostValidator } from "./utils/createPost.validator";
+import { createPostValidator as schema } from "./utils/createPost.validator";
+import {
+  SinglePost,
+  DuplicatePostTitleError,
+  PostValidationError,
+} from "../types";
 import {
   AuthenticationError,
   NotAllowedError,
@@ -27,15 +30,12 @@ interface User {
 
 const createPost: CreatePost = async (_, { post }, { db, user }) => {
   if (!user) {
-    if (post.imageBanner) supabaseEvent.emit("removeIMage", post.imageBanner);
+    if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
     return new AuthenticationError("Unable to create post");
   }
 
   try {
-    const validated = await createPostValidator.validateAsync(post, {
-      abortEarly: false,
-    });
-
+    const validated = await schema.validateAsync(post, { abortEarly: false });
     const { title, description, content, tags, imageBanner } = validated;
 
     const checkUser = db.query<User>(
@@ -60,19 +60,19 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
     const { rows: savedTitle } = foundTitle;
 
     if (loggedInUser.length === 0) {
-      if (imageBanner) supabaseEvent.emit("removeIMage", imageBanner);
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new NotAllowedError("Unable to create post");
     }
 
     const [{ name, image, isRegistered }] = loggedInUser;
 
     if (!isRegistered) {
-      if (imageBanner) supabaseEvent.emit("removeIMage", imageBanner);
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new RegistrationError("Unable to create post");
     }
 
     if (savedTitle.length > 0) {
-      if (imageBanner) supabaseEvent.emit("removeIMage", imageBanner);
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
 
       return new DuplicatePostTitleError(
         "A post with that title has already been created"
@@ -86,7 +86,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       const gottenTags = await getPostTags(db, tags);
 
       if (!gottenTags || gottenTags.length < tags.length) {
-        if (imageBanner) supabaseEvent.emit("removeIMage", imageBanner);
+        if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
         return new UnknownError("Unknown post tag id provided");
       }
 
@@ -161,9 +161,9 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
         typeof post
       >;
 
-      if (post.imageBanner) supabaseEvent.emit("removeIMage", post.imageBanner);
+      if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
 
-      return new CreatePostValidationError(errors);
+      return new PostValidationError(errors);
     }
 
     throw new GraphQLError("Unable to create post. Please try again later");

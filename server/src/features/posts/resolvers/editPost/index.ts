@@ -2,10 +2,10 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
 import { getPostTags, getPostUrl } from "@features/posts/utils";
+import { EditPostValidationError } from "./types";
 import {
   DuplicatePostTitleError,
   NotAllowedPostActionError,
-  PostValidationError,
   SinglePost,
   UnauthorizedAuthorError,
 } from "../types";
@@ -229,7 +229,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
         typeof post
       >;
 
-      return new PostValidationError(errors);
+      return new EditPostValidationError(errors);
     }
 
     throw new GraphQLError("Unable to edit post. Please try again later");

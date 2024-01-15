@@ -47,7 +47,7 @@ export const CREATE_POST = `#graphql
         status
       }
 
-      ... on CreatePostValidationError {
+      ... on PostValidationError {
         __typename
         titleError
         descriptionError
@@ -78,7 +78,7 @@ export const EDIT_POST = `#graphql
         status
       }
 
-      ...on PostValidationError {
+      ...on EditPostValidationError {
         __typename
         postIdError
         titleError
@@ -112,7 +112,6 @@ export const DRAFT_POST = `#graphql
 
       ... on PostValidationError {
         __typename
-        postIdError
         titleError
         descriptionError
         contentError

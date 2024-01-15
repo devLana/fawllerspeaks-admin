@@ -26,7 +26,7 @@ import {
 } from "./types";
 
 import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
-import { CreatePostValidationErrorResolver } from "./createPost/types";
+import { EditPostValidationErrorResolver } from "./editPost/types";
 
 import type {
   MutationResolvers,
@@ -59,7 +59,7 @@ type TypeKeys =
   | "PostValidationError"
   | "PostIdValidationError"
   | "PostIdsValidationError"
-  | "CreatePostValidationError";
+  | "EditPostValidationError";
 
 interface PostsResolvers {
   Queries: ResolversMapper<Pick<QueryResolvers, "getPosts" | "getPost">>;
@@ -98,6 +98,6 @@ export const postsResolvers: PostsResolvers = {
     PostValidationError: PostValidationErrorResolver,
     PostIdValidationError: PostIdValidationErrorResolver,
     PostIdsValidationError: PostIdsValidationErrorResolver,
-    CreatePostValidationError: CreatePostValidationErrorResolver,
+    EditPostValidationError: EditPostValidationErrorResolver,
   },
 };
