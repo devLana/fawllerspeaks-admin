@@ -11,10 +11,16 @@ import {
 import { NotAllowedError, UnknownError, dateToISOString } from "@utils";
 
 import type { MutationResolvers, PostTag, Post } from "@resolverTypes";
-import type { DbFindPost, ResolverFunc } from "@types";
+import type { GetPostDBData, ResolverFunc } from "@types";
 
 type DeletePosts = ResolverFunc<MutationResolvers["deletePostsFromBin"]>;
-type DbPost = Omit<DbFindPost, "author" | "isInBin" | "isDeleted">;
+type DbPost = Omit<GetPostDBData, "author" | "isInBin" | "isDeleted">;
+
+interface User {
+  isRegistered: boolean;
+  name: string;
+  image: string | null;
+}
 
 const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
   const schema = Joi.array<typeof args.postIds>()
@@ -46,7 +52,7 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
       abortEarly: false,
     });
 
-    const findUser = db.query<{ isRegistered: boolean; name: string }>(
+    const findUser = db.query<User>(
       `SELECT
         is_registered "isRegistered",
         first_name || ' ' || last_name name
@@ -77,6 +83,8 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
     if (foundUser.rows.length === 0 || !foundUser.rows[0].isRegistered) {
       return new NotAllowedError(`Unable to delete ${postOrPosts} from bin`);
     }
+
+    const [{ image, name }] = foundUser.rows;
 
     if (checkedPost.rows.length > 0) {
       return new UnauthorizedAuthorError(
@@ -113,22 +121,19 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
         description,
         content,
         status,
-        slug,
         image_banner "imageBanner",
         date_created "dateCreated",
         date_published "datePublished",
         last_modified "lastModified",
-        views,
-        likes,
-        tags`,
+        views`,
       [true, validatedPostIds, user, true]
     );
 
     const set = new Set<string>();
 
     const mappedDeletedPosts = deletedPosts.map<Post>(deletedPost => {
-      const postUrl = getPostUrl(deletedPost.slug ?? deletedPost.title);
-      const tags = deletedPost.tags ? mapPostTags(deletedPost.tags, map) : null;
+      const { url, slug } = getPostUrl(deletedPost.title);
+      // const tags = deletedPost.tags ? mapPostTags(deletedPost.tags, map) : null;
 
       set.add(deletedPost.postId);
 
@@ -137,10 +142,10 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
         title: deletedPost.title,
         description: deletedPost.description,
         content: deletedPost.content,
-        author: foundUser.rows[0].name,
+        author: { name, image },
         status: deletedPost.status,
-        url: postUrl,
-        slug: deletedPost.slug,
+        url,
+        slug,
         imageBanner: deletedPost.imageBanner,
         dateCreated: dateToISOString(deletedPost.dateCreated),
         datePublished: deletedPost.datePublished
@@ -150,10 +155,9 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
           ? dateToISOString(deletedPost.lastModified)
           : deletedPost.lastModified,
         views: deletedPost.views,
-        likes: deletedPost.likes,
         isInBin: true,
         isDeleted: true,
-        tags,
+        tags: null,
       };
     });
 

@@ -11,13 +11,14 @@ import { getPostTags, getPostUrl } from "@features/posts/utils";
 import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
 
 import type { MutationResolvers, PostStatus } from "@resolverTypes";
-import type { DbFindPost, ResolverFunc } from "@types";
+import type { GetPostDBData, ResolverFunc } from "@types";
 
 type PublishPost = ResolverFunc<MutationResolvers["publishPost"]>;
 
 interface DbPost {
   authorId: string;
   authorName: string;
+  authorImage: string | null;
   status: PostStatus;
 }
 
@@ -45,6 +46,7 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
       `SELECT
         author "authorId",
         first_name || ' ' || last_name "authorName",
+        image "authorImage"
         status
       FROM posts LEFT JOIN users ON author = user_id
       WHERE post_id = $1`,
@@ -81,7 +83,7 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
     }
 
     const { rows: updatePost } = await db.query<
-      Omit<DbFindPost, "status" | "author" | "postId">
+      Omit<GetPostDBData, "status" | "author" | "postId">
     >(
       `UPDATE posts
       SET
@@ -106,18 +108,21 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
     );
 
     const [updated] = updatePost;
-    const url = getPostUrl(updated.slug ?? updated.title);
-    const tags = updated.tags ? await getPostTags(db, updated.tags) : null;
+    const { url, slug } = getPostUrl(updated.title);
+    // const tags = updated.tags ? await getPostTags(db, updated.tags) : null;
 
     return new SinglePost({
       id: post,
       title: updated.title,
       description: updated.description,
       content: updated.content,
-      author: foundPost[0].authorName,
+      author: {
+        name: foundPost[0].authorName,
+        image: foundPost[0].authorImage,
+      },
       status: "Published",
       url,
-      slug: updated.slug,
+      slug,
       imageBanner: updated.imageBanner,
       dateCreated: dateToISOString(updated.dateCreated),
       datePublished: updated.datePublished
@@ -127,10 +132,9 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
         ? dateToISOString(updated.lastModified)
         : updated.lastModified,
       views: updated.views,
-      likes: updated.likes,
       isInBin: updated.isInBin,
       isDeleted: updated.isDeleted,
-      tags,
+      tags: null,
     });
   } catch (err) {
     if (err instanceof ValidationError) {

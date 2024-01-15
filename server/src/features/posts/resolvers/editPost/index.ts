@@ -17,13 +17,14 @@ import {
 } from "@utils";
 
 import type { MutationResolvers, PostTag, PostStatus } from "@resolverTypes";
-import type { DbCreatePost, ResolverFunc, ValidationErrorObject } from "@types";
+import type { PostDBData, ResolverFunc, ValidationErrorObject } from "@types";
 
 type EditPost = ResolverFunc<MutationResolvers["editPost"]>;
 
 interface DbFindPost {
   authorId: string;
   authorName: string;
+  authorImage: string | null;
   postStatus: PostStatus;
   foundImageBanner: string | null;
   foundTags: string[] | null;
@@ -104,6 +105,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       `SELECT
         author "authorId",
         first_name || ' ' || last_name "authorName",
+        image "authorImage",
         status "postStatus",
         image_banner "foundImageBanner",
         tags "foundTags"
@@ -130,8 +132,16 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       );
     }
 
-    const [{ authorId, authorName, postStatus, foundImageBanner, foundTags }] =
-      foundPost;
+    const [
+      {
+        authorId,
+        authorName,
+        authorImage,
+        postStatus,
+        foundImageBanner,
+        foundTags,
+      },
+    ] = foundPost;
 
     if (authorId !== user) {
       return new UnauthorizedAuthorError(
@@ -160,7 +170,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
     const tagsToSave = tags ?? foundTags;
     const dbTags = tagsToSave ? `{${tagsToSave.join(", ")}}` : null;
 
-    const { rows: editedPost } = await db.query<Omit<DbCreatePost, "postId">>(
+    const { rows: editedPost } = await db.query<Omit<PostDBData, "postId">>(
       `UPDATE posts SET
         title = $1,
         description = $2,
@@ -190,7 +200,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
     );
 
     const [edited] = editedPost;
-    const postUrl = getPostUrl(dbImageBanner ?? title);
+    const { url, slug } = getPostUrl(dbImageBanner ?? title);
     const returnTags = postTags.length === 0 ? null : postTags;
 
     return new SinglePost({
@@ -199,9 +209,10 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       title,
       description,
       content,
-      author: authorName,
+      author: { name: authorName, image: authorImage },
       status: postStatus,
-      url: postUrl,
+      url,
+      slug,
       imageBanner: dbImageBanner,
       dateCreated: dateToISOString(edited.dateCreated),
       datePublished: edited.datePublished

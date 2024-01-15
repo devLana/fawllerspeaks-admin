@@ -5,7 +5,7 @@ import { getPostUrl, mapPostTags } from "@features/posts/utils";
 import { dateToISOString, NotAllowedError } from "@utils";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
-import type { DbFindPost, ResolverFunc } from "@types";
+import type { GetPostDBData, ResolverFunc } from "@types";
 
 type GetPosts = ResolverFunc<QueryResolvers["getPosts"]>;
 
@@ -27,7 +27,7 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
       FROM post_tags`
     );
 
-    const allPosts = db.query<DbFindPost>(`
+    const allPosts = db.query<GetPostDBData>(`
       SELECT
         post_id "postId",
         title,
@@ -74,8 +74,8 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
     });
 
     const posts = savedPosts.rows.map(post => {
-      const postUrl = getPostUrl(post.slug ?? post.title);
-      const tags = post.tags ? mapPostTags(post.tags, map) : null;
+      const { url, slug } = getPostUrl(post.title);
+      // const tags = post.tags ? mapPostTags(post.tags, map) : null;
 
       return {
         id: post.postId,
@@ -84,8 +84,8 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
         content: post.content,
         author: post.author,
         status: post.status,
-        url: postUrl,
-        slug: post.slug,
+        url,
+        slug,
         imageBanner: post.imageBanner,
         dateCreated: dateToISOString(post.dateCreated),
         datePublished: post.datePublished
@@ -95,10 +95,9 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
           ? dateToISOString(post.lastModified)
           : post.lastModified,
         views: post.views,
-        likes: post.likes,
         isInBin: post.isInBin,
         isDeleted: post.isDeleted,
-        tags,
+        tags: null,
       };
     });
 

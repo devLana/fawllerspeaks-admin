@@ -6,16 +6,17 @@ import { getPostUrl, mapPostTags } from "@features/posts/utils";
 import { NotAllowedError, dateToISOString } from "@utils";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
-import type { DbFindPost, ResolverFunc } from "@types";
+import type { GetPostDBData, ResolverFunc } from "@types";
 
 type EmptyBin = ResolverFunc<MutationResolvers["emptyBin"]>;
 
 interface DbUser {
   isRegistered: boolean;
   name: string;
+  image: string | null;
 }
 
-type DbPost = Omit<DbFindPost, "author" | "isInBin" | "isDeleted">;
+type DbPost = Omit<GetPostDBData, "author" | "isInBin" | "isDeleted">;
 
 const emptyBin: EmptyBin = async (_, __, { db, user }) => {
   try {
@@ -24,7 +25,8 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
     const checkUser = db.query<DbUser>(
       `SELECT
         is_Registered "isRegistered",
-        first_name || ' ' || last_name name
+        first_name || ' ' || last_name name,
+        image
       FROM users WHERE user_id = $1`,
       [user]
     );
@@ -46,6 +48,7 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
     if (checkedUser.length === 0 || !checkedUser[0].isRegistered) {
       return new NotAllowedError("Unable to empty all posts from bin");
     }
+    const [{ name, image }] = checkedUser;
 
     const map = new Map<string, PostTag>();
 
@@ -88,18 +91,18 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
     }
 
     const posts = emptiedPosts.map(post => {
-      const postUrl = getPostUrl(post.slug ?? post.title);
-      const tags = post.tags ? mapPostTags(post.tags, map) : null;
+      const { slug, url } = getPostUrl(post.title);
+      // const tags = post.tags ? mapPostTags(post.tags, map) : null;
 
       return {
         id: post.postId,
         title: post.title,
         description: post.description,
         content: post.content,
-        author: checkedUser[0].name,
+        author: { name, image },
         status: post.status,
-        url: postUrl,
-        slug: post.slug,
+        url,
+        slug,
         imageBanner: post.imageBanner,
         dateCreated: dateToISOString(post.dateCreated),
         datePublished: post.datePublished
@@ -109,10 +112,9 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
           ? dateToISOString(post.lastModified)
           : post.lastModified,
         views: post.views,
-        likes: post.likes,
         isInBin: true,
         isDeleted: true,
-        tags,
+        tags: null,
       };
     });
 

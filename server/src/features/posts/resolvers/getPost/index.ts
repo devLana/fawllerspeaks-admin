@@ -6,10 +6,10 @@ import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
 import { getPostTags, getPostUrl } from "@features/posts/utils";
 
 import type { QueryResolvers } from "@resolverTypes";
-import type { DbFindPost, ResolverFunc } from "@types";
+import type { GetPostDBData, ResolverFunc } from "@types";
 
 type GetPost = ResolverFunc<QueryResolvers["getPost"]>;
-type Post = Omit<DbFindPost, "postId">;
+type Post = Omit<GetPostDBData, "postId">;
 
 const getPost: GetPost = async (_, { postId }, { user, db }) => {
   const schema = Joi.string()
@@ -67,8 +67,8 @@ const getPost: GetPost = async (_, { postId }, { user, db }) => {
 
     const [found] = foundPost;
 
-    const postUrl = getPostUrl(found.slug ?? found.title);
-    const tags = found.tags ? await getPostTags(db, found.tags) : null;
+    const { slug, url } = getPostUrl(found.title);
+    // const tags = found.tags ? await getPostTags(db, found.tags) : null;
 
     return new SinglePost({
       id: post,
@@ -77,8 +77,8 @@ const getPost: GetPost = async (_, { postId }, { user, db }) => {
       content: found.content,
       author: found.author,
       status: found.status,
-      url: postUrl,
-      slug: found.slug,
+      url,
+      slug,
       imageBanner: found.imageBanner,
       dateCreated: dateToISOString(found.dateCreated),
       datePublished: found.datePublished
@@ -88,10 +88,9 @@ const getPost: GetPost = async (_, { postId }, { user, db }) => {
         ? dateToISOString(found.lastModified)
         : found.lastModified,
       views: found.views,
-      likes: found.likes,
       isInBin: found.isInBin,
       isDeleted: found.isDeleted,
-      tags,
+      tags: null,
     });
   } catch (err) {
     if (err instanceof ValidationError) {

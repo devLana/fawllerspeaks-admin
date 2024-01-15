@@ -11,7 +11,7 @@ import { getPostTags, getPostUrl } from "@features/posts/utils";
 import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
 
 import type { MutationResolvers, PostStatus } from "@resolverTypes";
-import type { DbFindPost, ResolverFunc } from "@types";
+import type { GetPostDBData, ResolverFunc } from "@types";
 
 type UnpublishPost = ResolverFunc<MutationResolvers["unpublishPost"]>;
 type Keys = "status" | "author" | "datePublished" | "postId";
@@ -20,6 +20,7 @@ interface DbPost {
   authorId: string;
   authorName: string;
   status: PostStatus;
+  authorImage: string | null;
 }
 
 const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
@@ -46,7 +47,8 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
       `SELECT
         author "authorId",
         first_name || ' ' || last_name "authorName",
-        status
+        status,
+        image "authorImage"
       FROM posts LEFT JOIN users ON author = user_id
       WHERE post_id = $1`,
       [post]
@@ -81,7 +83,7 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
       );
     }
 
-    const { rows: updatePost } = await db.query<Omit<DbFindPost, Keys>>(
+    const { rows: updatePost } = await db.query<Omit<GetPostDBData, Keys>>(
       `UPDATE posts SET
         status = $1,
         date_published = $2
@@ -104,18 +106,21 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
 
     const [updated] = updatePost;
 
-    const url = getPostUrl(updated.slug ?? updated.title);
-    const tags = updated.tags ? await getPostTags(db, updated.tags) : null;
+    const { url, slug } = getPostUrl(updated.title);
+    // const tags = updated.tags ? await getPostTags(db, updated.tags) : null;
 
     return new SinglePost({
       id: post,
       title: updated.title,
       description: updated.description,
       content: updated.content,
-      author: foundPost[0].authorName,
+      author: {
+        name: foundPost[0].authorName,
+        image: foundPost[0].authorImage,
+      },
       status: "Unpublished",
       url,
-      slug: updated.slug,
+      slug,
       imageBanner: updated.imageBanner,
       dateCreated: dateToISOString(updated.dateCreated),
       datePublished: null,
@@ -123,10 +128,9 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
         ? dateToISOString(updated.lastModified)
         : updated.lastModified,
       views: updated.views,
-      likes: updated.likes,
       isInBin: updated.isInBin,
       isDeleted: updated.isDeleted,
-      tags,
+      tags: null,
     });
   } catch (err) {
     if (err instanceof ValidationError) {

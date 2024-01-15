@@ -19,10 +19,16 @@ import {
   type PostTag,
   type Post,
 } from "@resolverTypes";
-import type { DbFindPost, ResolverFunc } from "@types";
+import type { GetPostDBData, ResolverFunc } from "@types";
 
 type BinPosts = ResolverFunc<MutationResolvers["binPosts"]>;
-type DbPost = Omit<DbFindPost, "author" | "isInBin">;
+type DbPost = Omit<GetPostDBData, "author" | "isInBin">;
+
+interface User {
+  isRegistered: boolean;
+  name: string;
+  image: string | null;
+}
 
 const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
   const schema = Joi.array<typeof postIds>()
@@ -54,10 +60,11 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
       abortEarly: false,
     });
 
-    const findUser = db.query<{ isRegistered: boolean; name: string }>(
+    const findUser = db.query<User>(
       `SELECT
         is_registered "isRegistered",
-        first_name || ' ' || last_name name
+        first_name || ' ' || last_name name,
+        image
       FROM users WHERE user_id = $1`,
       [user]
     );
@@ -85,6 +92,8 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
     if (foundUser.rows.length === 0 || !foundUser.rows[0].isRegistered) {
       return new NotAllowedError(`Unable to move ${postOrPosts} to bin`);
     }
+
+    const [{ image, name }] = foundUser.rows;
 
     if (checkedPosts.rows.length > 0) {
       return new UnauthorizedAuthorError(
@@ -119,15 +128,12 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
         description,
         content,
         status,
-        slug,
         image_banner "imageBanner",
         date_created "dateCreated",
         date_published "datePublished",
         last_modified "lastModified",
         views,
-        likes,
-        is_deleted "isDeleted",
-        tags`,
+        is_deleted "isDeleted"`,
       [true, validatedPostIds, user]
     );
 
@@ -135,8 +141,8 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
     const binnedPostIds: string[] = [];
 
     const mappedBinnedPosts = binnedPosts.map<Post>(binnedPost => {
-      const postUrl = getPostUrl(binnedPost.slug ?? binnedPost.title);
-      const tags = binnedPost.tags ? mapPostTags(binnedPost.tags, map) : null;
+      const { url, slug } = getPostUrl(binnedPost.title);
+      // const tags = binnedPost.tags ? mapPostTags(binnedPost.tags, map) : null;
 
       set.add(binnedPost.postId);
       binnedPostIds.push(binnedPost.postId);
@@ -146,10 +152,10 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
         title: binnedPost.title,
         description: binnedPost.description,
         content: binnedPost.content,
-        author: foundUser.rows[0].name,
+        author: { name, image },
         status: binnedPost.status,
-        url: postUrl,
-        slug: binnedPost.slug,
+        url,
+        slug,
         imageBanner: binnedPost.imageBanner,
         dateCreated: dateToISOString(binnedPost.dateCreated),
         datePublished: binnedPost.datePublished
@@ -159,10 +165,9 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
           ? dateToISOString(binnedPost.lastModified)
           : binnedPost.lastModified,
         views: binnedPost.views,
-        likes: binnedPost.likes,
         isInBin: true,
         isDeleted: binnedPost.isDeleted,
-        tags,
+        tags: null,
       };
     });
 

@@ -15,8 +15,8 @@ import {
   postAuthor,
   createAllTestPosts,
   PUBLISH_POST,
+  DATE_REGEX,
 } from "@tests";
-import { DATE_REGEX } from "@utils";
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag, Post } from "@resolverTypes";

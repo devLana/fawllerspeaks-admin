@@ -11,10 +11,16 @@ import { getPostUrl, mapPostTags } from "@features/posts/utils";
 import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
 
 import type { MutationResolvers, PostTag, Post } from "@resolverTypes";
-import type { DbFindPost, ResolverFunc } from "@types";
+import type { GetPostDBData, ResolverFunc } from "@types";
 
 type UnBinPosts = ResolverFunc<MutationResolvers["unBinPosts"]>;
-type DbPost = Omit<DbFindPost, "author" | "isInBin">;
+type DbPost = Omit<GetPostDBData, "author" | "isInBin">;
+
+interface User {
+  isRegistered: boolean;
+  name: string;
+  image: string | null;
+}
 
 const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
   const schema = Joi.array<typeof postIds>()
@@ -46,7 +52,7 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
       abortEarly: false,
     });
 
-    const findUser = db.query<{ isRegistered: boolean; name: string }>(
+    const findUser = db.query<User>(
       `SELECT
         is_registered "isRegistered",
         first_name || ' ' || last_name name
@@ -77,6 +83,8 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
     if (foundUser.rows.length === 0 || !foundUser.rows[0].isRegistered) {
       return new NotAllowedError(`Unable to remove ${postOrPosts} from bin`);
     }
+
+    const [{ name, image }] = foundUser.rows;
 
     if (checkedPost.rows.length > 0) {
       return new UnauthorizedAuthorError(
@@ -126,11 +134,11 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
     const set = new Set<string>();
 
     const mappedUnBinnedPosts = unBinnedPosts.map<Post>(unBinnedPost => {
-      const postUrl = getPostUrl(unBinnedPost.slug ?? unBinnedPost.title);
+      const { url, slug } = getPostUrl(unBinnedPost.title);
 
-      const tags = unBinnedPost.tags
-        ? mapPostTags(unBinnedPost.tags, map)
-        : null;
+      // const tags = unBinnedPost.tags
+      //   ? mapPostTags(unBinnedPost.tags, map)
+      //   : null;
 
       set.add(unBinnedPost.postId);
 
@@ -139,10 +147,10 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
         title: unBinnedPost.title,
         description: unBinnedPost.description,
         content: unBinnedPost.content,
-        author: foundUser.rows[0].name,
+        author: { name, image },
         status: unBinnedPost.status,
-        url: postUrl,
-        slug: unBinnedPost.slug,
+        url,
+        slug,
         imageBanner: unBinnedPost.imageBanner,
         dateCreated: dateToISOString(unBinnedPost.dateCreated),
         datePublished: unBinnedPost.datePublished
@@ -152,10 +160,9 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
           ? dateToISOString(unBinnedPost.lastModified)
           : unBinnedPost.lastModified,
         views: unBinnedPost.views,
-        likes: unBinnedPost.likes,
         isInBin: false,
         isDeleted: unBinnedPost.isDeleted,
-        tags,
+        tags: null,
       };
     });
 
