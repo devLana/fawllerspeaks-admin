@@ -49,71 +49,70 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
   const { handleOpenAlert } = usePostTagsPage();
   const dispatch = usePostTagsListDispatch();
 
-  const submitHandler = async (values: OmitTagId) => {
+  const submitHandler = (values: OmitTagId) => {
     onStatusChange("submitting");
 
-    const { data: editData } = await edit({
+    void edit({
       variables: { ...values, tagId: id },
+      refetchQueries,
       onError() {
         onStatusChange("idle");
         setAlertIsOpen(true);
       },
-      refetchQueries,
+      onCompleted(editData) {
+        switch (editData.editPostTag.__typename) {
+          case "AuthenticationError":
+            void client.clearStore();
+            void router.replace("/login?status=unauthenticated");
+            break;
+
+          case "NotAllowedError":
+            void client.clearStore();
+            void router.replace("/login?status=unauthorized");
+            break;
+
+          case "RegistrationError":
+            void router.replace("/register?status=unregistered");
+            break;
+
+          case "EditPostTagValidationError": {
+            const { nameError, tagIdError } = editData.editPostTag;
+            const focus = { shouldFocus: true };
+
+            if (tagIdError) setAlertIsOpen(true);
+
+            if (nameError) setError("name", { message: nameError }, focus);
+
+            onStatusChange("idle");
+            break;
+          }
+
+          case "DuplicatePostTagError": {
+            const { message } = editData.editPostTag;
+
+            if (message) setError("name", { message }, { shouldFocus: true });
+
+            onStatusChange("idle");
+            break;
+          }
+
+          case "UnknownError":
+          case "EditedPostTagWarning":
+          default:
+            onStatusChange("idle");
+            setAlertIsOpen(true);
+            break;
+
+          case "EditedPostTag": {
+            const { __typename, ...rest } = editData.editPostTag.tag;
+
+            handleOpenAlert("Post tag edited");
+            onStatusChange("idle");
+            dispatch({ type: "POST_TAG_EDITED", payload: rest });
+          }
+        }
+      },
     });
-
-    if (editData) {
-      switch (editData.editPostTag.__typename) {
-        case "AuthenticationError":
-          void client.clearStore();
-          void router.replace("/login?status=unauthenticated");
-          break;
-
-        case "NotAllowedError":
-          void client.clearStore();
-          void router.replace("/login?status=unauthorized");
-          break;
-
-        case "RegistrationError":
-          void router.replace("/register?status=unregistered");
-          break;
-
-        case "EditPostTagValidationError": {
-          const { nameError, tagIdError } = editData.editPostTag;
-          const focus = { shouldFocus: true };
-
-          if (tagIdError) setAlertIsOpen(true);
-
-          if (nameError) setError("name", { message: nameError }, focus);
-
-          onStatusChange("idle");
-          break;
-        }
-
-        case "DuplicatePostTagError": {
-          const { message } = editData.editPostTag;
-
-          if (message) setError("name", { message }, { shouldFocus: true });
-
-          onStatusChange("idle");
-          break;
-        }
-
-        case "UnknownError":
-        case "EditedPostTagWarning":
-        default:
-          onStatusChange("idle");
-          setAlertIsOpen(true);
-          break;
-
-        case "EditedPostTag": {
-          const { __typename, ...rest } = editData.editPostTag.tag;
-
-          handleOpenAlert("Post tag edited");
-          onStatusChange("idle");
-          dispatch({ type: "POST_TAG_EDITED", payload: rest });
-        }
-      }
-    }
   };
 
   let alertMessage =
