@@ -12,7 +12,7 @@ import PasswordInput from "@components/PasswordInput";
 import { resetPasswordValidator } from "../utils/resetPasswordValidator";
 import type { ResetPasswordData } from "../operations/RESET_PASSWORD";
 import type { MutationResetPasswordArgs } from "@apiTypes";
-import type { AuthPageView, FormStatus, StateSetterFn } from "@types";
+import type { AuthPageView, Status, StateSetterFn } from "@types";
 
 type OmitToken = Omit<MutationResetPasswordArgs, "token">;
 
@@ -25,7 +25,7 @@ interface ResetPasswordFormProps {
 
 const ResetPasswordForm = (props: ResetPasswordFormProps) => {
   const { email, resetToken, resetPassword, setView } = props;
-  const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
+  const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const { push } = useRouter();
 
   const {
@@ -38,7 +38,7 @@ const ResetPasswordForm = (props: ResetPasswordFormProps) => {
   });
 
   const submitHandler = (values: OmitToken) => {
-    setFormStatus("submitting");
+    setFormStatus("loading");
 
     void resetPassword({
       variables: { ...values, token: resetToken },
@@ -123,7 +123,7 @@ const ResetPasswordForm = (props: ResetPasswordFormProps) => {
         margin={errors.confirmPassword ? "dense" : "normal"}
       />
       <LoadingButton
-        loading={formStatus === "submitting"}
+        loading={formStatus === "loading"}
         variant="contained"
         size="large"
         type="submit"

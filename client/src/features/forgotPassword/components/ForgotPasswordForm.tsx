@@ -9,7 +9,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import AlertToast from "@components/AlertToast";
 import { FORGOT_PASSWORD } from "../operations/FORGOT_PASSWORD";
 import { forgotPasswordValidator } from "../utils/forgotPasswordValidator";
-import type { AuthPageView, FormStatus, StateSetterFn } from "@types";
+import type { AuthPageView, Status, StateSetterFn } from "@types";
 import type { MutationForgotPasswordArgs } from "@apiTypes";
 
 interface ForgotPasswordFormProps {
@@ -17,7 +17,7 @@ interface ForgotPasswordFormProps {
 }
 
 const ForgotPasswordForm = ({ setView }: ForgotPasswordFormProps) => {
-  const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
+  const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const [forgotPassword, { error, data }] = useMutation(FORGOT_PASSWORD);
 
   const {
@@ -30,7 +30,7 @@ const ForgotPasswordForm = ({ setView }: ForgotPasswordFormProps) => {
   });
 
   const submitHandler = (values: MutationForgotPasswordArgs) => {
-    setFormStatus("submitting");
+    setFormStatus("loading");
 
     void forgotPassword({
       variables: values,
@@ -106,7 +106,7 @@ const ForgotPasswordForm = ({ setView }: ForgotPasswordFormProps) => {
           }}
         />
         <LoadingButton
-          loading={formStatus === "submitting"}
+          loading={formStatus === "loading"}
           variant="contained"
           size="large"
           type="submit"

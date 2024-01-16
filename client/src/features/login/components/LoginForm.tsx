@@ -15,12 +15,12 @@ import { LOGIN_USER } from "../operations/LOGIN_USER";
 import { loginValidator } from "../utils/loginValidator";
 import { SESSION_ID } from "@utils/constants";
 import type { MutationLoginArgs } from "@apiTypes";
-import type { FormStatus } from "@types";
+import type { Status } from "@types";
 
 type LoginFormValues = Omit<MutationLoginArgs, "sessionId">;
 
 const LoginForm = () => {
-  const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
+  const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const { replace } = useRouter();
 
   const [login, { data, error }] = useMutation(LOGIN_USER);
@@ -36,7 +36,7 @@ const LoginForm = () => {
   const { handleAuthHeader } = useAuthHeaderHandler();
 
   const submitHandler = (values: LoginFormValues) => {
-    setFormStatus("submitting");
+    setFormStatus("loading");
 
     const sessionId = localStorage.getItem(SESSION_ID);
     const variables: MutationLoginArgs = sessionId
@@ -136,7 +136,7 @@ const LoginForm = () => {
           margin={errors.password ? "dense" : "normal"}
         />
         <LoadingButton
-          loading={formStatus === "submitting"}
+          loading={formStatus === "loading"}
           variant="contained"
           size="large"
           type="submit"

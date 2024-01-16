@@ -17,12 +17,12 @@ import { editProfileValidator } from "@features/settings/editProfile/utils/editP
 import settingsLayout from "@utils/settings/settingsLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { MutationEditProfileArgs } from "@apiTypes";
-import type { EditProfileImage, FormStatus, NextPageWithLayout } from "@types";
+import type { EditProfileImage, Status, NextPageWithLayout } from "@types";
 
 type EditProfile = Omit<MutationEditProfileArgs, "image">;
 
 const EditMe: NextPageWithLayout = () => {
-  const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
+  const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const [removeCurrentImage, setRemoveCurrentImage] = React.useState(false);
   const [image, setImage] = React.useState<EditProfileImage>({
     error: "",
@@ -50,7 +50,7 @@ const EditMe: NextPageWithLayout = () => {
   });
 
   const submitHandler = async (values: EditProfile) => {
-    setFormStatus("submitting");
+    setFormStatus("loading");
 
     let variables: MutationEditProfileArgs = values;
     let uploadHasError = false;
@@ -155,7 +155,7 @@ const EditMe: NextPageWithLayout = () => {
       <Snackbar
         message={msg}
         open={formStatus === "error"}
-        onClose={handleCloseAlert<FormStatus>("idle", setFormStatus)}
+        onClose={handleCloseAlert<Status>("idle", setFormStatus)}
       />
       <form onSubmit={handleSubmit(submitHandler)}>
         <Grid container rowSpacing={2} columnSpacing={2} mb={3.3} mt={0}>
@@ -205,7 +205,7 @@ const EditMe: NextPageWithLayout = () => {
           setFormStatus={setFormStatus}
         />
         <LoadingButton
-          loading={formStatus === "submitting"}
+          loading={formStatus === "loading"}
           variant="contained"
           size="large"
           type="submit"

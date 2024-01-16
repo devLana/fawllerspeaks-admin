@@ -17,10 +17,10 @@ import { changePasswordValidator } from "@features/settings/changePassword/utils
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import settingsLayout from "@utils/settings/settingsLayout";
 import type { MutationChangePasswordArgs } from "@apiTypes";
-import type { FormStatus, NextPageWithLayout } from "@types";
+import type { RequestStatus, NextPageWithLayout } from "@types";
 
 const ChangePassword: NextPageWithLayout = () => {
-  const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
+  const [formStatus, setFormStatus] = React.useState<RequestStatus>("idle");
   const { replace } = useRouter();
 
   const [password, { data, error, client }] = useMutation(CHANGE_PASSWORD);
@@ -43,7 +43,7 @@ const ChangePassword: NextPageWithLayout = () => {
   });
 
   const submitHandler = (values: MutationChangePasswordArgs) => {
-    setFormStatus("submitting");
+    setFormStatus("loading");
 
     void password({
       variables: values,
@@ -121,7 +121,7 @@ const ChangePassword: NextPageWithLayout = () => {
       <Snackbar
         message={msg}
         open={formStatus === "error" || formStatus === "success"}
-        onClose={handleCloseAlert<FormStatus>("idle", setFormStatus)}
+        onClose={handleCloseAlert<RequestStatus>("idle", setFormStatus)}
       />
       <Box
         component="form"
@@ -162,7 +162,7 @@ const ChangePassword: NextPageWithLayout = () => {
           margin={errors.confirmNewPassword ? "dense" : "normal"}
         />
         <LoadingButton
-          loading={formStatus === "submitting"}
+          loading={formStatus === "loading"}
           variant="contained"
           size="large"
           type="submit"

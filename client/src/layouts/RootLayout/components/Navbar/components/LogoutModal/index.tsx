@@ -15,7 +15,7 @@ import { useSession } from "@context/SessionContext";
 import { LOGOUT } from "./LOGOUT";
 import { SESSION_ID } from "@utils/constants";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
-import type { RequestStatus } from "@types";
+import type { Status } from "@types";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ interface LogoutModalProps {
 }
 
 const LogoutModal = ({ isOpen, onCloseModal }: LogoutModalProps) => {
-  const [requestStatus, setStatus] = React.useState<RequestStatus>("idle");
+  const [status, setStatus] = React.useState<Status>("idle");
   const { replace } = useRouter();
 
   const [logout, { data, error, client }] = useMutation(LOGOUT);
@@ -85,12 +85,12 @@ const LogoutModal = ({ isOpen, onCloseModal }: LogoutModalProps) => {
     <>
       <Snackbar
         message={alertMessage}
-        open={requestStatus === "error"}
-        onClose={handleCloseAlert<RequestStatus>("idle", setStatus)}
+        open={status === "error"}
+        onClose={handleCloseAlert<Status>("idle", setStatus)}
       />
       <Dialog
         open={isOpen}
-        onClose={requestStatus === "loading" ? undefined : onCloseModal}
+        onClose={status === "loading" ? undefined : onCloseModal}
         aria-labelledby="logout-dialog-title"
       >
         <DialogTitle id="logout-dialog-title" sx={{ textAlign: "center" }}>
@@ -102,12 +102,12 @@ const LogoutModal = ({ isOpen, onCloseModal }: LogoutModalProps) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-          <Button disabled={requestStatus === "loading"} onClick={onCloseModal}>
+          <Button disabled={status === "loading"} onClick={onCloseModal}>
             Cancel
           </Button>
           <LoadingButton
             onClick={handleLogout}
-            loading={requestStatus === "loading"}
+            loading={status === "loading"}
             variant="contained"
           >
             <span>Logout</span>

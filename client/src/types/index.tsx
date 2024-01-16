@@ -53,9 +53,8 @@ export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export type AuthPageView = "form" | "unregistered error" | "success";
 
-type Status = "idle" | "error" | "success";
-export type FormStatus = Status | "submitting";
-export type RequestStatus = Status | "loading";
+export type Status = "idle" | "error" | "loading";
+export type RequestStatus = Status | "success";
 
 export type PostTagData = Omit<PostTag, "dateCreated" | "lastModified">;
 

@@ -8,7 +8,7 @@ import { useHandleFile } from "@hooks/useHandleFile";
 import EditProfileImagePreview from "./EditProfileImagePreview";
 import { FileInput } from "@components/FileInput";
 import type { User } from "@hooks/useGetUserInfo";
-import type { EditProfileImage, FormStatus, StateSetterFn } from "@types";
+import type { EditProfileImage, Status, StateSetterFn } from "@types";
 
 interface EditProfileFileInputProps {
   image: EditProfileImage;
@@ -16,7 +16,7 @@ interface EditProfileFileInputProps {
   removeCurrentImage: boolean;
   setImage: StateSetterFn<EditProfileImage>;
   setRemoveCurrentImage: StateSetterFn<boolean>;
-  setFormStatus: StateSetterFn<FormStatus>;
+  setFormStatus: StateSetterFn<Status>;
 }
 
 const EditProfileFileInput = ({

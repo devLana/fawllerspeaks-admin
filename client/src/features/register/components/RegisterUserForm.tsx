@@ -15,12 +15,12 @@ import PasswordInput from "@components/PasswordInput";
 import { REGISTER_USER } from "../operations/REGISTER_USER";
 import { registerUserValidator } from "../utils/registerUserValidator";
 import type { MutationRegisterUserArgs } from "@apiTypes";
-import type { FormStatus } from "@types";
+import type { Status } from "@types";
 
 type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
 
 const RegisterUserForm = () => {
-  const [formStatus, setFormStatus] = React.useState<FormStatus>("idle");
+  const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const { replace } = useRouter();
 
   const [registerUser, { error, client }] = useMutation(REGISTER_USER);
@@ -35,7 +35,7 @@ const RegisterUserForm = () => {
   });
 
   const submitHandler = (values: RegisterUserArgs) => {
-    setFormStatus("submitting");
+    setFormStatus("loading");
 
     void registerUser({
       variables: { userInput: values },
@@ -194,7 +194,7 @@ const RegisterUserForm = () => {
           </Grid>
         </Box>
         <LoadingButton
-          loading={formStatus === "submitting"}
+          loading={formStatus === "loading"}
           variant="contained"
           size="large"
           type="submit"
