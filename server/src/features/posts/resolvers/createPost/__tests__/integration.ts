@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 
 import createPost from "..";
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
-
 import { getPostTags } from "@features/posts/utils";
 import * as mocks from "../utils/createPost.testUtils";
+
 import { info, mockContext, spyDb } from "@tests";
 import { urls } from "@utils";
 
@@ -127,7 +126,7 @@ describe("Test createPost resolver", () => {
     const author = { name: "Author Name", image: "/author/image/path" };
     const mockRows = [{ isRegistered: true, ...author }];
 
-    it("Should create a new post with an image banner and post tags", async () => {
+    it("Should create and publish a new post with an image banner and post tags", async () => {
       const post = { ...mocks.argsWithImage, tags: mocks.tags };
       const mocked = getPostTags as unknown as MockType<["tag", "tag", "tag"]>;
       mocked.mockImplementationOnce(() => ["tag", "tag", "tag"]);
@@ -170,7 +169,7 @@ describe("Test createPost resolver", () => {
       );
     });
 
-    it("Should create a new post without an image banner and post tags", async () => {
+    it("Should create and publish a new post without an image banner and post tags", async () => {
       const post = mocks.argsWithNoImage;
       const spy = spyDb({ rows: mockRows });
       spy.mockReturnValueOnce({ rows: [] });

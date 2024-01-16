@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 
-import { getPostUrl, mapPostTags } from "@features/posts/utils";
+import supabase from "@lib/supabase/supabaseClient";
+import { getPostUrl } from "@features/posts/utils";
 import dateToISOString from "../dateToISOString";
 
 import type { GetPostDBData, TestPostAuthor, TestPostData } from "@types";
@@ -15,12 +16,7 @@ interface Params {
 
 const createTestPost = async (params: Params): Promise<Post> => {
   const { db, postTags, postAuthor, postData } = params;
-  const map = new Map<string, PostTag>();
-
-  const tags = postTags?.map(postTag => {
-    map.set(postTag.id, postTag);
-    return postTag.id;
-  });
+  const tagIds = postTags?.map(postTag => postTag.id);
 
   try {
     const { rows } = await db.query<GetPostDBData>(
@@ -68,21 +64,21 @@ const createTestPost = async (params: Params): Promise<Post> => {
 
     const [post] = rows;
 
-    if (tags) {
+    if (tagIds) {
       void db.query(
         `UPDATE post_tags
         SET posts = array_append(posts, $1)
         WHERE tag_id = ANY ($2)`,
-        [post.id, tags]
+        [post.id, tagIds]
       );
     }
 
+    const { storageUrl } = supabase();
     const { url, slug } = getPostUrl(post.title);
-    const mappedTags = tags ? mapPostTags(tags, map) : null;
 
     const author = {
       name: `${postAuthor.firstName} ${postAuthor.lastName}`,
-      image: postAuthor.image,
+      image: postAuthor.image ? `${storageUrl}${postAuthor.image}` : null,
     };
 
     const datePublished = post.datePublished
@@ -103,14 +99,14 @@ const createTestPost = async (params: Params): Promise<Post> => {
       status: post.status,
       url,
       slug,
-      imageBanner: post.imageBanner,
+      imageBanner: post.imageBanner ? `${storageUrl}${post.imageBanner}` : null,
       dateCreated: dateToISOString(post.dateCreated),
       datePublished,
       lastModified,
       views: post.views,
       isInBin: post.isInBin,
       isDeleted: post.isDeleted,
-      tags: mappedTags,
+      tags: postTags ?? null,
     };
   } catch (err) {
     console.error("Create Test Post Error - ", err);

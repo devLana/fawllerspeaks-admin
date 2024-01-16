@@ -37,23 +37,22 @@ export const newRegisteredUser: RemoveNullFromTestUser = {
   resetToken: ["new_registered_user_reset_token", "203"],
 };
 
-const createData: CreateTestPostData = {
-  status: "Published",
-  imageBanner: "post/image/banner/storage/path",
-  datePublished: new Date().toISOString(),
-  lastModified: null,
-  isInBin: false,
-  isDeleted: false,
-};
+const description = "Test post description";
+const content = "Test post content";
+const imageBanner = "post/image/banner/storage/path";
+const datePublished = new Date().toISOString();
 
-export const testPostData = (params = createData): TestPostData => ({
-  title: "Test Post Title",
-  description: "Test Post Description",
-  content: "Test Post Content",
-  status: params.status,
-  imageBanner: params.imageBanner,
-  datePublished: params.datePublished,
-  lastModified: params.lastModified,
-  isInBin: params.isInBin,
-  isDeleted: params.isDeleted,
+export const testPostData = (params?: CreateTestPostData): TestPostData => ({
+  title: params?.title ?? "Test post default title",
+  description:
+    params?.description === undefined ? description : params.description,
+  content: params?.content === undefined ? content : params.content,
+  status: params?.status ?? "Published",
+  imageBanner:
+    params?.imageBanner === undefined ? imageBanner : params.imageBanner,
+  datePublished:
+    params?.datePublished === undefined ? datePublished : params.datePublished,
+  lastModified: params?.lastModified ?? null,
+  isInBin: params?.isInBin ?? false,
+  isDeleted: params?.isDeleted ?? false,
 });

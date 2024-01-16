@@ -21,19 +21,14 @@ const mockEvent = jest.spyOn(supabaseEvent, "emit");
 mockEvent.mockImplementation(() => true);
 
 describe("Create post - E2E", () => {
-  let server: ApolloServer<APIContext>, url: string;
-  let registeredJwt: string, unRegisteredJwt: string;
-  let postTags: PostTag[], dbPost: Post;
+  let server: ApolloServer<APIContext>, url: string, dbPost: Post;
+  let registeredJwt: string, unRegisteredJwt: string, postTags: PostTag[];
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
-    const {
-      newRegisteredUser: user,
-      registeredUser: userRegistered,
-      unregisteredUser,
-    } = await tests.authUsers(db);
+    const { registeredUser, unregisteredUser } = await tests.testUsers(db);
 
-    const registered = tests.loginTestUser(userRegistered.userId);
+    const registered = tests.loginTestUser(registeredUser.userId);
     const unRegistered = tests.loginTestUser(unregisteredUser.userId);
     const createPostTags = tests.createTestPostTags(db);
 
@@ -47,10 +42,10 @@ describe("Create post - E2E", () => {
       db,
       postTags,
       postAuthor: {
-        userId: user.userId,
-        firstName: tests.newRegisteredUser.firstName,
-        lastName: tests.newRegisteredUser.lastName,
-        image: tests.newRegisteredUser.image,
+        userId: registeredUser.userId,
+        firstName: tests.registeredUser.firstName,
+        lastName: tests.registeredUser.lastName,
+        image: tests.registeredUser.image,
       },
       postData: tests.testPostData(),
     });
@@ -175,7 +170,7 @@ describe("Create post - E2E", () => {
       image: `${storageUrl}${tests.registeredUser.image}`,
     };
 
-    it("Should create a new post with an image banner and post tags", async () => {
+    it("Should create and publish a new post with an image banner and post tags", async () => {
       const [tag1, tag2, tag3, tag4, tag5] = postTags;
       const tags = [tag1.id, tag2.id, tag3.id, tag4.id, tag5.id];
       const variables = { post: { ...mocks.argsWithImage, tags } };
@@ -211,7 +206,7 @@ describe("Create post - E2E", () => {
       });
     });
 
-    it("Should create a new post without an image banner and post tags", async () => {
+    it("Should create and publish a new post without an image banner and post tags", async () => {
       const variables = { post: { ...mocks.argsWithNoImage, tags: null } };
       const payload = { query: tests.CREATE_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };

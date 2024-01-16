@@ -45,9 +45,10 @@ describe("Draft post - E2E", () => {
         userId: registeredUser.userId,
         firstName: tests.registeredUser.firstName,
         lastName: tests.registeredUser.lastName,
-        image: tests.newRegisteredUser.image,
+        image: tests.registeredUser.image,
       },
       postData: tests.testPostData({
+        content: null,
         status: "Draft",
         datePublished: null,
       }),
