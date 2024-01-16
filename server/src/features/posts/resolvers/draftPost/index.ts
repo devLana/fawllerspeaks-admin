@@ -1,105 +1,58 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
+import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import { getPostTags, getPostUrl } from "@features/posts/utils";
 import {
   SinglePost,
   DuplicatePostTitleError,
   PostValidationError,
-  UnauthorizedAuthorError,
-  NotAllowedPostActionError,
 } from "../types";
+import { draftPostSchema as schema } from "./utils/draftPost.validator";
 import {
+  AuthenticationError,
   NotAllowedError,
+  RegistrationError,
   UnknownError,
-  dateToISOString,
   generateErrorsObject,
 } from "@utils";
 
-import type { MutationResolvers, PostTag, PostStatus } from "@resolverTypes";
-import type { ResolverFunc, DbCreatePost, ValidationErrorObject } from "@types";
+import type { MutationResolvers, PostTag } from "@resolverTypes";
+import type { ResolverFunc, PostDBData, ValidationErrorObject } from "@types";
 
 type DraftPost = ResolverFunc<MutationResolvers["draftPost"]>;
 
-interface DBUser {
+interface User {
   isRegistered: boolean;
   name: string;
-}
-
-interface DbPost {
-  author: string;
-  description: string | null;
-  content: string | null;
-  status: PostStatus;
-  tags: string[] | null;
-  imageBanner: string | null;
+  image: string | null;
 }
 
 const draftPost: DraftPost = async (_, { post }, { db, user }) => {
-  const schema = Joi.object<typeof post>({
-    postId: Joi.string()
-      .trim()
-      .uuid({ version: "uuidv4", separator: "-" })
-      .messages({
-        "string.empty": "Provide post id",
-        "string.guid": "Invalid post id",
-      }),
-    title: Joi.string().required().trim().messages({
-      "string.empty": "A title is required to save this post to draft",
-    }),
-    description: Joi.string().trim().messages({
-      "string.empty": "Provide post description",
-    }),
-    content: Joi.string().trim().messages({
-      "string.empty": "Provide post content",
-    }),
-    tags: Joi.array()
-      .items(
-        Joi.string()
-          .trim()
-          .uuid({ version: "uuidv4", separator: "-" })
-          .messages({
-            "string.empty": "Input post tags cannot be empty values",
-            "string.guid": "Invalid post tag id",
-          })
-      )
-      .min(1)
-      .unique()
-      .messages({
-        "array.unique": "Input tags can only contain unique tags",
-        "array.min": "No post tags were provided",
-        "array.base": "Post tags input must be an array",
-      }),
-    imageBanner: Joi.string()
-      .trim()
-      .messages({ "string.empty": "Provide post image banner link" }),
-  });
+  if (!user) {
+    if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
+    return new AuthenticationError("Unable to save post to draft");
+  }
 
   try {
-    if (!user) return new NotAllowedError("Unable to save post to draft");
+    const validated = await schema.validateAsync(post, { abortEarly: false });
+    const { title, description, content, tags, imageBanner } = validated;
 
-    const result = await schema.validateAsync(post, { abortEarly: false });
-    const {
-      postId,
-      title,
-      description = null,
-      content = null,
-      tags,
-      imageBanner = null,
-    } = result;
-
-    const findUser = db.query<DBUser>(
+    const findUser = db.query<User>(
       `SELECT
         is_registered "isRegistered",
-        concat(first_name,' ', last_name) name
+        concat(first_name,' ', last_name) name,
+        image
       FROM users
       WHERE user_id = $1`,
       [user]
     );
 
-    const findTitle = db.query<{ postId: string }>(
-      `SELECT post_id "postId" FROM posts WHERE lower(title) = $1`,
-      [title.toLowerCase()]
+    const findTitle = db.query(
+      `SELECT id
+      FROM posts
+      WHERE lower(replace(replace(replace(title, '-', ''), ' ', ''), '_', '')) = $1`,
+      [title.toLowerCase().replace(/[\s_-]/g, "")]
     );
 
     const [{ rows: foundUser }, { rows: foundTitle }] = await Promise.all([
@@ -107,179 +60,100 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
       findTitle,
     ]);
 
-    if (foundUser.length === 0 || !foundUser[0].isRegistered) {
+    if (foundUser.length === 0) {
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new NotAllowedError("Unable to save post to draft");
     }
 
-    // write content to a file on disk
+    const [{ name, image, isRegistered }] = foundUser;
 
-    const dbTags = tags ? `{${tags.join(", ")}}` : null;
-    let savedPost: DbCreatePost;
-    let postTags: PostTag[] = [];
+    if (!isRegistered) {
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+      return new RegistrationError("Unable to save post to draft");
+    }
+
+    if (foundTitle.length > 0) {
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+
+      return new DuplicatePostTitleError(
+        "A post with that title has already been created"
+      );
+    }
+
+    let postTags: PostTag[] | null = null;
+    let passedTags: readonly string[] | null = null;
 
     if (tags) {
       const gottenTags = await getPostTags(db, tags);
 
       if (!gottenTags || gottenTags.length < tags.length) {
+        if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
         return new UnknownError("Unknown post tag id provided");
       }
 
       postTags = gottenTags;
+      passedTags = tags;
     }
 
-    let newDescription: string | null = null;
-    let newContent: string | null = null;
-    let newTags: string[] | null = null;
-    let newImageBanner: string | null = null;
+    const { rows: draftedPost } = await db.query<PostDBData>(
+      `INSERT INTO posts (
+        title,
+        description,
+        content,
+        author,
+        status,
+        image_banner
+      ) VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING
+        id,
+        post_id "postId",
+        date_created "dateCreated",
+        date_published "datePublished",
+        last_modified "lastModified",
+        views,
+        is_in_bin "isInBin",
+        is_deleted "isDeleted"`,
+      [title, description, content, user, "Draft", imageBanner]
+    );
 
-    if (postId) {
-      const { rows: checkPostId } = await db.query<DbPost>(
-        `SELECT
-          author,
-          description,
-          content,
-          status,
-          tags,
-          image_banner "imageBanner"
-        FROM posts
-        WHERE post_id = $1`,
-        [postId]
+    const [drafted] = draftedPost;
+
+    if (passedTags && passedTags.length > 0) {
+      void db.query(
+        `UPDATE post_tags
+        SET posts = array_append(posts, $1)
+        WHERE tag_id = ANY ($2)`,
+        [drafted.id, passedTags]
       );
-
-      if (checkPostId.length === 0) {
-        return new UnknownError("Unknown post id provided");
-      }
-
-      if (checkPostId[0].author !== user) {
-        return new UnauthorizedAuthorError(
-          "Cannot update another author's draft post"
-        );
-      }
-
-      if (checkPostId[0].status !== "Draft") {
-        return new NotAllowedPostActionError("Can only update a draft post");
-      }
-
-      if (foundTitle.length > 0 && foundTitle[0].postId !== postId) {
-        return new DuplicatePostTitleError(
-          "A post with that title has already been created"
-        );
-      }
-
-      const newDbTags = checkPostId[0].tags
-        ? `{${checkPostId[0].tags.join(", ")}}`
-        : null;
-
-      newDescription = checkPostId[0].description;
-      newContent = checkPostId[0].content;
-      newTags = checkPostId[0].tags;
-      newImageBanner = checkPostId[0].imageBanner;
-
-      const {
-        rows: [updateDraft],
-      } = await db.query<DbCreatePost>(
-        `UPDATE posts SET
-          title = $1,
-          description = $2,
-          content = $3,
-          status = $4,
-          image_banner = $5,
-          tags = $6
-        WHERE post_id = $7
-        RETURNING
-          post_id "postId",
-          image_banner "imageBanner",
-          date_created "dateCreated",
-          date_published "datePublished",
-          last_modified "lastModified",
-          slug,
-          views,
-          likes,
-          is_in_bin "isInBin",
-          is_deleted "isDeleted"`,
-        [
-          title,
-          description ?? checkPostId[0].description,
-          content ?? checkPostId[0].content,
-          "Draft",
-          imageBanner ?? checkPostId[0].imageBanner,
-          dbTags ?? newDbTags,
-          postId,
-        ]
-      );
-
-      savedPost = updateDraft;
-    } else {
-      if (foundTitle.length > 0) {
-        return new DuplicatePostTitleError(
-          "A post with that title has already been created"
-        );
-      }
-
-      const {
-        rows: [newDraft],
-      } = await db.query<DbCreatePost>(
-        `INSERT INTO posts (
-          title,
-          description,
-          content,
-          author,
-          status,
-          image_banner,
-          tags
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING
-          post_id "postId",
-          image_banner "imageBanner",
-          date_created "dateCreated",
-          date_published "datePublished",
-          last_modified "lastModified",
-          views,
-          likes,
-          is_in_bin "isInBin",
-          is_deleted "isDeleted"`,
-        [title, description, content, user, "Draft", imageBanner, dbTags]
-      );
-
-      savedPost = newDraft;
     }
 
-    if (!tags && newTags) {
-      const gottenTags = await getPostTags(db, newTags);
-      postTags = gottenTags ?? [];
-    }
-
-    const postUrl = getPostUrl(title);
-    const returnTags = postTags.length === 0 ? null : postTags;
+    const { url, slug } = getPostUrl(title);
 
     return new SinglePost({
-      id: savedPost.postId,
+      id: drafted.postId,
       title,
-      description: description ?? newDescription,
-      content: content ?? newContent,
-      author: foundUser[0].name,
+      description,
+      content,
+      author: { name, image },
       status: "Draft",
-      url: postUrl,
-      slug: savedPost.slug,
-      imageBanner: savedPost.imageBanner ?? newImageBanner,
-      dateCreated: dateToISOString(savedPost.dateCreated),
-      datePublished: savedPost.datePublished
-        ? dateToISOString(savedPost.datePublished)
-        : savedPost.datePublished,
-      lastModified: savedPost.lastModified
-        ? dateToISOString(savedPost.lastModified)
-        : savedPost.lastModified,
-      views: savedPost.views,
-      likes: savedPost.likes,
-      isInBin: savedPost.isInBin,
-      isDeleted: savedPost.isDeleted,
-      tags: returnTags,
+      url,
+      slug,
+      imageBanner,
+      dateCreated: drafted.dateCreated,
+      datePublished: drafted.datePublished,
+      lastModified: drafted.lastModified,
+      views: drafted.views,
+      isInBin: drafted.isInBin,
+      isDeleted: drafted.isDeleted,
+      tags: postTags,
     });
   } catch (err) {
     if (err instanceof ValidationError) {
       const errors = generateErrorsObject(err.details) as ValidationErrorObject<
         typeof post
       >;
+
+      if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
 
       return new PostValidationError(errors);
     }
