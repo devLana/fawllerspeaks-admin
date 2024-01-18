@@ -5,9 +5,10 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import LoadingButton from "@mui/lab/LoadingButton";
 
-import { postMetadataValidator } from "./utils/postMetadataValidator";
 import MetadataList from "./components/MetadataList";
+import { postMetadataValidator } from "./utils/postMetadataValidator";
 import type { PostView, StateSetterFn } from "@types";
 import type { CreatePostInput } from "@apiTypes";
 
@@ -16,8 +17,11 @@ interface PostMetadataProps {
   description: string;
   fileInput: React.ReactElement;
   selectPostTags: React.ReactElement;
+  draftStatus: "idle" | "loading" | "error";
   handleMetadata: (title: string, description: string) => void;
+  handleDraftPost: () => Promise<void>;
   setView: StateSetterFn<PostView>;
+  onInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 type PostMetadataValues = Pick<CreatePostInput, "title" | "description">;
@@ -27,8 +31,11 @@ const PostMetadata = ({
   description,
   fileInput,
   selectPostTags,
+  draftStatus,
+  handleDraftPost,
   handleMetadata,
   setView,
+  onInput,
 }: PostMetadataProps) => {
   const {
     register,
@@ -60,6 +67,7 @@ const PostMetadata = ({
       >
         <TextField
           {...register("title")}
+          onInput={onInput}
           id="title"
           autoComplete="on"
           fullWidth
@@ -92,8 +100,18 @@ const PostMetadata = ({
           columnGap={2}
           mt={4}
         >
-          <Button variant="outlined">Save as draft</Button>
-          <Button variant="contained" type="submit">
+          <LoadingButton
+            variant="outlined"
+            loading={draftStatus === "loading"}
+            onClick={handleDraftPost}
+          >
+            <span>Save as draft</span>
+          </LoadingButton>
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={draftStatus === "loading"}
+          >
             Next
           </Button>
         </Stack>

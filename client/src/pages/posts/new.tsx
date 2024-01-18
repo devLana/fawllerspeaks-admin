@@ -1,13 +1,16 @@
 import * as React from "react";
 
+import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
-import uiLayout from "@utils/uiLayout";
+import { useDraftPost } from "@features/posts/CreatePost/hooks/useDraftPost";
 import RootLayout from "@layouts/RootLayout";
 import PostMetadata from "@features/posts/CreatePost/components/PostMetadata";
 import PostFileInput from "@features/posts/CreatePost/components/PostMetadata/components/PostFileInput";
 import SelectPostTags from "@features/posts/CreatePost/components/PostMetadata/components/SelectPostTags";
-import type { NextPageWithLayout, PostData, PostView } from "@types";
+import uiLayout from "@utils/uiLayout";
+import { handleCloseAlert } from "@utils/handleCloseAlert";
+import type { NextPageWithLayout, PostData, PostView, Status } from "@types";
 
 const CreatePostPage: NextPageWithLayout = () => {
   const [view, setView] = React.useState<PostView>("metadata");
@@ -17,10 +20,15 @@ const CreatePostPage: NextPageWithLayout = () => {
     content: "",
   });
 
+  const { handleDraftPost, setDraftStatus, draftStatus, msg } = useDraftPost(
+    postData,
+    setPostData
+  );
+
   const handlePostTags = (selectedTags: string[]) => {
     if (selectedTags.length === 0) {
-      const { tags: _, ...data } = postData;
-      setPostData(data);
+      const { tags: _, ...rest } = postData;
+      setPostData(rest);
     } else {
       setPostData({ ...postData, tags: selectedTags });
     }
@@ -30,13 +38,17 @@ const CreatePostPage: NextPageWithLayout = () => {
     if (imageFile) {
       setPostData({ ...postData, imageBanner: imageFile });
     } else {
-      const { imageBanner: _, ...data } = postData;
-      setPostData(data);
+      const { imageBanner: _, ...rest } = postData;
+      setPostData(rest);
     }
   };
 
   const handleMetadata = (title: string, description: string) => {
     setPostData({ ...postData, title, description });
+  };
+
+  const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPostData({ ...postData, title: e.target.value });
   };
 
   return (
@@ -46,10 +58,13 @@ const CreatePostPage: NextPageWithLayout = () => {
       </Typography>
       {view === "metadata" ? (
         <PostMetadata
-          setView={setView}
+          onInput={handleTitle}
           title={postData.title}
           description={postData.description}
+          draftStatus={draftStatus}
           handleMetadata={handleMetadata}
+          handleDraftPost={handleDraftPost}
+          setView={setView}
           selectPostTags={
             <SelectPostTags
               tags={postData.tags}
@@ -64,6 +79,11 @@ const CreatePostPage: NextPageWithLayout = () => {
           }
         />
       ) : null}
+      <Snackbar
+        message={msg}
+        open={draftStatus === "error"}
+        onClose={handleCloseAlert<Status>("idle", setDraftStatus)}
+      />
     </>
   );
 };
