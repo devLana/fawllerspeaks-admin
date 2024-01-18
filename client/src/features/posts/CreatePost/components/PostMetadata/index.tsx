@@ -56,15 +56,10 @@ const PostMetadata = ({
   };
 
   return (
-    <section>
+    <Box component="section" maxWidth={700}>
       <Typography>Provide post metadata for the following:</Typography>
       <MetadataList />
-      <Box
-        component="form"
-        maxWidth={700}
-        aria-label="Post metadata"
-        onSubmit={handleSubmit(submitHandler)}
-      >
+      <form aria-label="Post metadata" onSubmit={handleSubmit(submitHandler)}>
         <TextField
           {...register("title")}
           onInput={onInput}
@@ -74,7 +69,7 @@ const PostMetadata = ({
           label="Title"
           defaultValue={defaultValues?.title ?? ""}
           inputProps={{ "aria-errormessage": ariaErrorMessage("title") }}
-          margin={errors.title ? "dense" : "normal"}
+          margin="normal"
           error={!!errors.title}
           helperText={errors.title?.message ?? null}
         />
@@ -86,7 +81,7 @@ const PostMetadata = ({
           label="Description"
           defaultValue={defaultValues?.description ?? ""}
           inputProps={{ "aria-errormessage": ariaErrorMessage("description") }}
-          margin={errors.description ? "dense" : "normal"}
+          margin="normal"
           error={!!errors.description}
           helperText={errors.description?.message ?? null}
         />
@@ -115,8 +110,8 @@ const PostMetadata = ({
             Next
           </Button>
         </Stack>
-      </Box>
-    </section>
+      </form>
+    </Box>
   );
 };
 
