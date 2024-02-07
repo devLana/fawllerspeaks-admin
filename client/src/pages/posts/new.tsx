@@ -8,6 +8,7 @@ import RootLayout from "@layouts/RootLayout";
 import PostMetadata from "@features/posts/CreatePost/components/PostMetadata";
 import PostFileInput from "@features/posts/CreatePost/components/PostMetadata/components/PostFileInput";
 import SelectPostTags from "@features/posts/CreatePost/components/PostMetadata/components/SelectPostTags";
+import PostContent from "@features/posts/CreatePost/components/PostContent";
 import uiLayout from "@utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout, PostData, PostView, Status } from "@types";
@@ -51,6 +52,10 @@ const CreatePostPage: NextPageWithLayout = () => {
     setPostData({ ...postData, title: e.target.value });
   };
 
+  const handleContent = (content: string) => {
+    setPostData({ ...postData, content });
+  };
+
   return (
     <>
       <Typography variant="h1" gutterBottom>
@@ -77,6 +82,14 @@ const CreatePostPage: NextPageWithLayout = () => {
               imageBanner={postData.imageBanner}
             />
           }
+        />
+      ) : view === "content" ? (
+        <PostContent
+          content={postData.content}
+          draftStatus={draftStatus}
+          handleContent={handleContent}
+          handleDraftPost={handleDraftPost}
+          setView={setView}
         />
       ) : null}
       <Snackbar
