@@ -88,7 +88,7 @@ export const useDraftPost = (
   };
 
   let msg =
-    "You are unable to update your profile at the moment. Please try again later";
+    "You are unable to save this post as draft at the moment. Please try again later";
 
   if (!postData.title) {
     msg = "No post title provided";
