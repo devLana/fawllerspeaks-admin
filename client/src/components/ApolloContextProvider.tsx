@@ -18,6 +18,7 @@ const ApolloContextProvider = ({ children }: { children: React.ReactNode }) => {
       cache,
       credentials: "include",
       ssrMode: typeof window === "undefined",
+      connectToDevTools: true,
       ...(jwt ? { headers: { authorization: `Bearer ${jwt}` } } : {}),
     });
   }, [jwt, cache]);
