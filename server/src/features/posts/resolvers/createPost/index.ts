@@ -156,12 +156,12 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       tags: postTags,
     });
   } catch (err) {
+    if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
+
     if (err instanceof ValidationError) {
       const errors = generateErrorsObject(err.details) as ValidationErrorObject<
         typeof post
       >;
-
-      if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
 
       return new PostValidationError(errors);
     }

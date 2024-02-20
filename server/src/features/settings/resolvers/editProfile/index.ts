@@ -93,11 +93,11 @@ const editProfile: EditProfile = async (_, args, { db, user }) => {
       dateCreated: userInfo[0].dateCreated,
     });
   } catch (err) {
+    if (args.image) supabaseEvent.emit("removeImage", args.image);
+
     if (err instanceof ValidationError) {
       const { firstNameError, lastNameError, imageError } =
         generateErrorsObject(err.details) as ValidationErrorObject<typeof args>;
-
-      if (args.image) supabaseEvent.emit("removeImage", args.image);
 
       return new EditProfileValidationError(
         firstNameError,
