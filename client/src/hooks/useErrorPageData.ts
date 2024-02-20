@@ -1,4 +1,4 @@
-import { useSession } from "@context/SessionContext";
+import { useSession } from "@context/Session";
 
 const useErrorPageData = () => {
   const { userId } = useSession();

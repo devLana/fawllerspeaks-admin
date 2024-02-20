@@ -7,8 +7,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { useSession } from "@context/SessionContext";
-import { useAuthHeaderHandler } from "@context/ApolloContext";
+import { useSession } from "@context/Session";
+import { useAuthHeader } from "@context/AuthHeader";
 import AlertToast from "@components/AlertToast";
 import PasswordInput from "@components/PasswordInput";
 import { LOGIN_USER } from "../operations/LOGIN_USER";
@@ -33,7 +33,7 @@ const LoginForm = () => {
   } = useForm<MutationLoginArgs>({ resolver: yupResolver(loginValidator) });
 
   const { handleUserId, handleRefreshToken } = useSession();
-  const { handleAuthHeader } = useAuthHeaderHandler();
+  const { handleAuthHeader } = useAuthHeader();
 
   const submitHandler = (values: LoginFormValues) => {
     setFormStatus("loading");

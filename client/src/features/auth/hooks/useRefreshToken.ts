@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 
 import { useApolloClient } from "@apollo/client";
 
-import { useAuthHeaderHandler } from "@context/ApolloContext";
+import { useAuthHeader } from "@context/AuthHeader";
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { SESSION_ID } from "@utils/constants";
 
@@ -16,7 +16,7 @@ const useRefreshToken = () => {
 
   const client = useApolloClient();
 
-  const { handleAuthHeader } = useAuthHeaderHandler();
+  const { handleAuthHeader } = useAuthHeader();
 
   const refreshToken = async (sessionId: string) => {
     try {

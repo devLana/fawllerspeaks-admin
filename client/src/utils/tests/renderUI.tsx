@@ -1,9 +1,9 @@
 import { render, type RenderOptions } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { SessionContext } from "@context/SessionContext";
-import ApolloContextProvider from "@components/ApolloContextProvider";
-import MUIThemeProvider from "@components/MUIThemeProvider";
+import { SessionContext } from "@context/Session";
+import AuthHeaderProvider from "@context/AuthHeader/AuthHeaderProvider";
+import AppThemeProvider from "@context/AppTheme/AppThemeProvider";
 
 export const userIdHandler = vi.fn().mockName("handleUserId");
 export const refreshTokenHandler = vi.fn().mockName("handleRefreshToken");
@@ -19,13 +19,13 @@ const sessionValue = {
 };
 
 const AppWrapper = ({ children }: { children: React.ReactElement }) => (
-  <ApolloContextProvider>
-    <MUIThemeProvider>
+  <AuthHeaderProvider>
+    <AppThemeProvider>
       <SessionContext.Provider value={sessionValue}>
         {children}
       </SessionContext.Provider>
-    </MUIThemeProvider>
-  </ApolloContextProvider>
+    </AppThemeProvider>
+  </AuthHeaderProvider>
 );
 
 export const renderUI = (ui: React.ReactElement, options?: RenderOptions) => ({

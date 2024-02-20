@@ -8,7 +8,7 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 import useRefreshToken from "../hooks/useRefreshToken";
 import useVerifySession from "../hooks/useVerifySession";
-import { SessionContext } from "@context/SessionContext";
+import { SessionContext } from "@context/Session";
 import type { PageLayout } from "@types";
 
 interface SessionProvideProps {

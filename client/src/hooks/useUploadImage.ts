@@ -1,4 +1,4 @@
-import { useAuthHeaderHandler } from "@context/ApolloContext";
+import { useAuthHeader } from "@context/AuthHeader";
 
 interface UploadImage {
   image: string;
@@ -6,7 +6,7 @@ interface UploadImage {
 }
 
 const useUploadImage = () => {
-  const { jwt } = useAuthHeaderHandler();
+  const { jwt } = useAuthHeader();
 
   const upload = async (file: File, fileType: "avatar" | "post") => {
     const headers = new Headers({ authorization: `Bearer ${jwt}` });

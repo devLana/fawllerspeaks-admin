@@ -1,28 +1,31 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql, useApolloClient, type TypedDocumentNode } from "@apollo/client";
+import { useSession } from "@context/Session";
 
-import { useSession } from "@context/SessionContext";
-
-export interface User {
+interface User {
   id: string;
+  email: string;
   firstName: string;
   lastName: string;
   image: string | null;
 }
 
+const GET_USER_INFO: TypedDocumentNode<User> = gql`
+  fragment GetCacheUser on User {
+    id
+    email
+    firstName
+    lastName
+    image
+  }
+`;
+
 const useGetUserInfo = () => {
   const client = useApolloClient();
   const { userId } = useSession();
 
-  const user = client.readFragment<User>({
+  const user = client.readFragment({
     id: userId ?? "",
-    fragment: gql`
-      fragment GetCacheUser on User {
-        id
-        firstName
-        lastName
-        image
-      }
-    `,
+    fragment: GET_USER_INFO,
   });
 
   return user;

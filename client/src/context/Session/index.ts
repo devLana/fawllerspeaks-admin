@@ -1,21 +1,19 @@
 import * as React from "react";
 
-interface SessionContextValues {
+interface Session {
   userId: string | null;
   handleUserId: (userId: string) => void;
   handleRefreshToken: (accessToken: string) => void;
   handleClearRefreshTokenTimer: () => void;
 }
 
-type SessionContextValue = SessionContextValues | null;
-
-export const SessionContext = React.createContext<SessionContextValue>(null);
+export const SessionContext = React.createContext<Session | null>(null);
 
 export const useSession = () => {
   const value = React.useContext(SessionContext);
 
   if (!value) {
-    throw new ReferenceError("SessionContext provider not available");
+    throw new ReferenceError("Session context provider not available");
   }
 
   return value;

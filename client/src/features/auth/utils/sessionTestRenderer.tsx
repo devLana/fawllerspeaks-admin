@@ -1,8 +1,8 @@
 import { type RenderOptions, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import ApolloContextProvider from "@components/ApolloContextProvider";
-import MUIThemeProvider from "@components/MUIThemeProvider";
+import AuthHeaderProvider from "@context/AuthHeader/AuthHeaderProvider";
+import AppThemeProvider from "@context/AppTheme/AppThemeProvider";
 import SessionProvider from "../components/SessionProvider";
 import { TEXT_NODE } from "./verifySession.mocks";
 import testLayout from "./testLayout";
@@ -10,11 +10,11 @@ import testLayout from "./testLayout";
 const TestComponent = () => <span>{TEXT_NODE}</span>;
 
 const SessionProviderTestUI = () => (
-  <ApolloContextProvider>
-    <MUIThemeProvider>
+  <AuthHeaderProvider>
+    <AppThemeProvider>
       <SessionProvider layout={testLayout} page={<TestComponent />} />
-    </MUIThemeProvider>
-  </ApolloContextProvider>
+    </AppThemeProvider>
+  </AuthHeaderProvider>
 );
 
 export const sessionTestRenderer = (options?: RenderOptions) => ({

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 
 import { ApolloError, useApolloClient } from "@apollo/client";
 
-import { useAuthHeaderHandler } from "@context/ApolloContext";
+import { useAuthHeader } from "@context/AuthHeader";
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 import { SESSION_ID } from "@utils/constants";
 
@@ -30,7 +30,7 @@ const useVerifySession = (
     };
   }, []);
 
-  const { handleAuthHeader } = useAuthHeaderHandler();
+  const { handleAuthHeader } = useAuthHeader();
 
   React.useEffect(() => {
     const sessionId = localStorage.getItem(SESSION_ID);

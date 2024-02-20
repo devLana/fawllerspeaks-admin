@@ -4,7 +4,7 @@ import { useApolloClient } from "@apollo/client";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
-import { useAuthHeaderHandler } from "@context/ApolloContext";
+import { useAuthHeader } from "@context/AuthHeader";
 import Metadata from "@components/Metadata";
 import Loader from "@components/Loader";
 import ErrorAlert from "@components/ErrorAlert";
@@ -20,7 +20,7 @@ const RootLayout = (props: RootLayoutProps) => {
 
   const client = useApolloClient();
 
-  const { jwt } = useAuthHeaderHandler();
+  const { jwt } = useAuthHeader();
 
   React.useEffect(() => {
     if (jwt) void client.query({ query: GET_POST_TAGS });

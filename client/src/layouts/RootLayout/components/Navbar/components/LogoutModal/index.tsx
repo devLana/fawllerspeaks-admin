@@ -11,7 +11,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Snackbar from "@mui/material/Snackbar";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { useSession } from "@context/SessionContext";
+import { useSession } from "@context/Session";
 import { LOGOUT } from "./LOGOUT";
 import { SESSION_ID } from "@utils/constants";
 import { handleCloseAlert } from "@utils/handleCloseAlert";

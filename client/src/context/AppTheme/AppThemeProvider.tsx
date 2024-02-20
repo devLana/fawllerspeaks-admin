@@ -3,22 +3,21 @@ import * as React from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
-import { MUIThemeContext } from "@context/MUIThemeContext";
-import { generateTheme } from "./generateTheme";
+import { AppThemeContext } from ".";
+import { generateTheme } from "./utils/generateTheme";
 import { getStorageTheme, saveStorageTheme } from "@utils/storage";
-import type { AppTheme as Theme } from "@types";
+import type { AppTheme } from "@types";
 
-const MUIThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [appTheme, setAppTheme] = React.useState<Theme>({
+const AppThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [appTheme, setAppTheme] = React.useState<AppTheme>({
     themeMode: "sunny",
     fontSize: 14,
     color: "#7dd1f3",
   });
 
-  const theme = React.useMemo(
-    () => createTheme(generateTheme(appTheme)),
-    [appTheme]
-  );
+  const theme = React.useMemo(() => {
+    return createTheme(generateTheme(appTheme));
+  }, [appTheme]);
 
   React.useEffect(() => {
     const defaultTheme = getStorageTheme();
@@ -26,7 +25,7 @@ const MUIThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <MUIThemeContext.Provider
+    <AppThemeContext.Provider
       value={(key, value) => {
         setAppTheme({ ...appTheme, [key]: value });
         saveStorageTheme(appTheme, key, value);
@@ -36,8 +35,8 @@ const MUIThemeProvider = ({ children }: { children: React.ReactNode }) => {
         <CssBaseline />
         {children}
       </ThemeProvider>
-    </MUIThemeContext.Provider>
+    </AppThemeContext.Provider>
   );
 };
 
-export default MUIThemeProvider;
+export default AppThemeProvider;

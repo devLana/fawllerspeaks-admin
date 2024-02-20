@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 
-import { useAppTheme } from "@context/MUIThemeContext";
+import { useAppTheme } from "@context/AppTheme";
 import ThemeItem from "./ThemeItem";
 import { themes } from "@utils/appThemes";
 import type { AppTheme, ThemeMode } from "@types";

@@ -6,7 +6,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
-import { useAppTheme } from "@context/MUIThemeContext";
+import { useAppTheme } from "@context/AppTheme";
 import { normalizedThemes, themes } from "@utils/appThemes";
 import type { ThemeMode } from "@types";
 

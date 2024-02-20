@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import { useAppTheme } from "@context/MUIThemeContext";
+import { useAppTheme } from "@context/AppTheme";
 import DefaultColor from "./DefaultColor";
 import type { AppTheme } from "@types";
 

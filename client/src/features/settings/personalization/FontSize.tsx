@@ -3,7 +3,7 @@ import Slider from "@mui/material/Slider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import { useAppTheme } from "@context/MUIThemeContext";
+import { useAppTheme } from "@context/AppTheme";
 import type { AppTheme } from "@types";
 
 const FontSize = ({ appTheme }: { appTheme: AppTheme }) => {

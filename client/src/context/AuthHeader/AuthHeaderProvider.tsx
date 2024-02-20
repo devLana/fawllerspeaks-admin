@@ -2,10 +2,10 @@ import * as React from "react";
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
-import { ApolloContext } from "@context/ApolloContext";
+import { AuthHeaderContext } from ".";
 import { BaseResponse, UserData } from "@utils/cachePossibleTypes";
 
-const ApolloContextProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthHeaderProvider = ({ children }: { children: React.ReactNode }) => {
   const [jwt, setJwt] = React.useState("");
 
   const cache = React.useMemo(() => {
@@ -24,12 +24,12 @@ const ApolloContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, [jwt, cache]);
 
   return (
-    <ApolloContext.Provider
+    <AuthHeaderContext.Provider
       value={{ handleAuthHeader: token => setJwt(token), jwt }}
     >
       <ApolloProvider client={client}>{children}</ApolloProvider>
-    </ApolloContext.Provider>
+    </AuthHeaderContext.Provider>
   );
 };
 
-export default ApolloContextProvider;
+export default AuthHeaderProvider;

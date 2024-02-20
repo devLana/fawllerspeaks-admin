@@ -1,7 +1,7 @@
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 
-import { useAppTheme } from "@context/MUIThemeContext";
+import { useAppTheme } from "@context/AppTheme";
 import { themes } from "@utils/appThemes";
 
 const HeaderThemeButton = () => {

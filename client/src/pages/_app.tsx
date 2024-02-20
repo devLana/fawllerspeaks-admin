@@ -1,8 +1,8 @@
 import Head from "next/head";
 import { CacheProvider } from "@emotion/react";
 
-import ApolloContextProvider from "@components/ApolloContextProvider";
-import MUIThemeProvider from "@components/MUIThemeProvider";
+import AuthHeaderProvider from "@context/AuthHeader/AuthHeaderProvider";
+import AppThemeProvider from "@context/AppTheme/AppThemeProvider";
 import SessionProvider from "@features/auth/components/SessionProvider";
 import createEmotionCache from "../configs/createEmotionCache";
 import type { NextAppProps } from "@types";
@@ -15,19 +15,19 @@ export default function App(props: NextAppProps) {
   const { layout = uiLayout } = Component;
 
   return (
-    <ApolloContextProvider>
+    <AuthHeaderProvider>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex, nofollow" />
       </Head>
       <CacheProvider value={emotionCache}>
-        <MUIThemeProvider>
+        <AppThemeProvider>
           <SessionProvider
             layout={layout}
             page={<Component {...pageProps} />}
           />
-        </MUIThemeProvider>
+        </AppThemeProvider>
       </CacheProvider>
-    </ApolloContextProvider>
+    </AuthHeaderProvider>
   );
 }

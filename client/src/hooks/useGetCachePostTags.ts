@@ -5,12 +5,7 @@ import type { PostTags } from "@apiTypes";
 import type { PostTagData } from "@types";
 
 type Tags = Omit<PostTags, "status" | "tags"> & { tags: PostTagData[] };
-
-interface CachePostTags {
-  getPostTags: Tags;
-}
-
-type CachedPostTagsData = TypedDocumentNode<CachePostTags>;
+type CachedPostTagsData = TypedDocumentNode<{ getPostTags: Tags }>;
 
 const GET_CACHED_POST_TAGS: CachedPostTagsData = gql`
   ${POST_TAG_FIELDS}

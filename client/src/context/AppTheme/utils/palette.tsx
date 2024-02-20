@@ -1,5 +1,4 @@
 import type { ThemeOptions } from "@mui/material/styles";
-
 import type { ThemeColors, ThemeMode } from "@types";
 
 type Palette = NonNullable<ThemeOptions["palette"]>;
