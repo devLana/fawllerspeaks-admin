@@ -104,3 +104,9 @@ type PostDataMapper<T extends Record<string, object>> = {
 };
 
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
+
+export interface EditProfileFormProps {
+  firstName: string;
+  lastName: string;
+  userImage: string;
+}

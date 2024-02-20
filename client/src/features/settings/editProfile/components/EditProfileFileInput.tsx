@@ -7,12 +7,15 @@ import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternate
 import { useHandleFile } from "@hooks/useHandleFile";
 import EditProfileImagePreview from "./EditProfileImagePreview";
 import { FileInput } from "@components/FileInput";
-import type { User } from "@hooks/useGetUserInfo";
-import type { EditProfileImage, Status, StateSetterFn } from "@types";
+import type {
+  EditProfileImage,
+  EditProfileFormProps,
+  Status,
+  StateSetterFn,
+} from "@types";
 
-interface EditProfileFileInputProps {
+interface EditProfileFileInputProps extends EditProfileFormProps {
   image: EditProfileImage;
-  user: User | null;
   removeCurrentImage: boolean;
   setImage: StateSetterFn<EditProfileImage>;
   setRemoveCurrentImage: StateSetterFn<boolean>;
@@ -21,7 +24,9 @@ interface EditProfileFileInputProps {
 
 const EditProfileFileInput = ({
   image,
-  user,
+  userImage,
+  firstName,
+  lastName,
   removeCurrentImage,
   setImage,
   setRemoveCurrentImage,
@@ -82,13 +87,13 @@ const EditProfileFileInput = ({
           onKeyDown={handleKeydown}
           alt="Profile image upload preview"
         />
-      ) : user?.image && !removeCurrentImage ? (
+      ) : userImage && !removeCurrentImage ? (
         <EditProfileImagePreview
           id={id}
-          src={user.image}
+          src={userImage}
           onClick={() => setRemoveCurrentImage(true)}
           onKeyDown={handleKeydown}
-          alt={`${user.firstName} ${user.lastName} profile image`}
+          alt={`${firstName} ${lastName} profile image`}
         />
       ) : (
         <Button
