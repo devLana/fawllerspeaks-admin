@@ -117,10 +117,10 @@ describe("Create post tags", () => {
         mocks.server.use(graphql.query("GetPostTags", resolver));
 
         expect(await screen.findByRole("alert")).toHaveTextContent(mock.msg);
+        expect(modal).not.toBeInTheDocument();
         expect(screen.getByText(mock.tags[0])).toBeInTheDocument();
         expect(screen.getByText(mock.tags[1])).toBeInTheDocument();
         expect(screen.getByText(mock.tags[2])).toBeInTheDocument();
-        expect(modal).not.toBeInTheDocument();
       });
     });
   });

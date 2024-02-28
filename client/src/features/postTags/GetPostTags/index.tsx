@@ -1,7 +1,5 @@
 import { useRouter } from "next/router";
 
-import { useApolloClient } from "@apollo/client";
-
 import useGetPostTags from "@hooks/useGetPostTags";
 import PostTags from "./components/PostTags";
 import PostTagsLoading from "./components/PostTagsLoading";
@@ -10,10 +8,10 @@ import PostTagsTextContent from "./components/PostTagsTextContent";
 const GetPostTags = () => {
   const { replace } = useRouter();
 
-  const client = useApolloClient();
-  const { data, loading, error } = useGetPostTags();
+  const { data, loading, error, client } = useGetPostTags();
 
   const id = "post-tags";
+
   const msg =
     "You are unable to get post tags at the moment. Please try again later";
 
@@ -27,6 +25,7 @@ const GetPostTags = () => {
   if (!data) {
     const text =
       "No post tags found. Click on 'Create Post Tags' above to get started";
+
     return <PostTagsTextContent id={id} text={text} />;
   }
 
@@ -49,6 +48,7 @@ const GetPostTags = () => {
       if (data.getPostTags.tags.length === 0) {
         const text =
           "No post tags have been created yet. Click on 'Create Post Tags' above to get started";
+
         return <PostTagsTextContent id={id} text={text} />;
       }
 

@@ -4,12 +4,12 @@ import { POST_TAG_FIELDS } from "@fragments/PostTag";
 import type { PostTags } from "@apiTypes";
 import type { PostTagData } from "@types";
 
-type Tags = Omit<PostTags, "status" | "tags"> & { tags: PostTagData[] };
-type CachedPostTagsData = TypedDocumentNode<{ getPostTags: Tags }>;
+type Tags = Pick<PostTags, "__typename"> & { tags: PostTagData[] };
+type CachePostTagsData = TypedDocumentNode<{ getPostTags: Tags }>;
 
-const GET_CACHED_POST_TAGS: CachedPostTagsData = gql`
+const GET_CACHE_POST_TAGS: CachePostTagsData = gql`
   ${POST_TAG_FIELDS}
-  query GetCachedPostTags {
+  query GetCachePostTags {
     getPostTags {
       tags {
         ...PostTagFields
@@ -20,7 +20,7 @@ const GET_CACHED_POST_TAGS: CachedPostTagsData = gql`
 
 export const useGetCachePostTags = () => {
   const client = useApolloClient();
-  const cachedTags = client.readQuery({ query: GET_CACHED_POST_TAGS });
+  const cachePostTags = client.readQuery({ query: GET_CACHE_POST_TAGS });
 
-  return cachedTags?.getPostTags.tags;
+  return cachePostTags?.getPostTags.tags;
 };

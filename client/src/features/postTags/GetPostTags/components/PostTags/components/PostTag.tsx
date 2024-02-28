@@ -6,19 +6,20 @@ import Grid from "@mui/material/Grid";
 import ListItem from "@mui/material/ListItem";
 import Stack from "@mui/material/Stack";
 
-import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
 import PostTagMenu from "./PostTagMenu";
+import type { PostTagsListAction } from "@types";
 
 interface PostTagProps {
   id: string;
   name: string;
   isChecked: boolean;
+  dispatch: React.Dispatch<PostTagsListAction>;
   onClickLabel: (shiftKey: boolean, id: string) => void;
 }
 
-const PostTag = ({ id, name, isChecked, onClickLabel }: PostTagProps) => {
+const PostTag = (props: PostTagProps) => {
+  const { id, name, isChecked, onClickLabel, dispatch } = props;
   const idName = name.replace(/[\s_.]/g, "-");
-  const dispatch = usePostTagsListDispatch();
 
   const handleChange = (checked: boolean) => {
     dispatch({ type: "CLICK_POST_TAG", payload: { checked, id, name } });
@@ -67,7 +68,7 @@ const PostTag = ({ id, name, isChecked, onClickLabel }: PostTagProps) => {
             },
           })}
         />
-        <PostTagMenu id={id} name={name} idName={idName} />
+        <PostTagMenu id={id} name={name} idName={idName} dispatch={dispatch} />
       </Stack>
     </Grid>
   );

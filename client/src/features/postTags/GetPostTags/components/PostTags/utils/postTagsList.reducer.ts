@@ -1,42 +1,15 @@
-import type { PostTagsList } from "@features/postTags/context/PostTagsListContext";
-import type { PostTagData } from "@types";
+import type { PostTagsListAction as A, PostTagsListState as S } from "@types";
 
-interface NameIdPayload {
-  name: string;
-  id: string;
-}
+type Reducer = (state: S, action: A) => S;
 
-export type Action =
-  | { type: "OPEN_MENU_EDIT"; payload: NameIdPayload }
-  | { type: "CLOSE_MENU_EDIT" }
-  | { type: "POST_TAG_EDITED"; payload: NameIdPayload }
-  | { type: "OPEN_MENU_DELETE"; payload: NameIdPayload }
-  | { type: "CLOSE_MENU_DELETE" }
-  | { type: "OPEN_MULTI_DELETE" }
-  | { type: "CLOSE_MULTI_DELETE" }
-  | { type: "CLICK_POST_TAG"; payload: { checked: boolean } & NameIdPayload }
-  | { type: "CLEAR_SELECTION"; payload?: { deletedTags: string[] } }
-  | {
-      type: "SELECT_UNSELECT_ALL_CHECKBOX";
-      payload: { checked: boolean; tags: PostTagData[] };
-    }
-  | {
-      type: "CTRL_A_SELECT_ALL";
-      payload: { tags: PostTagData[]; isNotAllSelected: boolean };
-    }
-  | {
-      type: "SHIFT_PLUS_CLICK";
-      payload: { anchorTagId: string; id: string; tags: PostTagData[] };
-    };
-
-export const initialState: PostTagsList = {
+export const initialState: S = {
   edit: { open: false, name: "", id: "" },
   deleteTag: { open: false, name: "", ids: [] },
   deleteTags: false,
   selectedTags: {},
 };
 
-export const reducer = (state: PostTagsList, action: Action): PostTagsList => {
+export const reducer: Reducer = (state, action) => {
   switch (action.type) {
     case "OPEN_MENU_EDIT": {
       const { name, id } = action.payload;
@@ -108,7 +81,7 @@ export const reducer = (state: PostTagsList, action: Action): PostTagsList => {
 
     case "SELECT_UNSELECT_ALL_CHECKBOX": {
       const { checked, tags } = action.payload;
-      const selectedTags: PostTagsList["selectedTags"] = {};
+      const selectedTags: S["selectedTags"] = {};
 
       if (checked) {
         tags.forEach(tag => {
@@ -121,7 +94,7 @@ export const reducer = (state: PostTagsList, action: Action): PostTagsList => {
 
     case "CTRL_A_SELECT_ALL": {
       const { tags, isNotAllSelected } = action.payload;
-      const selectedTags: PostTagsList["selectedTags"] = {};
+      const selectedTags: S["selectedTags"] = {};
 
       if (isNotAllSelected) {
         tags.forEach(tag => {

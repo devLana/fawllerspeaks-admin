@@ -1,17 +1,18 @@
 import * as React from "react";
 
-import { usePostTagsList } from "../context/PostTagsListContext";
-import { usePostTagsListDispatch } from "../context/PostTagsListDispatchContext";
 import PostTagsDialog from "../components/PostTagsDialog";
 import EditPostTagForm from "./components/EditPostTagForm";
+import type { PostTagsListAction, PostTagsListState } from "@types";
 
 type Status = "idle" | "submitting";
 
-const EditPostTag = () => {
-  const [status, setStatus] = React.useState<Status>("idle");
+interface EditPostTagProps {
+  dispatch: React.Dispatch<PostTagsListAction>;
+  edit: PostTagsListState["edit"];
+}
 
-  const { edit } = usePostTagsList();
-  const dispatch = usePostTagsListDispatch();
+const EditPostTag = ({ edit, dispatch }: EditPostTagProps) => {
+  const [status, setStatus] = React.useState<Status>("idle");
 
   const handleClose = () => dispatch({ type: "CLOSE_MENU_EDIT" });
 
@@ -29,6 +30,7 @@ const EditPostTag = () => {
         status={status}
         onStatusChange={(newStatus: Status) => setStatus(newStatus)}
         onClick={handleClose}
+        dispatch={dispatch}
       />
     </PostTagsDialog>
   );

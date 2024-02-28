@@ -5,47 +5,33 @@ import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 
 import { useGetCachePostTags } from "@hooks/useGetCachePostTags";
-import { usePostTagsList } from "@features/postTags/context/PostTagsListContext";
-import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
+import useControlPlusA from "../hooks/useControlPlusA";
 import PostTagsToolbar from "./PostTagsToolbar";
 import PostTag from "./PostTag";
+import type { PostTagsListAction, PostTagsListState } from "@types";
 
-const PostTagsList = ({ tagIdsLength }: { tagIdsLength: number }) => {
+interface PostTagsListProps {
+  tagIdsLength: number;
+  selectedTags: PostTagsListState["selectedTags"];
+  deleteTag: PostTagsListState["deleteTag"];
+  deleteTags: PostTagsListState["deleteTags"];
+  dispatch: React.Dispatch<PostTagsListAction>;
+}
+
+const PostTagsList = (props: PostTagsListProps) => {
+  const { deleteTag, deleteTags, selectedTags, tagIdsLength, dispatch } = props;
   const anchorTag = React.useRef<string | null>(null);
 
-  const cachedTags = useGetCachePostTags();
-  const { selectedTags, deleteTag, deleteTags } = usePostTagsList();
-  const dispatch = usePostTagsListDispatch();
+  const cachePostTags = useGetCachePostTags();
 
-  if (!cachedTags) throw new Error();
+  if (!cachePostTags) throw new Error();
 
-  React.useEffect(() => {
-    const handleControlPlusA = (e: KeyboardEvent) => {
-      const isDeleting = deleteTag.open || deleteTags;
-
-      if (!isDeleting && e.ctrlKey && (e.key === "A" || e.key === "a")) {
-        dispatch({
-          type: "CTRL_A_SELECT_ALL",
-          payload: {
-            tags: cachedTags,
-            isNotAllSelected: tagIdsLength !== cachedTags.length,
-          },
-        });
-      }
-    };
-
-    const handleKeydown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && (e.key === "A" || e.key === "a")) e.preventDefault();
-    };
-
-    window.addEventListener("keyup", handleControlPlusA);
-    window.addEventListener("keydown", handleKeydown);
-
-    return () => {
-      window.removeEventListener("keyup", handleControlPlusA);
-      window.removeEventListener("keydown", handleKeydown);
-    };
-  }, [cachedTags, deleteTags, deleteTag.open, tagIdsLength, dispatch]);
+  useControlPlusA({
+    cachePostTags,
+    isDeleting: deleteTag.open || deleteTags,
+    tagIdsLength,
+    dispatch,
+  });
 
   const handleShiftClick = React.useCallback(
     (shiftKey: boolean, id: string) => {
@@ -57,29 +43,30 @@ const PostTagsList = ({ tagIdsLength }: { tagIdsLength: number }) => {
       if (anchorTag.current && anchorTag.current !== id) {
         dispatch({
           type: "SHIFT_PLUS_CLICK",
-          payload: { anchorTagId: anchorTag.current, id, tags: cachedTags },
+          payload: { anchorTagId: anchorTag.current, id, tags: cachePostTags },
         });
       }
     },
-    [cachedTags, dispatch]
+    [cachePostTags, dispatch]
   );
 
   const tagsList = React.useMemo(() => {
-    return cachedTags.map(({ id, name }) => (
+    return cachePostTags.map(({ id, name }) => (
       <PostTag
         key={id}
         id={id}
         name={name}
         isChecked={!!selectedTags[id]}
         onClickLabel={handleShiftClick}
+        dispatch={dispatch}
       />
     ));
-  }, [cachedTags, selectedTags, handleShiftClick]);
+  }, [cachePostTags, selectedTags, handleShiftClick, dispatch]);
 
   const handleAllCheckboxChange = (checked: boolean) => {
     dispatch({
       type: "SELECT_UNSELECT_ALL_CHECKBOX",
-      payload: { checked, tags: cachedTags },
+      payload: { checked, tags: cachePostTags },
     });
   };
 
@@ -87,8 +74,9 @@ const PostTagsList = ({ tagIdsLength }: { tagIdsLength: number }) => {
     <div aria-busy={false}>
       <PostTagsToolbar
         numberOfSelectedPostTags={tagIdsLength}
-        totalNumberOfPostTags={cachedTags.length}
+        totalNumberOfPostTags={cachePostTags.length}
         onAllCheckboxChange={value => handleAllCheckboxChange(value)}
+        dispatch={dispatch}
       />
       <Divider sx={{ mt: 1, mb: 3.5 }} />
       <Grid

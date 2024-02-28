@@ -2,16 +2,14 @@ import * as React from "react";
 
 import Alert from "@mui/material/Alert";
 
-import { PostTagsListContext } from "@features/postTags/context/PostTagsListContext";
-import { PostTagsListDispatchContext } from "@features/postTags/context/PostTagsListDispatchContext";
-import ErrorBoundary from "@components/ErrorBoundary";
 import EditPostTag from "@features/postTags/EditPostTag";
 import DeletePostTags from "@features/postTags/DeletePostTags";
 import PostTagsWrapper from "../PostTagsWrapper";
 import PostTagsList from "./components/PostTagsList";
+import ErrorBoundary from "@components/ErrorBoundary";
 import { initialState, reducer } from "./utils/postTagsList.reducer";
 
-const PostTags = ({ id: titleId }: { id: string }) => {
+const PostTags = ({ id }: { id: string }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
   const msg =
@@ -21,30 +19,34 @@ const PostTags = ({ id: titleId }: { id: string }) => {
   const selectedTagsIds = Object.keys(state.selectedTags);
 
   return (
-    <PostTagsListContext.Provider value={state}>
-      <PostTagsListDispatchContext.Provider value={dispatch}>
-        <PostTagsWrapper id={titleId}>
-          <ErrorBoundary fallback={<Alert {...alertProps}>{msg}</Alert>}>
-            <PostTagsList tagIdsLength={selectedTagsIds.length} />
-          </ErrorBoundary>
-        </PostTagsWrapper>
-        <EditPostTag />
-        {/* Delete a post tag by clicking delete on the post tag's menu */}
-        <DeletePostTags
-          key="single-delete"
-          {...state.deleteTag}
-          onClose={() => dispatch({ type: "CLOSE_MENU_DELETE" })}
-        />
-        {/* Delete multiple post tag(s) by selecting the post tags and clicking the toolbar delete button */}
-        <DeletePostTags
-          key="multi-delete"
-          open={state.deleteTags}
-          name={state.selectedTags[selectedTagsIds[0]]}
-          ids={selectedTagsIds}
-          onClose={() => dispatch({ type: "CLOSE_MULTI_DELETE" })}
-        />
-      </PostTagsListDispatchContext.Provider>
-    </PostTagsListContext.Provider>
+    <>
+      <PostTagsWrapper id={id}>
+        <ErrorBoundary fallback={<Alert {...alertProps}>{msg}</Alert>}>
+          <PostTagsList
+            deleteTag={state.deleteTag}
+            deleteTags={state.deleteTags}
+            selectedTags={state.selectedTags}
+            tagIdsLength={selectedTagsIds.length}
+            dispatch={dispatch}
+          />
+        </ErrorBoundary>
+      </PostTagsWrapper>
+      <EditPostTag edit={state.edit} dispatch={dispatch} />
+      {/* Delete one post tag by clicking delete on the post tag's menu */}
+      <DeletePostTags
+        {...state.deleteTag}
+        onClose={() => dispatch({ type: "CLOSE_MENU_DELETE" })}
+        dispatch={dispatch}
+      />
+      {/* Delete multiple post tag(s) by selecting the post tags from the list and clicking the toolbar delete button */}
+      <DeletePostTags
+        open={state.deleteTags}
+        name={state.selectedTags[selectedTagsIds[0]]}
+        ids={selectedTagsIds}
+        onClose={() => dispatch({ type: "CLOSE_MULTI_DELETE" })}
+        dispatch={dispatch}
+      />
+    </>
   );
 };
 

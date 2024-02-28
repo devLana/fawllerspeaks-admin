@@ -11,27 +11,28 @@ import DialogTitle from "@mui/material/DialogTitle";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
-import { usePostTagsListDispatch } from "../context/PostTagsListDispatchContext";
 import DeletePostTagsTextFormatter from "./components/DeletePostTagsTextFormatter";
 import { DELETE_POST_TAGS } from "./operations/DELETE_POST_TAGS";
 import { update } from "./utils/update";
 import { refetchQueries } from "./utils/refetchQueries";
+import type { PostTagsListAction } from "@types";
 
 export interface DeletePostTagsProps {
   open: boolean;
   name: string;
   ids: string[];
   onClose: () => void;
+  dispatch: React.Dispatch<PostTagsListAction>;
 }
 
-const DeletePostTags = ({ open, name, ids, onClose }: DeletePostTagsProps) => {
+const DeletePostTags = (props: DeletePostTagsProps) => {
+  const { open, name, ids, onClose, dispatch } = props;
   const [isLoading, setIsLoading] = React.useState(false);
   const { replace } = useRouter();
 
   const [deleteTags, { client }] = useMutation(DELETE_POST_TAGS);
 
   const { handleOpenAlert } = usePostTagsPage();
-  const dispatch = usePostTagsListDispatch();
 
   const msg =
     "You are unable to delete post tags at the moment. Please try again later";

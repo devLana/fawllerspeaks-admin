@@ -1,22 +1,21 @@
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Toolbar from "@mui/material/Toolbar";
-
-import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
+import type { PostTagsListAction } from "@types";
 
 interface PostTagsToolbarProps {
   totalNumberOfPostTags: number;
   numberOfSelectedPostTags: number;
   onAllCheckboxChange: (checked: boolean) => void;
+  dispatch: React.Dispatch<PostTagsListAction>;
 }
 
 const PostTagsToolbar = ({
   totalNumberOfPostTags: numTags,
   numberOfSelectedPostTags: numSelected,
   onAllCheckboxChange,
+  dispatch,
 }: PostTagsToolbarProps) => {
-  const dispatch = usePostTagsListDispatch();
-
   const label = numSelected === numTags ? "Unselect" : "Select";
   let buttonText: string;
   let isIndeterminate: boolean;

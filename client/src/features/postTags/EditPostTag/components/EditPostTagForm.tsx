@@ -11,12 +11,12 @@ import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
-import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
 import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
 import { editPostTagValidator } from "../utils/editPostTagValidator";
 import { refetchQueries } from "../utils/refetchQueries";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { MutationEditPostTagArgs } from "@apiTypes";
+import type { PostTagsListAction } from "@types";
 
 type OmitTagId = Omit<MutationEditPostTagArgs, "tagId">;
 
@@ -26,11 +26,11 @@ interface EditPostTagFormProps {
   status: "idle" | "submitting";
   onClick: () => void;
   onStatusChange: (nextStatus: "idle" | "submitting") => void;
+  dispatch: React.Dispatch<PostTagsListAction>;
 }
 
 const EditPostTagForm = (props: EditPostTagFormProps) => {
-  const { name, id, status, onClick, onStatusChange } = props;
-
+  const { name, id, status, onClick, onStatusChange, dispatch } = props;
   const [alertIsOpen, setAlertIsOpen] = React.useState(false);
   const router = useRouter();
 
@@ -47,7 +47,6 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
   });
 
   const { handleOpenAlert } = usePostTagsPage();
-  const dispatch = usePostTagsListDispatch();
 
   const submitHandler = (values: OmitTagId) => {
     onStatusChange("submitting");

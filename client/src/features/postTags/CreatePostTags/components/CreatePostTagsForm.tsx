@@ -26,7 +26,6 @@ interface CreatePostTagsFormProps {
 
 const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
   const { status, onStatusChange, onCloseDialog } = props;
-
   const [inputs, setInputs] = React.useState([1]);
   const [alertIsOpen, setAlertIsOpen] = React.useState(false);
   const router = useRouter();

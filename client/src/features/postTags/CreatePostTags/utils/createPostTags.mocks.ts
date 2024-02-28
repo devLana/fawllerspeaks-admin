@@ -52,7 +52,8 @@ const cb = (mock: Mock<string>) => {
 };
 
 export const server = setupServer(
-  graphql.query("GetPostTags", () => {
+  graphql.query("GetPostTags", async () => {
+    await delay();
     return mswData("getPostTags", "PostTags", { tags: [] });
   }),
 

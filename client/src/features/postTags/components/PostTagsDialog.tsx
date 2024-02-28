@@ -10,28 +10,25 @@ interface PostTagsDialogProps extends Props {
   contentText?: string | React.ReactElement;
 }
 
-const PostTagsDialog = ({
-  contentText,
-  modalTitle,
-  open,
-  children,
-  onClose,
-  ...restProps
-}: PostTagsDialogProps) => (
-  <Dialog
-    open={open}
-    onClose={onClose}
-    aria-labelledby="form-dialog-title"
-    {...restProps}
-  >
-    <DialogTitle id="form-dialog-title">{modalTitle}</DialogTitle>
-    <DialogContent>
-      {contentText && (
-        <DialogContentText mb={2}>{contentText}</DialogContentText>
-      )}
-      {children}
-    </DialogContent>
-  </Dialog>
-);
+const PostTagsDialog = (props: PostTagsDialogProps) => {
+  const { contentText, modalTitle, open, children, onClose, ...rest } = props;
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="form-dialog-title"
+      {...rest}
+    >
+      <DialogTitle id="form-dialog-title">{modalTitle}</DialogTitle>
+      <DialogContent>
+        {contentText && (
+          <DialogContentText mb={2}>{contentText}</DialogContentText>
+        )}
+        {children}
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export default PostTagsDialog;

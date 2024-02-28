@@ -7,10 +7,10 @@ interface FormatTextProps {
 }
 
 const DeletePostTagsTextFormatter = ({ name, idsLength }: FormatTextProps) => {
-  const cachedTags = useGetCachePostTags();
-  const numberOfTags = cachedTags?.length ?? -1;
+  const cachePostTags = useGetCachePostTags();
+  const numberOfTags = cachePostTags?.length ?? -1;
 
-  if (idsLength === 1) {
+  if (numberOfTags === 1 || idsLength === 1) {
     return (
       <Typography variant="caption" fontSize="1em" fontWeight="bold">
         {name}

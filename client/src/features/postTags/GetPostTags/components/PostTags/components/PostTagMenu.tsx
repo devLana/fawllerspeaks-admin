@@ -6,8 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
-
-import { usePostTagsListDispatch } from "@features/postTags/context/PostTagsListDispatchContext";
+import type { PostTagsListAction } from "@types";
 
 type ActionType = "OPEN_MENU_EDIT" | "OPEN_MENU_DELETE";
 
@@ -15,12 +14,11 @@ interface PostTagMenuProps {
   id: string;
   name: string;
   idName: string;
+  dispatch: React.Dispatch<PostTagsListAction>;
 }
 
-const PostTagMenu = ({ id, name, idName }: PostTagMenuProps) => {
+const PostTagMenu = ({ id, name, idName, dispatch }: PostTagMenuProps) => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
-
-  const dispatch = usePostTagsListDispatch();
 
   const handleAction = (type: ActionType) => () => {
     dispatch({ type, payload: { name, id } });

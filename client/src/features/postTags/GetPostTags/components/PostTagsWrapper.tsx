@@ -1,4 +1,3 @@
-import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 interface PostTagsWrapperProps {
@@ -7,12 +6,12 @@ interface PostTagsWrapperProps {
 }
 
 const PostTagsWrapper = ({ children, id }: PostTagsWrapperProps) => (
-  <Box component="section">
+  <section>
     <Typography variant="h2" id={id} gutterBottom>
       Post Tags
     </Typography>
     {children}
-  </Box>
+  </section>
 );
 
 export default PostTagsWrapper;

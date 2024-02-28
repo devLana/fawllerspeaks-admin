@@ -5,13 +5,13 @@ import type { DeletePostTagsData } from "@types";
 
 type Update = MutationBaseOptions<DeletePostTagsData>["update"];
 
-interface PostTagRefs {
+interface PostTagsRef {
   __typename?: "PostTags";
   tags: Reference[];
 }
 
 interface CachePostTags {
-  getPostTags: PostTagRefs;
+  getPostTags: PostTagsRef;
 }
 
 export const update: Update = (cache, { data }) => {
@@ -21,7 +21,7 @@ export const update: Update = (cache, { data }) => {
     cache.modify<CachePostTags>({
       fields: {
         getPostTags(getPostTagsRef, { readField }) {
-          const tags = (getPostTagsRef as PostTagRefs).tags.filter(tagRef => {
+          const tags = (getPostTagsRef as PostTagsRef).tags.filter(tagRef => {
             const id = readField("id", tagRef);
 
             if (typeof id !== "string") return false;
