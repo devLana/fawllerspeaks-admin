@@ -8,12 +8,12 @@ import { useAuthHeader } from "@context/AuthHeader";
 import { VERIFY_SESSION } from "../operations/VERIFY_SESSION";
 import { SESSION_ID } from "@utils/constants";
 
-const useVerifySession = (
-  handleRefreshToken: (accessToken: string) => void,
-  setUserId: React.Dispatch<React.SetStateAction<string | null>>
-) => {
+type HandleRefreshToken = (accessToken: string) => void;
+
+const useVerifySession = (handleRefreshToken: HandleRefreshToken) => {
   const [clientHasRendered, setClientHasRendered] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [userId, setUserId] = React.useState<string | null>(null);
   const { pathname, replace, events } = useRouter();
 
   const client = useApolloClient();
@@ -143,7 +143,9 @@ const useVerifySession = (
     }
   }, []);
 
-  return { clientHasRendered, errorMessage };
+  const handleUserId = (id: string) => setUserId(id);
+
+  return { clientHasRendered, errorMessage, userId, handleUserId };
 };
 
 export default useVerifySession;

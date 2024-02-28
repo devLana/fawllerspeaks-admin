@@ -17,22 +17,19 @@ interface SessionProvideProps {
 }
 
 const SessionProvider = ({ layout, page }: SessionProvideProps) => {
-  const [userId, setUserId] = React.useState<string | null>(null);
   const { reload } = useRouter();
 
   const { handleRefreshToken, handleClearRefreshTokenTimer, isOpen } =
     useRefreshToken();
 
-  const { clientHasRendered, errorMessage } = useVerifySession(
-    handleRefreshToken,
-    setUserId
-  );
+  const { clientHasRendered, errorMessage, userId, handleUserId } =
+    useVerifySession(handleRefreshToken);
 
   return (
     <SessionContext.Provider
       value={{
         userId,
-        handleUserId: id => setUserId(id),
+        handleUserId,
         handleRefreshToken,
         handleClearRefreshTokenTimer,
       }}

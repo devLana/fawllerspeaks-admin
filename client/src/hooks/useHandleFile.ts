@@ -1,15 +1,14 @@
 import * as React from "react";
 
-interface UseHandleFile {
+interface HandleFileOptions {
   blobUrl: string;
   imageFilename: string | undefined;
   errorCb: (errorMsg: string) => void;
   successCb: (imageFile: File) => void;
 }
 
-export const useHandleFile = (props: UseHandleFile) => {
-  const { blobUrl, imageFilename, errorCb, successCb } = props;
-
+export const useHandleFile = (options: HandleFileOptions) => {
+  const { blobUrl, imageFilename, errorCb, successCb } = options;
   const [hasEnteredDropZone, setHasEnteredDropZone] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 

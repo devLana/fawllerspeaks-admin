@@ -25,7 +25,7 @@ module.exports = {
     },
   ],
   rules: {
-    /** Disable ESLint Rules for {TypeScript Extension Rules} Below */
+    /* Disable ESLint Rules for {TypeScript Extension Rules} Below */
     "default-param-last": 0,
     "no-dupe-class-members": 0,
     "no-empty-function": 0,
@@ -33,7 +33,7 @@ module.exports = {
     "no-shadow": 0,
     "no-unused-vars": 0,
 
-    /** ESLint Rules */
+    /* ESLint Rules */
     "no-duplicate-imports": [2, { includeExports: true }],
     "no-promise-executor-return": 2,
     "no-sparse-arrays": 1,
@@ -42,7 +42,7 @@ module.exports = {
     "no-use-before-define": [1, { functions: false, classes: false }],
     "require-atomic-updates": 2,
 
-    /** ESLint Suggestions */
+    /* ESLint Suggestions */
     "accessor-pairs": [2, { enforceForClassMembers: true }],
     "default-case": 1,
     eqeqeq: 1,
@@ -58,7 +58,7 @@ module.exports = {
     "prefer-object-has-own": 1,
     yoda: 1,
 
-    /** TypeScript Rules */
+    /* TypeScript Rules */
     "@typescript-eslint/array-type": 1,
     "@typescript-eslint/consistent-type-assertions": 2,
     "@typescript-eslint/consistent-type-definitions": [1, "interface"],
@@ -77,7 +77,7 @@ module.exports = {
     "@typescript-eslint/no-redundant-type-constituents": 1,
     "@typescript-eslint/no-unnecessary-qualifier": 1,
 
-    /** TypeScript Extension Rules */
+    /* TypeScript Extension Rules */
     "@typescript-eslint/default-param-last": 1,
     "@typescript-eslint/no-dupe-class-members": 1,
     "@typescript-eslint/no-empty-function": 0,

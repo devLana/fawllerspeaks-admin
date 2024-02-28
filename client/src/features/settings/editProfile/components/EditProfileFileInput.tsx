@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 
@@ -67,7 +66,7 @@ const EditProfileFileInput = ({
   const id = "image-avatar";
 
   return (
-    <Box mb={3.3}>
+    <>
       <FileInput
         type="file"
         name="image"
@@ -121,7 +120,7 @@ const EditProfileFileInput = ({
           Select Profile Image
         </Button>
       )}
-    </Box>
+    </>
   );
 };
 

@@ -8,8 +8,12 @@ interface CardProps {
   sx?: BoxProps["sx"];
 }
 
-const Card = (props: CardProps) => {
-  const { sx, maxWidth = "21.875rem", smMaxWidth = "25rem", children } = props;
+const Card = ({
+  sx = [],
+  maxWidth = "21.875rem",
+  smMaxWidth = "25rem",
+  children,
+}: CardProps) => {
   const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
   return (

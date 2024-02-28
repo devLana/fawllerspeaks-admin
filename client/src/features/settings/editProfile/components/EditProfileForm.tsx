@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
@@ -24,13 +25,13 @@ const EditProfileForm = (props: EditProfileFormProps) => {
 
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const [removeCurrentImage, setRemoveCurrentImage] = React.useState(false);
+  const router = useRouter();
+
   const [image, setImage] = React.useState<EditProfileImage>({
     error: "",
     file: null,
     blobUrl: "",
   });
-
-  const router = useRouter();
 
   const [editProfile, { error, client }] = useMutation(EDIT_PROFILE);
 
@@ -53,7 +54,7 @@ const EditProfileForm = (props: EditProfileFormProps) => {
     let uploadHasError = false;
 
     if (image.file) {
-      /**
+      /*
        * If the user has selected a new image to be uploaded:
        * - attempt to upload the image to storage
        * - if the upload was successful, append the image link response to variables
@@ -65,7 +66,7 @@ const EditProfileForm = (props: EditProfileFormProps) => {
         variables = { ...variables, image: data.imageLink };
       }
     } else if (removeCurrentImage) {
-      /**
+      /*
        * The user is attempting to remove their current uploaded image:
        * send "image: null" back to the api server
        */
@@ -75,7 +76,7 @@ const EditProfileForm = (props: EditProfileFormProps) => {
     void editProfile({
       variables,
       onError() {
-        /**
+        /*
          * The api request failed for some reason:
          * Set error status and reset the image error state
          */
@@ -126,7 +127,7 @@ const EditProfileForm = (props: EditProfileFormProps) => {
           }
 
           default:
-            /**
+            /*
              * The api responds with an unsupported object type:
              * Set error status and reset the image error state
              */
@@ -193,16 +194,18 @@ const EditProfileForm = (props: EditProfileFormProps) => {
             />
           </Grid>
         </Grid>
-        <EditProfileFileInput
-          image={image}
-          userImage={userImage}
-          firstName={firstName}
-          lastName={lastName}
-          removeCurrentImage={removeCurrentImage}
-          setImage={setImage}
-          setRemoveCurrentImage={setRemoveCurrentImage}
-          setFormStatus={setFormStatus}
-        />
+        <Box mb={3.3}>
+          <EditProfileFileInput
+            image={image}
+            userImage={userImage}
+            firstName={firstName}
+            lastName={lastName}
+            removeCurrentImage={removeCurrentImage}
+            setImage={setImage}
+            setRemoveCurrentImage={setRemoveCurrentImage}
+            setFormStatus={setFormStatus}
+          />
+        </Box>
         <LoadingButton
           loading={formStatus === "loading"}
           variant="contained"

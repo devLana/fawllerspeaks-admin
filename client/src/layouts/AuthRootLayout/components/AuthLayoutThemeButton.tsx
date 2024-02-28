@@ -12,6 +12,7 @@ import type { ThemeMode } from "@types";
 
 const AuthLayoutThemeButton = () => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
+
   const { appTheme } = useTheme();
 
   const handleAppTheme = useAppTheme();

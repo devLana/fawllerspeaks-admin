@@ -6,10 +6,10 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { AppThemeContext } from ".";
 import { generateTheme } from "./utils/generateTheme";
 import { getStorageTheme, saveStorageTheme } from "@utils/storage";
-import type { AppTheme } from "@types";
+import type { AppTheme as Theme } from "@types";
 
 const AppThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [appTheme, setAppTheme] = React.useState<AppTheme>({
+  const [appTheme, setAppTheme] = React.useState<Theme>({
     themeMode: "sunny",
     fontSize: 14,
     color: "#7dd1f3",
@@ -24,13 +24,13 @@ const AppThemeProvider = ({ children }: { children: React.ReactNode }) => {
     if (defaultTheme) setAppTheme(defaultTheme);
   }, []);
 
+  const handleAppTheme = <T extends keyof Theme>(key: T, value: Theme[T]) => {
+    setAppTheme({ ...appTheme, [key]: value });
+    saveStorageTheme(appTheme, key, value);
+  };
+
   return (
-    <AppThemeContext.Provider
-      value={(key, value) => {
-        setAppTheme({ ...appTheme, [key]: value });
-        saveStorageTheme(appTheme, key, value);
-      }}
-    >
+    <AppThemeContext.Provider value={handleAppTheme}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {children}

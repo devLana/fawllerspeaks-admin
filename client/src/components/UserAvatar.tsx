@@ -1,28 +1,32 @@
 import Avatar, { type AvatarProps } from "@mui/material/Avatar";
+import Skeleton from "@mui/material/Skeleton";
 import PersonIcon from "@mui/icons-material/Person";
 
+import useGetUserInfo from "@hooks/useGetUserInfo";
 import NextLink from "@components/NextLink";
 import type { SxPropsArray } from "@types";
+import type { Theme } from "@mui/material/styles";
 
 interface UserAvatarProps {
   sx?: AvatarProps["sx"];
   renderWithLink?: boolean;
-  user: { firstName: string; lastName: string; image: string | null } | null;
 }
 
-const UserAvatar = (props: UserAvatarProps) => {
-  const { user, renderWithLink = false, sx = [] } = props;
+const UserAvatar = ({ renderWithLink = false, sx = [] }: UserAvatarProps) => {
+  const userInfo = useGetUserInfo();
   const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
-  if (!user) {
+  if (!userInfo) {
     return (
-      <Avatar sx={[{ bgcolor: "text.disabled" }, ...sxProp]}>
-        <PersonIcon />
-      </Avatar>
+      <Skeleton variant="circular" aria-label="Authenticating user profile">
+        <Avatar sx={[{ bgcolor: "text.disabled" }, ...sxProp]}>
+          <PersonIcon />
+        </Avatar>
+      </Skeleton>
     );
   }
 
-  const { firstName, lastName, image } = user;
+  const { firstName, lastName, image } = userInfo;
 
   if (image) {
     return renderWithLink ? (
@@ -47,6 +51,12 @@ const UserAvatar = (props: UserAvatarProps) => {
 
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 
+  const bgcolor = (theme: Theme) => {
+    return theme.appTheme.themeMode === "sunny"
+      ? "secondary.light"
+      : "secondary.dark";
+  };
+
   return renderWithLink ? (
     <NextLink
       fontStyle="normal"
@@ -54,18 +64,7 @@ const UserAvatar = (props: UserAvatarProps) => {
       aria-label={`${firstName} ${lastName} profile page`}
     >
       <Avatar
-        sx={[
-          {
-            bgcolor: theme => {
-              return theme.appTheme.themeMode === "sunny"
-                ? "secondary.light"
-                : "secondary.dark";
-            },
-            color: "primary.main",
-            fontSize: 17,
-          },
-          ...sxProp,
-        ]}
+        sx={[{ bgcolor, color: "primary.main", fontSize: 17 }, ...sxProp]}
       >
         {initials}
       </Avatar>
@@ -73,18 +72,7 @@ const UserAvatar = (props: UserAvatarProps) => {
   ) : (
     <Avatar
       aria-label={`${firstName} ${lastName} initials`}
-      sx={[
-        {
-          bgcolor: theme => {
-            return theme.appTheme.themeMode === "sunny"
-              ? "secondary.light"
-              : "secondary.dark";
-          },
-          color: "primary.main",
-          fontSize: 17,
-        },
-        ...sxProp,
-      ]}
+      sx={[{ bgcolor, color: "primary.main", fontSize: 17 }, ...sxProp]}
     >
       {initials}
     </Avatar>

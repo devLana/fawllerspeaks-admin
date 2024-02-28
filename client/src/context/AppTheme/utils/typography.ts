@@ -1,8 +1,8 @@
 import type { ThemeOptions } from "@mui/material/styles";
 
-export const typography = (
-  fontSize: number
-): NonNullable<ThemeOptions["typography"]> => ({
+type Typo = (fontSize: number) => NonNullable<ThemeOptions["typography"]>;
+
+export const typography: Typo = fontSize => ({
   fontFamily: '"Lexend", sans-serif',
   fontSize,
   h1: { fontSize: "2rem" },

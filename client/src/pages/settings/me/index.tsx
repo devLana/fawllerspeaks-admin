@@ -25,7 +25,6 @@ const Me: NextPageWithLayout = () => {
             height: { xs: 100, md: 115 },
             fontSize: "2rem",
           }}
-          user={user}
         />
         <Stack>
           <Typography gutterBottom sx={{ wordBreak: "break-word" }}>

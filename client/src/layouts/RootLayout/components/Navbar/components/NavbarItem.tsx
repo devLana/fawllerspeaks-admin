@@ -19,12 +19,11 @@ interface NavbarItemProps {
   onClick: (() => void) | undefined;
 }
 
-const multiPageHrefs = ["/posts", "/settings"];
-
 const NavbarItem = (props: NavbarItemProps) => {
   const { label, href, Icon, isOpen, showTooltip, onClick } = props;
   const { pathname } = useRouter();
 
+  const multiPageHrefs = ["/posts", "/settings"];
   let isActive = false;
 
   if (href === pathname) {

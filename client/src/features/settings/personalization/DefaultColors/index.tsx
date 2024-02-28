@@ -15,7 +15,7 @@ const DefaultColors = ({ appTheme }: { appTheme: AppTheme }) => {
   const handleAppTheme = useAppTheme();
 
   return (
-    <Box component="section">
+    <section>
       <Typography variant="h2" gutterBottom>
         Default Color
       </Typography>
@@ -42,7 +42,7 @@ const DefaultColors = ({ appTheme }: { appTheme: AppTheme }) => {
           ))}
         </Stack>
       </Box>
-    </Box>
+    </section>
   );
 };
 

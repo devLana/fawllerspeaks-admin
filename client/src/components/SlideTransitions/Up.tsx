@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import Slide, { type SlideProps } from "@mui/material/Slide";
 
 type TransitionProps = Omit<SlideProps, "direction">;

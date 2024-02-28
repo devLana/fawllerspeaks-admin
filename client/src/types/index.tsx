@@ -9,16 +9,7 @@ import type { SxProps } from "@mui/material/styles";
 import type { MetaInfo } from "@components/Metadata";
 import type { Mutation, Post, PostTag, Query } from "@apiTypes";
 
-export type ThemeMode = "sunny" | "sunset" | "pitch black";
-export type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";
-export type ThemeColors = "#7dd1f3" | "#6a6a6a";
-
-export interface AppTheme {
-  themeMode: ThemeMode;
-  fontSize: number;
-  color: ThemeColors;
-}
-
+/* General Project Types */
 export type PageLayout = (
   page: React.ReactElement,
   clientHasRendered: boolean,
@@ -52,6 +43,32 @@ export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
 export type AuthPageView = "form" | "unregistered error" | "success";
 export type Status = "idle" | "error" | "loading";
 export type RequestStatus = Status | "success";
+
+/* App Theme Types */
+export type ThemeMode = "sunny" | "sunset" | "pitch black";
+export type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";
+export type ThemeColors = "#7dd1f3" | "#6a6a6a";
+
+export interface AppTheme {
+  themeMode: ThemeMode;
+  fontSize: number;
+  color: ThemeColors;
+}
+
+/* Edit Profile Feature Types */
+export interface EditProfileFormProps {
+  firstName: string;
+  lastName: string;
+  userImage: string;
+}
+
+export interface EditProfileImage {
+  file: File | null;
+  error: string;
+  blobUrl: string;
+}
+
+/* Post Tags Feature Types */
 export type PostTagData = Omit<PostTag, "dateCreated" | "lastModified">;
 
 type PostTagDataHelper<T extends object> = T extends { tags: PostTag[] }
@@ -75,6 +92,54 @@ export type DeletePostTagsData = PostTagDataMapper<
   Pick<Mutation, "deletePostTags">
 >;
 
+interface EditPostTag {
+  open: boolean;
+  name: string;
+  id: string;
+}
+
+interface DeletePostTag {
+  open: boolean;
+  name: string;
+  ids: string[];
+}
+
+interface NameIdPayload {
+  name: string;
+  id: string;
+}
+
+export interface PostTagsListState {
+  edit: EditPostTag;
+  deleteTags: boolean;
+  selectedTags: Record<string, string>;
+  deleteTag: DeletePostTag;
+}
+
+export type PostTagsListAction =
+  | { type: "OPEN_MENU_EDIT"; payload: NameIdPayload }
+  | { type: "CLOSE_MENU_EDIT" }
+  | { type: "POST_TAG_EDITED"; payload: NameIdPayload }
+  | { type: "OPEN_MENU_DELETE"; payload: NameIdPayload }
+  | { type: "CLOSE_MENU_DELETE" }
+  | { type: "OPEN_MULTI_DELETE" }
+  | { type: "CLOSE_MULTI_DELETE" }
+  | { type: "CLICK_POST_TAG"; payload: { checked: boolean } & NameIdPayload }
+  | { type: "CLEAR_SELECTION"; payload?: { deletedTags: string[] } }
+  | {
+      type: "SELECT_UNSELECT_ALL_CHECKBOX";
+      payload: { checked: boolean; tags: PostTagData[] };
+    }
+  | {
+      type: "CTRL_A_SELECT_ALL";
+      payload: { tags: PostTagData[]; isNotAllSelected: boolean };
+    }
+  | {
+      type: "SHIFT_PLUS_CLICK";
+      payload: { anchorTagId: string; id: string; tags: PostTagData[] };
+    };
+
+/* Posts Feature Types */
 export type PostView = "metadata" | "content" | "preview";
 
 export interface PostData {
@@ -83,12 +148,6 @@ export interface PostData {
   content: string;
   imageBanner?: File;
   tags?: string[];
-}
-
-export interface EditProfileImage {
-  file: File | null;
-  error: string;
-  blobUrl: string;
 }
 
 type ModifiedPost = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
@@ -104,9 +163,3 @@ type PostDataMapper<T extends Record<string, object>> = {
 };
 
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
-
-export interface EditProfileFormProps {
-  firstName: string;
-  lastName: string;
-  userImage: string;
-}

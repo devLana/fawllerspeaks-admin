@@ -14,10 +14,8 @@ const NavbarToggleButton = ({ isOpen, onClick }: NavbarToggleButtonProps) => (
       onClick={onClick}
       sx={{
         m: "auto",
-        color: ({ appTheme }) => {
-          return appTheme.themeMode === "sunny"
-            ? "primary.dark"
-            : "primary.main";
+        color: ({ appTheme: { themeMode } }) => {
+          return themeMode === "sunny" ? "primary.dark" : "primary.main";
         },
         transform: {
           sm: isOpen ? "rotate(0deg)" : "rotate(180deg)",

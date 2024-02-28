@@ -9,15 +9,13 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import NextLink from "@components/NextLink";
-import HeaderAvatar from "./components/HeaderAvatar";
+import UserAvatar from "@components/UserAvatar";
 import HeaderThemeButton from "./components/HeaderThemeButton";
 
 const Header = ({ onClick }: { onClick: () => void }) => (
   <AppBar
     sx={({ appTheme: { themeMode } }) => ({
-      ...(themeMode === "sunny" && {
-        backgroundColor: "background.default",
-      }),
+      ...(themeMode === "sunny" && { backgroundColor: "background.default" }),
     })}
   >
     <Toolbar component={Container}>
@@ -45,7 +43,7 @@ const Header = ({ onClick }: { onClick: () => void }) => (
       </Box>
       <Stack direction="row" spacing={{ xs: 1, sm: 2 }} alignItems="center">
         <HeaderThemeButton />
-        <HeaderAvatar />
+        <UserAvatar renderWithLink />
       </Stack>
     </Toolbar>
   </AppBar>

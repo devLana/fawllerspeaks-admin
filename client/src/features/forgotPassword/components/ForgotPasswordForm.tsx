@@ -18,6 +18,7 @@ interface ForgotPasswordFormProps {
 
 const ForgotPasswordForm = ({ setView }: ForgotPasswordFormProps) => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
+
   const [forgotPassword, { error, data }] = useMutation(FORGOT_PASSWORD);
 
   const {
@@ -64,6 +65,7 @@ const ForgotPasswordForm = ({ setView }: ForgotPasswordFormProps) => {
   };
 
   const ariaId = errors.email ? "email-error-message" : undefined;
+
   let alertMessage =
     "You are unable to reset your password at the moment. Please try again later";
 

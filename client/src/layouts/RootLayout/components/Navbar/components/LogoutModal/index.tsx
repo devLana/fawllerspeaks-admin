@@ -32,40 +32,44 @@ const LogoutModal = ({ isOpen, onCloseModal }: LogoutModalProps) => {
   const handleLogout = () => {
     const sessionId = localStorage.getItem(SESSION_ID);
 
-    if (sessionId) {
-      setStatus("loading");
-
-      void logout({
-        variables: { sessionId },
-        onError: () => {
-          onCloseModal();
-          setStatus("error");
-        },
-        onCompleted(logoutData) {
-          switch (logoutData.logout.__typename) {
-            case "NotAllowedError":
-            case "UnknownError":
-            case "SessionIdValidationError":
-            default:
-              onCloseModal();
-              setStatus("error");
-              break;
-
-            case "AuthenticationError":
-              handleClearRefreshTokenTimer();
-              void client.clearStore();
-              void replace("/login?status=unauthenticated");
-              break;
-
-            case "Response":
-              localStorage.removeItem(SESSION_ID);
-              handleClearRefreshTokenTimer();
-              void client.clearStore();
-              void replace("/login");
-          }
-        },
-      });
+    if (!sessionId) {
+      setStatus("error");
+      onCloseModal();
+      return;
     }
+
+    setStatus("loading");
+
+    void logout({
+      variables: { sessionId },
+      onError: () => {
+        onCloseModal();
+        setStatus("error");
+      },
+      onCompleted(logoutData) {
+        switch (logoutData.logout.__typename) {
+          case "NotAllowedError":
+          case "UnknownError":
+          case "SessionIdValidationError":
+          default:
+            onCloseModal();
+            setStatus("error");
+            break;
+
+          case "AuthenticationError":
+            handleClearRefreshTokenTimer();
+            void client.clearStore();
+            void replace("/login?status=unauthenticated");
+            break;
+
+          case "Response":
+            localStorage.removeItem(SESSION_ID);
+            handleClearRefreshTokenTimer();
+            void client.clearStore();
+            void replace("/login");
+        }
+      },
+    });
   };
 
   let alertMessage =
