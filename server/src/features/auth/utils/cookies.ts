@@ -8,10 +8,10 @@ export const cookieOptions: CookieOptions = {
   httpOnly: true,
   sameSite: "none",
 
-  /** Postman cookie options */
+  /* Postman cookie options */
   // secure: nodeEnv === "production",
 
-  /** Apollo explorer(development) cookie options */
+  /* Apollo explorer(development) cookie options */
   secure: true,
 };
 
