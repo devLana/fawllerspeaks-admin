@@ -14,7 +14,7 @@ const Home: NextPageWithLayout = () => {
   const { isReady, query } = useRouter();
 
   React.useEffect(() => {
-    if (isReady && query.status && !Array.isArray(query.status)) {
+    if (isReady && typeof query.status === "string") {
       switch (query.status) {
         case "registered":
           setAlert({
