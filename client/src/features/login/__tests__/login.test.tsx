@@ -121,12 +121,16 @@ describe("Login Page", () => {
 
     describe("Login request success", () => {
       afterEach(() => {
+        const router = useRouter();
+        router.query = {};
         localStorage.removeItem(SESSION_ID);
       });
 
-      it.each(mocks.successTable)("%s", async (_, page, mock) => {
+      it.each(mocks.successTable)("%s", async (_, { query, page }, mock) => {
+        const router = useRouter();
+        router.query = query;
+
         const { user } = renderUI(<Login />);
-        const { replace } = useRouter();
 
         await user.type(screen.getByRole("textbox", emailLabel), mock.email);
         await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
@@ -134,8 +138,8 @@ describe("Login Page", () => {
 
         expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
 
-        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-        expect(replace).toHaveBeenCalledWith(page);
+        await waitFor(() => expect(router.push).toHaveBeenCalledTimes(1));
+        expect(router.push).toHaveBeenCalledWith(page);
         expect(localStorage.getItem(SESSION_ID)).toBe("USER_DATA_SESSION_ID");
         expect(userIdHandler).toHaveBeenCalledTimes(1);
         expect(userIdHandler).toHaveBeenCalledWith("User:user_id");

@@ -21,7 +21,7 @@ type LoginFormValues = Omit<MutationLoginArgs, "sessionId">;
 
 const LoginForm = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
-  const { replace } = useRouter();
+  const { push, query } = useRouter();
 
   const [login, { data, error }] = useMutation(LOGIN_USER);
 
@@ -70,10 +70,23 @@ const LoginForm = () => {
 
           case "LoggedInUser": {
             const { __typename = "User", ...user } = loginData.login.user;
+            const { redirectTo } = query;
+
+            const regex =
+              /^\/?(register|login|forgot-password|reset-password|404|500)/;
+
+            if (!user.isRegistered) {
+              void push("/register");
+            } else if (
+              typeof redirectTo === "string" &&
+              !regex.test(redirectTo)
+            ) {
+              void push(redirectTo);
+            } else {
+              void push("/");
+            }
 
             localStorage.setItem(SESSION_ID, loginData.login.sessionId);
-            void replace(user.isRegistered ? "/" : "/register");
-
             handleAuthHeader(loginData.login.accessToken);
             handleRefreshToken(loginData.login.accessToken);
             handleUserId(`${__typename}:${user.id}`);

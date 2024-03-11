@@ -5,6 +5,11 @@ import { setupServer } from "msw/node";
 import { LOGIN_USER } from "../operations/LOGIN_USER";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
+interface Redirects {
+  query: { redirectTo: string } | Record<string, never>;
+  page: string;
+}
+
 export const PASSWORD = "testPassword";
 export const loginName = { name: /^login$/i };
 const emailStr = (label: string) => `${label}_test@mail.com`;
@@ -95,15 +100,25 @@ export const errorTable: [string, Mock<string>][] = [
   [`${text} api response is an unsupported object type`, unsupported],
 ];
 
-export const successTable: [string, string, Mock][] = [
+export const successTable: [string, Redirects, Mock][] = [
   [
     "Should redirect an unregistered user to the register page",
-    "/register",
+    { page: "/register", query: {} },
     unRegistered,
   ],
   [
     "Should redirect a registered user to the dashboard/home page",
-    "/",
+    { page: "/", query: {} },
+    registered,
+  ],
+  [
+    "Should redirect the user using the value of the 'redirectTo' query params",
+    { query: { redirectTo: "/posts" }, page: "/posts" },
+    registered,
+  ],
+  [
+    "Should redirect the user to the dashboard page if the 'redirectTo' query params is not allowed",
+    { query: { redirectTo: "/login" }, page: "/" },
     registered,
   ],
 ];
