@@ -14,6 +14,7 @@ import AlertToast from "@components/AlertToast";
 import PasswordInput from "@components/PasswordInput";
 import { REGISTER_USER } from "../operations/REGISTER_USER";
 import { registerUserValidator } from "../utils/registerUserValidator";
+import { SESSION_ID } from "@utils/constants";
 import type { MutationRegisterUserArgs } from "@apiTypes";
 import type { Status } from "@types";
 
@@ -21,7 +22,7 @@ type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
 
 const RegisterUserForm = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
-  const { replace } = useRouter();
+  const { replace, push } = useRouter();
 
   const [registerUser, { error, client }] = useMutation(REGISTER_USER);
 
@@ -72,13 +73,15 @@ const RegisterUserForm = () => {
           }
 
           case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void replace("/login?status=unauthenticated");
+            void push("/login?status=unauthenticated");
             break;
 
           case "UnknownError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void replace("/login?status=unauthorized");
+            void push("/login?status=unauthorized");
             break;
 
           case "RegistrationError":

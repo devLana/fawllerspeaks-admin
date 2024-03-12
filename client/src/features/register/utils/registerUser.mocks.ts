@@ -109,29 +109,24 @@ export const alerts: [string, Mock<string>][] = [
   [`${text} responded with an unsupported object type`, unsupported],
 ];
 
-export const redirects: [string, [string, string, Mock][]][] = [
+export const redirects1: [string, string, Mock][] = [
   [
-    "Redirect the user on user verification error",
-    [
-      [
-        "Should redirect the user to the login page if the user is not logged in",
-        "/login?status=unauthenticated",
-        auth,
-      ],
-      [
-        "Should redirect the user to the login page if the user's credentials could not be verified",
-        "/login?status=unauthorized",
-        unknown,
-      ],
-      [
-        "Should redirect the user to the home(dashboard) page if the user has already registered their account",
-        "/?status=registered",
-        registered,
-      ],
-    ],
+    "Should redirect the user to the login page if the user is not logged in",
+    "/login?status=unauthenticated",
+    auth,
   ],
   [
-    "User registered",
-    [["Should redirect the user to the home(dashboard) page", "/", success]],
+    "Should redirect the user to the login page if the user's credentials could not be verified",
+    "/login?status=unauthorized",
+    unknown,
   ],
+];
+
+export const redirects2: [string, string, Mock][] = [
+  [
+    "Should redirect the user to the home(dashboard) page if the user has already registered their account",
+    "/?status=registered",
+    registered,
+  ],
+  ["Should redirect the user to the home(dashboard) page", "/", success],
 ];
