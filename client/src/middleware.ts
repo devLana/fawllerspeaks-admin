@@ -7,24 +7,16 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (authCookie && sigCookie && tokenCookie) {
-    if (
-      pathname === "/login" ||
-      pathname === "/forgot-password" ||
-      pathname === "/reset-password"
-    ) {
+    if (/^\/(login|forgot-password|reset-password)/.test(pathname)) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
     return NextResponse.next();
   }
 
-  if (
-    pathname === "/" ||
-    pathname === "/post-tags" ||
-    pathname === "/register" ||
-    /^\/settings\/?/.test(pathname) ||
-    /^\/posts\/?/.test(pathname)
-  ) {
+  const regex = /^\/(post-tags|register|settings\/?|posts\/?)/;
+
+  if (pathname === "/" || regex.test(pathname)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
