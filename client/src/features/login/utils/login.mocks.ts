@@ -41,7 +41,6 @@ export const server = setupServer(
       return mswData("login", "LoginValidationError", {
         emailError: "Invalid e-mail address",
         passwordError: "Enter Password",
-        sessionIdError: "Enter session id",
       });
     }
 
@@ -80,14 +79,13 @@ export const validation = {
   email: emailStr("validation"),
   emailError: "Invalid e-mail address",
   passwordError: "Enter Password",
-  sessionIdError: "Enter session id",
 };
 
 const unrecognized = new Mock("unrecognised", msg2);
 const emailPasswordError = new Mock("email_password_error", msg2);
 const unsupported = new Mock("unsupported", msg1);
 const registered = new Mock("registered", undefined);
-const unRegistered = new Mock("unregistered", undefined);
+export const unRegistered = new Mock("unregistered", undefined);
 const gql = new Mock("graphql", msg3);
 const network = new Mock("network", msg1);
 
@@ -101,11 +99,6 @@ export const errorTable: [string, Mock<string>][] = [
 ];
 
 export const successTable: [string, Redirects, Mock][] = [
-  [
-    "Should redirect an unregistered user to the register page",
-    { page: "/register", query: {} },
-    unRegistered,
-  ],
   [
     "Should redirect a registered user to the dashboard/home page",
     { page: "/", query: {} },

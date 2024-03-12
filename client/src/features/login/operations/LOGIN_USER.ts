@@ -8,12 +8,11 @@ type Login = TypedDocumentNode<LoginData, MutationLoginArgs>;
 
 export const LOGIN_USER: Login = gql`
   ${USER_FIELDS}
-  mutation Login($email: String!, $password: String!, $sessionId: String) {
-    login(email: $email, password: $password, sessionId: $sessionId) {
+  mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
       ... on LoginValidationError {
         emailError
         passwordError
-        sessionIdError
       }
       ... on BaseResponse {
         message

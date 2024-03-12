@@ -17,11 +17,9 @@ import { SESSION_ID } from "@utils/constants";
 import type { MutationLoginArgs } from "@apiTypes";
 import type { Status } from "@types";
 
-type LoginFormValues = Omit<MutationLoginArgs, "sessionId">;
-
 const LoginForm = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
-  const { push, query } = useRouter();
+  const { push, query, replace } = useRouter();
 
   const [login, { data, error }] = useMutation(LOGIN_USER);
 
@@ -35,23 +33,17 @@ const LoginForm = () => {
   const { handleUserId, handleRefreshToken } = useSession();
   const { handleAuthHeader } = useAuthHeader();
 
-  const submitHandler = (values: LoginFormValues) => {
+  const submitHandler = (values: MutationLoginArgs) => {
     setFormStatus("loading");
 
-    const sessionId = localStorage.getItem(SESSION_ID);
-    const variables: MutationLoginArgs = sessionId
-      ? { ...values, sessionId }
-      : values;
-
     void login({
-      variables,
+      variables: values,
       onError: () => setFormStatus("error"),
       onCompleted(loginData) {
         switch (loginData.login.__typename) {
           case "LoginValidationError": {
             const focus = { shouldFocus: true };
-            const { emailError, passwordError, sessionIdError } =
-              loginData.login;
+            const { emailError, passwordError } = loginData.login;
 
             if (passwordError) {
               setError("password", { message: passwordError }, focus);
@@ -59,7 +51,7 @@ const LoginForm = () => {
 
             if (emailError) setError("email", { message: emailError }, focus);
 
-            setFormStatus(sessionIdError ? "error" : "idle");
+            setFormStatus("idle");
             break;
           }
 
@@ -76,7 +68,7 @@ const LoginForm = () => {
               /^\/?(register|login|forgot-password|reset-password|404|500)/;
 
             if (!user.isRegistered) {
-              void push("/register");
+              void replace("/register");
             } else if (
               typeof redirectTo === "string" &&
               !regex.test(redirectTo)
@@ -97,6 +89,7 @@ const LoginForm = () => {
   };
 
   const ariaId = errors.email ? "email-error-message" : undefined;
+
   let alertMessage =
     "You are unable to login at the moment. Please try again later";
 
@@ -104,11 +97,6 @@ const LoginForm = () => {
     alertMessage = data.login.message;
   } else if (error?.graphQLErrors[0]) {
     alertMessage = error.graphQLErrors[0].message;
-  } else if (
-    data?.login.__typename === "LoginValidationError" &&
-    data.login.sessionIdError
-  ) {
-    alertMessage = data.login.sessionIdError;
   }
 
   return (

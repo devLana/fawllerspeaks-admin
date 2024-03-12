@@ -75,7 +75,7 @@ describe("Login Page", () => {
     describe("Api response is an input validation error", () => {
       it("Should set error messages on the appropriate form input fields", async () => {
         const { user } = renderUI(<Login />);
-        const { sessionIdError, email } = mocks.validation;
+        const { email } = mocks.validation;
 
         await user.type(screen.getByRole("textbox", emailLabel), email);
         await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
@@ -92,9 +92,6 @@ describe("Login Page", () => {
         expect(
           screen.getByLabelText(/^password$/i)
         ).toHaveAccessibleErrorMessage(mocks.validation.passwordError);
-
-        expect(screen.getByRole("alert")).toHaveTextContent(sessionIdError);
-        expect(screen.getByRole("alert")).toHaveClass("MuiAlert-standardError");
 
         expect(screen.getByRole("textbox", emailLabel)).toHaveFocus();
         expect(screen.getByRole("button", mocks.loginName)).toBeEnabled();
@@ -124,6 +121,30 @@ describe("Login Page", () => {
         const router = useRouter();
         router.query = {};
         localStorage.removeItem(SESSION_ID);
+      });
+
+      it("Should redirect an unregistered user to the register page", async () => {
+        const { replace } = useRouter();
+        const { user } = renderUI(<Login />);
+
+        await user.type(
+          screen.getByRole("textbox", emailLabel),
+          mocks.unRegistered.email
+        );
+
+        await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
+        await user.click(screen.getByRole("button", mocks.loginName));
+
+        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
+
+        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+        expect(replace).toHaveBeenCalledWith("/register");
+        expect(localStorage.getItem(SESSION_ID)).toBe("USER_DATA_SESSION_ID");
+        expect(userIdHandler).toHaveBeenCalledTimes(1);
+        expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
+        expect(refreshTokenHandler).toHaveBeenCalledTimes(1);
+        expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
+        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
       });
 
       it.each(mocks.successTable)("%s", async (_, { query, page }, mock) => {
