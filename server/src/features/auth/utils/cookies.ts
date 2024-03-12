@@ -3,8 +3,7 @@ import type { CookieOptions, Response } from "express";
 // import { nodeEnv } from "@utils";
 import type { Cookies } from "@types";
 
-export const cookieOptions: CookieOptions = {
-  maxAge: 365 * 24 * 60 * 60 * 1000,
+const baseCookieOptions: CookieOptions = {
   httpOnly: true,
   sameSite: "none",
 
@@ -15,14 +14,24 @@ export const cookieOptions: CookieOptions = {
   secure: true,
 };
 
+const createCookieOptions: CookieOptions = {
+  ...baseCookieOptions,
+  maxAge: 365 * 24 * 60 * 60 * 1000,
+};
+
+const clearCookieOptions: CookieOptions = {
+  ...baseCookieOptions,
+  maxAge: 0,
+};
+
 export const setCookies = (res: Response, cookies: Required<Cookies>) => {
-  res.cookie("auth", cookies.auth, cookieOptions);
-  res.cookie("token", cookies.token, cookieOptions);
-  res.cookie("sig", cookies.sig, cookieOptions);
+  res.cookie("auth", cookies.auth, createCookieOptions);
+  res.cookie("token", cookies.token, createCookieOptions);
+  res.cookie("sig", cookies.sig, createCookieOptions);
 };
 
 export const clearCookies = (res: Response) => {
-  res.clearCookie("auth", cookieOptions);
-  res.clearCookie("token", cookieOptions);
-  res.clearCookie("sig", cookieOptions);
+  res.clearCookie("auth", clearCookieOptions);
+  res.clearCookie("token", clearCookieOptions);
+  res.clearCookie("sig", clearCookieOptions);
 };
