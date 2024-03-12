@@ -7,11 +7,7 @@ import type {
 export class LoginValidationError implements ValidationErrors {
   readonly status: Status;
 
-  constructor(
-    readonly emailError?: string,
-    readonly passwordError?: string,
-    readonly sessionIdError?: string
-  ) {
+  constructor(readonly emailError?: string, readonly passwordError?: string) {
     this.status = "ERROR";
   }
 }

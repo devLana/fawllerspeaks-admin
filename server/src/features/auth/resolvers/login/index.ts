@@ -24,21 +24,11 @@ interface DBUser {
   dateCreated: string;
 }
 
-const login: Login = async (_, args, { db, req, res }) => {
+const login: Login = async (_, args, { db, res }) => {
   try {
-    const validations = await loginValidator.validateAsync(args, {
+    const { email, password } = await loginValidator.validateAsync(args, {
       abortEarly: false,
     });
-    const { email, password, sessionId } = validations;
-
-    const { auth, sig, token } = req.cookies;
-
-    if (auth && sig && token) {
-      const jwt = `${sig}.${auth}.${token}`;
-      void db.query(`DELETE FROM sessions WHERE refresh_token = $1`, [jwt]);
-    } else if (sessionId) {
-      void db.query(`DELETE FROM sessions WHERE session_id = $1`, [sessionId]);
-    }
 
     const session = generateBytes(28, "base64url");
     const findUser = db.query<DBUser>(
@@ -105,14 +95,11 @@ const login: Login = async (_, args, { db, req, res }) => {
     return new LoggedInUser(user, accessToken, newSessionId);
   } catch (err) {
     if (err instanceof ValidationError) {
-      const { emailError, passwordError, sessionIdError } =
-        generateErrorsObject(err.details) as ValidationErrorObject<typeof args>;
+      const { emailError, passwordError } = generateErrorsObject(
+        err.details
+      ) as ValidationErrorObject<typeof args>;
 
-      return new LoginValidationError(
-        emailError,
-        passwordError,
-        sessionIdError
-      );
+      return new LoginValidationError(emailError, passwordError);
     }
 
     throw new GraphQLError("Unable to login. Please try again later");

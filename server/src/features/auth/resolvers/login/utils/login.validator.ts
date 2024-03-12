@@ -9,7 +9,4 @@ export const loginValidator = Joi.object<MutationLoginArgs>({
   password: Joi.string().required().messages({
     "string.empty": "Enter password",
   }),
-  sessionId: Joi.string().trim().allow(null).messages({
-    "string.empty": "Enter session id",
-  }),
 });

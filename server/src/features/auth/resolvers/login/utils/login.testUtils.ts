@@ -4,7 +4,6 @@ interface Input {
   [key: string]: unknown;
   email: string;
   password: string;
-  sessionId?: string | null;
 }
 
 interface GQLErrors {
@@ -14,28 +13,26 @@ interface GQLErrors {
 }
 
 type InputErrors = string | null | undefined;
-type Validations = [string, Input, [InputErrors, InputErrors, InputErrors]][];
+type Validations = [string, Input, [InputErrors, InputErrors]][];
 
-export const cookies = { auth: "auth", sig: "sig", token: "token" };
 export const args = { email: "test_mail@example.com", password: "df_i4irh983" };
-
 export const dateCreated = "2022-11-07 13:22:43.717+01";
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [
   [
-    "Should return a validation error response for empty email, password and session id strings",
-    { email: "", password: "", sessionId: "" },
-    ["Enter an e-mail address", "Enter password", "Enter session id"],
+    "Should return a validation error response for empty email and password strings",
+    { email: "", password: "" },
+    ["Enter an e-mail address", "Enter password"],
   ],
   [
-    "Should return a validation error response for empty whitespace email and session id strings",
-    { email: "   ", password: "   ", sessionId: "    " },
-    ["Enter an e-mail address", nullOrUndefined, "Enter session id"],
+    "Should return a validation error response for an empty whitespace email string",
+    { email: "   ", password: "   " },
+    ["Enter an e-mail address", nullOrUndefined],
   ],
   [
     "Should return a validation error response for an invalid email and empty password input strings",
-    { email: "invalid_email", password: "grdte", sessionId: "session_id" },
-    ["Invalid e-mail address", nullOrUndefined, nullOrUndefined],
+    { email: "invalid_email", password: "grdte" },
+    ["Invalid e-mail address", nullOrUndefined],
   ],
 ];
 
@@ -46,19 +43,19 @@ export const gqlValidation: [string, GQLErrors][] = [
   ],
   [
     "Should throw a graphql validation error for undefined input values",
-    { email: undefined, password: undefined, sessionId: undefined },
+    { email: undefined, password: undefined },
   ],
   [
     "Should throw a graphql validation error for boolean input values",
-    { email: true, password: false, sessionId: true },
+    { email: true, password: false },
   ],
   [
     "Should throw a graphql validation error for number input values",
-    { email: 23453, password: 7565767, sessionId: 781 },
+    { email: 23453, password: 7565767 },
   ],
   [
     "Should throw a graphql validation error for object input values",
-    { email: {}, password: [], sessionId: [] },
+    { email: {}, password: [] },
   ],
 ];
 

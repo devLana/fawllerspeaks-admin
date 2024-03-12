@@ -36,7 +36,6 @@ export const authTypeDefs = `#graphql
   type LoginValidationError {
     emailError: String
     passwordError: String
-    sessionIdError: String
     status: Status!
   }
 

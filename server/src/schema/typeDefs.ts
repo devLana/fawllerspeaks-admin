@@ -23,7 +23,7 @@ const types = `#graphql
     "Verify user email and initiate reset password"
     forgotPassword(email: String!): ForgotGeneratePassword!
     "Login a user"
-    login(email: String!, password: String!, sessionId: String): Login!
+    login(email: String!, password: String!): Login!
     "Logout a user"
     logout(sessionId: String!): Logout!
     "Refresh jwt access token"
