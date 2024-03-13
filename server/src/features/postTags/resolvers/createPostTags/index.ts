@@ -1,11 +1,17 @@
 import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
-import { PostTags, DuplicatePostTagError } from "../types";
-import { CreatedPostTagsWarning, CreatePostTagsValidationError } from "./types";
+import { DuplicatePostTagError } from "../types/DuplicatePostTagError";
+import { PostTags } from "../types/PostTags";
+import { CreatePostTagsValidationError } from "./types/CreatePostTagsValidationError";
+import { CreatedPostTagsWarning } from "./types/CreatedPostTagsWarning";
 import { createPostTagsValidator } from "./utils/createPostTags.validator";
-import { formatTagName } from "@features/postTags/utils";
-import { AuthenticationError, RegistrationError, UnknownError } from "@utils";
+import { formatTagName } from "@features/postTags/utils/formatTagName";
+import {
+  AuthenticationError,
+  RegistrationError,
+  UnknownError,
+} from "@utils/ObjectTypes";
 
 import type { ResolverFunc } from "@types";
 import type { MutationResolvers, PostTag } from "@resolverTypes";

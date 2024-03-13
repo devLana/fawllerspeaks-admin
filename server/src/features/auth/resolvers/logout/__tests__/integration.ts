@@ -10,17 +10,18 @@ import {
 
 import logout from "..";
 
-import { clearCookies } from "@features/auth/utils";
+import { clearCookies } from "@features/auth/utils/cookies";
 import { validations } from "../utils/logout.testUtils";
-import { mockContext, info, spyDb } from "@tests";
+import spyDb from "@tests/spyDb";
+import { mockContext, info } from "@tests/resolverArguments";
 
-type Module = typeof import("@features/auth/utils");
+type Module = typeof import("@features/auth/utils/cookies");
 
-jest.mock("@features/auth/utils", () => {
-  const actualModule = jest.requireActual<Module>("@features/auth/utils");
+jest.mock("@features/auth/utils/cookies", () => {
+  const mod = jest.requireActual<Module>("@features/auth/utils/cookies");
   return {
     __esModule: true,
-    ...actualModule,
+    ...mod,
     clearCookies: jest.fn().mockName("clearCookies"),
   };
 });

@@ -5,16 +5,16 @@
     "baseUrl": "src",
     "paths": {
       "@server": ["index"],
-      "@controllers": ["controllers"],
+      "@controllers/*": ["controllers/*"],
       "@events/*": ["events/*"],
       "@features/*": ["features/*"],
       "@lib/*": ["lib/*"],
-      "@middleware": ["middleware"],
-      "@schema": ["schema"],
+      "@middleware/*": ["middleware/*"],
+      "@schema/*": ["schema/*"],
       "@types": ["types"],
       "@resolverTypes": ["types/resolverTypes"],
-      "@utils": ["utils"],
-      "@tests": ["utils/tests"]
+      "@utils/*": ["utils/app/*"],
+      "@tests/*": ["utils/tests/*"]
     },
 
     /* Language and Environment */

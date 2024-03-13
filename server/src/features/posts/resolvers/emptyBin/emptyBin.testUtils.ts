@@ -1,4 +1,4 @@
-import { urls } from "@utils";
+import { urls } from "@utils/ClientUrls";
 
 export const name = "Post Author";
 const dateCreated = "2021-05-17 13:22:43.717+01";

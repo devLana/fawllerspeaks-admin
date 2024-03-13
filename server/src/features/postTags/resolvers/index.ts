@@ -3,28 +3,20 @@ import deletePostTags from "./deletePostTags";
 import editPostTag from "./editPostTag";
 import getPostTags from "./getPostTags";
 
-import {
-  PostTag,
-  PostTagsResolvers,
-  DuplicatePostTagErrorResolvers,
-} from "./types";
+import { DuplicatePostTagErrorResolvers } from "./types/DuplicatePostTagError";
+import { PostTag } from "./types/PostTag";
+import { PostTagsResolvers } from "./types/PostTags";
 
-import {
-  CreatedPostTagsWarningResolvers,
-  CreatePostTagsValidationErrorResolvers,
-} from "./createPostTags/types";
+import { CreatedPostTagsWarningResolvers } from "./createPostTags/types/CreatedPostTagsWarning";
+import { CreatePostTagsValidationErrorResolvers } from "./createPostTags/types/CreatePostTagsValidationError";
 
-import {
-  DeletedPostTagsResolvers,
-  DeletedPostTagsWarningResolvers,
-  DeletePostTagsValidationErrorResolvers,
-} from "./deletePostTags/types";
+import { DeletedPostTagsResolvers } from "./deletePostTags/types/DeletedPostTags";
+import { DeletedPostTagsWarningResolvers } from "./deletePostTags/types/DeletedPostTagsWarning";
+import { DeletePostTagsValidationErrorResolvers } from "./deletePostTags/types/DeletePostTagsValidationError";
 
-import {
-  EditedPostTagResolvers,
-  EditedPostTagWarningResolvers,
-  EditPostTagValidationErrorResolvers,
-} from "./editPostTag/types";
+import { EditPostTagValidationErrorResolvers } from "./editPostTag/types/EditPostTagValidationError";
+import { EditedPostTagResolvers } from "./editPostTag/types/EditedPostTag";
+import { EditedPostTagWarningResolvers } from "./editPostTag/types/EditedPostTagWarning";
 
 import type {
   QueryResolvers,

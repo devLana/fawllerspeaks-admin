@@ -10,12 +10,10 @@ import {
   validations,
   verifyToken,
 } from "../utils/verifyResetToken.testUtils";
-import {
-  registeredUser,
-  post,
-  VERIFY_PASSWORD_RESET_TOKEN,
-  testUsers,
-} from "@tests";
+import { registeredUser } from "@tests/mocks";
+import { VERIFY_PASSWORD_RESET_TOKEN } from "@tests/gqlQueries/authTestQueries";
+import post from "@tests/post";
+import testUsers from "@tests/createTestUsers/testUsers";
 
 import type { APIContext, TestData } from "@types";
 

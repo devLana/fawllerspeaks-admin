@@ -5,15 +5,13 @@ import { startServer } from "@server";
 import { db } from "@lib/db";
 
 import { UUID, testsTable1 } from "../unpublishPost.testUtils";
-import {
-  createTestPostTags,
-  postsUsers,
-  loginTestUser,
-  post,
-  postAuthor,
-  createAllTestPosts,
-  UNPUBLISH_POST,
-} from "@tests";
+import post from "@tests/post";
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
+import { UNPUBLISH_POST } from "@tests/gqlQueries/postsTestQueries";
+// import postsUsers
+// import postAuthor
+// import createAllTestPosts
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag, Post } from "@resolverTypes";

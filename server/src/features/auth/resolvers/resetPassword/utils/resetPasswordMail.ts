@@ -1,5 +1,6 @@
 import sgMail from "@sendgrid/mail";
-import { urls, MailError } from "@utils";
+import { urls } from "@utils/ClientUrls";
+import { MailError } from "@utils/Errors";
 
 const resetPasswordMail = async (email: string) => {
   const errorMsg =

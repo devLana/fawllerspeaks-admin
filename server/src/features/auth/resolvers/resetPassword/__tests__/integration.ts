@@ -4,8 +4,9 @@ import resetPassword from "..";
 
 import resetPasswordMail from "../utils/resetPasswordMail";
 import { validations } from "../utils/resetPassword.testUtils";
-import { MailError } from "@utils";
-import { mockContext, info, spyDb } from "@tests";
+import { MailError } from "@utils/Errors";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
 const email = "test.email@example.com";
 const args = {

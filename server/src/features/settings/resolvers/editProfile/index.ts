@@ -2,14 +2,15 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
-import { EditedProfile, EditProfileValidationError } from "./types";
+import { EditedProfile } from "./types/EditedProfile";
+import { EditProfileValidationError } from "./types/EditProfileValidationError";
 import { editProfileValidator } from "./utils/editProfile.validator";
 import {
   AuthenticationError,
   RegistrationError,
   UnknownError,
-  generateErrorsObject,
-} from "@utils";
+} from "@utils/ObjectTypes";
+import generateErrorsObject from "@utils/generateErrorsObject";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";

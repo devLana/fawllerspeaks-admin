@@ -1,6 +1,7 @@
 import sgMail from "@sendgrid/mail";
 
-import { urls, MailError } from "@utils";
+import { MailError } from "@utils/Errors";
+import { urls } from "@utils/ClientUrls";
 
 const sessionMail = async (email: string) => {
   try {

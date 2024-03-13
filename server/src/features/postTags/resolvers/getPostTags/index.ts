@@ -1,7 +1,11 @@
 import { GraphQLError } from "graphql";
 
-import { PostTags } from "../types";
-import { AuthenticationError, RegistrationError, UnknownError } from "@utils";
+import { PostTags } from "../types/PostTags";
+import {
+  AuthenticationError,
+  RegistrationError,
+  UnknownError,
+} from "@utils/ObjectTypes";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc } from "@types";

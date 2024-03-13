@@ -9,8 +9,9 @@ import {
   validations,
   verifyMail,
 } from "../utils/generatePassword.testUtils";
-import { MailError } from "@utils";
-import { mockContext, info, spyDb } from "@tests";
+import { MailError } from "@utils/Errors";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
 jest.mock("../utils/generatePasswordMail", () => {
   return jest.fn().mockName("generatePasswordMail");

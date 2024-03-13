@@ -6,16 +6,14 @@ import { type ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import {
-  postAuthor,
-  post,
-  GET_POST,
-  postsUsers,
-  loginTestUser,
-  createTestPostTags,
-  createTestPosts,
-  publishedTestPosts,
-} from "@tests";
+import post from "@tests/post";
+import { GET_POST } from "@tests/gqlQueries/postsTestQueries";
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
+// import  postsUsers
+// import  postAuthor
+// import  createTestPosts
+// import  publishedTestPosts
 
 import type { PostTag, Post } from "@resolverTypes";
 import type { APIContext, TestData } from "@types";

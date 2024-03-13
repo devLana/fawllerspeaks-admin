@@ -1,7 +1,8 @@
 import { describe, expect, it, beforeEach } from "@jest/globals";
 
 import createPostTags from "..";
-import { mockContext, info, spyDb } from "@tests";
+import spyDb from "@tests/spyDb";
+import { mockContext, info } from "@tests/resolverArguments";
 import {
   tags,
   tag1,

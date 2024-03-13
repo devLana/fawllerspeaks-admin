@@ -1,4 +1,4 @@
-import { urls } from "@utils";
+import { urls } from "@utils/ClientUrls";
 
 const dateCreated = "2021-05-17 13:22:43.717+01";
 const returnDateCreated = "2021-05-17T12:22:43.717Z";

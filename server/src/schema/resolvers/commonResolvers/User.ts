@@ -1,5 +1,5 @@
 import supabase from "@lib/supabase/supabaseClient";
-import { dateToISOString } from "@utils";
+import dateToISOString from "@utils/dateToISOString";
 import type { UserResolvers } from "@resolverTypes";
 
 export const User: UserResolvers = {

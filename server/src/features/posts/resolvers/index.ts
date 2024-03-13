@@ -11,22 +11,20 @@ import unBinPosts from "./unBinPosts";
 import deletePostsFromBin from "./deletePostsFromBin";
 import emptyBin from "./emptyBin";
 
-import {
-  PostResolvers,
-  AuthorResolvers,
-  SinglePostResolver,
-  PostsResolver,
-  PostsWarningResolver,
-  DuplicatePostTitleErrorResolver,
-  NotAllowedPostActionErrorResolver,
-  UnauthorizedAuthorErrorResolver,
-  PostValidationErrorResolver,
-  PostIdValidationErrorResolver,
-  PostIdsValidationErrorResolver,
-} from "./types";
+import { PostResolvers } from "./types/Post";
+import { AuthorResolvers } from "./types/Author";
+import { SinglePostResolver } from "./types/SinglePost";
+import { PostsResolver } from "./types/Posts";
+import { PostsWarningResolver } from "./types/PostsWarning";
+import { DuplicatePostTitleErrorResolver } from "./types/DuplicatePostTitleError";
+import { NotAllowedPostActionErrorResolver } from "./types/NotAllowedPostActionError";
+import { UnauthorizedAuthorErrorResolver } from "./types/UnauthorizedAuthorError";
+import { PostValidationErrorResolver } from "./types/PostValidationError";
+import { PostIdValidationErrorResolver } from "./types/PostIdValidationError";
+import { PostIdsValidationErrorResolver } from "./types/PostIdsValidationError";
 
 import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
-import { EditPostValidationErrorResolver } from "./editPost/types";
+import { EditPostValidationErrorResolver } from "./editPost/types/EditPostValidationError";
 
 import type {
   MutationResolvers,

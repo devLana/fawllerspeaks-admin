@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { urls } from "@utils";
+import { urls } from "@utils/ClientUrls";
 
 type Table1Contents = [string, string[], string];
 

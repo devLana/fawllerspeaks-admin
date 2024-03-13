@@ -6,7 +6,11 @@ import { startServer } from "@server";
 import { db } from "@lib/db";
 
 import { gqlValidations, validations } from "../utils/logout.testUtils";
-import { LOGOUT, testUsers, loginTestUser, post, testSession } from "@tests";
+import { LOGOUT } from "@tests/gqlQueries/authTestQueries";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import post from "@tests/post";
+import testSession from "@tests/testSession";
 
 import type { APIContext, TestData } from "@types";
 

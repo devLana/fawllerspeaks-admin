@@ -16,7 +16,14 @@ import {
   validations,
   verifyUser,
 } from "../utils/registerUser.testUtils";
-import { mockContext, info, spyDb } from "@tests";
+
+import deleteSession from "@utils/deleteSession";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
+});
 
 describe("Test register user resolver", () => {
   beforeEach(() => {
@@ -33,6 +40,7 @@ describe("Test register user resolver", () => {
 
       const data = await resolver({}, { userInput: args }, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(data).toHaveProperty("message", "Unable to register user");
       expect(data).toHaveProperty("status", "ERROR");
     });

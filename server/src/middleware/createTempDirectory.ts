@@ -2,7 +2,7 @@ import { mkdir } from "node:fs";
 
 import type { Request, Response, NextFunction } from "express";
 
-import { UPLOAD_DIR } from "@utils";
+import { UPLOAD_DIR } from "@utils/constants";
 
 export const createTempDirectory = (
   _: Request,

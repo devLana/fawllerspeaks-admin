@@ -14,13 +14,11 @@ import { db } from "@lib/db";
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import { startServer } from "@server";
 
-import {
-  EDIT_PROFILE,
-  testUsers,
-  registeredUser as mockUser,
-  loginTestUser,
-  post,
-} from "@tests";
+import { registeredUser as mockUser } from "@tests/mocks";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import post from "@tests/post";
+import { EDIT_PROFILE } from "@tests/gqlQueries/settingsTestQueries";
 import {
   args as variables,
   gqlValidate,

@@ -6,9 +6,17 @@ import { db } from "@lib/db";
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import supabase from "@lib/supabase/supabaseClient";
 
-import { urls } from "@utils";
-import * as tests from "@tests";
+import { urls } from "@utils/ClientUrls";
 import * as mocks from "../utils/draftPost.testUtils";
+
+import { testPostData, registeredUser as user } from "@tests/mocks";
+import { DRAFT_POST } from "@tests/gqlQueries/postsTestQueries";
+import createTestPostTags from "@tests/createTestPostTags";
+import { DATE_REGEX, UUID_REGEX } from "@tests/constants";
+import testUsers from "@tests/createTestUsers/testUsers";
+import createTestPost from "@tests/createTestPost";
+import loginTestUser from "@tests/loginTestUser";
+import post from "@tests/post";
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag, Post } from "@resolverTypes";
@@ -26,11 +34,11 @@ describe("Draft post - E2E", () => {
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
-    const { registeredUser, unregisteredUser } = await tests.testUsers(db);
+    const { registeredUser, unregisteredUser } = await testUsers(db);
 
-    const registered = tests.loginTestUser(registeredUser.userId);
-    const unRegistered = tests.loginTestUser(unregisteredUser.userId);
-    const createPostTags = tests.createTestPostTags(db);
+    const registered = loginTestUser(registeredUser.userId);
+    const unRegistered = loginTestUser(unregisteredUser.userId);
+    const createPostTags = createTestPostTags(db);
 
     [registeredJwt, unRegisteredJwt, postTags] = await Promise.all([
       registered,
@@ -38,16 +46,16 @@ describe("Draft post - E2E", () => {
       createPostTags,
     ]);
 
-    dbPost = await tests.createTestPost({
+    dbPost = await createTestPost({
       db,
       postTags,
       postAuthor: {
         userId: registeredUser.userId,
-        firstName: tests.registeredUser.firstName,
-        lastName: tests.registeredUser.lastName,
-        image: tests.registeredUser.image,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
       },
-      postData: tests.testPostData({
+      postData: testPostData({
         content: null,
         status: "Draft",
         datePublished: null,
@@ -67,9 +75,9 @@ describe("Draft post - E2E", () => {
   describe("Verify user authentication", () => {
     it("Should respond with an error if the user is not logged in", async () => {
       const variables = { post: mocks.argsWithNoImage };
-      const payload = { query: tests.DRAFT_POST, variables };
+      const payload = { query: DRAFT_POST, variables };
 
-      const { data } = await tests.post<Draft>(url, payload);
+      const { data } = await post<Draft>(url, payload);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -84,20 +92,20 @@ describe("Draft post - E2E", () => {
   describe("Validate user input", () => {
     it.each(mocks.gqlValidations)("%s", async (_, postData) => {
       const variables = { post: postData };
-      const payload = { query: tests.DRAFT_POST, variables };
+      const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
 
-      const { data } = await tests.post<Draft>(url, payload, options);
+      const { data } = await post<Draft>(url, payload, options);
 
       expect(data.errors).toBeDefined();
       expect(data.data).toBeUndefined();
     });
 
     it.each(mocks.validations(null))("%s", async (_, input, errors) => {
-      const payload = { query: tests.DRAFT_POST, variables: { post: input } };
+      const payload = { query: DRAFT_POST, variables: { post: input } };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
 
-      const { data } = await tests.post<Draft>(url, payload, options);
+      const { data } = await post<Draft>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -113,10 +121,10 @@ describe("Draft post - E2E", () => {
     it("Should send an error response if the user is unregistered", async () => {
       const postData = { ...mocks.argsWithNoImage, tags: mocks.tags };
       const variables = { post: postData };
-      const payload = { query: tests.DRAFT_POST, variables };
+      const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
 
-      const { data } = await tests.post<Draft>(url, payload, options);
+      const { data } = await post<Draft>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -132,10 +140,10 @@ describe("Draft post - E2E", () => {
     it("Should respond with an error if the provided post title already exists", async () => {
       const testData = { ...mocks.argsWithNoImage, title: dbPost.title };
       const variables = { post: testData };
-      const payload = { query: tests.DRAFT_POST, variables };
+      const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await tests.post<Draft>(url, payload, options);
+      const { data } = await post<Draft>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -152,9 +160,9 @@ describe("Draft post - E2E", () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const testData = { ...mocks.argsWithImage, tags: mocks.tags };
       const variables = { post: testData };
-      const payload = { query: tests.DRAFT_POST, variables };
+      const payload = { query: DRAFT_POST, variables };
 
-      const { data } = await tests.post<Draft>(url, payload, options);
+      const { data } = await post<Draft>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -170,18 +178,18 @@ describe("Draft post - E2E", () => {
     const { storageUrl } = supabase();
 
     const author = {
-      name: `${tests.registeredUser.firstName} ${tests.registeredUser.lastName}`,
-      image: `${storageUrl}${tests.registeredUser.image}`,
+      name: `${user.firstName} ${user.lastName}`,
+      image: `${storageUrl}${user.image}`,
     };
 
     it("Should save a new post with an image and post tags as draft", async () => {
       const [tag1, tag2, tag3, tag4, tag5] = postTags;
       const tags = [tag1.id, tag2.id, tag3.id, tag4.id, tag5.id];
       const variables = { post: { ...mocks.argsWithImage, tags } };
-      const payload = { query: tests.DRAFT_POST, variables };
+      const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await tests.post<Draft>(url, payload, options);
+      const { data } = await post<Draft>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -189,7 +197,7 @@ describe("Draft post - E2E", () => {
         __typename: "SinglePost",
         post: {
           __typename: "Post",
-          id: expect.stringMatching(tests.UUID_REGEX),
+          id: expect.stringMatching(UUID_REGEX),
           title: mocks.argsWithImage.title,
           description: null,
           content: mocks.argsWithImage.content,
@@ -198,7 +206,7 @@ describe("Draft post - E2E", () => {
           slug: "blog-post-title",
           url: `${urls.siteUrl}/blog/blog-post-title`,
           imageBanner: `${storageUrl}${mocks.imageBanner}`,
-          dateCreated: expect.stringMatching(tests.DATE_REGEX),
+          dateCreated: expect.stringMatching(DATE_REGEX),
           datePublished: null,
           lastModified: null,
           views: 0,
@@ -212,10 +220,10 @@ describe("Draft post - E2E", () => {
 
     it("Should save a new post without an image and post tags as draft", async () => {
       const variables = { post: { ...mocks.argsWithNoImage, tags: null } };
-      const payload = { query: tests.DRAFT_POST, variables };
+      const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await tests.post<Draft>(url, payload, options);
+      const { data } = await post<Draft>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -223,7 +231,7 @@ describe("Draft post - E2E", () => {
         __typename: "SinglePost",
         post: {
           __typename: "Post",
-          id: expect.stringMatching(tests.UUID_REGEX),
+          id: expect.stringMatching(UUID_REGEX),
           title: mocks.argsWithNoImage.title,
           description: null,
           content: null,
@@ -232,7 +240,7 @@ describe("Draft post - E2E", () => {
           slug: "another-blog-post-title",
           url: `${urls.siteUrl}/blog/another-blog-post-title`,
           imageBanner: null,
-          dateCreated: expect.stringMatching(tests.DATE_REGEX),
+          dateCreated: expect.stringMatching(DATE_REGEX),
           datePublished: null,
           lastModified: null,
           views: 0,

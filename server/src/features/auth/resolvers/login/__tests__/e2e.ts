@@ -3,17 +3,16 @@ import { test, expect, describe, beforeAll, afterAll } from "@jest/globals";
 import type { ApolloServer } from "@apollo/server";
 
 import supabase from "@lib/supabase/supabaseClient";
-import { JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
+import { JWT_REGEX, SESSION_ID_REGEX } from "@tests/constants";
 
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import {
-  gqlValidation,
-  validations,
-  verifyInputs,
-} from "../utils/login.testUtils";
-import { registeredUser, post, LOGIN, testUsers } from "@tests";
+import * as mocks from "../utils/login.testUtils";
+import { LOGIN } from "@tests/gqlQueries/authTestQueries";
+import post from "@tests/post";
+import testUsers from "@tests/createTestUsers/testUsers";
+import { registeredUser } from "@tests/mocks";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
 
@@ -36,19 +35,15 @@ describe("Login - E2E", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(gqlValidation)("%s", async (_, variables) => {
-      const payload = { query: LOGIN, variables };
-
-      const { data } = await post<Login>(url, payload);
+    test.each(mocks.gqlValidation)("%s", async (_, variables) => {
+      const { data } = await post<Login>(url, { query: LOGIN, variables });
 
       expect(data.errors).toBeDefined();
       expect(data.data).toBeUndefined();
     });
 
-    test.each(validations(null))("%s", async (_, variables, errors) => {
-      const payload = { query: LOGIN, variables };
-
-      const { data } = await post<Login>(url, payload);
+    test.each(mocks.validations(null))("%s", async (_, variables, errors) => {
+      const { data } = await post<Login>(url, { query: LOGIN, variables });
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -62,10 +57,8 @@ describe("Login - E2E", () => {
   });
 
   describe("Verify e-mail and password", () => {
-    test.each(verifyInputs)("%s", async (_, variables) => {
-      const payload = { query: LOGIN, variables };
-
-      const { data } = await post<Login>(url, payload);
+    test.each(mocks.verifyInputs)("%s", async (_, variables) => {
+      const { data } = await post<Login>(url, { query: LOGIN, variables });
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();

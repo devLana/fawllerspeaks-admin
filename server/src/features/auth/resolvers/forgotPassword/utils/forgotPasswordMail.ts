@@ -1,6 +1,7 @@
 import sgMail from "@sendgrid/mail";
 import { URL } from "node:url";
-import { urls, MailError } from "@utils";
+import { MailError } from "@utils/Errors";
+import { urls } from "@utils/ClientUrls";
 
 const forgotPasswordMail = async (email: string, token: string) => {
   const errorMsg = "Unable to send password reset link. Please try again later";

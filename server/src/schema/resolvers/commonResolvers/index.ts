@@ -9,7 +9,7 @@ import {
   ServerError,
   UnknownError,
   UserSessionError,
-} from "@utils";
+} from "@utils/ObjectTypes";
 
 import type { ObjectMapper } from "@types";
 import type { Resolvers } from "@resolverTypes";

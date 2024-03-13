@@ -5,13 +5,11 @@ import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import {
-  post,
-  GET_POST_TAGS,
-  testUsers,
-  loginTestUser,
-  createTestPostTags,
-} from "@tests";
+import { GET_POST_TAGS } from "@tests/gqlQueries/postTagsTestQueries";
+import post from "@tests/post";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag } from "@resolverTypes";

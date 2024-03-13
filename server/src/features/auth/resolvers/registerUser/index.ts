@@ -2,15 +2,18 @@ import { GraphQLError } from "graphql";
 import bcrypt from "bcrypt";
 import { ValidationError } from "joi";
 
-import { RegisterUserValidationError, RegisteredUser } from "./types";
+import { RegisterUserValidationError } from "./types/RegisterUserValidationError";
+import { RegisteredUser } from "./types/RegisteredUser";
 import { registerUserValidator } from "./utils/registerUser.validator";
 
 import {
   AuthenticationError,
   RegistrationError,
   UnknownError,
-  generateErrorsObject,
-} from "@utils";
+} from "@utils/ObjectTypes";
+
+import deleteSession from "@utils/deleteSession";
+import generateErrorsObject from "@utils/generateErrorsObject";
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";
@@ -24,10 +27,15 @@ interface Select {
   dateCreated: string;
 }
 
-const registerUser: RegisterUser = async (_, { userInput }, { db, user }) => {
-  if (!user) return new AuthenticationError("Unable to register user");
-
+const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
   try {
+    const { db, user, req, res } = ctx;
+
+    if (!user) {
+      await deleteSession(db, req, res);
+      return new AuthenticationError("Unable to register user");
+    }
+
     const validations = await registerUserValidator.validateAsync(userInput, {
       abortEarly: false,
     });
@@ -47,7 +55,10 @@ const registerUser: RegisterUser = async (_, { userInput }, { db, user }) => {
 
     const [hash, { rows }] = await Promise.all([generateHash, findUser]);
 
-    if (rows.length === 0) return new UnknownError("Unable to register user");
+    if (rows.length === 0) {
+      await deleteSession(db, req, res);
+      return new UnknownError("Unable to register user");
+    }
 
     if (rows[0].isRegistered) {
       return new RegistrationError("User is already registered");
@@ -80,6 +91,8 @@ const registerUser: RegisterUser = async (_, { userInput }, { db, user }) => {
       >;
       return new RegisterUserValidationError(errors);
     }
+
+    console.log(err);
 
     throw new GraphQLError("Unable to register. Please try again later");
   }

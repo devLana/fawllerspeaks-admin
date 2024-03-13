@@ -4,26 +4,23 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
-import {
-  signTokens,
-  clearCookies,
-  sessionMail,
-  setCookies,
-  sessionIdValidator,
-} from "@features/auth/utils";
+import { setCookies, clearCookies } from "@features/auth/utils/cookies";
+import signTokens from "@features/auth/utils/signTokens";
+import sessionMail from "@features/auth/utils/sessionMail";
+import { sessionIdValidator } from "@features/auth/utils/sessionId.validator";
 
 import { verify } from "@lib/tokenPromise";
-import { AccessToken } from "./types";
-import { SessionIdValidationError } from "../types";
+import { AccessToken } from "./types/AccessToken";
+import { SessionIdValidationError } from "../types/SessionIdValidationError";
 
 import {
   AuthCookieError,
   ForbiddenError,
-  MailError,
   NotAllowedError,
   UnknownError,
   UserSessionError,
-} from "@utils";
+} from "@utils/ObjectTypes";
+import { MailError } from "@utils/Errors";
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";

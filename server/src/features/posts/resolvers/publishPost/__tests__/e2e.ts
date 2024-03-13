@@ -7,16 +7,16 @@ import { startServer } from "@server";
 import { db } from "@lib/db";
 
 import { testsTable1 } from "../publishPost.testUtils";
-import {
-  createTestPostTags,
-  postsUsers,
-  loginTestUser,
-  post,
-  postAuthor,
-  createAllTestPosts,
-  PUBLISH_POST,
-  DATE_REGEX,
-} from "@tests";
+
+import post from "@tests/post";
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
+import { PUBLISH_POST } from "@tests/gqlQueries/postsTestQueries";
+import { DATE_REGEX } from "@tests/constants";
+
+// import  postsUsers
+// import  postAuthor
+// import  createAllTestPosts
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag, Post } from "@resolverTypes";

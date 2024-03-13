@@ -1,7 +1,7 @@
-import { authTypeDefs } from "@features/auth";
-import { settingsTypeDefs } from "@features/settings";
-import { postTagsTypeDefs } from "@features/postTags";
-import { postsTypeDefs } from "@features/posts";
+import { authTypeDefs } from "@features/auth/typeDefs";
+import { settingsTypeDefs } from "@features/settings/typeDefs";
+import { postTagsTypeDefs } from "@features/postTags/typeDefs";
+import { postsTypeDefs } from "@features/posts/typeDefs";
 
 const types = `#graphql
   type Query {

@@ -9,16 +9,24 @@ import cors from "cors";
 import helmet from "helmet";
 import * as dotenv from "dotenv";
 
-import { typeDefs, resolvers } from "@schema";
-import {
-  authenticateUser,
-  createTempDirectory,
-  errorMiddleware,
-  multipartParser,
-  parseCookies,
-} from "@middleware";
-import { uploadImage, catchAll, healthCheck, graphqlApi } from "@controllers";
-import { nodeEnv, getServerUrl, corsOptions, startServerHandler } from "@utils";
+import typeDefs from "@schema/typeDefs";
+import { resolvers } from "@schema/resolvers";
+
+import { createTempDirectory } from "@middleware/createTempDirectory";
+import { authenticateUser } from "@middleware/authenticateUser";
+import { errorMiddleware } from "@middleware/errorMiddleware";
+import { multipartParser } from "@middleware/multipartParser";
+import { parseCookies } from "@middleware/parseCookies";
+
+import { healthCheck } from "@controllers/healthCheck";
+import { uploadImage } from "@controllers/uploadImage";
+import { graphqlApi } from "@controllers/graphqlApi";
+import { catchAll } from "@controllers/catchAll";
+
+import { startServerHandler } from "@utils/startServerHandler";
+import { corsOptions } from "@utils/corsOptions";
+import getServerUrl from "@utils/getServerUrl";
+import { nodeEnv } from "@utils/nodeEnv";
 
 import type { APIContext } from "@types";
 

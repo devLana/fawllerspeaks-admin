@@ -14,12 +14,9 @@ import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 import resolver from "..";
 import { verify } from "@lib/tokenPromise";
 
-import {
-  clearCookies,
-  setCookies,
-  sessionMail,
-  JWT_REGEX,
-} from "@features/auth/utils";
+import { clearCookies, setCookies } from "@features/auth/utils/cookies";
+import sessionMail from "@features/auth/utils/sessionMail";
+import { JWT_REGEX } from "@tests/constants";
 import {
   authCookies,
   cookies,
@@ -32,8 +29,9 @@ import {
   sessionId,
   validations,
 } from "../utils/verifySession.testUtils";
-import { MailError } from "@utils";
-import { mockContext, info, spyDb } from "@tests";
+import { MailError } from "@utils/Errors";
+import spyDb from "@tests/spyDb";
+import { mockContext, info } from "@tests/resolverArguments";
 
 type Module = typeof import("");
 
@@ -42,14 +40,14 @@ jest.mock("@lib/tokenPromise", () => {
   return { __esModule: true, ...mod, verify: jest.fn().mockName("verify") };
 });
 
-jest.mock("@features/auth/utils", () => {
-  const actualModule = jest.requireActual<Module>("@features/auth/utils");
+jest.mock("@features/auth/utils/sessionMail", () => {
+  return jest.fn().mockName("sessionMail");
+});
 
+jest.mock("@features/auth/utils/cookies", () => {
   return {
     __esModule: true,
-    ...actualModule,
     clearCookies: jest.fn().mockName("clearCookies"),
-    sessionMail: jest.fn().mockName("sessionMail"),
     setCookies: jest.fn().mockName("setCookies"),
   };
 });

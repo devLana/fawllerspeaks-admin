@@ -14,8 +14,9 @@ import { db } from "@lib/db";
 
 import createUserMail from "../utils/createUserMail";
 import { gqlValidations, validations } from "../utils/createUser.testUtils";
-import { MailError } from "@utils";
-import { CREATE_USER, post } from "@tests";
+import { MailError } from "@utils/Errors";
+import post from "@tests/post";
+import { CREATE_USER } from "@tests/gqlQueries/authTestQueries";
 
 import type { APIContext, TestData } from "@types";
 

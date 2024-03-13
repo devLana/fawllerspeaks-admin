@@ -2,7 +2,8 @@ import { describe, test, expect, afterEach, jest } from "@jest/globals";
 
 import resolver from "..";
 import { validations } from "../utils/verifyResetToken.testUtils";
-import { mockContext, info, spyDb } from "@tests";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
 const token = "reset_token";
 

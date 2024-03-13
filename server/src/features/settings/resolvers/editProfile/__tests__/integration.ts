@@ -9,7 +9,8 @@ import {
 
 import editProfile from "..";
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
-import { mockContext, info, spyDb } from "@tests";
+import spyDb from "@tests/spyDb";
+import { mockContext, info } from "@tests/resolverArguments";
 import {
   args,
   dateCreated,

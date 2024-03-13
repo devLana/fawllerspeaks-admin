@@ -10,13 +10,11 @@ import type { ApolloServer } from "@apollo/server";
 import { db } from "@lib/db";
 import { startServer } from "@server";
 
-import {
-  post,
-  DELETE_POST_TAGS,
-  testUsers,
-  loginTestUser,
-  createTestPostTags,
-} from "@tests";
+import { DELETE_POST_TAGS } from "@tests/gqlQueries/postTagsTestQueries";
+import post from "@tests/post";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
 import {
   gqlValidate,
   uuid,

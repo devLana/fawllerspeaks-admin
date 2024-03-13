@@ -1,20 +1,16 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import { getPostTags, getPostUrl } from "@features/posts/utils";
-import { EditPostValidationError } from "./types";
-import {
-  DuplicatePostTitleError,
-  NotAllowedPostActionError,
-  SinglePost,
-  UnauthorizedAuthorError,
-} from "../types";
-import {
-  dateToISOString,
-  NotAllowedError,
-  UnknownError,
-  generateErrorsObject,
-} from "@utils";
+import getPostTags from "@features/posts/utils/getPostTags";
+import getPostUrl from "@features/posts/utils/getPostUrl";
+import { EditPostValidationError } from "./types/EditPostValidationError";
+import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
+import { NotAllowedPostActionError } from "../types/NotAllowedPostActionError";
+import { SinglePost } from "../types/SinglePost";
+import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
+import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
+import dateToISOString from "@utils/dateToISOString";
+import generateErrorsObject from "@utils/generateErrorsObject";
 
 import type { MutationResolvers, PostTag, PostStatus } from "@resolverTypes";
 import type { PostDBData, ResolverFunc, ValidationErrorObject } from "@types";

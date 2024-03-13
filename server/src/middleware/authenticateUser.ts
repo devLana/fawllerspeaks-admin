@@ -3,7 +3,11 @@ import type { Response, Request, NextFunction } from "express";
 
 import { db } from "@lib/db";
 import { verify } from "@lib/tokenPromise";
-import { ApiError, UnauthenticatedError, UnauthorizedError } from "@utils";
+import {
+  ApiError,
+  UnauthenticatedError,
+  UnauthorizedError,
+} from "@utils/Errors";
 
 export const authenticateUser = async (
   req: Request,

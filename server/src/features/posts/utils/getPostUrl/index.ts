@@ -1,4 +1,4 @@
-import { urls } from "@utils";
+import { urls } from "@utils/ClientUrls";
 
 const getPostUrl = (title: string) => {
   const slug = title

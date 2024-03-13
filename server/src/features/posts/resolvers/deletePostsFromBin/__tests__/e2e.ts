@@ -8,15 +8,13 @@ import { db } from "@lib/db";
 import { startServer } from "@server";
 
 import { validationsTable } from "../deletePostsFromBin.testUtils";
-import {
-  post,
-  DELETE_POSTS_FROM_BIN,
-  postAuthor,
-  loginTestUser,
-  createTestPostTags,
-  createDeleteTestPosts,
-  postsUsers,
-} from "@tests";
+import post from "@tests/post";
+import { DELETE_POSTS_FROM_BIN } from "@tests/gqlQueries/postsTestQueries";
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
+// import createDeleteTestPosts
+// import postAuthor
+// import postsUsers
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag, Post } from "@resolverTypes";

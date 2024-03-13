@@ -4,7 +4,12 @@ import type { Response, NextFunction } from "express";
 
 import supabase from "@lib/supabase/supabaseClient";
 import { removeFile } from "@events/removeFile";
-import { ApiError, generateSupabasePath, upload, UPLOAD_DIR } from "@utils";
+
+import { ApiError } from "@utils/Errors";
+import { generateSupabasePath } from "@utils/generateSupabasePath";
+import { UPLOAD_DIR } from "@utils/constants";
+import { upload } from "@utils/upload";
+
 import type { UploadRequest } from "@types";
 
 export const uploadImage = async (

@@ -9,29 +9,21 @@ import generatePassword from "./generatePassword";
 import verifyResetToken from "./verifyResetToken";
 import verifySession from "./verifySession";
 
-import { VerifiedSessionResolvers } from "./verifySession/types";
-import { AccessTokenResolvers } from "./refreshToken/types";
-import { ResetPasswordValidationErrorResolvers } from "./resetPassword/types";
+import { VerifiedSessionResolvers } from "./verifySession/types/VerifiedSession";
+import { AccessTokenResolvers } from "./refreshToken/types/AccessToken";
+import { ResetPasswordValidationErrorResolvers } from "./resetPassword/types/ResetPasswordValidationError";
 
-import {
-  LoggedInUserResolvers,
-  LoginValidationErrorResolvers,
-} from "./login/types";
+import { LoggedInUserResolvers } from "./login/types/LoggedInUser";
+import { LoginValidationErrorResolvers } from "./login/types/LoginValidationError";
 
-import {
-  RegisteredUserResolvers,
-  RegisterUserValidationErrorResolvers,
-} from "./registerUser/types";
+import { RegisterUserValidationErrorResolvers } from "./registerUser/types/RegisterUserValidationError";
+import { RegisteredUserResolvers } from "./registerUser/types/RegisteredUser";
 
-import {
-  VerifiedResetTokenResolvers,
-  VerifyResetTokenValidationErrorResolvers,
-} from "./verifyResetToken/types";
+import { VerifiedResetTokenResolvers } from "./verifyResetToken/types/VerifiedResetToken";
+import { VerifyResetTokenValidationErrorResolvers } from "./verifyResetToken/types/VerifyResetTokenValidationError";
 
-import {
-  EmailValidationErrorResolvers,
-  SessionIdValidationErrorResolvers,
-} from "./types";
+import { EmailValidationErrorResolvers } from "./types/EmailValidationError";
+import { SessionIdValidationErrorResolvers } from "./types/SessionIdValidationError";
 
 import type { MutationResolvers, Resolvers } from "@resolverTypes";
 import type { ResolversMapper, ObjectMapper } from "@types";

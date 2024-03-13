@@ -4,7 +4,7 @@ import { test, expect } from "@jest/globals";
 
 import signTokens from ".";
 import { verify } from "@lib/tokenPromise";
-import { JWT_REGEX } from "../constants";
+import { JWT_REGEX } from "@tests/constants";
 
 interface Verify {
   sub: string;

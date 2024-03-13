@@ -11,17 +11,16 @@ import {
   postFields,
   validationsTable,
 } from "../editPost.testUtils";
-import {
-  post,
-  EDIT_POST,
-  loginTestUser,
-  createTestPostTags,
-  createAllTestPosts,
-  postAuthor,
-  postsUsers,
-  DATE_REGEX,
-} from "@tests";
-import { urls } from "@utils";
+// import createAllTestPosts,
+// import postAuthor,
+// import postsUsers,
+import { urls } from "@utils/ClientUrls";
+
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
+import post from "@tests/post";
+import { EDIT_POST } from "@tests/gqlQueries/postsTestQueries";
+import { DATE_REGEX } from "@tests/constants";
 
 import type { PostTag, Post } from "@resolverTypes";
 import type { APIContext, TestData } from "@types";

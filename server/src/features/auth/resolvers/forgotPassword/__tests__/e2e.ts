@@ -19,14 +19,13 @@ import {
   message,
   validations,
 } from "../utils/forgotPassword.testUtils";
-import { MailError } from "@utils";
-import {
-  unRegisteredUser,
-  registeredUser,
-  post,
-  FORGOT_PASSWORD,
-  testUsers,
-} from "@tests";
+
+import { MailError } from "@utils/Errors";
+
+import post from "@tests/post";
+import { unRegisteredUser, registeredUser } from "@tests/mocks";
+import { FORGOT_PASSWORD } from "@tests/gqlQueries/authTestQueries";
+import testUsers from "@tests/createTestUsers/testUsers";
 
 import type { APIContext, TestData } from "@types";
 

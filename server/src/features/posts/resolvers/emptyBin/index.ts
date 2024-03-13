@@ -1,9 +1,11 @@
 import { GraphQLError } from "graphql";
 
-import { Posts } from "../types";
+import { Posts } from "../types/Posts";
 import { EmptyBinWarning } from "./EmptyBinWarning";
-import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import { NotAllowedError, dateToISOString } from "@utils";
+import getPostUrl from "@features/posts/utils/getPostUrl";
+// import mapPostTags from "@features/posts/utils/mapPostTags";
+import { NotAllowedError } from "@utils/ObjectTypes";
+import dateToISOString from "@utils/dateToISOString";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { GetPostDBData, ResolverFunc } from "@types";

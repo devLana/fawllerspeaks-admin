@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { spyDb } from "@tests";
+import spyDb from "@tests/spyDb";
 import getPostTags from ".";
 import { db } from "@lib/db";
 

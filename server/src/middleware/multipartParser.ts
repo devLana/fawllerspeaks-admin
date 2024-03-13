@@ -2,7 +2,8 @@ import formidable from "formidable";
 import type { Response, NextFunction } from "express";
 
 import { removeFile } from "@events/removeFile";
-import { ApiError, BadRequestError, UPLOAD_DIR } from "@utils";
+import { ApiError, BadRequestError } from "@utils/Errors";
+import { UPLOAD_DIR } from "@utils/constants";
 import type { UploadRequest } from "@types";
 
 export const multipartParser = async (

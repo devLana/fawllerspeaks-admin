@@ -1,8 +1,8 @@
 import type { Pool } from "pg";
 
 import supabase from "@lib/supabase/supabaseClient";
-import { getPostUrl } from "@features/posts/utils";
-import dateToISOString from "../dateToISOString";
+import getPostUrl from "@features/posts/utils/getPostUrl";
+import dateToISOString from "@utils/dateToISOString";
 
 import type { GetPostDBData, TestPostAuthor, TestPostData } from "@types";
 import type { Post, PostTag } from "@resolverTypes";

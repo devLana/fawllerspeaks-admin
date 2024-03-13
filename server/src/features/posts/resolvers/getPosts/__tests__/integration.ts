@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, test } from "@jest/globals";
 
 import getPosts from "..";
 import { dbPosts, returnPosts, tags } from "../getPosts.testUtils";
-import { info, mockContext, spyDb } from "@tests";
-
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 beforeEach(() => {
   mockContext.user = "user_id";
 });

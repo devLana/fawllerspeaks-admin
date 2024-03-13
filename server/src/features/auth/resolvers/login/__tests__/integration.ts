@@ -10,16 +10,20 @@ import {
   mockUser,
   validations,
 } from "../utils/login.testUtils";
-import { setCookies, JWT_REGEX, SESSION_ID_REGEX } from "@features/auth/utils";
-import { mockContext, info, spyDb } from "@tests";
+import { setCookies } from "@features/auth/utils/cookies";
+import { JWT_REGEX, SESSION_ID_REGEX } from "@tests/constants";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
-type Module = typeof import("@features/auth/utils");
+type Module = typeof import("@features/auth/utils/cookies");
 
-jest.mock("@features/auth/utils", () => {
-  const actualModule = jest.requireActual<Module>("@features/auth/utils");
+jest.mock("@utils/deleteSession");
+
+jest.mock("@features/auth/utils/cookies", () => {
+  const mod = jest.requireActual<Module>("@features/auth/utils/cookies");
   return {
     __esModule: true,
-    ...actualModule,
+    ...mod,
     setCookies: jest.fn().mockName("setCookies"),
   };
 });

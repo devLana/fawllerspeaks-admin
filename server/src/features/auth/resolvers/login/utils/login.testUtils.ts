@@ -1,13 +1,11 @@
-import { registeredUser } from "@tests";
+import { registeredUser } from "@tests/mocks";
 
 interface Input {
-  [key: string]: unknown;
   email: string;
   password: string;
 }
 
 interface GQLErrors {
-  [key: string]: unknown;
   email: number | boolean | null | undefined | Record<string, string>;
   password: number | boolean | null | undefined | [];
 }
@@ -16,6 +14,7 @@ type InputErrors = string | null | undefined;
 type Validations = [string, Input, [InputErrors, InputErrors]][];
 
 export const args = { email: "test_mail@example.com", password: "df_i4irh983" };
+export const cookies = { auth: "auth", sig: "sig", token: "token" };
 export const dateCreated = "2022-11-07 13:22:43.717+01";
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [

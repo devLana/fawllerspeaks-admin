@@ -1,7 +1,8 @@
 import { it, describe, expect, beforeEach } from "@jest/globals";
 
 import getPostTags from "..";
-import { spyDb, info, mockContext } from "@tests";
+import spyDb from "@tests/spyDb";
+import { info, mockContext } from "@tests/resolverArguments";
 import { tags, verifyUser } from "../utils/getPostTags.testUtils";
 
 beforeEach(() => {

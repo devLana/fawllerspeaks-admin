@@ -18,14 +18,11 @@ import {
   validations,
   verifyEmail,
 } from "../utils/resetPassword.testUtils";
-import { MailError } from "@utils";
-import {
-  registeredUser,
-  newRegisteredUser,
-  post,
-  RESET_PASSWORD,
-  authUsers,
-} from "@tests";
+import { MailError } from "@utils/Errors";
+import { registeredUser, newRegisteredUser } from "@tests/mocks";
+import post from "@tests/post";
+import { RESET_PASSWORD } from "@tests/gqlQueries/authTestQueries";
+import authUsers from "@tests/createTestUsers/authUsers";
 
 import type { APIContext, TestData } from "@types";
 

@@ -1,20 +1,19 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 
 import draftPost from "..";
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
-import { getPostTags } from "@features/posts/utils";
+
+import getPostTags from "@features/posts/utils/getPostTags";
 import * as mocks from "../utils/draftPost.testUtils";
 
-import { urls } from "@utils";
-import { info, mockContext, spyDb } from "@tests";
+import { urls } from "@utils/ClientUrls";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
-type Module = typeof import("@features/posts/utils");
 type MockType = jest.MockedFunction<() => mocks.Tags | null>;
 
-jest.mock("@features/posts/utils", () => {
-  const actualModule = jest.requireActual<Module>("@features/posts/utils");
-  return { __esModule: true, ...actualModule, getPostTags: jest.fn() };
+jest.mock("@features/posts/utils/getPostTags", () => {
+  return jest.fn().mockName("getPostTags");
 });
 
 jest.mock("@lib/supabase/supabaseEvent");

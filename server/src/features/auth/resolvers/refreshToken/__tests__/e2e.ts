@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 
 import type { ApolloServer } from "@apollo/server";
@@ -6,34 +5,30 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import { JWT_REGEX, sessionMail } from "@features/auth/utils";
+import sessionMail from "@features/auth/utils/sessionMail";
 import {
   gqlValidations,
   validateSession,
 } from "../utils/refreshToken.testUtils";
+
 import {
-  REFRESH_TOKEN,
-  authUsers,
-  post,
   registeredUser as registeredTestUser,
-  testSession,
   unRegisteredUser as unRegisteredTestUser,
-} from "@tests";
+} from "@tests/mocks";
+import { REFRESH_TOKEN } from "@tests/gqlQueries/authTestQueries";
+import authUsers from "@tests/createTestUsers/authUsers";
+import testSession from "@tests/testSession";
+import { JWT_REGEX } from "@tests/constants";
+import post from "@tests/post";
 
 import type { APIContext, TestData } from "@types";
-import { MailError } from "@utils";
+import { MailError } from "@utils/Errors";
 
 type Refresh = TestData<{ refreshToken: Record<string, unknown> }>;
-type Module = typeof import("@features/auth/utils");
 type MockFunction = jest.MockedFunction<() => unknown>;
 
-jest.mock("@features/auth/utils", () => {
-  const mod = jest.requireActual<Module>("@features/auth/utils");
-  return {
-    __esModule: true,
-    ...mod,
-    sessionMail: jest.fn().mockName("sessionMail"),
-  };
+jest.mock("@features/auth/utils/sessionMail", () => {
+  return jest.fn().mockName("sessionMail");
 });
 
 describe("Refresh Token - E2E", () => {

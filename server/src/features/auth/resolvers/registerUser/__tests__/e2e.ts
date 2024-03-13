@@ -10,13 +10,12 @@ import {
   userInput,
   validations,
 } from "../utils/registerUser.testUtils";
-import {
-  post,
-  REGISTER_USER,
-  testUsers,
-  loginTestUser,
-  unRegisteredUser,
-} from "@tests";
+
+import { REGISTER_USER } from "@tests/gqlQueries/authTestQueries";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import { unRegisteredUser } from "@tests/mocks";
+import post from "@tests/post";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
 

@@ -1,14 +1,15 @@
 import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
-import { clearCookies, sessionIdValidator } from "@features/auth/utils";
-import { SessionIdValidationError } from "../types";
+import { clearCookies } from "@features/auth/utils/cookies";
+import { sessionIdValidator } from "@features/auth/utils/sessionId.validator";
+import { SessionIdValidationError } from "../types/SessionIdValidationError";
 import {
   AuthenticationError,
   NotAllowedError,
   Response,
   UnknownError,
-} from "@utils";
+} from "@utils/ObjectTypes";
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";

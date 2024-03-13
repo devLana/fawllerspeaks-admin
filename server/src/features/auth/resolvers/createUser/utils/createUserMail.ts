@@ -1,5 +1,6 @@
 import sgMail from "@sendgrid/mail";
-import { urls, MailError } from "@utils";
+import { MailError } from "@utils/Errors";
+import { urls } from "@utils/ClientUrls";
 
 const createUserMail = async (email: string, password: string) => {
   const errMsg = "Unable to send confirmation mail. Please try again later";

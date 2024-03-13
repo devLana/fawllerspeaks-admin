@@ -3,18 +3,18 @@ import { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
 import changePasswordMail from "./utils/changePasswordMail";
-import { ChangePasswordValidationError } from "./types";
+import { ChangePasswordValidationError } from "./types/ChangePasswordValidationError";
 import { changePasswordValidator } from "./utils/changePassword.validator";
 import {
   AuthenticationError,
-  MailError,
   NotAllowedError,
   RegistrationError,
   Response,
   ServerError,
   UnknownError,
-  generateErrorsObject,
-} from "@utils";
+} from "@utils/ObjectTypes";
+import { MailError } from "@utils/Errors";
+import generateErrorsObject from "@utils/generateErrorsObject";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ValidationErrorObject, ResolverFunc } from "@types";

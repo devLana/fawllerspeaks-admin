@@ -1,7 +1,7 @@
 import { expect, test } from "@jest/globals";
 
 import getPostUrl from ".";
-import { urls } from "@utils";
+import { urls } from "@utils/ClientUrls";
 
 test.each([
   [

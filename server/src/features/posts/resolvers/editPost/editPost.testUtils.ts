@@ -1,4 +1,4 @@
-import { urls } from "@utils";
+import { urls } from "@utils/ClientUrls";
 import { randomUUID } from "node:crypto";
 
 interface Post1 {

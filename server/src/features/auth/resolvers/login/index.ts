@@ -2,14 +2,19 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import { LoggedInUser, LoginValidationError } from "./types";
-import { loginValidator } from "./utils/login.validator";
+import { LoginValidationError } from "./types/LoginValidationError";
+import { LoggedInUser } from "./types/LoggedInUser";
+import { NotAllowedError } from "@utils/ObjectTypes";
 
-import { NotAllowedError, generateErrorsObject } from "@utils";
-import { signTokens, generateBytes, setCookies } from "@features/auth/utils";
+import { loginValidator } from "./utils/login.validator";
+import generateErrorsObject from "@utils/generateErrorsObject";
+import generateBytes from "@features/auth/utils/generateBytes";
+import { setCookies } from "@features/auth/utils/cookies";
+import signTokens from "@features/auth/utils/signTokens";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";
+import deleteSession from "@utils/deleteSession";
 
 type Login = ResolverFunc<MutationResolvers["login"]>;
 
@@ -24,8 +29,10 @@ interface DBUser {
   dateCreated: string;
 }
 
-const login: Login = async (_, args, { db, res }) => {
+const login: Login = async (_, args, { db, res, req }) => {
   try {
+    await deleteSession(db, req, res);
+
     const { email, password } = await loginValidator.validateAsync(args, {
       abortEarly: false,
     });

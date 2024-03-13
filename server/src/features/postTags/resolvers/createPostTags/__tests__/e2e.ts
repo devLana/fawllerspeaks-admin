@@ -5,15 +5,11 @@ import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 import { db } from "@lib/db";
 import { startServer } from "@server";
 
-import {} from "@utils";
-import {
-  CREATE_POST_TAGS,
-  testUsers,
-  loginTestUser,
-  post,
-  DATE_REGEX,
-  UUID_REGEX,
-} from "@tests";
+import { CREATE_POST_TAGS } from "@tests/gqlQueries/postTagsTestQueries";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import post from "@tests/post";
+import { DATE_REGEX, UUID_REGEX } from "@tests/constants";
 import {
   duplicate,
   gqlValidations,

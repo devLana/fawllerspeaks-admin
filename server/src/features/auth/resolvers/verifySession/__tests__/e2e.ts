@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 
 import type { ApolloServer } from "@apollo/server";
@@ -7,31 +6,26 @@ import supabase from "@lib/supabase/supabaseClient";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import { JWT_REGEX, sessionMail } from "@features/auth/utils";
+import { JWT_REGEX } from "@tests/constants";
+import sessionMail from "@features/auth/utils/sessionMail";
 import { gqlValidations, validations } from "../utils/verifySession.testUtils";
 
 import {
-  VERIFY_SESSION,
-  authUsers,
-  post,
   registeredUser as registeredTestUser,
   newRegisteredUser as newTestUser,
-  testSession,
   unRegisteredUser as unRegisteredTestUser,
-} from "@tests";
+} from "@tests/mocks";
+import { VERIFY_SESSION } from "@tests/gqlQueries/authTestQueries";
+import authUsers from "@tests/createTestUsers/authUsers";
+import post from "@tests/post";
+import testSession from "@tests/testSession";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
 
 type Verify = TestData<{ verifySession: Record<string, unknown> }>;
-type Module = typeof import("@features/auth/utils");
 
-jest.mock("@features/auth/utils", () => {
-  const mod = jest.requireActual<Module>("@features/auth/utils");
-  return {
-    __esModule: true,
-    ...mod,
-    sessionMail: jest.fn().mockName("sessionMail"),
-  };
+jest.mock("@features/auth/utils/sessionMail", () => {
+  return jest.fn().mockName("sessionMail");
 });
 
 describe("Verify Session - E2E", () => {

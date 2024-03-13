@@ -2,20 +2,22 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
-import { getPostTags, getPostUrl } from "@features/posts/utils";
-import {
-  SinglePost,
-  DuplicatePostTitleError,
-  PostValidationError,
-} from "../types";
-import { draftPostSchema as schema } from "./utils/draftPost.validator";
+
+import { SinglePost } from "../types/SinglePost";
+import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
+import { PostValidationError } from "../types/PostValidationError";
 import {
   AuthenticationError,
   NotAllowedError,
   RegistrationError,
   UnknownError,
-  generateErrorsObject,
-} from "@utils";
+} from "@utils/ObjectTypes";
+
+import getPostTags from "@features/posts/utils/getPostTags";
+import getPostUrl from "@features/posts/utils/getPostUrl";
+
+import { draftPostSchema as schema } from "./utils/draftPost.validator";
+import generateErrorsObject from "@utils/generateErrorsObject";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc, PostDBData, ValidationErrorObject } from "@types";

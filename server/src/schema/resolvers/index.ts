@@ -1,8 +1,8 @@
 import { commonResolvers } from "./commonResolvers";
-import { authResolvers } from "@features/auth";
-import { settingsResolvers } from "@features/settings";
-import { postTagsResolvers } from "@features/postTags";
-import { postsResolvers } from "@features/posts";
+import { authResolvers } from "@features/auth/resolvers";
+import { settingsResolvers } from "@features/settings/resolvers";
+import { postTagsResolvers } from "@features/postTags/resolvers";
+import { postsResolvers } from "@features/posts/resolvers";
 
 import type { ObjectMapper } from "@types";
 import type { Resolvers } from "@resolverTypes";

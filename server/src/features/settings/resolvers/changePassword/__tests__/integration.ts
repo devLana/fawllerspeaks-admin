@@ -16,8 +16,9 @@ import {
   validations,
   verifyUser,
 } from "../utils/changePassword.testUtils";
-import { MailError } from "@utils";
-import { mockContext, info, spyDb } from "@tests";
+import { MailError } from "@utils/Errors";
+import spyDb from "@tests/spyDb";
+import { mockContext, info } from "@tests/resolverArguments";
 
 let hash = "";
 

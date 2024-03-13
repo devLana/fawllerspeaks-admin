@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 
-import { nodeEnv } from "@utils";
+import { nodeEnv } from "@utils/nodeEnv";
 
 export const db = new Pool({
   connectionString:

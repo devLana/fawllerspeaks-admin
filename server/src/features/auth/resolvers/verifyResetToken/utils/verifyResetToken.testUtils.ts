@@ -1,4 +1,4 @@
-import { unRegisteredUser } from "@tests";
+import { unRegisteredUser } from "@tests/mocks";
 
 export const validations: [string, string][] = [
   [

@@ -1,14 +1,14 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import {
-  NotAllowedPostActionError,
-  PostIdValidationError,
-  SinglePost,
-  UnauthorizedAuthorError,
-} from "../types";
-import { getPostTags, getPostUrl } from "@features/posts/utils";
-import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
+import { NotAllowedPostActionError } from "../types/NotAllowedPostActionError";
+import { PostIdValidationError } from "../types/PostIdValidationError";
+import { SinglePost } from "../types/SinglePost";
+import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
+// import  getPostTags from "@features/posts/utils/mapPostTags";
+import getPostUrl from "@features/posts/utils/getPostUrl";
+import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
+import dateToISOString from "@utils/dateToISOString";
 
 import type { MutationResolvers, PostStatus } from "@resolverTypes";
 import type { GetPostDBData, ResolverFunc } from "@types";

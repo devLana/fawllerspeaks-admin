@@ -12,7 +12,7 @@ import {
 import { db } from "@lib/db";
 import { startServer } from "@server";
 
-import { MailError } from "@utils";
+import { MailError } from "@utils/Errors";
 import changePasswordMail from "../utils/changePasswordMail";
 import {
   authCheck,
@@ -21,13 +21,11 @@ import {
   validations,
   PASSWORD,
 } from "../utils/changePassword.testUtils";
-import {
-  CHANGE_PASSWORD,
-  testUsers,
-  loginTestUser,
-  post,
-  registeredUser,
-} from "@tests";
+import { registeredUser } from "@tests/mocks";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import post from "@tests/post";
+import { CHANGE_PASSWORD } from "@tests/gqlQueries/settingsTestQueries";
 
 import type { APIContext, TestData } from "@types";
 

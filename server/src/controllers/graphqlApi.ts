@@ -2,7 +2,7 @@ import { expressMiddleware } from "@apollo/server/express4";
 import type { ApolloServer } from "@apollo/server";
 
 import { db } from "@lib/db";
-import { getUser } from "@utils";
+import getUser from "@utils/getUser";
 import type { APIContext } from "@types";
 
 export const graphqlApi = (server: ApolloServer<APIContext>) => {

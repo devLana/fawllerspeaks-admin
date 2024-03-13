@@ -15,7 +15,8 @@ import {
   validations,
   verifyUser,
 } from "../utils/deletePostTags.testUtils";
-import { mockContext, info, spyDb } from "@tests";
+import spyDb from "@tests/spyDb";
+import { mockContext, info } from "@tests/resolverArguments";
 
 // jest.mock("../deletePostTagsWorker");
 // jest.mock("node:worker_threads");

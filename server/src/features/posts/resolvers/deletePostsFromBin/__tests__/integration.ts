@@ -15,7 +15,8 @@ import {
   returnPost4,
   validationsTable,
 } from "../deletePostsFromBin.testUtils";
-import { mockContext, info, spyDb } from "@tests";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
 beforeEach(() => {
   mockContext.user = "logged_In_User_Id";

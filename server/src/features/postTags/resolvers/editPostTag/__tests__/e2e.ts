@@ -7,14 +7,12 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import {
-  post,
-  EDIT_POST_TAG,
-  testUsers,
-  loginTestUser,
-  createTestPostTags,
-  DATE_REGEX,
-} from "@tests";
+import { EDIT_POST_TAG } from "@tests/gqlQueries/postTagsTestQueries";
+import post from "@tests/post";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
+import { DATE_REGEX } from "@tests/constants";
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag } from "@resolverTypes";

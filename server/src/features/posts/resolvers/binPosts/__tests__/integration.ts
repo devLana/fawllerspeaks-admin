@@ -18,7 +18,8 @@ import {
   returnPost4,
   validationsTable,
 } from "../binPosts.testUtils";
-import { mockContext, info, spyDb } from "@tests";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
 jest.mock("node:worker_threads");
 // jest.mock("../binPostsWorker");

@@ -18,15 +18,13 @@ import { startServer } from "@server";
 // import binPostsWorker from "../binPostsWorker";
 
 import { validationsTable } from "../binPosts.testUtils";
-import {
-  post,
-  BIN_POSTS,
-  postAuthor,
-  postsUsers,
-  loginTestUser,
-  createTestPostTags,
-  createBinnedTestPosts,
-} from "@tests";
+import { BIN_POSTS } from "@tests/gqlQueries/postsTestQueries";
+import post from "@tests/post";
+import loginTestUser from "@tests/loginTestUser";
+import createTestPostTags from "@tests/createTestPostTags";
+// import postAuthor from "@tests/post";
+// import postsUsers from "@tests/cre";
+// import createBinnedTestPosts from "@tests/cre";
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag, Post } from "@resolverTypes";

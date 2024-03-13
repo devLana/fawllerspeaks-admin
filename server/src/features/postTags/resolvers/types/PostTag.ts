@@ -1,4 +1,4 @@
-import { dateToISOString } from "@utils";
+import dateToISOString from "@utils/dateToISOString";
 import type { PostTagResolvers } from "@resolverTypes";
 
 export const PostTag: PostTagResolvers = {

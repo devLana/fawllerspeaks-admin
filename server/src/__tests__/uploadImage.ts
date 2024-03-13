@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { Buffer, File } from "node:buffer";
 import { randomUUID } from "node:crypto";
 
@@ -18,18 +17,16 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@lib/db";
 
-import { upload } from "@utils";
-import { postFormData, testUsers, loginTestUser } from "@tests";
+import { upload } from "@utils/upload";
+import testUsers from "@tests/createTestUsers/testUsers";
+import loginTestUser from "@tests/loginTestUser";
+import postFormData from "@tests/postFormData";
 
 import type { APIContext } from "@types";
 
 type UploadReturn = () => Promise<{ error: Error | null }>;
-type Module = typeof import("@utils");
 
-jest.mock("@utils", () => {
-  const actualModule = jest.requireActual<Module>("@utils");
-  return { __esModule: true, ...actualModule, upload: jest.fn() };
-});
+jest.mock("@utils/upload");
 
 describe("Upload image endpoint - E2E", () => {
   const unknownUserId = randomUUID();

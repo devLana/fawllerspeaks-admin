@@ -1,5 +1,5 @@
 import sgMail from "@sendgrid/mail";
-import { MailError } from "@utils";
+import { MailError } from "@utils/Errors";
 
 const changePasswordMail = async (email: string) => {
   const errorMsg = "Unable to change password. Please try again later";

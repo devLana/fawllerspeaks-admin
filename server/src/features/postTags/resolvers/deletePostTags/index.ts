@@ -5,18 +5,16 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
 // import deletePostTagsWorker from "./deletePostTagsWorker";
-import {
-  DeletedPostTags,
-  DeletedPostTagsWarning,
-  DeletePostTagsValidationError,
-} from "./types";
+import { DeletePostTagsValidationError } from "./types/DeletePostTagsValidationError";
+import { DeletedPostTags } from "./types/DeletedPostTags";
+import { DeletedPostTagsWarning } from "./types/DeletedPostTagsWarning";
 import { deletePostTagsValidator as schema } from "./utils/deletePostTags.validator";
 import {
   AuthenticationError,
   NotAllowedError,
   RegistrationError,
   UnknownError,
-} from "@utils";
+} from "@utils/ObjectTypes";
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";

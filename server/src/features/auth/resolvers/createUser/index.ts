@@ -1,11 +1,13 @@
 import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
-import { EmailValidationError } from "../types";
+import { EmailValidationError } from "../types/EmailValidationError";
 
-import { MailError, Response, NotAllowedError, ServerError } from "@utils";
+import { MailError } from "@utils/Errors";
+import { Response, NotAllowedError, ServerError } from "@utils/ObjectTypes";
 import createUserMail from "./utils/createUserMail";
-import { bytesHash, emailValidator } from "@features/auth/utils";
+import bytesHash from "@features/auth/utils/bytesHash";
+import { emailValidator } from "@features/auth/utils/email.validator";
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";

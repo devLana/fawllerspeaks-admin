@@ -2,7 +2,8 @@ import { describe, expect, test, beforeEach } from "@jest/globals";
 
 import emptyBin from "..";
 
-import { mockContext, info, spyDb } from "@tests";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 import {
   dbPost1,
   dbPost2,

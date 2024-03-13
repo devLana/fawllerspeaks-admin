@@ -1,4 +1,4 @@
-import { unRegisteredUser } from "@tests";
+import { unRegisteredUser } from "@tests/mocks";
 import type { InputErrors } from "@types";
 
 interface Input {

@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { randomUUID } from "node:crypto";
 
 import { beforeEach, describe, expect, test, jest } from "@jest/globals";
 
 import getPost from "..";
-import { getPostTags } from "@features/posts/utils";
+import getPostTags from "@features/posts/utils/getPostTags";
 
-import { urls } from "@utils";
-import { info, mockContext, spyDb } from "@tests";
+import { urls } from "@utils/ClientUrls";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
-type Module = typeof import("@features/posts/utils");
 type PostTags = { id: string; name: string }[];
 type MockType = jest.MockedFunction<() => PostTags | null>;
 
@@ -38,9 +37,8 @@ const mockPostTags = [
   { id: "3", name: "tag3" },
 ];
 
-jest.mock("@features/posts/utils", () => {
-  const actualModule = jest.requireActual<Module>("@features/posts/utils");
-  return { __esModule: true, ...actualModule, getPostTags: jest.fn() };
+jest.mock("@features/posts/utils/getPostTags", () => {
+  return jest.fn().mockName("getPostTags");
 });
 
 const mocked = getPostTags as unknown as MockType;

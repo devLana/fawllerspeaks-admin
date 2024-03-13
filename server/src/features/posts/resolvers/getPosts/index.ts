@@ -1,8 +1,10 @@
 import { GraphQLError } from "graphql";
 
-import { Posts } from "../types";
-import { getPostUrl, mapPostTags } from "@features/posts/utils";
-import { dateToISOString, NotAllowedError } from "@utils";
+import { Posts } from "../types/Posts";
+import getPostUrl from "@features/posts/utils/getPostUrl";
+// import  mapPostTags from "@features/posts/utils/mapPostTags";
+import { NotAllowedError } from "@utils/ObjectTypes";
+import dateToISOString from "@utils/dateToISOString";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
 import type { GetPostDBData, ResolverFunc } from "@types";

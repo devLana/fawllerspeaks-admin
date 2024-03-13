@@ -18,8 +18,11 @@ import {
   validations,
   verifyMailE2E,
 } from "../utils/generatePassword.testUtils";
-import { MailError } from "@utils";
-import { unRegisteredUser, post, GENERATE_PASSWORD, testUsers } from "@tests";
+import { MailError } from "@utils/Errors";
+import post from "@tests/post";
+import { unRegisteredUser } from "@tests/mocks";
+import { GENERATE_PASSWORD } from "@tests/gqlQueries/authTestQueries";
+import testUsers from "@tests/createTestUsers/testUsers";
 
 import type { APIContext, TestData } from "@types";
 

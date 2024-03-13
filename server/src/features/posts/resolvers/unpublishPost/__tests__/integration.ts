@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { beforeEach, describe, expect, test, jest } from "@jest/globals";
 
 import unpublishPost from "..";
@@ -15,16 +14,15 @@ import {
   testsTable3,
   userId,
 } from "../unpublishPost.testUtils";
-import { getPostTags } from "@features/posts/utils";
+import getPostTags from "@features/posts/utils/getPostTags";
 
-import { info, mockContext, spyDb } from "@tests";
+import { mockContext, info } from "@tests/resolverArguments";
+import spyDb from "@tests/spyDb";
 
-type Module = typeof import("@features/posts/utils");
 type MockType = jest.MockedFunction<() => MockPostTags | null>;
 
-jest.mock("@features/posts/utils", () => {
-  const actualModule = jest.requireActual<Module>("@features/posts/utils");
-  return { __esModule: true, ...actualModule, getPostTags: jest.fn() };
+jest.mock("@features/posts/utils/getPostTags", () => {
+  return jest.fn().mockName("getPostTags");
 });
 
 beforeEach(() => {

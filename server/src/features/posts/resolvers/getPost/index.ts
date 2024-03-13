@@ -1,9 +1,12 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import { PostIdValidationError, SinglePost } from "../types";
-import { dateToISOString, NotAllowedError, UnknownError } from "@utils";
-import { getPostTags, getPostUrl } from "@features/posts/utils";
+import { PostIdValidationError } from "../types/PostIdValidationError";
+import { SinglePost } from "../types/SinglePost";
+import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
+import dateToISOString from "@utils/dateToISOString";
+import getPostUrl from "@features/posts/utils/getPostUrl";
+// import getPostTags  from "@features/posts/utils/getPostTags";
 
 import type { QueryResolvers } from "@resolverTypes";
 import type { GetPostDBData, ResolverFunc } from "@types";

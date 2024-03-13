@@ -1,5 +1,5 @@
 import supabase from "@lib/supabase/supabaseClient";
-import { registeredUser } from "@tests";
+import { registeredUser } from "@tests/mocks";
 import type { InputErrors } from "@types";
 
 interface Input {
