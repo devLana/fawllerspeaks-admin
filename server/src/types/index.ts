@@ -73,6 +73,7 @@ export interface TestPostAuthor {
 }
 
 export interface Cookies {
+  [index: string]: string | undefined;
   auth?: string;
   token?: string;
   sig?: string;
