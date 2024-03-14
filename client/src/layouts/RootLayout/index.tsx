@@ -1,30 +1,19 @@
 import * as React from "react";
 
-import { useApolloClient } from "@apollo/client";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
-import { useAuthHeader } from "@context/AuthHeader";
 import Metadata from "@components/Metadata";
 import Loader from "@components/Loader";
 import ErrorAlert from "@components/ErrorAlert";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import PageBreadcrumbs from "./components/PageBreadcrumbs";
-import { GET_POST_TAGS } from "@features/postTags/GetPostTags/operations/GET_POST_TAGS";
 import { type RootLayoutProps } from "@types";
 
 const RootLayout = (props: RootLayoutProps) => {
   const { children, clientHasRendered, errorMessage, ...metaProps } = props;
   const [navBarIsOpen, setNavBarIsOpen] = React.useState(false);
-
-  const client = useApolloClient();
-
-  const { jwt } = useAuthHeader();
-
-  React.useEffect(() => {
-    if (jwt) void client.query({ query: GET_POST_TAGS });
-  }, [client, jwt]);
 
   let content: React.ReactElement;
 

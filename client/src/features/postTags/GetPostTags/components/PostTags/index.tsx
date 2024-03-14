@@ -29,23 +29,23 @@ const PostTags = ({ id }: { id: string }) => {
             tagIdsLength={selectedTagsIds.length}
             dispatch={dispatch}
           />
+          <EditPostTag edit={state.edit} dispatch={dispatch} />
+          {/* Delete one post tag by clicking delete on the post tag's menu */}
+          <DeletePostTags
+            {...state.deleteTag}
+            onClose={() => dispatch({ type: "CLOSE_MENU_DELETE" })}
+            dispatch={dispatch}
+          />
+          {/* Delete multiple post tag(s) by selecting the post tags from the list and clicking the toolbar delete button */}
+          <DeletePostTags
+            open={state.deleteTags}
+            name={state.selectedTags[selectedTagsIds[0]]}
+            ids={selectedTagsIds}
+            onClose={() => dispatch({ type: "CLOSE_MULTI_DELETE" })}
+            dispatch={dispatch}
+          />
         </ErrorBoundary>
       </PostTagsWrapper>
-      <EditPostTag edit={state.edit} dispatch={dispatch} />
-      {/* Delete one post tag by clicking delete on the post tag's menu */}
-      <DeletePostTags
-        {...state.deleteTag}
-        onClose={() => dispatch({ type: "CLOSE_MENU_DELETE" })}
-        dispatch={dispatch}
-      />
-      {/* Delete multiple post tag(s) by selecting the post tags from the list and clicking the toolbar delete button */}
-      <DeletePostTags
-        open={state.deleteTags}
-        name={state.selectedTags[selectedTagsIds[0]]}
-        ids={selectedTagsIds}
-        onClose={() => dispatch({ type: "CLOSE_MULTI_DELETE" })}
-        dispatch={dispatch}
-      />
     </>
   );
 };
