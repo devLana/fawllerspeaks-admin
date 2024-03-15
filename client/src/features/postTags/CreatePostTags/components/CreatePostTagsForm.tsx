@@ -13,10 +13,11 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 import { usePostTagsPage } from "../../context/PostTagsPageContext";
 import CreatePostTagsInput from "./CreatePostTagsInput";
+import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
 import { createPostTagsValidator } from "../utils/createPostTagsValidator";
 import { refetchQueries } from "../utils/refetchQueries";
-import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
+import { SESSION_ID } from "@utils/constants";
 
 interface CreatePostTagsFormProps {
   onCloseDialog: () => void;
@@ -66,11 +67,13 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
       onCompleted(createData) {
         switch (createData.createPostTags.__typename) {
           case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void router.replace("/login?status=unauthenticated");
             break;
 
           case "UnknownError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void router.replace("/login?status=unauthorized");
             break;

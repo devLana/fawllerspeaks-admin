@@ -12,7 +12,7 @@ const useRefreshToken = () => {
   const [timer, setTimer] = React.useState(0);
   const [isOpen, setIsOpen] = React.useState(false);
   const refreshTokenTimerId = React.useRef<number>();
-  const router = useRouter();
+  const { replace, pathname } = useRouter();
 
   const client = useApolloClient();
 
@@ -35,14 +35,15 @@ const useRefreshToken = () => {
           break;
 
         case "AuthCookieError":
+          localStorage.removeItem(SESSION_ID);
           void client.clearStore();
-          void router.replace("/login?status=expired");
+          void replace(`/login?status=expired&redirectTo=${pathname}`);
           break;
 
         case "NotAllowedError":
           localStorage.removeItem(SESSION_ID);
           void client.clearStore();
-          void router.replace("/login?status=unauthorized");
+          void replace("/login?status=unauthorized");
           break;
 
         case "AccessToken":

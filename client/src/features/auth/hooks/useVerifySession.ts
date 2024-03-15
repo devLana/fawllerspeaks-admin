@@ -34,6 +34,7 @@ const useVerifySession = (handleRefreshToken: HandleRefreshToken) => {
 
   React.useEffect(() => {
     const sessionId = localStorage.getItem(SESSION_ID);
+    const regex = /^\/(login|forgot-password|reset-password|404|500)/;
 
     if (sessionId) {
       client
@@ -50,48 +51,41 @@ const useVerifySession = (handleRefreshToken: HandleRefreshToken) => {
               setErrorMessage(
                 "Current logged in session could not be verified"
               );
+
               setClientHasRendered(true);
               break;
 
             case "AuthCookieError":
-              void client.clearStore();
-
               if (pathname === "/login") {
                 setClientHasRendered(true);
               } else {
                 void replace("/login");
               }
+
+              void client.clearStore();
+              localStorage.removeItem(SESSION_ID);
               break;
 
-            case "NotAllowedError":
-              localStorage.removeItem(SESSION_ID);
-              void client.clearStore();
-
-              if (
-                pathname !== "/login" &&
-                pathname !== "/forgot-password" &&
-                pathname !== "/reset-password" &&
-                pathname !== "/404" &&
-                pathname !== "/500"
-              ) {
+            case "NotAllowedError": {
+              if (!regex.test(pathname)) {
                 void replace("/login");
               } else {
                 setClientHasRendered(true);
               }
+
+              localStorage.removeItem(SESSION_ID);
+              void client.clearStore();
               break;
+            }
 
             case "VerifiedSession": {
               const { __typename = "User", ...user } = data.verifySession.user;
+              const re = /^\/(login|forgot-password|reset-password|register)/;
 
               handleRefreshToken(data.verifySession.accessToken);
 
               if (user.isRegistered) {
-                if (
-                  pathname === "/login" ||
-                  pathname === "/forgot-password" ||
-                  pathname === "/reset-password" ||
-                  pathname === "/register"
-                ) {
+                if (re.test(pathname)) {
                   void replace("/");
                 } else {
                   setClientHasRendered(true);
@@ -117,25 +111,19 @@ const useVerifySession = (handleRefreshToken: HandleRefreshToken) => {
               err.graphQLErrors[0]?.message ??
               "Server is currently unreachable. Please try again later";
 
-            setClientHasRendered(true);
             setErrorMessage(message);
           } else {
-            setClientHasRendered(true);
             setErrorMessage(
               "An unexpected error has occurred while trying to verify your current session"
             );
           }
+
+          setClientHasRendered(true);
         });
     } else {
       void client.clearStore();
 
-      if (
-        pathname === "/login" ||
-        pathname === "/forgot-password" ||
-        pathname === "/reset-password" ||
-        pathname === "/404" ||
-        pathname === "/500"
-      ) {
+      if (regex.test(pathname)) {
         setClientHasRendered(true);
       } else {
         void replace("/login");

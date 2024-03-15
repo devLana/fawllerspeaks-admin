@@ -178,20 +178,8 @@ describe("Register User Page", () => {
       });
     });
 
-    describe("Redirect the user on user verification error", () => {
-      it.each(mocks.redirects1)("%s", async (_, path, mock) => {
-        const router = useRouter();
-        const { user } = renderUI(<RegisterUser />);
-
-        await dryEvents(user, mock.input);
-
-        await waitFor(() => expect(router.push).toHaveBeenCalledTimes(1));
-        expect(router.push).toHaveBeenCalledWith(path);
-      });
-    });
-
-    describe("User registered", () => {
-      it.each(mocks.redirects2)("%s", async (_, path, mock) => {
+    describe.each(mocks.redirects)("%s", (_, mockData) => {
+      it.each(mockData)("%s", async (__, path, mock) => {
         const router = useRouter();
         const { user } = renderUI(<RegisterUser />);
 

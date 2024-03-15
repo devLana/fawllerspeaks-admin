@@ -17,14 +17,20 @@ describe("Refresh expired user access token", () => {
   });
 
   describe("Refresh request failed with a user session error", () => {
-    it.each(mocks.redirects)("%s", async (_, status, sessionId) => {
-      const { replace } = useRouter();
+    afterAll(() => {
+      const router = useRouter();
+      router.pathname = "/";
+    });
+
+    it.each(mocks.redirects)("%s", async (_, { url, pathname }, sessionId) => {
+      const router = useRouter();
+      router.pathname = pathname;
 
       localStorage.setItem(SESSION_ID, sessionId);
       sessionTestRenderer();
 
-      await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-      expect(replace).toHaveBeenCalledWith(`/login?status=${status}`);
+      await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+      expect(router.replace).toHaveBeenCalledWith(url);
     });
   });
 

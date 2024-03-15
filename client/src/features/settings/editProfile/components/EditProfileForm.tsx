@@ -15,6 +15,7 @@ import EditProfileFileInput from "./EditProfileFileInput";
 import { EDIT_PROFILE } from "@features/settings/editProfile/operations/EDIT_PROFILE";
 import { editProfileValidator } from "@features/settings/editProfile/utils/editProfileValidator";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
+import { SESSION_ID } from "@utils/constants";
 import type { MutationEditProfileArgs } from "@apiTypes";
 import type { EditProfileFormProps, EditProfileImage, Status } from "@types";
 
@@ -107,11 +108,13 @@ const EditProfileForm = (props: EditProfileFormProps) => {
           }
 
           case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void router.replace("/login?status=unauthenticated");
             break;
 
           case "UnknownError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void router.replace("/login?status=unauthorized");
             break;

@@ -13,6 +13,7 @@ import PasswordInput from "@components/PasswordInput";
 import { CHANGE_PASSWORD } from "../operations/CHANGE_PASSWORD";
 import { changePasswordValidator } from "../utils/changePasswordValidator";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
+import { SESSION_ID } from "@utils/constants";
 import type { MutationChangePasswordArgs } from "@apiTypes";
 import type { RequestStatus } from "@types";
 
@@ -64,11 +65,13 @@ const ChangePasswordForm = ({ userEmail }: { userEmail: string }) => {
           }
 
           case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void replace("/login?status=unauthenticated");
             break;
 
           case "UnknownError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void replace("/login?status=unauthorized");
             break;

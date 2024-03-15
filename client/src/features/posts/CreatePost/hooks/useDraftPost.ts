@@ -6,6 +6,7 @@ import { useMutation } from "@apollo/client";
 import useUploadImage from "@hooks/useUploadImage";
 import { DRAFT_POST } from "../operations/DRAFT_POST";
 import { refetchQueries } from "../utils/refetchQueries";
+import { SESSION_ID } from "@utils/constants";
 import type { PostData, StateSetterFn, Status } from "@types";
 import type { MutationDraftPostArgs } from "@apiTypes";
 
@@ -52,6 +53,7 @@ export const useDraftPost = (
       onCompleted(draftData) {
         switch (draftData.draftPost.__typename) {
           case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void router.replace("/login?status=unauthenticated");
             break;
@@ -61,6 +63,7 @@ export const useDraftPost = (
             break;
 
           case "NotAllowedError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void router.replace("/login?status=unauthorized");
             break;

@@ -57,6 +57,7 @@ const LogoutModal = ({ isOpen, onCloseModal }: LogoutModalProps) => {
             break;
 
           case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
             handleClearRefreshTokenTimer();
             void client.clearStore();
             void replace("/login?status=unauthenticated");

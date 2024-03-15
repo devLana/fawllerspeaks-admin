@@ -22,7 +22,7 @@ type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
 
 const RegisterUserForm = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
-  const { replace, push } = useRouter();
+  const { replace } = useRouter();
 
   const [registerUser, { error, client }] = useMutation(REGISTER_USER);
 
@@ -75,13 +75,13 @@ const RegisterUserForm = () => {
           case "AuthenticationError":
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void push("/login?status=unauthenticated");
+            void replace("/login?status=unauthenticated");
             break;
 
           case "UnknownError":
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void push("/login?status=unauthorized");
+            void replace("/login?status=unauthorized");
             break;
 
           case "RegistrationError":

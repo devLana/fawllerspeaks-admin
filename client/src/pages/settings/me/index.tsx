@@ -28,7 +28,7 @@ const Me: NextPageWithLayout = () => {
         />
         <Stack>
           <Typography gutterBottom sx={{ wordBreak: "break-word" }}>
-            {user?.firstName ?? "Unknown"} {user?.lastName ?? "User"}
+            {user?.firstName} {user?.lastName}
           </Typography>
           <NextLink href="/settings/me/edit">Edit Profile</NextLink>
         </Stack>

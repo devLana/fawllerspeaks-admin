@@ -15,6 +15,7 @@ import DeletePostTagsTextFormatter from "./components/DeletePostTagsTextFormatte
 import { DELETE_POST_TAGS } from "./operations/DELETE_POST_TAGS";
 import { update } from "./utils/update";
 import { refetchQueries } from "./utils/refetchQueries";
+import { SESSION_ID } from "@utils/constants";
 import type { PostTagsListAction } from "@types";
 
 export interface DeletePostTagsProps {
@@ -54,11 +55,13 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
       onCompleted(data) {
         switch (data.deletePostTags.__typename) {
           case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void replace("/login?status=unauthenticated");
             break;
 
           case "NotAllowedError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void replace("/login?status=unauthorized");
             break;

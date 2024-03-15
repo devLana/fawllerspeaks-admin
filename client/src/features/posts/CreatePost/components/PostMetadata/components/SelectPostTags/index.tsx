@@ -6,6 +6,7 @@ import Skeleton from "@mui/material/Skeleton";
 
 import useGetPostTags from "@hooks/useGetPostTags";
 import SelectPostTagsInput from "./SelectPostTagsInput";
+import { SESSION_ID } from "@utils/constants";
 
 interface SelectPostTagsProps {
   tags?: string[];
@@ -54,6 +55,7 @@ const SelectPostTags = ({ tags = [], onSelectTags }: SelectPostTagsProps) => {
 
   switch (data.getPostTags.__typename) {
     case "AuthenticationError":
+      localStorage.removeItem(SESSION_ID);
       void client.clearStore();
       void replace("/login?status=unauthenticated");
 
@@ -64,6 +66,7 @@ const SelectPostTags = ({ tags = [], onSelectTags }: SelectPostTagsProps) => {
       );
 
     case "UnknownError":
+      localStorage.removeItem(SESSION_ID);
       void client.clearStore();
       void replace("/login?status=unauthorized");
 

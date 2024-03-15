@@ -5,6 +5,11 @@ import { setupServer } from "msw/node";
 import { REFRESH_TOKEN } from "../operations/REFRESH_TOKEN";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
+interface Redirects {
+  url: string;
+  pathname: string;
+}
+
 const accessToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGQ5ZTAzNC0xMWQxLTQ2ZjItOGRmNS1hMmVmOTQ4MDJkOWMiLCJpYXQiOjE2OTU4NDA2ODMsImV4cCI6MTY5NTg0MDY4M30.aiSxMDQYPhsKJ8n8Tfaq1ryJZrpjEwVbn1ADAepOWds";
 
@@ -82,10 +87,20 @@ const authCookie = mock("AUTH_COOKIE");
 const gql = mock("GRAPHQL_ERROR");
 const network = mock("NETWORK_ERROR");
 
-const msg = "Should redirect to the login page if the";
-export const redirects: [string, string, string][] = [
-  [`${msg} user session could not be verified`, "unauthorized", notAllowed],
-  [`${msg} user session has expired`, "expired", authCookie],
+export const redirects: [string, Redirects, string][] = [
+  [
+    "Should redirect to the login page if the user session could not be verified",
+    { url: "/login?status=unauthorized", pathname: "/" },
+    notAllowed,
+  ],
+  [
+    "Should redirect to the login page if the user session has expired",
+    {
+      url: "/login?status=expired&redirectTo=/post-tags",
+      pathname: "/post-tags",
+    },
+    authCookie,
+  ],
 ];
 
 const text = "Should display an alert message toast if the";

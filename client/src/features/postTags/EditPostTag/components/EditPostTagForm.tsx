@@ -15,6 +15,7 @@ import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
 import { editPostTagValidator } from "../utils/editPostTagValidator";
 import { refetchQueries } from "../utils/refetchQueries";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
+import { SESSION_ID } from "@utils/constants";
 import type { MutationEditPostTagArgs } from "@apiTypes";
 import type { PostTagsListAction } from "@types";
 
@@ -61,11 +62,13 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
       onCompleted(editData) {
         switch (editData.editPostTag.__typename) {
           case "AuthenticationError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void router.replace("/login?status=unauthenticated");
             break;
 
           case "NotAllowedError":
+            localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void router.replace("/login?status=unauthorized");
             break;

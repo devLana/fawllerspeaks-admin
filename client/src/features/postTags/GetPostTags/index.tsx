@@ -4,6 +4,7 @@ import useGetPostTags from "@hooks/useGetPostTags";
 import PostTags from "./components/PostTags";
 import PostTagsLoading from "./components/PostTagsLoading";
 import PostTagsTextContent from "./components/PostTagsTextContent";
+import { SESSION_ID } from "@utils/constants";
 
 const GetPostTags = () => {
   const { replace } = useRouter();
@@ -31,11 +32,13 @@ const GetPostTags = () => {
 
   switch (data.getPostTags.__typename) {
     case "AuthenticationError":
+      localStorage.removeItem(SESSION_ID);
       void client.clearStore();
       void replace("/login?status=unauthenticated");
       return <PostTagsLoading id={id} />;
 
     case "UnknownError":
+      localStorage.removeItem(SESSION_ID);
       void client.clearStore();
       void replace("/login?status=unauthorized");
       return <PostTagsLoading id={id} />;
