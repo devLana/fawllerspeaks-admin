@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from "@jest/globals";
+import { describe, expect, it, jest, beforeEach } from "@jest/globals";
 
 import createPostTags from "..";
 import spyDb from "@tests/spyDb";
@@ -14,6 +14,11 @@ import {
   testWarn,
   testDuplicate,
 } from "../utils/createPostTags.testUtils";
+import deleteSession from "@utils/deleteSession";
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
+});
 
 beforeEach(() => {
   mockContext.user = "logged_In_User_Id";
@@ -26,6 +31,7 @@ describe("Test createPostTags resolver", () => {
 
       const result = await createPostTags({}, { tags }, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to create post tags");
       expect(result).toHaveProperty("status", "ERROR");
     });

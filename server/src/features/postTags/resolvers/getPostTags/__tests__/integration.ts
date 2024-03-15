@@ -1,9 +1,14 @@
-import { it, describe, expect, beforeEach } from "@jest/globals";
+import { it, describe, expect, beforeEach, jest } from "@jest/globals";
 
 import getPostTags from "..";
 import spyDb from "@tests/spyDb";
 import { info, mockContext } from "@tests/resolverArguments";
 import { tags, verifyUser } from "../utils/getPostTags.testUtils";
+import deleteSession from "@utils/deleteSession";
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
+});
 
 beforeEach(() => {
   mockContext.user = "logged_in_user_id";
@@ -16,6 +21,7 @@ describe("Test getPostTags resolver", () => {
 
       const result = await getPostTags({}, {}, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to get post tags");
       expect(result).toHaveProperty("status", "ERROR");
     });

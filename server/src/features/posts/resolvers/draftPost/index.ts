@@ -18,6 +18,7 @@ import getPostUrl from "@features/posts/utils/getPostUrl";
 
 import { draftPostSchema as schema } from "./utils/draftPost.validator";
 import generateErrorsObject from "@utils/generateErrorsObject";
+import deleteSession from "@utils/deleteSession";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc, PostDBData, ValidationErrorObject } from "@types";
@@ -30,13 +31,14 @@ interface User {
   image: string | null;
 }
 
-const draftPost: DraftPost = async (_, { post }, { db, user }) => {
-  if (!user) {
-    if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
-    return new AuthenticationError("Unable to save post to draft");
-  }
-
+const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
   try {
+    if (!user) {
+      await deleteSession(db, req, res);
+      if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
+      return new AuthenticationError("Unable to save post to draft");
+    }
+
     const validated = await schema.validateAsync(post, { abortEarly: false });
     const { title, description, content, tags, imageBanner } = validated;
 
@@ -63,6 +65,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user }) => {
     ]);
 
     if (foundUser.length === 0) {
+      await deleteSession(db, req, res);
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new NotAllowedError("Unable to save post to draft");
     }

@@ -15,17 +15,20 @@ import {
 
 import type { ResolverFunc } from "@types";
 import type { MutationResolvers, PostTag } from "@resolverTypes";
+import deleteSession from "@utils/deleteSession";
 
 type CreatePostTags = ResolverFunc<MutationResolvers["createPostTags"]>;
 
-const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
+const createPostTags: CreatePostTags = async (_, { tags }, ctx) => {
+  const { user, db, req, res } = ctx;
   const tagOrTags = tags.length > 1 ? "tags" : "tag";
 
-  if (!user) {
-    return new AuthenticationError(`Unable to create post ${tagOrTags}`);
-  }
-
   try {
+    if (!user) {
+      await deleteSession(db, req, res);
+      return new AuthenticationError(`Unable to create post ${tagOrTags}`);
+    }
+
     const validatedTags = await createPostTagsValidator.validateAsync(tags, {
       abortEarly: false,
     });
@@ -47,6 +50,7 @@ const createPostTags: CreatePostTags = async (_, { tags }, { user, db }) => {
     );
 
     if (foundUser.length === 0) {
+      await deleteSession(db, req, res);
       return new UnknownError(`Unable to create post ${tagOrTags}`);
     }
 

@@ -11,6 +11,7 @@ import {
   UnknownError,
 } from "@utils/ObjectTypes";
 import generateErrorsObject from "@utils/generateErrorsObject";
+import deleteSession from "@utils/deleteSession";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";
@@ -28,16 +29,18 @@ interface UserInfo {
   image: string | null;
 }
 
-const editProfile: EditProfile = async (_, args, { db, user }) => {
+const editProfile: EditProfile = async (_, args, { db, user, req, res }) => {
   try {
     if (!user) {
       if (args.image) supabaseEvent.emit("removeImage", args.image);
+      await deleteSession(db, req, res);
       return new AuthenticationError("Unable to edit user profile");
     }
 
     const validated = await editProfileValidator.validateAsync(args, {
       abortEarly: false,
     });
+
     const { firstName, lastName, image } = validated;
 
     const { rows } = await db.query<SelectUSerInfo>(
@@ -47,6 +50,7 @@ const editProfile: EditProfile = async (_, args, { db, user }) => {
 
     if (rows.length === 0) {
       if (image) supabaseEvent.emit("removeImage", image);
+      await deleteSession(db, req, res);
       return new UnknownError("Unable to edit user profile");
     }
 

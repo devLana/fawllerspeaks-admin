@@ -6,22 +6,27 @@ import {
   RegistrationError,
   UnknownError,
 } from "@utils/ObjectTypes";
+import deleteSession from "@utils/deleteSession";
 
 import type { QueryResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
 
 type GetPostTags = ResolverFunc<QueryResolvers["getPostTags"]>;
 
-const getPostTags: GetPostTags = async (_, __, { db, user }) => {
-  if (!user) return new AuthenticationError("Unable to get post tags");
-
+const getPostTags: GetPostTags = async (_, __, { db, user, req, res }) => {
   try {
+    if (!user) {
+      await deleteSession(db, req, res);
+      return new AuthenticationError("Unable to get post tags");
+    }
+
     const { rows: findUser } = await db.query<{ isRegistered: boolean }>(
       `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
       [user]
     );
 
     if (findUser.length === 0) {
+      await deleteSession(db, req, res);
       return new UnknownError("Unable to get post tags");
     }
 

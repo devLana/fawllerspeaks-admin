@@ -17,13 +17,17 @@ import { formatTagName } from "@features/postTags/utils/formatTagName";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc, ValidationErrorObject } from "@types";
+import deleteSession from "@utils/deleteSession";
 
 type EditPostTag = ResolverFunc<MutationResolvers["editPostTag"]>;
 
-const editPostTag: EditPostTag = async (_, args, { db, user }) => {
-  if (!user) return new AuthenticationError("Unable to edit post tag");
-
+const editPostTag: EditPostTag = async (_, args, { db, user, req, res }) => {
   try {
+    if (!user) {
+      await deleteSession(db, req, res);
+      return new AuthenticationError("Unable to edit post tag");
+    }
+
     const { name, tagId } = await editPostTagValidator.validateAsync(args, {
       abortEarly: false,
     });
@@ -34,6 +38,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user }) => {
     );
 
     if (findUser.length === 0) {
+      await deleteSession(db, req, res);
       return new NotAllowedError("Unable to edit post tag");
     }
 

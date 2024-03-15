@@ -10,6 +10,7 @@ import {
 
 import logout from "..";
 
+import deleteSession from "@utils/deleteSession";
 import { clearCookies } from "@features/auth/utils/cookies";
 import { validations } from "../utils/logout.testUtils";
 import spyDb from "@tests/spyDb";
@@ -24,6 +25,10 @@ jest.mock("@features/auth/utils/cookies", () => {
     ...mod,
     clearCookies: jest.fn().mockName("clearCookies"),
   };
+});
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
 });
 
 const cookies = { auth: "auth", sig: "sig", token: "token" };
@@ -45,6 +50,7 @@ describe("Test logout resolver", () => {
 
       const result = await logout({}, { sessionId }, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(clearCookies).not.toHaveBeenCalled();
       expect(result).toHaveProperty("message", "Unable to logout");
       expect(result).toHaveProperty("status", "ERROR");

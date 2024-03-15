@@ -16,6 +16,7 @@ import {
   validations,
   verifyUser,
 } from "../utils/changePassword.testUtils";
+import deleteSession from "@utils/deleteSession";
 import { MailError } from "@utils/Errors";
 import spyDb from "@tests/spyDb";
 import { mockContext, info } from "@tests/resolverArguments";
@@ -24,6 +25,10 @@ let hash = "";
 
 jest.mock("../utils/changePasswordMail", () => {
   return jest.fn().mockName("changePasswordMail");
+});
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
 });
 
 beforeAll(async () => {
@@ -41,6 +46,7 @@ describe("Test change password resolver", () => {
 
       const result = await changePassword({}, args, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(changePasswordMail).not.toHaveBeenCalled();
       expect(result).toHaveProperty("message", "Unable to change password");
       expect(result).toHaveProperty("status", "ERROR");

@@ -1,4 +1,4 @@
-import { it, describe, expect, beforeEach } from "@jest/globals";
+import { it, describe, expect, beforeEach, jest } from "@jest/globals";
 
 import editPostTag from "..";
 import { info, mockContext } from "@tests/resolverArguments";
@@ -14,6 +14,11 @@ import {
   validations,
   verifyUser,
 } from "../utils/editPostTag.testUtils";
+import deleteSession from "@utils/deleteSession";
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
+});
 
 beforeEach(() => {
   mockContext.user = "logged_in_user_id";
@@ -26,6 +31,7 @@ describe("Test edit post tag resolver", () => {
 
       const result = await editPostTag({}, tag, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to edit post tag");
       expect(result).toHaveProperty("status", "ERROR");
     });

@@ -7,6 +7,7 @@ import getPostTags from "@features/posts/utils/getPostTags";
 import * as mocks from "../utils/draftPost.testUtils";
 
 import { urls } from "@utils/ClientUrls";
+import deleteSession from "@utils/deleteSession";
 import { mockContext, info } from "@tests/resolverArguments";
 import spyDb from "@tests/spyDb";
 
@@ -14,6 +15,10 @@ type MockType = jest.MockedFunction<() => mocks.Tags | null>;
 
 jest.mock("@features/posts/utils/getPostTags", () => {
   return jest.fn().mockName("getPostTags");
+});
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
 });
 
 jest.mock("@lib/supabase/supabaseEvent");
@@ -37,6 +42,7 @@ describe("Test draft post resolver", () => {
 
       const result = await draftPost({}, { post }, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to save post to draft");
       expect(result).toHaveProperty("status", "ERROR");
     });

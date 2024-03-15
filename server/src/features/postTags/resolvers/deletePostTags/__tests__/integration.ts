@@ -1,7 +1,7 @@
 // import { Worker } from "node:worker_threads";
 
 // import { describe, expect, it, beforeEach, jest } from "@jest/globals";
-import { describe, expect, it, beforeEach } from "@jest/globals";
+import { describe, expect, it, beforeEach, jest } from "@jest/globals";
 
 import deletePostTags from "..";
 // import deletePostTagsWorker from "../deletePostTagsWorker";
@@ -17,6 +17,11 @@ import {
 } from "../utils/deletePostTags.testUtils";
 import spyDb from "@tests/spyDb";
 import { mockContext, info } from "@tests/resolverArguments";
+import deleteSession from "@utils/deleteSession";
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
+});
 
 // jest.mock("../deletePostTagsWorker");
 // jest.mock("node:worker_threads");
@@ -40,6 +45,7 @@ describe("Test delete post tags resolver", () => {
       // expect(Worker).not.toHaveBeenCalled();
       // expect(deletePostTagsWorker).not.toHaveBeenCalled();
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to delete post tags");
       expect(result).toHaveProperty("status", "ERROR");
     });

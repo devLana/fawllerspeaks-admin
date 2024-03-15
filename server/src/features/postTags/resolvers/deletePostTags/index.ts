@@ -18,17 +18,20 @@ import {
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
+import deleteSession from "@utils/deleteSession";
 
 type DeletePostTags = ResolverFunc<MutationResolvers["deletePostTags"]>;
 
-const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
+const deletePostTags: DeletePostTags = async (_, { tagIds }, ctx) => {
+  const { db, user, req, res } = ctx;
   const tagOrTags = tagIds.length > 1 ? "tags" : "tag";
 
-  if (!user) {
-    return new AuthenticationError(`Unable to delete post ${tagOrTags}`);
-  }
-
   try {
+    if (!user) {
+      await deleteSession(db, req, res);
+      return new AuthenticationError(`Unable to delete post ${tagOrTags}`);
+    }
+
     const validatedTagIds = await schema.validateAsync(tagIds, {
       abortEarly: false,
     });
@@ -39,6 +42,7 @@ const deletePostTags: DeletePostTags = async (_, { tagIds }, { db, user }) => {
     );
 
     if (findUser.length === 0) {
+      await deleteSession(db, req, res);
       return new NotAllowedError(`Unable to delete post ${tagOrTags}`);
     }
 

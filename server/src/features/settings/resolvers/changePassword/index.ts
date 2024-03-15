@@ -15,6 +15,7 @@ import {
 } from "@utils/ObjectTypes";
 import { MailError } from "@utils/Errors";
 import generateErrorsObject from "@utils/generateErrorsObject";
+import deleteSession from "@utils/deleteSession";
 
 import { type MutationResolvers } from "@resolverTypes";
 import type { ValidationErrorObject, ResolverFunc } from "@types";
@@ -27,15 +28,20 @@ interface User {
   password: string;
 }
 
-const changePassword: ChangePassword = async (_, args, { db, user }) => {
-  if (!user) return new AuthenticationError("Unable to change password");
-
+const changePassword: ChangePassword = async (_, args, ctx) => {
+  const { db, user, req, res } = ctx;
   let currentPassword: string | null = null;
 
   try {
+    if (!user) {
+      await deleteSession(db, req, res);
+      return new AuthenticationError("Unable to change password");
+    }
+
     const validate = await changePasswordValidator.validateAsync(args, {
       abortEarly: false,
     });
+
     const { newPassword } = validate;
     ({ currentPassword } = validate);
 
@@ -44,7 +50,10 @@ const changePassword: ChangePassword = async (_, args, { db, user }) => {
       [user]
     );
 
-    if (rows.length === 0) return new UnknownError("Unable to change password");
+    if (rows.length === 0) {
+      await deleteSession(db, req, res);
+      return new UnknownError("Unable to change password");
+    }
 
     if (!rows[0].isRegistered) {
       return new RegistrationError("Unable to change password");

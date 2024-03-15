@@ -18,8 +18,13 @@ import {
   validations,
   verify,
 } from "../utils/editProfile.testUtils";
+import deleteSession from "@utils/deleteSession";
 
 jest.mock("@lib/supabase/supabaseEvent");
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
+});
 
 const mockEvent = jest.spyOn(supabaseEvent, "emit");
 mockEvent.mockImplementation(() => true);
@@ -39,6 +44,7 @@ describe("Test edit profile resolver", () => {
 
       const result = await editProfile({}, args, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to edit user profile");
       expect(result).toHaveProperty("status", "ERROR");
     });
