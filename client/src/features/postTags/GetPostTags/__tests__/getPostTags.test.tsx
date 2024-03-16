@@ -21,15 +21,16 @@ describe("View/Get post tags", () => {
   });
 
   describe("Api response redirects the user to an authentication page", () => {
-    it.each(mocks.redirects)("%s", async (_, path, resolver) => {
-      mocks.server.use(graphql.query("GetPostTags", resolver));
+    it.each(mocks.redirects)("%s", async (_, { pathname, url }, resolver) => {
+      const router = useRouter();
 
+      router.pathname = pathname;
+      mocks.server.use(graphql.query("GetPostTags", resolver));
       renderUI(<PostTagsPage />);
-      const { replace } = useRouter();
 
       expect(screen.getByRole("progressbar")).toBeInTheDocument();
-      await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-      expect(replace).toHaveBeenCalledWith(path);
+      await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+      expect(router.replace).toHaveBeenCalledWith(url);
       expect(screen.getByRole("progressbar")).toBeInTheDocument();
     });
   });

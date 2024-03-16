@@ -14,7 +14,7 @@ interface SelectPostTagsProps {
 }
 
 const SelectPostTags = ({ tags = [], onSelectTags }: SelectPostTagsProps) => {
-  const { replace } = useRouter();
+  const { replace, pathname } = useRouter();
 
   const client = useApolloClient();
   const { data, error, loading } = useGetPostTags();
@@ -57,7 +57,7 @@ const SelectPostTags = ({ tags = [], onSelectTags }: SelectPostTagsProps) => {
     case "AuthenticationError":
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
-      void replace("/login?status=unauthenticated");
+      void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
 
       return (
         <Skeleton variant="rounded" width="100%" sx={skeletonSx}>
@@ -77,7 +77,7 @@ const SelectPostTags = ({ tags = [], onSelectTags }: SelectPostTagsProps) => {
       );
 
     case "RegistrationError":
-      void replace("/register?status=unregistered");
+      void replace(`/register?status=unregistered&redirectTo=${pathname}`);
 
       return (
         <Skeleton variant="rounded" width="100%" sx={skeletonSx}>

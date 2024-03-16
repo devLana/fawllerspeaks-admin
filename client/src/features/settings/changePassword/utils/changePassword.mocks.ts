@@ -5,6 +5,11 @@ import { setupServer } from "msw/node";
 import { CHANGE_PASSWORD } from "../operations/CHANGE_PASSWORD";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
+interface Redirects {
+  url: string;
+  pathname: string;
+}
+
 const passwordStr = (prefix: string) => `${prefix}_N3w_p@55w0rD`;
 
 export const currentPassword = "us3r_currenT_P@ssw0rd";
@@ -90,24 +95,29 @@ const gql = mock("graphql", gqlErrorMsg);
 const network = mock("network", message);
 const unsupported = mock("unsupported", message);
 
-export const redirects: [string, [string, string], ReturnType<typeof mock>][] =
+export const redirects: [string, Redirects, ReturnType<typeof mock>][] = [
   [
-    [
-      "Should redirect the user to the login page if the user is not logged in",
-      ["/login", "unauthenticated"],
-      auth,
-    ],
-    [
-      "Should redirect the user to the register page if the user is unregistered",
-      ["/register", "unregistered"],
-      register,
-    ],
-    [
-      "Should redirect the user to the login page if the user could not be verified",
-      ["/login", "unauthorized"],
-      unknown,
-    ],
-  ];
+    "Should redirect the user to the login page if the user is not logged in",
+    {
+      url: "/login?status=unauthenticated&redirectTo=/posts",
+      pathname: "/posts",
+    },
+    auth,
+  ],
+  [
+    "Should redirect the user to the register page if the user is unregistered",
+    {
+      url: "/register?status=unregistered&redirectTo=/settings",
+      pathname: "/settings",
+    },
+    register,
+  ],
+  [
+    "Should redirect the user to the login page if the user could not be verified",
+    { url: "/login?status=unauthorized", pathname: "/post-tags" },
+    unknown,
+  ],
+];
 
 const text = "Should display an alert toast if the";
 export const alerts: [string, [string, ReturnType<typeof mock<string>>][]][] = [

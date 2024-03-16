@@ -6,6 +6,11 @@ import { DRAFT_POST } from "../operations/DRAFT_POST";
 import { mswData, mswErrors } from "@utils/tests/msw";
 import { testPostTag } from "@features/postTags/utils/testPostTag";
 
+interface Redirects {
+  pathname: string;
+  url: string;
+}
+
 export const draftBtn = { name: /^save as draft$/i };
 export const regex = /^Select Post Image Banner$/i;
 export const main = { name: /^title$/i };
@@ -102,21 +107,27 @@ const unsupported = mock("unsupported", MESSAGE);
 const network = mock("network", MESSAGE);
 const gql = mock("graphql", gqlMsg);
 
-export const redirects: [string, ReturnType<typeof mock>, string][] = [
+export const redirects: [string, ReturnType<typeof mock>, Redirects][] = [
   [
     "Should redirect the user to the login page if the user is not logged in",
     auth,
-    "/login?status=unauthenticated",
+    {
+      url: "/login?status=unauthenticated&redirectTo=/settings/edit/me",
+      pathname: "/settings/edit/me",
+    },
   ],
   [
     "Should redirect the user to the login page if the user could not be verified",
     notAllowed,
-    "/login?status=unauthorized",
+    { url: "/login?status=unauthorized", pathname: "/" },
   ],
   [
     "Should redirect the user to the registration page if the user's account is not registered",
     unregister,
-    "/register?status=unregistered",
+    {
+      url: "/register?status=unregistered&redirectTo=/post-tags",
+      pathname: "/post-tags",
+    },
   ],
 ];
 

@@ -7,6 +7,11 @@ import { mswData, mswErrors, type TypeNames } from "@utils/tests/msw";
 
 type Typename = TypeNames<"getPostTags">;
 
+interface Redirects {
+  url: string;
+  pathname: string;
+}
+
 interface Res {
   data?: object;
   errors?: object[];
@@ -41,20 +46,26 @@ const dataCb = (typename: Typename, data: object = {}) => {
 };
 
 type MswData = ReturnType<typeof mswData<"getPostTags">>;
-export const redirects: [string, string, () => MswData][] = [
+export const redirects: [string, Redirects, () => MswData][] = [
   [
     "Should redirect to the login page if the user is not logged in",
-    "/login?status=unauthenticated",
+    {
+      url: "/login?status=unauthenticated&redirectTo=/posts/new",
+      pathname: "/posts/new",
+    },
     dataCb("AuthenticationError"),
   ],
   [
     "Should redirect to the login page if the user could not be verified",
-    "/login?status=unauthorized",
+    { url: "/login?status=unauthorized", pathname: "/posts" },
     dataCb("UnknownError"),
   ],
   [
     "Should redirect to the registration page if the user is not registered",
-    "/register?status=unregistered",
+    {
+      url: "/register?status=unregistered&redirectTo=/post-tags",
+      pathname: "/post-tags",
+    },
     dataCb("RegistrationError"),
   ],
 ];

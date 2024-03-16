@@ -7,7 +7,7 @@ import PostTagsTextContent from "./components/PostTagsTextContent";
 import { SESSION_ID } from "@utils/constants";
 
 const GetPostTags = () => {
-  const { replace } = useRouter();
+  const { replace, pathname } = useRouter();
 
   const { data, loading, error, client } = useGetPostTags();
 
@@ -34,7 +34,7 @@ const GetPostTags = () => {
     case "AuthenticationError":
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
-      void replace("/login?status=unauthenticated");
+      void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
       return <PostTagsLoading id={id} />;
 
     case "UnknownError":
@@ -44,7 +44,7 @@ const GetPostTags = () => {
       return <PostTagsLoading id={id} />;
 
     case "RegistrationError":
-      void replace("/register?status=unregistered");
+      void replace(`/register?status=unregistered&redirectTo=${pathname}`);
       return <PostTagsLoading id={id} />;
 
     case "PostTags":

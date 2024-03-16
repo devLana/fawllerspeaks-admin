@@ -22,7 +22,7 @@ type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
 
 const RegisterUserForm = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
-  const { replace } = useRouter();
+  const { replace, query } = useRouter();
 
   const [registerUser, { error, client }] = useMutation(REGISTER_USER);
 
@@ -88,9 +88,20 @@ const RegisterUserForm = () => {
             void replace("/?status=registered");
             break;
 
-          case "RegisteredUser":
-            void replace("/");
+          case "RegisteredUser": {
+            const { redirectTo } = query;
+
+            const regex =
+              /^\/?(register|login|forgot-password|reset-password|404|500)/;
+
+            if (typeof redirectTo === "string" && !regex.test(redirectTo)) {
+              void replace(redirectTo);
+            } else {
+              void replace("/");
+            }
+
             break;
+          }
 
           default:
             setFormStatus("error");

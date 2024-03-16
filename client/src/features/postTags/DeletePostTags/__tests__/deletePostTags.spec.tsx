@@ -24,12 +24,14 @@ describe("Delete post tags", () => {
     const { deleteBtn1, deleteMenuItem, wrapper, name } = mocks;
 
     // Attempt the delete operation through each 'post tag menu'
-    it.each(mocks.redirects)("%s", async (_, path, mock) => {
+    it.each(mocks.redirects)("%s", async (_, { pathname, url }, mock) => {
       const [tagName] = mock.tagNames;
+      const router = useRouter();
+
+      router.pathname = pathname;
       mocks.server.use(graphql.query("GetPostTags", mock.resolver));
 
       const { user } = renderUI(<PostTagsPage />);
-      const { replace } = useRouter();
 
       await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
 
@@ -46,8 +48,8 @@ describe("Delete post tags", () => {
 
       expect(within(modal).getByRole("button", deleteBtn1)).toBeDisabled();
       expect(within(modal).getByRole("button", mocks.cancelBtn)).toBeDisabled();
-      await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-      expect(replace).toHaveBeenCalledWith(path);
+      await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+      expect(router.replace).toHaveBeenCalledWith(url);
       expect(within(modal).getByRole("button", deleteBtn1)).toBeDisabled();
       expect(within(modal).getByRole("button", mocks.cancelBtn)).toBeDisabled();
     });

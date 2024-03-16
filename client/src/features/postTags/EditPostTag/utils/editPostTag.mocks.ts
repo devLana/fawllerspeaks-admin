@@ -6,6 +6,11 @@ import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
 import { testPostTag } from "../../utils/testPostTag";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
+interface Redirects {
+  pathname: string;
+  url: string;
+}
+
 const nameStr = (prefix: string) => `${prefix} post tag`;
 export const tagName = "Post tag";
 const tagId = "tag-id-1";
@@ -119,20 +124,26 @@ export const resolver = () => {
   return mswData("getPostTags", "PostTags", { tags: [tag] });
 };
 
-export const redirects: [string, string, Mock][] = [
+export const redirects: [string, Redirects, Mock][] = [
   [
     "Should redirect to the registration page if the user is not registered",
-    "/register?status=unregistered",
+    {
+      url: "/register?status=unregistered&redirectTo=/post-tags",
+      pathname: "/post-tags",
+    },
     unregister,
   ],
   [
     "Should redirect to the login page if the user is not logged in",
-    "/login?status=unauthenticated",
+    {
+      url: "/login?status=unauthenticated&redirectTo=/posts/new",
+      pathname: "/posts/new",
+    },
     auth,
   ],
   [
     "Should redirect to the login page if the user could not be verified",
-    "/login?status=unauthorized",
+    { url: "/login?status=unauthorized", pathname: "posts" },
     notAllowed,
   ],
 ];

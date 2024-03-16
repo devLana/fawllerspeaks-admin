@@ -81,9 +81,11 @@ describe("Edit a post tag", () => {
     });
 
     describe("Redirect the user to an authentication page", () => {
-      it.each(mocks.redirects)("%s", async (_, path, mock) => {
+      it.each(mocks.redirects)("%s", async (_, { pathname, url }, mock) => {
+        const router = useRouter();
+        router.pathname = pathname;
+
         const { user } = renderUI(<PostTagsPage />);
-        const { replace } = useRouter();
 
         await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
         await user.hover(screen.getByLabelText(wrapper));
@@ -102,8 +104,8 @@ describe("Edit a post tag", () => {
 
         expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
-        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-        expect(replace).toHaveBeenCalledWith(path);
+        await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+        expect(router.replace).toHaveBeenCalledWith(url);
         expect(within(modal).getByRole("button", editBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", cancelBtn)).toBeDisabled();
       });

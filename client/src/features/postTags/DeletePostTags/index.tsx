@@ -29,7 +29,7 @@ export interface DeletePostTagsProps {
 const DeletePostTags = (props: DeletePostTagsProps) => {
   const { open, name, ids, onClose, dispatch } = props;
   const [isLoading, setIsLoading] = React.useState(false);
-  const { replace } = useRouter();
+  const { replace, pathname } = useRouter();
 
   const [deleteTags, { client }] = useMutation(DELETE_POST_TAGS);
 
@@ -57,7 +57,9 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
           case "AuthenticationError":
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void replace("/login?status=unauthenticated");
+            void replace(
+              `/login?status=unauthenticated&redirectTo=${pathname}`
+            );
             break;
 
           case "NotAllowedError":
@@ -67,7 +69,9 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
             break;
 
           case "RegistrationError":
-            void replace("/register?status=unregistered");
+            void replace(
+              `/register?status=unregistered&redirectTo=${pathname}`
+            );
             break;
 
           case "DeletePostTagsValidationError":

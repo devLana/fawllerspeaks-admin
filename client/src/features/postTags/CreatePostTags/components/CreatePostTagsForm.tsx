@@ -69,7 +69,9 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
           case "AuthenticationError":
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void router.replace("/login?status=unauthenticated");
+            void router.replace(
+              `/login?status=unauthenticated&redirectTo=${router.pathname}`
+            );
             break;
 
           case "UnknownError":
@@ -79,7 +81,9 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
             break;
 
           case "RegistrationError":
-            void router.replace("/register?status=unregistered");
+            void router.replace(
+              `/register?status=unregistered&redirectTo=${router.pathname}`
+            );
             break;
 
           case "CreatePostTagsValidationError":

@@ -7,6 +7,11 @@ import { testPostTag } from "../../utils/testPostTag";
 import { mswData, mswErrors } from "@utils/tests/msw";
 import type { PostTagData } from "@types";
 
+interface Redirects {
+  pathname: string;
+  url: string;
+}
+
 export const deleteMenuItem = { name: /^delete$/i };
 export const dialog1 = { name: /^Delete post tag$/i };
 export const dialog2 = { name: /^Delete post tags$/i };
@@ -14,6 +19,7 @@ export const deleteBtn1 = { name: /^Delete Tag$/i };
 export const deleteBtn2 = { name: /^Delete Tags$/i };
 export const selectAll = { name: /^select all post tags$/i };
 export const deselectAll = { name: /^deselect all post tags$/i };
+
 export const cancelBtn = { name: /^cancel$/i };
 
 export const wrapper = (tagName: string) => {
@@ -148,24 +154,29 @@ export const server = setupServer(
   })
 );
 
-export const redirects: [string, string, ReturnType<typeof mock<undefined>>][] =
+export const redirects: [string, Redirects, ReturnType<typeof mock>][] = [
   [
-    [
-      "Should redirect to the login page if the user is not logged in",
-      "/login?status=unauthenticated",
-      auth,
-    ],
-    [
-      "Should redirect to the login page if the user could not be verified",
-      "/login?status=unauthorized",
-      notAllowed,
-    ],
-    [
-      "Should redirect to the registration page if the user is not registered",
-      "/register?status=unregistered",
-      unregister,
-    ],
-  ];
+    "Should redirect to the login page if the user is not logged in",
+    {
+      url: "/login?status=unauthenticated&redirectTo=/posts",
+      pathname: "/posts",
+    },
+    auth,
+  ],
+  [
+    "Should redirect to the login page if the user could not be verified",
+    { url: "/login?status=unauthorized", pathname: "/settings/me/edit" },
+    notAllowed,
+  ],
+  [
+    "Should redirect to the registration page if the user is not registered",
+    {
+      url: "/register?status=unregistered&redirectTo=/posts/edit",
+      pathname: "/posts/edit",
+    },
+    unregister,
+  ],
+];
 
 const text = "Should display an alert message toast if the api";
 export const alerts: [string, ReturnType<typeof mock<string>>][] = [

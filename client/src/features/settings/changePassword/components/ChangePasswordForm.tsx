@@ -19,7 +19,7 @@ import type { RequestStatus } from "@types";
 
 const ChangePasswordForm = ({ userEmail }: { userEmail: string }) => {
   const [formStatus, setFormStatus] = React.useState<RequestStatus>("idle");
-  const { replace } = useRouter();
+  const { replace, pathname } = useRouter();
 
   const [password, { data, error, client }] = useMutation(CHANGE_PASSWORD);
 
@@ -67,7 +67,9 @@ const ChangePasswordForm = ({ userEmail }: { userEmail: string }) => {
           case "AuthenticationError":
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void replace("/login?status=unauthenticated");
+            void replace(
+              `/login?status=unauthenticated&redirectTo=${pathname}`
+            );
             break;
 
           case "UnknownError":
@@ -77,7 +79,9 @@ const ChangePasswordForm = ({ userEmail }: { userEmail: string }) => {
             break;
 
           case "RegistrationError":
-            void replace("/register?status=unregistered");
+            void replace(
+              `/register?status=unregistered&redirectTo=${pathname}`
+            );
             break;
 
           case "NotAllowedError":

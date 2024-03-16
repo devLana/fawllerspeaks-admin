@@ -64,7 +64,9 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
           case "AuthenticationError":
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void router.replace("/login?status=unauthenticated");
+            void router.replace(
+              `/login?status=unauthenticated&redirectTo=${router.pathname}`
+            );
             break;
 
           case "NotAllowedError":
@@ -74,7 +76,9 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
             break;
 
           case "RegistrationError":
-            void router.replace("/register?status=unregistered");
+            void router.replace(
+              `/register?status=unregistered&redirectTo=${router.pathname}`
+            );
             break;
 
           case "EditPostTagValidationError": {

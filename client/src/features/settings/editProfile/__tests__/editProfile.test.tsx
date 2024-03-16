@@ -122,8 +122,10 @@ describe("Edit Profile", () => {
     });
 
     describe("Redirect the user to an authentication page", () => {
-      it.each(mocks.redirects)("%s", async (_, mock, path) => {
-        const { replace } = useRouter();
+      it.each(mocks.redirects)("%s", async (_, mock, { url, pathname }) => {
+        const router = useRouter();
+        router.pathname = pathname;
+
         const { user } = renderUI(<EditMe />);
         const firstName = screen.getByRole("textbox", fName);
         const lastName = screen.getByRole("textbox", lName);
@@ -133,8 +135,8 @@ describe("Edit Profile", () => {
         await user.click(screen.getByRole("button", { name: /^edit$/i }));
 
         expect(screen.getByRole("button", { name: /^edit$/i })).toBeDisabled();
-        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-        expect(replace).toHaveBeenCalledWith(path);
+        await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+        expect(router.replace).toHaveBeenCalledWith(url);
         expect(screen.getByRole("button", { name: /^edit$/i })).toBeDisabled();
       });
     });

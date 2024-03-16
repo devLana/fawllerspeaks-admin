@@ -13,6 +13,11 @@ export const textBox = { name: /^post tag$/i };
 export const addMoreBtn = { name: /^add more$/i };
 export const saveBtn = { name: /^Create tags$/i };
 
+interface Redirects {
+  pathname: string;
+  url: string;
+}
+
 const tagsError = "Post tags input must be an array";
 const message = "Duplicate post tags error message";
 const gqlMsg = "Unable to create post tags. Please try again later";
@@ -107,20 +112,26 @@ export const server = setupServer(
   })
 );
 
-export const redirects: [string, string, Mock][] = [
+export const redirects: [string, Redirects, Mock][] = [
   [
     "Should redirect to the login page if the user is not logged in",
-    "/login?status=unauthenticated",
+    {
+      url: "/login?status=unauthenticated&redirectTo=/settings/password",
+      pathname: "/settings/password",
+    },
     auth,
   ],
   [
     "Should redirect to the login page if the user could not be verified",
-    "/login?status=unauthorized",
+    { url: "/login?status=unauthorized", pathname: "/post-tags" },
     unknown,
   ],
   [
     "Should redirect to the register page if the user is unregistered",
-    "/register?status=unregistered",
+    {
+      url: "/register?status=unregistered&redirectTo=/posts/new",
+      pathname: "/posts/new",
+    },
     unregister,
   ],
 ];

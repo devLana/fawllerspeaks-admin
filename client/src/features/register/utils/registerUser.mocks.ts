@@ -109,29 +109,43 @@ export const alerts: [string, Mock<string>][] = [
   [`${text} responded with an unsupported object type`, unsupported],
 ];
 
-export const redirects: [string, [string, string, Mock][]][] = [
+export const errorRedirects: [string, string, Mock][] = [
   [
-    "Redirect the user on user verification error",
-    [
-      [
-        "Should redirect the user to the login page if the user is not logged in",
-        "/login?status=unauthenticated",
-        auth,
-      ],
-      [
-        "Should redirect the user to the login page if the user's credentials could not be verified",
-        "/login?status=unauthorized",
-        unknown,
-      ],
-      [
-        "Should redirect the user to the home(dashboard) page if the user has already registered their account",
-        "/?status=registered",
-        registered,
-      ],
-    ],
+    "Should redirect the user to the login page if the user is not logged in",
+    "/login?status=unauthenticated",
+    auth,
   ],
   [
-    "User registered",
-    [["Should redirect the user to the home(dashboard) page", "/", success]],
+    "Should redirect the user to the login page if the user's credentials could not be verified",
+    "/login?status=unauthorized",
+    unknown,
+  ],
+  [
+    "Should redirect the user to the home(dashboard) page if the user has already registered their account",
+    "/?status=registered",
+    registered,
+  ],
+];
+
+interface Query {
+  query: { redirectTo: string } | Record<string, never>;
+  page: string;
+}
+
+export const successRedirects: [string, Query, Mock][] = [
+  [
+    "Should redirect the user to the home(dashboard) page",
+    { query: {}, page: "/" },
+    success,
+  ],
+  [
+    "Should redirect the user based on the value of the 'redirectTo' url query",
+    { query: { redirectTo: "/post-tags" }, page: "/post-tags" },
+    success,
+  ],
+  [
+    "Should redirect the user to the home(dashboard) page if the value of the 'redirectTo' url query is not allowed",
+    { query: { redirectTo: "forgot-password" }, page: "/" },
+    success,
   ],
 ];

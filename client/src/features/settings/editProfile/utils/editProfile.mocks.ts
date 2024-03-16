@@ -5,6 +5,11 @@ import { setupServer } from "msw/node";
 import { EDIT_PROFILE } from "../operations/EDIT_PROFILE";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
+interface Redirects {
+  url: string;
+  pathname: string;
+}
+
 const nameStr = (prefix: string) => `${prefix}_FIRST_NAME`;
 const imageLink = "https://www.mock-image-link/image-name.jpg";
 export const firstNameError = "Provide first name";
@@ -100,21 +105,27 @@ const unsupported = new Mock("unsupported", msg);
 const network = new Mock("network", msg);
 const gql = new Mock("graphql", gqlError);
 
-export const redirects: [string, Mock, string][] = [
+export const redirects: [string, Mock, Redirects][] = [
   [
     "Should redirect to the login page if the user is not logged in",
     auth,
-    "/login?status=unauthenticated",
+    {
+      url: "/login?status=unauthenticated&redirectTo=/post-tags",
+      pathname: "/post-tags",
+    },
   ],
   [
     "Should redirect to the login page if the user could not be verified",
     unknown,
-    "/login?status=unauthorized",
+    { url: "/login?status=unauthorized", pathname: "/" },
   ],
   [
     "Should redirect to the register page if the user is unregistered",
     unregistered,
-    "/register?status=unregistered",
+    {
+      url: "/register?status=unregistered&redirectTo=/settings/me/edit",
+      pathname: "/settings/me/edit",
+    },
   ],
 ];
 

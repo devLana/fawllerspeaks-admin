@@ -72,9 +72,11 @@ describe("Create blog post as draft", () => {
     });
 
     describe("Redirect the user to an authentication page", () => {
-      it.each(mocks.redirects)("%s", async (_, mock, path) => {
+      it.each(mocks.redirects)("%s", async (_, mock, { pathname, url }) => {
+        const router = useRouter();
+        router.pathname = pathname;
+
         const { user } = renderUI(<CreatePostPage />);
-        const { replace } = useRouter();
 
         await user.type(screen.getByRole("textbox", mocks.main), mock.title);
         await user.type(screen.getByRole("textbox", mocks.description), "test");
@@ -85,8 +87,8 @@ describe("Create blog post as draft", () => {
         await user.click(screen.getByRole("button", mocks.draftBtn));
 
         expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
-        expect(replace).toHaveBeenCalledWith(path);
+        await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+        expect(router.replace).toHaveBeenCalledWith(url);
         expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
       });
     });

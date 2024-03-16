@@ -110,7 +110,9 @@ const EditProfileForm = (props: EditProfileFormProps) => {
           case "AuthenticationError":
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void router.replace("/login?status=unauthenticated");
+            void router.replace(
+              `/login?status=unauthenticated&redirectTo=${router.pathname}`
+            );
             break;
 
           case "UnknownError":
@@ -120,7 +122,9 @@ const EditProfileForm = (props: EditProfileFormProps) => {
             break;
 
           case "RegistrationError":
-            void router.replace("/register?status=unregistered");
+            void router.replace(
+              `/register?status=unregistered&redirectTo=${router.pathname}`
+            );
             break;
 
           case "EditedProfile": {
