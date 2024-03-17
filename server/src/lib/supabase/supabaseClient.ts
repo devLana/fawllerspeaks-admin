@@ -1,12 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = () => {
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error("Server Error");
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = "https://soeoohvasnrkaxvjduim.supabase.co";
 
   const storageUrl = `${supabaseUrl}/storage/v1/object/public/images/`;
   const client = createClient(supabaseUrl, supabaseKey, {
