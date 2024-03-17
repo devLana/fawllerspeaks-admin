@@ -14,7 +14,7 @@ const AuthHeaderProvider = ({ children }: { children: React.ReactNode }) => {
 
   const client = React.useMemo(() => {
     return new ApolloClient({
-      uri: "http://localhost:7692/",
+      uri: process.env.NEXT_PUBLIC_API_URL,
       cache,
       credentials: "include",
       ssrMode: typeof window === "undefined",

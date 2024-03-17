@@ -9,6 +9,7 @@ const useUploadImage = () => {
   const { jwt } = useAuthHeader();
 
   const upload = async (file: File, fileType: "avatar" | "post") => {
+    const url = process.env.NEXT_PUBLIC_API_URL ?? "";
     const headers = new Headers({ authorization: `Bearer ${jwt}` });
 
     const body = new FormData();
@@ -16,7 +17,7 @@ const useUploadImage = () => {
     body.append("type", fileType);
 
     const options: RequestInit = { method: "POST", body, headers };
-    const request = new Request("http://localhost:7692/upload-image", options);
+    const request = new Request(`${url}/upload-image`, options);
 
     let uploadHasError = false;
     let imageLink: string | null = null;
