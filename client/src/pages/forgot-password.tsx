@@ -7,6 +7,7 @@ import useStatusAlert from "@features/forgotPassword/hooks/useStatusAlert";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
 import AlertToast from "@components/AlertToast";
+import Down from "@components/SlideTransitions/Down";
 import Card from "@components/Card";
 import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
 import ForgotPasswordForm from "@features/forgotPassword/components/ForgotPasswordForm";
@@ -36,7 +37,7 @@ const ForgotPassword: NextPageWithLayout = () => {
         vertical="top"
         isOpen={open}
         onClose={handleCloseAlert}
-        direction="down"
+        transition={Down}
         severity="info"
         content={message}
       />

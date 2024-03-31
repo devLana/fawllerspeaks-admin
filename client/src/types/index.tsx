@@ -1,6 +1,7 @@
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 
+import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 import type { EmotionCache } from "@emotion/react";
 import type { OverridableComponent } from "@mui/material/OverridableComponent";
 import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
@@ -10,7 +11,7 @@ import type { MetaInfo } from "@components/Metadata";
 import type { Mutation, Post, PostTag, Query } from "@apiTypes";
 
 /* General Project Types */
-export type PageLayout = (
+export type PageLayoutFn = (
   page: React.ReactElement,
   clientHasRendered: boolean,
   errorMessage: string | null
@@ -19,7 +20,7 @@ export type PageLayout = (
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<
   P,
   IP
-> & { layout: PageLayout };
+> & { layout: PageLayoutFn };
 
 export interface NextAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -38,11 +39,17 @@ export interface RootLayoutProps extends MetaInfo {
 }
 
 type Keys = ((...theme: never[]) => unknown) | Record<string, unknown>;
+type FunctionLike = (...args: never[]) => unknown;
 export type SxPropsArray = NonNullable<Exclude<SxProps, Keys>>;
 export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
 export type AuthPageView = "form" | "unregistered error" | "success";
 export type Status = "idle" | "error" | "loading";
 export type RequestStatus = Status | "success";
+
+export type RefetchQueriesFn<T extends object> = Extract<
+  MutationBaseOptions<T>["refetchQueries"],
+  FunctionLike
+>;
 
 /* App Theme Types */
 export type ThemeMode = "sunny" | "sunset" | "pitch black";
@@ -56,12 +63,6 @@ export interface AppTheme {
 }
 
 /* Edit Profile Feature Types */
-export interface EditProfileFormProps {
-  firstName: string;
-  lastName: string;
-  userImage: string;
-}
-
 export interface EditProfileImage {
   file: File | null;
   error: string;

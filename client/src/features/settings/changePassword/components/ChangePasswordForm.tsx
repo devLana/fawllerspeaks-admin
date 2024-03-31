@@ -9,6 +9,7 @@ import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
+import useGetUserInfo from "@hooks/useGetUserInfo";
 import PasswordInput from "@components/PasswordInput";
 import { CHANGE_PASSWORD } from "../operations/CHANGE_PASSWORD";
 import { changePasswordValidator } from "../utils/changePasswordValidator";
@@ -17,7 +18,7 @@ import { SESSION_ID } from "@utils/constants";
 import type { MutationChangePasswordArgs } from "@apiTypes";
 import type { RequestStatus } from "@types";
 
-const ChangePasswordForm = ({ userEmail }: { userEmail: string }) => {
+const ChangePasswordForm = () => {
   const [formStatus, setFormStatus] = React.useState<RequestStatus>("idle");
   const { replace, pathname } = useRouter();
 
@@ -32,6 +33,8 @@ const ChangePasswordForm = ({ userEmail }: { userEmail: string }) => {
   } = useForm<MutationChangePasswordArgs>({
     resolver: yupResolver(changePasswordValidator),
   });
+
+  const userEmail = useGetUserInfo()?.email ?? "";
 
   const submitHandler = (values: MutationChangePasswordArgs) => {
     setFormStatus("loading");

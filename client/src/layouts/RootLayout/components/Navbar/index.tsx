@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import Divider from "@mui/material/Divider";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import List from "@mui/material/List";

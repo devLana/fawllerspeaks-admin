@@ -6,11 +6,6 @@ import Alert, { type AlertColor, type AlertProps } from "@mui/material/Alert";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import { type SlideProps } from "@mui/material/Slide";
 
-import Up from "./SlideTransitions/Up";
-import Down from "./SlideTransitions/Down";
-import Left from "./SlideTransitions/Left";
-import Right from "./SlideTransitions/Right";
-
 type TransitionProps = Omit<SlideProps, "direction">;
 
 interface AlertToastProps {
@@ -18,10 +13,10 @@ interface AlertToastProps {
   vertical?: SnackbarOrigin["vertical"];
   isOpen: boolean;
   onClose: () => void;
-  direction?: SlideProps["direction"];
   severity: AlertColor;
   variant?: AlertProps["variant"];
   content: string;
+  transition: React.FC<TransitionProps>;
 }
 
 const AlertToast = ({
@@ -29,28 +24,11 @@ const AlertToast = ({
   vertical = "bottom",
   isOpen,
   onClose,
-  direction = "left",
+  transition,
   severity,
   variant,
   content,
 }: AlertToastProps) => {
-  let transition: React.FC<TransitionProps>;
-
-  switch (direction) {
-    case "down":
-      transition = Down;
-      break;
-    case "up":
-      transition = Up;
-      break;
-    case "left":
-    default:
-      transition = Left;
-      break;
-    case "right":
-      transition = Right;
-  }
-
   const handleClose = (_: React.SyntheticEvent | Event, reason: Reason) => {
     if (reason === "clickaway") return;
     onClose();

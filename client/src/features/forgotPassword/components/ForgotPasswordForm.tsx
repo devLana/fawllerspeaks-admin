@@ -7,6 +7,7 @@ import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import AlertToast from "@components/AlertToast";
+import Down from "@components/SlideTransitions/Down";
 import { FORGOT_PASSWORD } from "../operations/FORGOT_PASSWORD";
 import { forgotPasswordValidator } from "../utils/forgotPasswordValidator";
 import type { AuthPageView, Status, StateSetterFn } from "@types";
@@ -85,7 +86,7 @@ const ForgotPasswordForm = ({ setView }: ForgotPasswordFormProps) => {
         vertical="top"
         isOpen={formStatus === "error"}
         onClose={() => setFormStatus("idle")}
-        direction="down"
+        transition={Down}
         severity="error"
         content={alertMessage}
       />

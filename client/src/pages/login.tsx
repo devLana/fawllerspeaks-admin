@@ -1,10 +1,9 @@
-import * as React from "react";
-
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 
 import useStatusAlert from "@features/login/hooks/useStatusAlert";
 import AlertToast from "@components/AlertToast";
+import Down from "@components/SlideTransitions/Down";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
 import Card from "@components/Card";
@@ -22,7 +21,7 @@ const Login: NextPageWithLayout = () => {
         vertical="top"
         isOpen={open}
         onClose={handleCloseAlert}
-        direction="down"
+        transition={Down}
         severity="info"
         content={message}
       />

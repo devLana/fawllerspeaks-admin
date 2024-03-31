@@ -1,13 +1,8 @@
-import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
-import type { EditPostTagData } from "@types";
+import type { RefetchQueriesFn, EditPostTagData } from "@types";
 
-type FunctionLike = (...args: never[]) => unknown;
-type RefetchQueries = Extract<
-  MutationBaseOptions<EditPostTagData>["refetchQueries"],
-  FunctionLike
->;
+type EditPostTagRefetchQueriesFn = RefetchQueriesFn<EditPostTagData>;
 
-export const refetchQueries: RefetchQueries = result => {
+export const refetchQueries: EditPostTagRefetchQueriesFn = result => {
   if (result.data?.editPostTag.__typename === "EditedPostTag") {
     return ["GetPostTags"];
   }

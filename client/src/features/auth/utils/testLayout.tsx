@@ -1,7 +1,7 @@
 import TestLayout from "@layouts/TestLayout";
-import type { PageLayout } from "@types";
+import type { PageLayoutFn } from "@types";
 
-const testLayout: PageLayout = (page, clientHasRendered, errorMessage) => (
+const testLayout: PageLayoutFn = (page, clientHasRendered, errorMessage) => (
   <TestLayout clientHasRendered={clientHasRendered} errorMessage={errorMessage}>
     {page}
   </TestLayout>

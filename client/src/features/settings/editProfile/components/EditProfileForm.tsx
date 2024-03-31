@@ -10,6 +10,7 @@ import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
+import useGetUserInfo from "@hooks/useGetUserInfo";
 import useUploadImage from "@hooks/useUploadImage";
 import EditProfileFileInput from "./EditProfileFileInput";
 import { EDIT_PROFILE } from "@features/settings/editProfile/operations/EDIT_PROFILE";
@@ -17,13 +18,11 @@ import { editProfileValidator } from "@features/settings/editProfile/utils/editP
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { SESSION_ID } from "@utils/constants";
 import type { MutationEditProfileArgs } from "@apiTypes";
-import type { EditProfileFormProps, EditProfileImage, Status } from "@types";
+import type { EditProfileImage, Status } from "@types";
 
 type EditProfile = Omit<MutationEditProfileArgs, "image">;
 
-const EditProfileForm = (props: EditProfileFormProps) => {
-  const { firstName, lastName, userImage } = props;
-
+const EditProfileForm = () => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const [removeCurrentImage, setRemoveCurrentImage] = React.useState(false);
   const router = useRouter();
@@ -36,6 +35,13 @@ const EditProfileForm = (props: EditProfileFormProps) => {
 
   const [editProfile, { error, client }] = useMutation(EDIT_PROFILE);
 
+  const upload = useUploadImage();
+  const user = useGetUserInfo();
+
+  const firstName = user?.firstName ?? "";
+  const lastName = user?.lastName ?? "";
+  const userImage = user?.image ?? "";
+
   const {
     register,
     handleSubmit,
@@ -45,8 +51,6 @@ const EditProfileForm = (props: EditProfileFormProps) => {
     resolver: yupResolver(editProfileValidator),
     defaultValues: { firstName, lastName },
   });
-
-  const upload = useUploadImage();
 
   const submitHandler = async (values: EditProfile) => {
     setFormStatus("loading");

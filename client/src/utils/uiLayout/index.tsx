@@ -1,10 +1,10 @@
 import { type MetaInfo } from "@components/Metadata";
-import type { PageLayout, RootLayoutProps } from "@types";
+import type { PageLayoutFn, RootLayoutProps } from "@types";
 
 const uiLayout = (
   UILayout: React.FC<RootLayoutProps>,
   uiLayoutProps: MetaInfo
-): PageLayout => {
+): PageLayoutFn => {
   return function layout(page, clientHasRendered, errorMessage) {
     return (
       <UILayout

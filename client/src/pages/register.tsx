@@ -1,10 +1,9 @@
-import * as React from "react";
-
 import Typography from "@mui/material/Typography";
 
 import useStatusAlert from "@features/register/hooks/useStatusAlert";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import AlertToast from "@components/AlertToast";
+import Down from "@components/SlideTransitions/Down";
 import Card from "@components/Card";
 import RegisterUserForm from "@features/register/components/RegisterUserForm";
 import uiLayout from "@utils/uiLayout";
@@ -20,7 +19,7 @@ const RegisterUser: NextPageWithLayout = () => {
         vertical="top"
         isOpen={open}
         onClose={handleCloseAlert}
-        direction="down"
+        transition={Down}
         severity="info"
         content={message}
       />

@@ -1,13 +1,8 @@
-import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
-import type { DeletePostTagsData } from "@types";
+import type { DeletePostTagsData, RefetchQueriesFn } from "@types";
 
-type FunctionLike = (...args: never[]) => unknown;
-type RefetchQueries = Extract<
-  MutationBaseOptions<DeletePostTagsData>["refetchQueries"],
-  FunctionLike
->;
+type DeletePostTagRefetchQueriesFn = RefetchQueriesFn<DeletePostTagsData>;
 
-export const refetchQueries: RefetchQueries = ({ data }) => {
+export const refetchQueries: DeletePostTagRefetchQueriesFn = ({ data }) => {
   if (
     data?.deletePostTags.__typename === "DeletePostTagsValidationError" ||
     data?.deletePostTags.__typename === "UnknownError" ||

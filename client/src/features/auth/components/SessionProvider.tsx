@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useRouter } from "next/router";
 
 import IconButton from "@mui/material/IconButton";
@@ -9,10 +8,10 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import useRefreshToken from "../hooks/useRefreshToken";
 import useVerifySession from "../hooks/useVerifySession";
 import { SessionContext } from "@context/Session";
-import type { PageLayout } from "@types";
+import type { PageLayoutFn } from "@types";
 
 interface SessionProvideProps {
-  layout: PageLayout;
+  layout: PageLayoutFn;
   page: React.ReactElement;
 }
 

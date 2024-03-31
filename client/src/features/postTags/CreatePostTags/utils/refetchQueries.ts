@@ -1,13 +1,8 @@
-import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
-import type { CreatePostTagsData } from "@types";
+import type { CreatePostTagsData, RefetchQueriesFn } from "@types";
 
-type FunctionLike = (...args: never[]) => unknown;
-type RefetchQueries = Extract<
-  MutationBaseOptions<CreatePostTagsData>["refetchQueries"],
-  FunctionLike
->;
+type CreatePostTagsRefetchQueriesFn = RefetchQueriesFn<CreatePostTagsData>;
 
-export const refetchQueries: RefetchQueries = result => {
+export const refetchQueries: CreatePostTagsRefetchQueriesFn = result => {
   if (
     result.data?.createPostTags.__typename === "PostTags" ||
     result.data?.createPostTags.__typename === "CreatedPostTagsWarning"

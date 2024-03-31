@@ -4,9 +4,8 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { useAppTheme } from "@context/AppTheme";
-import type { AppTheme } from "@types";
 
-const FontSize = ({ appTheme }: { appTheme: AppTheme }) => {
+const FontSize = ({ fontSize }: { fontSize: number }) => {
   const handleAppTheme = useAppTheme();
 
   return (
@@ -32,7 +31,7 @@ const FontSize = ({ appTheme }: { appTheme: AppTheme }) => {
           min={14}
           max={18}
           marks
-          value={appTheme.fontSize}
+          value={fontSize}
           onChangeCommitted={(_, value) => {
             handleAppTheme("fontSize", value as number);
           }}

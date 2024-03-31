@@ -56,18 +56,16 @@ type PasswordInputProps = Omit<TextFieldProps, Keys> &
     | ConfirmNewPasswordProps
   ) & { fieldError: FieldError | undefined };
 
-const PasswordInput = (props: PasswordInputProps) => {
-  const {
-    id,
-    label,
-    register,
-    fieldError,
-    FormHelperTextProps,
-    inputProps,
-    InputProps,
-    ...muiProps
-  } = props;
-
+const PasswordInput = ({
+  id,
+  label,
+  register,
+  fieldError,
+  FormHelperTextProps,
+  inputProps,
+  InputProps,
+  ...muiProps
+}: PasswordInputProps) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
   const ariaId = fieldError ? `${id}-error-message` : undefined;

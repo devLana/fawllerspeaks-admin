@@ -16,9 +16,9 @@ interface SettingsMenuItemProps {
 }
 
 const SettingsMenuItem = (props: SettingsMenuItemProps) => {
-  const { pathname } = useRouter();
-
   const { to, label, Icon, onClick } = props;
+
+  const { pathname } = useRouter();
   let isActive = false;
 
   if (to === pathname) {

@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";

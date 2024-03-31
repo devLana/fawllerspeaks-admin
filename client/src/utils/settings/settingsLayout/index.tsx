@@ -1,12 +1,12 @@
 import RootLayout from "@layouts/RootLayout";
 import SettingsLayout from "@layouts/SettingsLayout";
 import { type MetaInfo } from "@components/Metadata";
-import type { PageLayout } from "@types";
+import type { PageLayoutFn } from "@types";
 
 export const settingsLayout = (
   pageHeading: string,
   rootLayoutMetaProps: MetaInfo
-): PageLayout => {
+): PageLayoutFn => {
   return function layout(page, clientHasRendered, errorMessage) {
     return (
       <RootLayout

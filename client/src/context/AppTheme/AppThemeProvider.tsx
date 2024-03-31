@@ -4,27 +4,50 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 import { AppThemeContext } from ".";
-import { generateTheme } from "./utils/generateTheme";
-import { getStorageTheme, saveStorageTheme } from "@utils/storage";
-import type { AppTheme as Theme } from "@types";
+import { palette } from "./utils/palette";
+import { typography } from "./utils/typography";
+import { shape } from "./utils/shape";
+import { shadows } from "./utils/shadows";
+import { components } from "./utils/components";
+import { getStorageTheme, saveStorageTheme } from "./utils/storage";
+import type { AppTheme } from "@types";
+
+type ThemeKeys = keyof AppTheme;
+
+declare module "@mui/material/styles" {
+  interface Theme {
+    appTheme: AppTheme;
+  }
+
+  interface ThemeOptions {
+    appTheme: AppTheme;
+  }
+}
 
 const AppThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [appTheme, setAppTheme] = React.useState<Theme>({
+  const [appTheme, setAppTheme] = React.useState<AppTheme>({
     themeMode: "sunny",
     fontSize: 14,
     color: "#7dd1f3",
   });
-
-  const theme = React.useMemo(() => {
-    return createTheme(generateTheme(appTheme));
-  }, [appTheme]);
 
   React.useEffect(() => {
     const defaultTheme = getStorageTheme();
     if (defaultTheme) setAppTheme(defaultTheme);
   }, []);
 
-  const handleAppTheme = <T extends keyof Theme>(key: T, value: Theme[T]) => {
+  const theme = React.useMemo(() => {
+    return createTheme({
+      appTheme,
+      palette: palette(appTheme.themeMode, appTheme.color),
+      typography: typography(appTheme.fontSize),
+      shape: shape(appTheme.fontSize),
+      shadows,
+      components,
+    });
+  }, [appTheme]);
+
+  const handleAppTheme = <T extends ThemeKeys>(key: T, value: AppTheme[T]) => {
     setAppTheme({ ...appTheme, [key]: value });
     saveStorageTheme(appTheme, key, value);
   };

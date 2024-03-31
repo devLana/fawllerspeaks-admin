@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import type { Theme } from "@mui/material/styles";

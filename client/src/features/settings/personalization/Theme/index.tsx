@@ -5,9 +5,9 @@ import Typography from "@mui/material/Typography";
 import { useAppTheme } from "@context/AppTheme";
 import ThemeItem from "./ThemeItem";
 import { themes } from "@utils/appThemes";
-import type { AppTheme, ThemeMode } from "@types";
+import type { ThemeMode } from "@types";
 
-const Theme = ({ appTheme }: { appTheme: AppTheme }) => {
+const Theme = ({ themeMode }: { themeMode: ThemeMode }) => {
   const handleAppTheme = useAppTheme();
 
   return (
@@ -18,7 +18,7 @@ const Theme = ({ appTheme }: { appTheme: AppTheme }) => {
       <RadioGroup
         row
         name="theme-settings"
-        value={appTheme.themeMode}
+        value={themeMode}
         onChange={e => handleAppTheme("themeMode", e.target.value as ThemeMode)}
         sx={{
           bgcolor: "action.disabledBackground",
@@ -32,7 +32,7 @@ const Theme = ({ appTheme }: { appTheme: AppTheme }) => {
         {themes.map(theme => (
           <ThemeItem
             key={theme.id}
-            isCurrentTheme={appTheme.themeMode === theme.id}
+            isCurrentTheme={themeMode === theme.id}
             {...theme}
           />
         ))}

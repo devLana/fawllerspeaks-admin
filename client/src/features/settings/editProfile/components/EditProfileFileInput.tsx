@@ -1,20 +1,16 @@
-import * as React from "react";
-
 import Button from "@mui/material/Button";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 
 import { useHandleFile } from "@hooks/useHandleFile";
 import EditProfileImagePreview from "./EditProfileImagePreview";
 import { FileInput } from "@components/FileInput";
-import type {
-  EditProfileImage,
-  EditProfileFormProps,
-  Status,
-  StateSetterFn,
-} from "@types";
+import type { EditProfileImage, Status, StateSetterFn } from "@types";
 
-interface EditProfileFileInputProps extends EditProfileFormProps {
+interface EditProfileFileInputProps {
   image: EditProfileImage;
+  userImage: string;
+  firstName: string;
+  lastName: string;
   removeCurrentImage: boolean;
   setImage: StateSetterFn<EditProfileImage>;
   setRemoveCurrentImage: StateSetterFn<boolean>;

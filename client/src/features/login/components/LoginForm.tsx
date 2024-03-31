@@ -10,6 +10,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { useSession } from "@context/Session";
 import { useAuthHeader } from "@context/AuthHeader";
 import AlertToast from "@components/AlertToast";
+import Down from "@components/SlideTransitions/Down";
 import PasswordInput from "@components/PasswordInput";
 import { LOGIN_USER } from "../operations/LOGIN_USER";
 import { loginValidator } from "../utils/loginValidator";
@@ -106,7 +107,7 @@ const LoginForm = () => {
         vertical="top"
         isOpen={formStatus === "error"}
         onClose={() => setFormStatus("idle")}
-        direction="down"
+        transition={Down}
         severity="error"
         content={alertMessage}
       />

@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import AlertToast from "@components/AlertToast";
+import Down from "@components/SlideTransitions/Down";
 import PasswordInput from "@components/PasswordInput";
 import { REGISTER_USER } from "../operations/REGISTER_USER";
 import { registerUserValidator } from "../utils/registerUserValidator";
@@ -125,7 +126,7 @@ const RegisterUserForm = () => {
         vertical="top"
         isOpen={formStatus === "error"}
         onClose={() => setFormStatus("idle")}
-        direction="down"
+        transition={Down}
         severity="error"
         content={alertMessage}
       />

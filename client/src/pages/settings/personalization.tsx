@@ -11,9 +11,9 @@ const Personalize: NextPageWithLayout = () => {
 
   return (
     <>
-      <Theme appTheme={appTheme} />
-      <FontSize appTheme={appTheme} />
-      <DefaultColors appTheme={appTheme} />
+      <Theme themeMode={appTheme.themeMode} />
+      <FontSize fontSize={appTheme.fontSize} />
+      <DefaultColors color={appTheme.color} />
     </>
   );
 };
