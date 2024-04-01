@@ -77,6 +77,8 @@ export const server = setupServer(
     if (password === passwordStr("network")) {
       return mswErrors(new Error(), { status: 503 });
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

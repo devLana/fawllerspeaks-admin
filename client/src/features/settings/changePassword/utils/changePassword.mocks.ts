@@ -73,6 +73,8 @@ export const server = setupServer(
     if (newPassword === passwordStr("graphql")) {
       return mswErrors(new GraphQLError(gqlErrorMsg));
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

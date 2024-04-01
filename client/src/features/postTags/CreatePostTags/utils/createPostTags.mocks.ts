@@ -109,6 +109,8 @@ export const server = setupServer(
     if (tags[0].startsWith("network")) {
       return mswErrors(new Error(), { status: 503 });
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

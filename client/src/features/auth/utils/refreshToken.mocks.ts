@@ -71,6 +71,8 @@ export const server = setupServer(
         accessToken: "newAuthToken",
       });
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

@@ -82,6 +82,8 @@ export const server = setupServer(
     if (firstName === nameStr("network")) {
       return mswErrors(new Error(), { status: 503 });
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

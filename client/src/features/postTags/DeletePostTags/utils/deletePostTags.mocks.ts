@@ -151,6 +151,8 @@ export const server = setupServer(
     if (tagIds[0].startsWith("graphql")) {
       return mswErrors(new GraphQLError(gqlMsg));
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

@@ -117,6 +117,8 @@ export const server = setupServer(
     if (name === nameStr("graphql")) {
       return mswErrors(new GraphQLError(gqlMsg));
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

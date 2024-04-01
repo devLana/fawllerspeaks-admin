@@ -77,6 +77,8 @@ export const server = setupServer(
     if (sessionId === "UNREGISTERED_SESSION_ID") {
       return response(undefined, false);
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

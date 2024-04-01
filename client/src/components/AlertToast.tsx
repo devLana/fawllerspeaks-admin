@@ -11,23 +11,23 @@ type TransitionProps = Omit<SlideProps, "direction">;
 interface AlertToastProps {
   horizontal?: SnackbarOrigin["horizontal"];
   vertical?: SnackbarOrigin["vertical"];
-  isOpen: boolean;
-  onClose: () => void;
-  severity: AlertColor;
   variant?: AlertProps["variant"];
+  isOpen: boolean;
+  severity: AlertColor;
   content: string;
-  transition: React.FC<TransitionProps>;
+  transition: (props: TransitionProps) => React.ReactNode;
+  onClose: () => void;
 }
 
 const AlertToast = ({
   horizontal = "right",
   vertical = "bottom",
+  variant = "standard",
   isOpen,
-  onClose,
-  transition,
   severity,
-  variant,
   content,
+  transition,
+  onClose,
 }: AlertToastProps) => {
   const handleClose = (_: React.SyntheticEvent | Event, reason: Reason) => {
     if (reason === "clickaway") return;
@@ -42,8 +42,8 @@ const AlertToast = ({
       TransitionComponent={transition}
     >
       <Alert
-        severity={severity}
         variant={variant}
+        severity={severity}
         icon={<CancelOutlinedIcon />}
         sx={{ width: "100%" }}
       >

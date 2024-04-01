@@ -62,6 +62,8 @@ export const server = setupServer(
     if (sessionId === sessionIdStr("graphql")) {
       return mswErrors(new GraphQLError(msg4));
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

@@ -64,6 +64,8 @@ export const server = setupServer(
     }
 
     if (email === emailStr("graphql")) return mswErrors(new GraphQLError(msg3));
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 
