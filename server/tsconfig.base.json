@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    /* Modules */
-    "moduleResolution": "node",
+    // Modules
+    "module": "node16",
     "baseUrl": "src",
     "paths": {
       "@server": ["index"],
@@ -17,17 +17,22 @@
       "@tests/*": ["utils/tests/*"]
     },
 
-    /* Language and Environment */
-    "target": "ES2022",
-    "lib": ["ES2022"],
+    // Language and Environment
+    "target": "es2022",
+    "lib": ["es2022"],
 
-    /* Interop Constraints */
+    // Interop Constraints
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
 
-    /* Type Checking */
+    // Type Checking
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "removeComments": true,
     "strict": true,
 
-    /* Completeness */
+    // Completeness
     "skipLibCheck": true
   }
 }

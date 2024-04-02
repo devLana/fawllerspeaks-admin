@@ -12,14 +12,8 @@
   "extends": "./tsconfig.base.json",
 
   "compilerOptions": {
-    /* Modules */
-    "module": "commonjs",
-
-    /* Emit */
+    // Emit
     "noEmitOnError": true,
-    "outDir": "build",
-
-    /* Interop Constraints */
-    "forceConsistentCasingInFileNames": true
+    "outDir": "build"
   }
 }
