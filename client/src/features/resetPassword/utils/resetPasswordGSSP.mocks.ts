@@ -58,6 +58,8 @@ export const server = setupServer(
     if (token === NETWORK_ERROR_RESET_TOKEN) {
       return mswErrors(new Error(), { status: 503 });
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 
