@@ -21,7 +21,7 @@ const Me: NextPageWithLayout = () => {
           sx={{
             width: { xs: 100, md: 115 },
             height: { xs: 100, md: 115 },
-            fontSize: "2rem",
+            fontSize: "2em",
           }}
         />
         <Stack>
