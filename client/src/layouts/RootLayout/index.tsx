@@ -46,7 +46,13 @@ const RootLayout = (props: RootLayoutProps) => {
         onToggleNav={handleToggleNavbar}
         onCloseNav={handleCloseNavbar}
       />
-      <Box component="main" py={4} flexGrow={{ sm: 1 }}>
+      <Box
+        component="main"
+        py={4}
+        flexGrow={{ sm: 1 }}
+        minWidth={{ sm: 0 }}
+        sx={{ overflowX: { sm: "auto" } }}
+      >
         <PageBreadcrumbs />
         {content}
       </Box>
