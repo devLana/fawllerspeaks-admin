@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "ckeditor": "cd ckeditor5 && npm run postbuild && npm run build",
     "codegen:remove": "cd src/types && rm index.ts gql.ts fragment-masking.ts",
     "codegen": "graphql-codegen && npm run codegen:remove",
     "codegen:watch": "graphql-codegen -w",
