@@ -20,9 +20,14 @@ const RootLayout = (props: RootLayoutProps) => {
   if (!clientHasRendered) {
     content = <Loader />;
   } else if (errorMessage) {
-    content = <ErrorAlert message={errorMessage} />;
+    content = <ErrorAlert message={errorMessage} sx={{ mt: 4 }} />;
   } else {
-    content = children;
+    content = (
+      <>
+        <PageBreadcrumbs />
+        {children}
+      </>
+    );
   }
 
   const handleOpenNavbar = () => setNavBarIsOpen(true);
@@ -50,10 +55,8 @@ const RootLayout = (props: RootLayoutProps) => {
         component="main"
         py={4}
         flexGrow={{ sm: 1 }}
-        minWidth={{ sm: 0 }}
-        sx={{ overflowX: { sm: "auto" } }}
+        sx={{ overflowX: "auto" }}
       >
-        <PageBreadcrumbs />
         {content}
       </Box>
     </Container>

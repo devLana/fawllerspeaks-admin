@@ -1,11 +1,19 @@
 import { useRouter } from "next/router";
 
-import Box from "@mui/material/Box";
+import Box, { type BoxProps } from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
-const ErrorAlert = ({ message }: { message: string }) => {
+import type { SxPropsArray } from "@types";
+
+interface ErrorAlertProps {
+  sx?: BoxProps["sx"];
+  message: string;
+}
+
+const ErrorAlert = ({ message, sx = [] }: ErrorAlertProps) => {
   const { reload } = useRouter();
+  const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
   return (
     <Box
@@ -14,6 +22,7 @@ const ErrorAlert = ({ message }: { message: string }) => {
       justifyContent="space-between"
       alignItems="center"
       rowGap={2}
+      sx={[...sxProp]}
     >
       <Alert severity="info" color="error">
         {message}
