@@ -152,8 +152,21 @@ class Editor extends ClassicEditor {
         {
           label: "Font styles",
           icon: "text",
-          items: ["fontSize", "fontColor", "fontBackgroundColor"],
+          items: ["fontColor", "fontBackgroundColor", "fontSize"],
         },
+        "|",
+        {
+          label: "Embed content",
+          icon: "plus",
+          items: ["imageInsert", "link", "insertTable", "blockQuote"],
+        },
+        {
+          label: "Insert lists",
+          icon: "dragIndicator",
+          items: ["numberedList", "bulletedList", "todoList"],
+        },
+        "specialCharacters",
+        "horizontalLine",
         "|",
         {
           label: "Indentation",
@@ -161,19 +174,6 @@ class Editor extends ClassicEditor {
           items: ["outdent", "indent"],
         },
         "alignment",
-        "|",
-        {
-          label: "Embed content",
-          icon: "plus",
-          items: ["link", "imageInsert", "blockQuote", "insertTable"],
-        },
-        {
-          label: "Insert lists",
-          icon: "dragIndicator",
-          items: ["numberedList", "bulletedList", "todoList"],
-        },
-        "horizontalLine",
-        "specialCharacters",
         "|",
         "findAndReplace",
         "selectAll",
