@@ -11,10 +11,10 @@ const generatePalette = (hex: string, rgb: string) => ({
     disabled: `rgba(${rgb},0.3)`,
   },
   action: {
-    active: `rgba(${rgb},0.5)`,
+    active: `rgba(${rgb},0.22)`,
     hover: `rgba(${rgb},0.04)`,
     selected: `rgba(${rgb},0.08)`,
-    disabled: `rgba(${rgb},0.26)`,
+    disabled: `rgba(${rgb},0.18)`,
     disabledBackground: `rgba(${rgb},0.12)`,
   },
   divider: `rgba(${rgb},0.12)`,
@@ -67,6 +67,7 @@ export const palette: AppThemePalette = (themeMode, color) => {
       ? {
           primary: { light: "#d0effb", main: "#7dd1f3", dark: "#0d688c" },
           secondary: { light: "#e6e6e6", main: "#ccc", dark: "#6a6a6a" },
+          ...generatePalette("#fff", "255,255,255"),
         }
       : {
           primary: { light: "#e6e6e6", main: "#ccc", dark: "#6a6a6a" },
