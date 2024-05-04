@@ -1,17 +1,27 @@
 import * as React from "react";
+import dynamic from "next/dynamic";
 
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
 import { useDraftPost } from "@features/posts/CreatePost/hooks/useDraftPost";
 import RootLayout from "@layouts/RootLayout";
+import PostContentSkeleton from "@features/posts/CreatePost/components/PostContent/components/PostContentSkeleton";
 import PostMetadata from "@features/posts/CreatePost/components/PostMetadata";
 import PostFileInput from "@features/posts/CreatePost/components/PostMetadata/components/PostFileInput";
 import SelectPostTags from "@features/posts/CreatePost/components/PostMetadata/components/SelectPostTags";
-import PostContent from "@features/posts/CreatePost/components/PostContent";
 import uiLayout from "@utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout, PostData, PostView, Status } from "@types";
+
+const PostContent = dynamic(
+  () => {
+    return import(
+      /* webpackChunkName: "PostContent" */ "@features/posts/CreatePost/components/PostContent"
+    );
+  },
+  { loading: () => <PostContentSkeleton />, ssr: false }
+);
 
 const CreatePostPage: NextPageWithLayout = () => {
   const [view, setView] = React.useState<PostView>("metadata");

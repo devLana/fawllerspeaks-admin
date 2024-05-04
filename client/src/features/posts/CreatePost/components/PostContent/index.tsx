@@ -31,7 +31,9 @@ const PostContent = ({
 
   return (
     <>
-      <Button startIcon={<ChevronLeft />}>Back</Button>
+      <Button onClick={() => setView("metadata")} startIcon={<ChevronLeft />}>
+        Back
+      </Button>
       <Typography gutterBottom>Provide your blog post content</Typography>
       <CKEditorComponent data={content} onChange={handleContent} />
       <Stack
@@ -40,7 +42,6 @@ const PostContent = ({
         flexWrap="wrap"
         rowGap={1}
         columnGap={2}
-        mt={4}
       >
         <LoadingButton
           variant="outlined"
