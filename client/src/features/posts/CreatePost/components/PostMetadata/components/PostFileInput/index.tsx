@@ -91,7 +91,7 @@ const PostFileInput = ({ onSelectImage, imageBanner }: PostFileInputProps) => {
             },
           })}
         >
-          Select Post Image Banner
+          Select A Post Image Banner
         </Button>
       )}
       <FileInput

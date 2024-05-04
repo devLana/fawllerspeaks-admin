@@ -24,7 +24,7 @@ const MetadataList = () => (
       <ListItemIcon>
         <CircleIcon sx={{ fontSize: 8 }} />
       </ListItemIcon>
-      <ListItemText secondary="An optional collection of topics that best describes what the post will be about. Select as much as needed">
+      <ListItemText secondary="An optional collection of labels that best describes the post. Select as much as needed">
         Post Tags
       </ListItemText>
     </ListItem>
@@ -32,7 +32,7 @@ const MetadataList = () => (
       <ListItemIcon>
         <CircleIcon sx={{ fontSize: 8 }} />
       </ListItemIcon>
-      <ListItemText secondary="An optional image banner that gives meaning to the post">
+      <ListItemText secondary="An optional image banner that gives visual meaning to the post">
         Post Image
       </ListItemText>
     </ListItem>

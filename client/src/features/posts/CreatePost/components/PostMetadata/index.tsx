@@ -4,10 +4,10 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+// import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import MetadataList from "./components/MetadataList";
+// import MetadataList from "./components/MetadataList";
 import { postMetadataValidator } from "./utils/postMetadataValidator";
 import type { PostView, StateSetterFn } from "@types";
 import type { CreatePostInput } from "@apiTypes";
@@ -57,8 +57,8 @@ const PostMetadata = ({
 
   return (
     <Box component="section" maxWidth={700}>
-      <Typography>Provide post metadata for the following:</Typography>
-      <MetadataList />
+      {/* <Typography>Provide post metadata for the following:</Typography>
+      <MetadataList /> */}
       <form aria-label="Post metadata" onSubmit={handleSubmit(submitHandler)}>
         <TextField
           {...register("title")}
@@ -66,7 +66,7 @@ const PostMetadata = ({
           id="title"
           autoComplete="on"
           fullWidth
-          label="Title"
+          label="Post Title"
           defaultValue={defaultValues?.title ?? ""}
           inputProps={{ "aria-errormessage": ariaErrorMessage("title") }}
           margin="normal"
@@ -78,7 +78,7 @@ const PostMetadata = ({
           id="description"
           autoComplete="on"
           fullWidth
-          label="Description"
+          label="Post Description"
           defaultValue={defaultValues?.description ?? ""}
           inputProps={{ "aria-errormessage": ariaErrorMessage("description") }}
           margin="normal"
