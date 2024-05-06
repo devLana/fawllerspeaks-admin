@@ -7,5 +7,9 @@ export const postMetadataValidator = yup
       .string()
       .trim("Enter post description")
       .required("Enter post description"),
+    excerpt: yup
+      .string()
+      .trim("Enter post excerpt")
+      .required("Enter post excerpt"),
   })
   .required("Provide post metadata");

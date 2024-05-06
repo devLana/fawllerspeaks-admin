@@ -1,6 +1,8 @@
 import * as React from "react";
 
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -30,11 +32,17 @@ const PostContent = ({
   };
 
   return (
-    <>
-      <Button onClick={() => setView("metadata")} startIcon={<ChevronLeft />}>
-        Back
-      </Button>
-      <Typography gutterBottom>Provide your blog post content</Typography>
+    <section>
+      <Box mb={1.5} display="flex" alignItems="center" columnGap={3}>
+        <IconButton
+          color="primary"
+          aria-label="Go back to post metadata section"
+          onClick={() => setView("metadata")}
+        >
+          <ChevronLeft />
+        </IconButton>
+        <Typography variant="h2">Provide blog post content</Typography>
+      </Box>
       <CKEditorComponent data={content} onChange={handleContent} />
       <Stack
         direction="row"
@@ -58,7 +66,7 @@ const PostContent = ({
           Next
         </Button>
       </Stack>
-    </>
+    </section>
   );
 };
 

@@ -8,6 +8,7 @@ import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternate
 import { useHandleFile } from "@hooks/useHandleFile";
 import { FileInput } from "@components/FileInput";
 import PostImagePreview from "./PostImagePreview";
+import TooltipHint from "../TooltipHint";
 import { initImage } from "./utils/initImage";
 
 interface PostFileInputProps {
@@ -19,12 +20,6 @@ const PostFileInput = ({ onSelectImage, imageBanner }: PostFileInputProps) => {
   const [image, setImage] = React.useState<{ error: string; blobUrl: string }>(
     () => initImage(imageBanner)
   );
-
-  React.useEffect(() => {
-    return () => {
-      if (image.blobUrl) window.URL.revokeObjectURL(image.blobUrl);
-    };
-  }, [image.blobUrl]);
 
   const {
     fileInputRef,
@@ -59,59 +54,64 @@ const PostFileInput = ({ onSelectImage, imageBanner }: PostFileInputProps) => {
   const id = "post-image-banner";
 
   return (
-    <FormControl fullWidth margin="normal">
-      {imageBanner && image.blobUrl ? (
-        <PostImagePreview
+    <TooltipHint
+      hint="An optional image banner that gives visual meaning to the post"
+      childHasError={!!image.error}
+    >
+      <FormControl fullWidth>
+        {imageBanner && image.blobUrl ? (
+          <PostImagePreview
+            id={id}
+            imageSrc={image.blobUrl}
+            onClick={handleRemoveImage}
+            onKeydown={handleKeydown}
+          />
+        ) : (
+          <Button
+            component="label"
+            size="large"
+            htmlFor={id}
+            startIcon={<AddPhotoAlternateOutlinedIcon />}
+            onDrop={handleDrop}
+            onDragOver={handleDragEvent()}
+            onDragEnter={handleDragEvent(true)}
+            onDragLeave={handleDragEvent(false)}
+            onKeyDown={handleKeydown}
+            sx={theme => ({
+              [theme.breakpoints.down("md")]: { alignSelf: "flex-start" },
+              [theme.breakpoints.up("md")]: {
+                color: "text.primary",
+                width: "100%",
+                height: 280,
+                border: 1,
+                borderColor: hasEnteredDropZone ? "primary.main" : "divider",
+                ...(hasEnteredDropZone && { borderStyle: "dashed" }),
+                "&:hover": { borderColor: "text.primary" },
+              },
+            })}
+          >
+            Select A Post Image Banner
+          </Button>
+        )}
+        <FileInput
+          type="file"
+          name="image"
           id={id}
-          imageSrc={image.blobUrl}
-          onClick={handleRemoveImage}
-          onKeydown={handleKeydown}
+          accept="image/*"
+          tabIndex={-1}
+          onChange={handleChange}
+          aria-invalid={!!image.error}
+          aria-errormessage={image.error ? "image-helper-text" : undefined}
+          ref={fileInputRef}
+          key={imageBanner?.name}
         />
-      ) : (
-        <Button
-          component="label"
-          size="large"
-          htmlFor={id}
-          startIcon={<AddPhotoAlternateOutlinedIcon />}
-          onDrop={handleDrop}
-          onDragOver={handleDragEvent()}
-          onDragEnter={handleDragEvent(true)}
-          onDragLeave={handleDragEvent(false)}
-          onKeyDown={handleKeydown}
-          sx={theme => ({
-            [theme.breakpoints.down("md")]: { alignSelf: "flex-start" },
-            [theme.breakpoints.up("md")]: {
-              color: "text.primary",
-              width: "100%",
-              height: 280,
-              border: 1,
-              borderColor: hasEnteredDropZone ? "primary.main" : "divider",
-              ...(hasEnteredDropZone && { borderStyle: "dashed" }),
-              "&:hover": { borderColor: "text.primary" },
-            },
-          })}
-        >
-          Select A Post Image Banner
-        </Button>
-      )}
-      <FileInput
-        type="file"
-        name="image"
-        id={id}
-        accept="image/*"
-        tabIndex={-1}
-        onChange={handleChange}
-        aria-invalid={!!image.error}
-        aria-errormessage={image.error ? "image-helper-text" : undefined}
-        ref={fileInputRef}
-        key={imageBanner?.name}
-      />
-      {image.error && (
-        <FormHelperText error id="image-helper-text">
-          {image.error}
-        </FormHelperText>
-      )}
-    </FormControl>
+        {image.error && (
+          <FormHelperText error id="image-helper-text">
+            {image.error}
+          </FormHelperText>
+        )}
+      </FormControl>
+    </TooltipHint>
   );
 };
 

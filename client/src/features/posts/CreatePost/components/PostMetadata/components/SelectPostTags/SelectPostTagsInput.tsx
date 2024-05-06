@@ -12,12 +12,11 @@ import RenderSelectedPostTags from "./RenderSelectedPostTags";
 
 interface SelectPostTagsInputProps {
   tags?: string[];
-  margin?: boolean;
   onSelectTags?: (selectedTags: string[]) => void;
 }
 
 const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
-  const { tags = [], margin, onSelectTags } = props;
+  const { tags = [], onSelectTags } = props;
 
   const postTags = useGetCachePostTags();
 
@@ -51,7 +50,7 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
   };
 
   return (
-    <FormControl fullWidth margin={margin ? "normal" : "none"}>
+    <FormControl fullWidth>
       <InputLabel id="post-tags-label" htmlFor="post-tags-input">
         Post Tags
       </InputLabel>

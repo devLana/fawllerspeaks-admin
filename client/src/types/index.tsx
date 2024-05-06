@@ -146,6 +146,7 @@ export type PostView = "metadata" | "content" | "preview";
 export interface PostData {
   title: string;
   description: string;
+  excerpt: string;
   content: string;
   imageBanner?: File;
   tags?: string[];

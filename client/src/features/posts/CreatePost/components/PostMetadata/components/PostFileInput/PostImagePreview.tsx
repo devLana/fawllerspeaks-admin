@@ -21,11 +21,11 @@ const PostImagePreview = (props: PostImagePreviewProps) => {
     <Box
       position="relative"
       width="100%"
+      height={200}
       maxWidth={700}
       borderRadius={1}
       overflow="hidden"
       sx={theme => ({
-        height: 200,
         [theme.breakpoints.up("sm")]: { height: 250 },
         [theme.breakpoints.up("md")]: { height: 280 },
       })}

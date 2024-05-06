@@ -28,6 +28,7 @@ const CreatePostPage: NextPageWithLayout = () => {
   const [postData, setPostData] = React.useState<PostData>({
     title: "",
     description: "",
+    excerpt: "",
     content: "",
   });
 
@@ -54,8 +55,12 @@ const CreatePostPage: NextPageWithLayout = () => {
     }
   };
 
-  const handleMetadata = (title: string, description: string) => {
-    setPostData({ ...postData, title, description });
+  const handleMetadata = (
+    title: string,
+    description: string,
+    excerpt: string
+  ) => {
+    setPostData({ ...postData, title, description, excerpt });
   };
 
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +81,7 @@ const CreatePostPage: NextPageWithLayout = () => {
           onInput={handleTitle}
           title={postData.title}
           description={postData.description}
+          excerpt={postData.excerpt}
           draftStatus={draftStatus}
           handleMetadata={handleMetadata}
           handleDraftPost={handleDraftPost}

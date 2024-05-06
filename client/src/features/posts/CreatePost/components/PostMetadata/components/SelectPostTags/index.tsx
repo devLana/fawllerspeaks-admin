@@ -7,6 +7,7 @@ import Skeleton from "@mui/material/Skeleton";
 import useGetPostTags from "@hooks/useGetPostTags";
 import SelectPostTagsInput from "./SelectPostTagsInput";
 import { SESSION_ID } from "@utils/constants";
+import TooltipHint from "../TooltipHint";
 
 interface SelectPostTagsProps {
   tags?: string[];
@@ -98,7 +99,9 @@ const SelectPostTags = ({ tags = [], onSelectTags }: SelectPostTagsProps) => {
       }
 
       return (
-        <SelectPostTagsInput tags={tags} onSelectTags={onSelectTags} margin />
+        <TooltipHint hint="An optional collection of labels that best describes the post. Select as much as needed">
+          <SelectPostTagsInput tags={tags} onSelectTags={onSelectTags} />
+        </TooltipHint>
       );
 
     default:
