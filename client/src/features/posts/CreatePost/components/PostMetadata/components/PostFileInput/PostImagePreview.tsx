@@ -9,13 +9,13 @@ import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
 
 interface PostImagePreviewProps {
   id: string;
-  imageSrc: string;
+  src: string;
   onClick: () => void;
   onKeydown: (e: React.KeyboardEvent<HTMLLabelElement>) => void;
 }
 
 const PostImagePreview = (props: PostImagePreviewProps) => {
-  const { id, imageSrc, onKeydown, onClick } = props;
+  const { id, src, onKeydown, onClick } = props;
 
   return (
     <Box
@@ -31,7 +31,7 @@ const PostImagePreview = (props: PostImagePreviewProps) => {
       })}
     >
       <Image
-        src={imageSrc}
+        src={src}
         alt="Post image banner preview"
         fill
         style={{ objectFit: "cover" }}

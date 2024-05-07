@@ -9,14 +9,15 @@ import Select, { type SelectChangeEvent } from "@mui/material/Select";
 
 import { useGetCachePostTags } from "@hooks/useGetCachePostTags";
 import RenderSelectedPostTags from "./RenderSelectedPostTags";
+import type { CreatePostAction } from "@types";
 
 interface SelectPostTagsInputProps {
   tags?: string[];
-  onSelectTags?: (selectedTags: string[]) => void;
+  dispatch?: React.Dispatch<CreatePostAction>;
 }
 
 const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
-  const { tags = [], onSelectTags } = props;
+  const { tags = [], dispatch } = props;
 
   const postTags = useGetCachePostTags();
 
@@ -46,7 +47,8 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
   const handleChange = (e: SelectChangeEvent<string[]>) => {
     const { value } = e.target;
     const selectedTags = typeof value === "string" ? value.split(",") : value;
-    onSelectTags?.(selectedTags);
+
+    dispatch?.({ type: "SELECT_POST_TAGS", payload: { tags: selectedTags } });
   };
 
   return (

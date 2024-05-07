@@ -7,12 +7,12 @@ import useUploadImage from "@hooks/useUploadImage";
 import { DRAFT_POST } from "../operations/DRAFT_POST";
 import { refetchQueries } from "../utils/refetchQueries";
 import { SESSION_ID } from "@utils/constants";
-import type { PostData, StateSetterFn, Status } from "@types";
+import type { CreatePostData, CreatePostAction, Status } from "@types";
 import type { MutationDraftPostArgs } from "@apiTypes";
 
 export const useDraftPost = (
-  postData: PostData,
-  setPostData: StateSetterFn<PostData>
+  postData: CreatePostData,
+  dispatch: React.Dispatch<CreatePostAction>
 ) => {
   const [draftStatus, setDraftStatus] = React.useState<Status>("idle");
   const router = useRouter();
@@ -22,23 +22,19 @@ export const useDraftPost = (
   const upload = useUploadImage();
 
   const handleDraftPost = async () => {
-    if (!postData.title) {
-      setDraftStatus("error");
-      return;
-    }
-
     setDraftStatus("loading");
 
     let uploadHasError = false;
     const post: MutationDraftPostArgs["post"] = {
       title: postData.title,
-      ...(postData.description && { description: postData.description }),
-      ...(postData.content && { content: postData.content }),
-      ...(postData.tags && { tags: postData.tags }),
+      ...(postData.description ? { description: postData.description } : {}),
+      ...(postData.excerpt ? { excerpt: postData.excerpt } : {}),
+      ...(postData.content ? { content: postData.content } : {}),
+      ...(postData.tags ? { tags: postData.tags } : {}),
     };
 
     if (postData.imageBanner) {
-      const imageData = await upload(postData.imageBanner, "post");
+      const imageData = await upload(postData.imageBanner.file, "post");
       ({ uploadHasError } = imageData);
 
       if (imageData.imageLink) {
@@ -79,9 +75,8 @@ export const useDraftPost = (
             break;
 
           case "UnknownError": {
-            const { tags: _, ...rest } = postData;
             setDraftStatus("error");
-            setPostData(rest);
+            dispatch({ type: "UNKNOWN_POST_TAGS" });
             break;
           }
 
@@ -97,9 +92,7 @@ export const useDraftPost = (
   let msg =
     "You are unable to save this post as draft at the moment. Please try again later";
 
-  if (!postData.title) {
-    msg = "No post title provided";
-  } else if (error?.graphQLErrors[0]) {
+  if (error?.graphQLErrors[0]) {
     msg = error.graphQLErrors[0].message;
   } else if (
     data?.draftPost.__typename === "UnknownError" ||

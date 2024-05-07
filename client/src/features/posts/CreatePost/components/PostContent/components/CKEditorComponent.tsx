@@ -7,13 +7,14 @@ import type { Theme } from "@mui/material/styles";
 import { useAuthHeader } from "@context/AuthHeader";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import CustomEditor from "ckeditor5-custom-build";
+import type { CreatePostAction } from "@types";
 
 interface CKEditorComponentProps {
   data: string;
-  onChange: (newData: string) => void;
+  dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const CKEditorComponent = ({ data, onChange }: CKEditorComponentProps) => {
+const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
   const ckEditorRef = React.useRef<CustomEditor | null>(null);
 
   const mq = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
@@ -24,6 +25,10 @@ const CKEditorComponent = ({ data, onChange }: CKEditorComponentProps) => {
       ckEditorRef.current.ui.viewportOffset = { top: mq ? 64 : 56 };
     }
   }, [mq]);
+
+  const handleContent = (content: string) => {
+    dispatch({ type: "ADD_POST_CONTENT", payload: { content } });
+  };
 
   return (
     <Box
@@ -248,7 +253,7 @@ const CKEditorComponent = ({ data, onChange }: CKEditorComponentProps) => {
       <CKEditor
         editor={CustomEditor}
         data={data}
-        onBlur={(_, editorRef) => onChange(editorRef.getData())}
+        onBlur={(_, editorRef) => handleContent(editorRef.getData())}
         onReady={editorRef => {
           ckEditorRef.current = editorRef;
         }}

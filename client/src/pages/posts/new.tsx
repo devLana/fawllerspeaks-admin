@@ -10,9 +10,10 @@ import PostContentSkeleton from "@features/posts/CreatePost/components/PostConte
 import PostMetadata from "@features/posts/CreatePost/components/PostMetadata";
 import PostFileInput from "@features/posts/CreatePost/components/PostMetadata/components/PostFileInput";
 import SelectPostTags from "@features/posts/CreatePost/components/PostMetadata/components/SelectPostTags";
+import * as post from "@features/posts/CreatePost/utils/createPostReducer";
 import uiLayout from "@utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
-import type { NextPageWithLayout, PostData, PostView, Status } from "@types";
+import type { NextPageWithLayout, Status } from "@types";
 
 const PostContent = dynamic(
   () => {
@@ -24,90 +25,44 @@ const PostContent = dynamic(
 );
 
 const CreatePostPage: NextPageWithLayout = () => {
-  const [view, setView] = React.useState<PostView>("metadata");
-  const [postData, setPostData] = React.useState<PostData>({
-    title: "",
-    description: "",
-    excerpt: "",
-    content: "",
-  });
+  const [state, dispatch] = React.useReducer(post.reducer, post.initialState);
 
   const { handleDraftPost, setDraftStatus, draftStatus, msg } = useDraftPost(
-    postData,
-    setPostData
+    state.postData,
+    dispatch
   );
-
-  const handlePostTags = (selectedTags: string[]) => {
-    if (selectedTags.length === 0) {
-      const { tags: _, ...rest } = postData;
-      setPostData(rest);
-    } else {
-      setPostData({ ...postData, tags: selectedTags });
-    }
-  };
-
-  const handlePostImage = (imageFile?: File) => {
-    if (imageFile) {
-      setPostData({ ...postData, imageBanner: imageFile });
-    } else {
-      const { imageBanner: _, ...rest } = postData;
-      setPostData(rest);
-    }
-  };
-
-  const handleMetadata = (
-    title: string,
-    description: string,
-    excerpt: string
-  ) => {
-    setPostData({ ...postData, title, description, excerpt });
-  };
-
-  const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPostData({ ...postData, title: e.target.value });
-  };
-
-  const handleContent = (content: string) => {
-    setPostData({ ...postData, content });
-  };
 
   return (
     <>
       <Typography variant="h1" gutterBottom>
         Create A New Blog Post
       </Typography>
-      {view === "metadata" ? (
+      {state.view === "metadata" ? (
         <PostMetadata
-          onInput={handleTitle}
-          title={postData.title}
-          description={postData.description}
-          excerpt={postData.excerpt}
+          title={state.postData.title}
+          description={state.postData.description}
+          excerpt={state.postData.excerpt}
           draftStatus={draftStatus}
-          handleMetadata={handleMetadata}
+          dispatch={dispatch}
           handleDraftPost={handleDraftPost}
-          setView={setView}
           selectPostTags={
-            <SelectPostTags
-              tags={postData.tags}
-              onSelectTags={handlePostTags}
-            />
+            <SelectPostTags tags={state.postData.tags} dispatch={dispatch} />
           }
           fileInput={
             <PostFileInput
-              onSelectImage={handlePostImage}
-              imageBanner={postData.imageBanner}
+              dispatch={dispatch}
+              imageBanner={state.postData.imageBanner}
             />
           }
         />
-      ) : view === "content" ? (
+      ) : state.view === "content" ? (
         <PostContent
-          content={postData.content}
+          content={state.postData.content}
           draftStatus={draftStatus}
-          handleContent={handleContent}
           handleDraftPost={handleDraftPost}
-          setView={setView}
+          dispatch={dispatch}
         />
-      ) : null}
+      ) : /* TODO: <PostPreview /> */ null}
       <Snackbar
         message={msg}
         open={draftStatus === "error"}

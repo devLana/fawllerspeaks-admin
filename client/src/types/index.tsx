@@ -8,7 +8,13 @@ import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
 import type { SxProps } from "@mui/material/styles";
 
 import type { MetaInfo } from "@components/Metadata";
-import type { Mutation, Post, PostTag, Query } from "@apiTypes";
+import type {
+  CreatePostInput,
+  Mutation,
+  Post,
+  PostTag,
+  Query,
+} from "@apiTypes";
 
 /* General Project Types */
 export type PageLayoutFn = (
@@ -143,14 +149,40 @@ export type PostTagsListAction =
 /* Posts Feature Types */
 export type PostView = "metadata" | "content" | "preview";
 
-export interface PostData {
-  title: string;
-  description: string;
-  excerpt: string;
-  content: string;
-  imageBanner?: File;
-  tags?: string[];
+export interface PostImageBanner {
+  file: File;
+  blobUrl: string;
 }
+
+export type CreatePostData = Omit<CreatePostInput, "imageBanner" | "tags"> & {
+  excerpt: string;
+  tags?: string[];
+  imageBanner?: PostImageBanner;
+};
+
+export interface CreatePostState {
+  view: PostView;
+  postData: CreatePostData;
+}
+
+export type RequiredMetadataKeys = "title" | "description" | "excerpt";
+export type RequiredPostMetadata = Pick<CreatePostData, RequiredMetadataKeys>;
+
+export type CreatePostAction =
+  | { type: "CHANGE_VIEW"; payload: { view: PostView } }
+  | { type: "SELECT_POST_TAGS"; payload: { tags: string[] } }
+  | { type: "UNKNOWN_POST_TAGS" }
+  | { type: "ADD_POST_BANNER_IMAGE"; payload: { imageFile: File } }
+  | { type: "REMOVE_POST_BANNER_IMAGE" }
+  | {
+      type: "ADD_REQUIRED_METADATA";
+      payload: { metadata: RequiredPostMetadata };
+    }
+  | { type: "ADD_POST_CONTENT"; payload: { content: string } }
+  | {
+      type: "CHANGE_METADATA_FIELD";
+      payload: { key: RequiredMetadataKeys; value: string };
+    };
 
 type ModifiedPost = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
 

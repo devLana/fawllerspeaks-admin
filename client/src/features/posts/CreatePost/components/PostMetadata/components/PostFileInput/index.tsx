@@ -9,17 +9,15 @@ import { useHandleFile } from "@hooks/useHandleFile";
 import { FileInput } from "@components/FileInput";
 import PostImagePreview from "./PostImagePreview";
 import TooltipHint from "../TooltipHint";
-import { initImage } from "./utils/initImage";
+import type { CreatePostAction, PostImageBanner } from "@types";
 
 interface PostFileInputProps {
-  imageBanner?: File;
-  onSelectImage: (imageFile?: File) => void;
+  imageBanner?: PostImageBanner;
+  dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const PostFileInput = ({ onSelectImage, imageBanner }: PostFileInputProps) => {
-  const [image, setImage] = React.useState<{ error: string; blobUrl: string }>(
-    () => initImage(imageBanner)
-  );
+const PostFileInput = ({ dispatch, imageBanner }: PostFileInputProps) => {
+  const [imageError, setImageError] = React.useState("");
 
   const {
     fileInputRef,
@@ -29,26 +27,23 @@ const PostFileInput = ({ onSelectImage, imageBanner }: PostFileInputProps) => {
     handleDrop,
     handleKeydown,
   } = useHandleFile({
-    blobUrl: image.blobUrl,
-    imageFilename: imageBanner?.name,
-    errorCb: handleFileError,
-    successCb: handleFileSuccess,
+    blobUrl: imageBanner?.blobUrl ?? "",
+    imageFilename: imageBanner?.file.name,
+    errorCb: handleImageError,
+    successCb: handleAddImage,
   });
 
-  function handleFileError(errorMsg: string) {
-    setImage({ ...image, error: errorMsg });
+  function handleImageError(errorMsg: string) {
+    setImageError(errorMsg);
   }
 
-  function handleFileSuccess(imageFile: File) {
-    setImage({ error: "", blobUrl: window.URL.createObjectURL(imageFile) });
-    onSelectImage(imageFile);
+  function handleAddImage(imageFile: File) {
+    setImageError("");
+    dispatch({ type: "ADD_POST_BANNER_IMAGE", payload: { imageFile } });
   }
 
   const handleRemoveImage = () => {
-    if (image.blobUrl) window.URL.revokeObjectURL(image.blobUrl);
-
-    setImage({ error: "", blobUrl: "" });
-    onSelectImage();
+    dispatch({ type: "REMOVE_POST_BANNER_IMAGE" });
   };
 
   const id = "post-image-banner";
@@ -56,13 +51,13 @@ const PostFileInput = ({ onSelectImage, imageBanner }: PostFileInputProps) => {
   return (
     <TooltipHint
       hint="An optional image banner that gives visual meaning to the post"
-      childHasError={!!image.error}
+      childHasError={!!imageError}
     >
       <FormControl fullWidth>
-        {imageBanner && image.blobUrl ? (
+        {imageBanner?.blobUrl ? (
           <PostImagePreview
             id={id}
-            imageSrc={image.blobUrl}
+            src={imageBanner.blobUrl}
             onClick={handleRemoveImage}
             onKeydown={handleKeydown}
           />
@@ -100,14 +95,14 @@ const PostFileInput = ({ onSelectImage, imageBanner }: PostFileInputProps) => {
           accept="image/*"
           tabIndex={-1}
           onChange={handleChange}
-          aria-invalid={!!image.error}
-          aria-errormessage={image.error ? "image-helper-text" : undefined}
+          aria-invalid={!!imageError}
+          aria-errormessage={imageError ? "image-helper-text" : undefined}
           ref={fileInputRef}
-          key={imageBanner?.name}
+          key={imageBanner?.file.name}
         />
-        {image.error && (
+        {imageError && (
           <FormHelperText error id="image-helper-text">
-            {image.error}
+            {imageError}
           </FormHelperText>
         )}
       </FormControl>

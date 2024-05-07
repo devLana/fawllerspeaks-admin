@@ -8,13 +8,14 @@ import useGetPostTags from "@hooks/useGetPostTags";
 import SelectPostTagsInput from "./SelectPostTagsInput";
 import { SESSION_ID } from "@utils/constants";
 import TooltipHint from "../TooltipHint";
+import type { CreatePostAction } from "@types";
 
 interface SelectPostTagsProps {
   tags?: string[];
-  onSelectTags: (selectedTags: string[]) => void;
+  dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const SelectPostTags = ({ tags = [], onSelectTags }: SelectPostTagsProps) => {
+const SelectPostTags = ({ tags = [], dispatch }: SelectPostTagsProps) => {
   const { replace, pathname } = useRouter();
 
   const client = useApolloClient();
@@ -99,8 +100,8 @@ const SelectPostTags = ({ tags = [], onSelectTags }: SelectPostTagsProps) => {
       }
 
       return (
-        <TooltipHint hint="An optional collection of labels that best describes the post. Select as much as needed">
-          <SelectPostTagsInput tags={tags} onSelectTags={onSelectTags} />
+        <TooltipHint hint="An optional collection of labels used to categorize the post. Select as much as needed">
+          <SelectPostTagsInput tags={tags} dispatch={dispatch} />
         </TooltipHint>
       );
 
