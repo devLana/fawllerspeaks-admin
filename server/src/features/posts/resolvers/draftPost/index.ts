@@ -39,8 +39,8 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       return new AuthenticationError("Unable to save post to draft");
     }
 
-    const validated = await schema.validateAsync(post, { abortEarly: false });
-    const { title, description, content, tags, imageBanner } = validated;
+    const input = await schema.validateAsync(post, { abortEarly: false });
+    const { title, description, excerpt, content, tags, imageBanner } = input;
 
     const findUser = db.query<User>(
       `SELECT
@@ -104,11 +104,12 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       `INSERT INTO posts (
         title,
         description,
+        excerpt,
         content,
         author,
         status,
         image_banner
-      ) VALUES ($1, $2, $3, $4, $5, $6)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING
         id,
         post_id "postId",
@@ -118,7 +119,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
         views,
         is_in_bin "isInBin",
         is_deleted "isDeleted"`,
-      [title, description, content, user, "Draft", imageBanner]
+      [title, description, excerpt, content, user, "Draft", imageBanner]
     );
 
     const [drafted] = draftedPost;
@@ -138,6 +139,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       id: drafted.postId,
       title,
       description,
+      excerpt,
       content,
       author: { name, image },
       status: "Draft",

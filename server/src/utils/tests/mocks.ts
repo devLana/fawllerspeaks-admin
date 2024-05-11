@@ -38,6 +38,7 @@ export const newRegisteredUser: RemoveNullFromTestUser = {
 };
 
 const description = "Test post description";
+const excerpt = "Test post excerpt";
 const content = "Test post content";
 const imageBanner = "post/image/banner/storage/path";
 const datePublished = new Date().toISOString();
@@ -46,6 +47,7 @@ export const testPostData = (params?: CreateTestPostData): TestPostData => ({
   title: params?.title ?? "Test post default title",
   description:
     params?.description === undefined ? description : params.description,
+  excerpt: params?.excerpt === undefined ? excerpt : params.excerpt,
   content: params?.content === undefined ? content : params.content,
   status: params?.status ?? "Published",
   imageBanner:

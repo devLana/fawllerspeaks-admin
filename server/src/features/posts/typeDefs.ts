@@ -8,6 +8,7 @@ export const postsTypeDefs = `#graphql
     id: ID!
     title: String!
     description: String
+    excerpt: String
     content: String
     author: Author!
     status: PostStatus!
@@ -62,6 +63,7 @@ export const postsTypeDefs = `#graphql
   type DraftPostValidationError {
     titleError: String
     descriptionError: String
+    excerptError: String
     contentError: String
     tagsError: String
     imageBannerError: String
@@ -72,6 +74,7 @@ export const postsTypeDefs = `#graphql
     postIdError: String
     titleError: String
     descriptionError: String
+    excerptError: String
     contentError: String
     tagsError: String
     imageBannerError: String
@@ -91,6 +94,7 @@ export const postsTypeDefs = `#graphql
   type PostValidationError {
     titleError: String
     descriptionError: String
+    excerptError: String
     contentError: String
     tagsError: String
     imageBannerError: String
@@ -122,6 +126,7 @@ export const postsTypeDefs = `#graphql
   input CreatePostInput {
     title: String!
     description: String!
+    excerpt: String!
     content: String!
     tags: [ID!]
     imageBanner: String
@@ -130,6 +135,7 @@ export const postsTypeDefs = `#graphql
   input DraftPostInput {
     title: String!
     description: String
+    excerpt: String
     content: String
     tags: [ID!]
     imageBanner: String
@@ -139,6 +145,7 @@ export const postsTypeDefs = `#graphql
     postId: ID!
     title: String!
     description: String!
+    excerpt: String!
     content: String!
     tags: [ID!]
     imageBanner: String

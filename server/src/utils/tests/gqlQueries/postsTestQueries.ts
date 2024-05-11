@@ -4,6 +4,7 @@ const POST_FIELDS = `#graphql
     id
     title
     description
+    excerpt
     content
     author {
       name
@@ -51,6 +52,7 @@ export const CREATE_POST = `#graphql
         __typename
         titleError
         descriptionError
+        excerptError
         contentError
         tagsError
         imageBannerError
@@ -83,6 +85,7 @@ export const EDIT_POST = `#graphql
         postIdError
         titleError
         descriptionError
+        excerptError
         contentError
         tagsError
         imageBannerError
@@ -114,6 +117,7 @@ export const DRAFT_POST = `#graphql
         __typename
         titleError
         descriptionError
+        excerptError
         contentError
         tagsError
         imageBannerError

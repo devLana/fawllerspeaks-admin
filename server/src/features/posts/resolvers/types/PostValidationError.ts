@@ -10,6 +10,7 @@ type ValidationErrors = RemoveNull<Omit<Errors, "status">>;
 export class PostValidationError implements Errors {
   readonly titleError?: string;
   readonly descriptionError?: string;
+  readonly excerptError?: string;
   readonly contentError?: string;
   readonly tagsError?: string;
   readonly imageBannerError?: string;
@@ -18,6 +19,7 @@ export class PostValidationError implements Errors {
   constructor(errors: ValidationErrors) {
     this.titleError = errors.titleError;
     this.descriptionError = errors.descriptionError;
+    this.excerptError = errors.excerptError;
     this.contentError = errors.contentError;
     this.tagsError = errors.tagsError;
     this.imageBannerError = errors.imageBannerError;

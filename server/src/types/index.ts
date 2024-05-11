@@ -55,6 +55,7 @@ export interface PostDBData {
 export interface GetPostDBData extends PostDBData {
   readonly title: string;
   readonly description: string | null;
+  readonly excerpt: string | null;
   readonly content: string | null;
   readonly author: Omit<Author, "__typename">;
   readonly status: PostStatus;

@@ -15,6 +15,7 @@ import {
   UnknownError,
 } from "@utils/ObjectTypes";
 import generateErrorsObject from "@utils/generateErrorsObject";
+import deleteSession from "@utils/deleteSession";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
 import type { ResolverFunc, PostDBData, ValidationErrorObject } from "@types";
@@ -27,15 +28,16 @@ interface User {
   name: string;
 }
 
-const createPost: CreatePost = async (_, { post }, { db, user }) => {
-  if (!user) {
-    if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
-    return new AuthenticationError("Unable to create post");
-  }
-
+const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
   try {
-    const validated = await schema.validateAsync(post, { abortEarly: false });
-    const { title, description, content, tags, imageBanner } = validated;
+    if (!user) {
+      await deleteSession(db, req, res);
+      if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
+      return new AuthenticationError("Unable to create post");
+    }
+
+    const input = await schema.validateAsync(post, { abortEarly: false });
+    const { title, description, excerpt, content, tags, imageBanner } = input;
 
     const checkUser = db.query<User>(
       `SELECT
@@ -59,6 +61,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
     const { rows: savedTitle } = foundTitle;
 
     if (loggedInUser.length === 0) {
+      await deleteSession(db, req, res);
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new NotAllowedError("Unable to create post");
     }
@@ -97,12 +100,13 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       `INSERT INTO posts (
         title,
         description,
+        excerpt,
         content,
         author,
         status,
         image_banner,
         date_published
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING
         id,
         post_id "postId",
@@ -115,6 +119,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       [
         title,
         description,
+        excerpt,
         content,
         user,
         "Published",
@@ -140,6 +145,7 @@ const createPost: CreatePost = async (_, { post }, { db, user }) => {
       id: saved.postId,
       title,
       description,
+      excerpt,
       content,
       author: { name, image },
       status: "Published",

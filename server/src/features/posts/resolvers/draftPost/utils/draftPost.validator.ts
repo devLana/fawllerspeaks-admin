@@ -8,6 +8,9 @@ export const draftPostSchema = Joi.object<DraftPostInput>({
   description: Joi.string().allow(null).trim().messages({
     "string.empty": "Provide post description",
   }),
+  excerpt: Joi.string().allow(null).trim().messages({
+    "string.empty": "Provide post excerpt",
+  }),
   content: Joi.string().allow(null).trim().messages({
     "string.empty": "Provide post content",
   }),

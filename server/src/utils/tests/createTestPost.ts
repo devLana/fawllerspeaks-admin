@@ -23,6 +23,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
       `INSERT INTO posts (
         title,
         description,
+        excerpt,
         content,
         author,
         status,
@@ -32,12 +33,13 @@ const createTestPost = async (params: Params): Promise<Post> => {
         is_in_bin,
         is_deleted
       ) VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING
         id,
         post_id "postId",
         title,
         description,
+        excerpt,
         content,
         author,
         status,
@@ -51,6 +53,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
       [
         postData.title,
         postData.description,
+        postData.excerpt,
         postData.content,
         postAuthor.userId,
         postData.status,
@@ -94,6 +97,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
       id: post.postId,
       title: post.title,
       description: post.description,
+      excerpt: post.excerpt,
       content: post.content,
       author,
       status: post.status,

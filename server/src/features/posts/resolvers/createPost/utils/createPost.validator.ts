@@ -8,6 +8,9 @@ export const createPostValidator = Joi.object<CreatePostInput>({
   description: Joi.string().required().trim().messages({
     "string.empty": "Provide post description",
   }),
+  excerpt: Joi.string().required().trim().messages({
+    "string.empty": "Provide post excerpt",
+  }),
   content: Joi.string().required().trim().messages({
     "string.empty": "Provide post content",
   }),

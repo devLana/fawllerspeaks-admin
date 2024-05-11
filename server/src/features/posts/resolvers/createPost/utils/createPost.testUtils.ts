@@ -4,6 +4,7 @@ import type { InputErrors } from "@types";
 interface Input {
   title: string;
   description: string;
+  excerpt: string;
   content: string;
   tags: string[] | null;
   imageBanner: string;
@@ -20,6 +21,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       title: "",
       description: "",
+      excerpt: "",
       content: "",
       tags: ["", ""],
       imageBanner: "",
@@ -27,6 +29,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       titleError: "Provide post title",
       descriptionError: "Provide post description",
+      excerptError: "Provide post excerpt",
       contentError: "Provide post content",
       tagsError: "Input post tags cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
@@ -37,6 +40,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       title: "  ",
       description: " ",
+      excerpt: " ",
       content: "    ",
       tags: ["   ", "     "],
       imageBanner: "  ",
@@ -44,6 +48,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       titleError: "Provide post title",
       descriptionError: "Provide post description",
+      excerptError: "Provide post excerpt",
       contentError: "Provide post content",
       tagsError: "Input post tags cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
@@ -54,6 +59,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       title: "title",
       description: "description",
+      excerpt: "excerpt",
       content: "content",
       tags: [],
       imageBanner: "post/image/storage/path",
@@ -61,6 +67,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
+      excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
       tagsError: "No post tags were provided",
       imageBannerError: nullOrUndefined,
@@ -71,6 +78,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       title: "title",
       description: "description",
+      excerpt: "excerpt",
       content: "content",
       tags: [tagId, tagId],
       imageBanner: "slug/image/storage/path",
@@ -78,6 +86,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
+      excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
       tagsError: "Input tags can only contain unique tags",
       imageBannerError: nullOrUndefined,
@@ -88,6 +97,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       title: "title",
       description: "description",
+      excerpt: "excerpt",
       content: "content",
       tags: [tagId, "tagId"],
       imageBanner: "post/image/storage/path",
@@ -95,6 +105,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
+      excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
       tagsError: "Invalid post tag id",
       imageBannerError: nullOrUndefined,
@@ -108,6 +119,7 @@ export const gqlValidations: [string, object][] = [
     {
       title: null,
       description: undefined,
+      excerpt: undefined,
       content: null,
       tags: undefined,
       imageBanner: undefined,
@@ -118,6 +130,7 @@ export const gqlValidations: [string, object][] = [
     {
       title: false,
       description: 34646,
+      excerpt: 34646,
       content: true,
       tags: [9877, true],
       imageBanner: 21314,
@@ -140,7 +153,11 @@ export const dbPost = {
 
 export const tags = [UUID, randomUUID(), randomUUID()];
 export const imageBanner = "post/image/banner";
-const mockData = { description: "post description", content: "post content" };
+const mockData = {
+  description: "post description",
+  excerpt: "mock excerpt",
+  content: "post content",
+};
 
 export const argsWithImage = {
   ...mockData,

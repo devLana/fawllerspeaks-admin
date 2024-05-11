@@ -5,6 +5,7 @@ import type { InputErrors } from "@types";
 interface Input {
   title: string;
   description?: string;
+  excerpt?: string;
   content?: string;
   tags?: string[];
   imageBanner?: string;
@@ -53,6 +54,7 @@ export const gqlValidations: [string, object][] = [
     {
       title: null,
       description: undefined,
+      excerpt: undefined,
       content: undefined,
       tags: undefined,
       imageBanner: undefined,
@@ -63,6 +65,7 @@ export const gqlValidations: [string, object][] = [
     {
       title: false,
       description: 34646,
+      excerpt: true,
       content: true,
       tags: [9877, true],
       imageBanner: 21314,
@@ -76,6 +79,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     {
       title: "",
       description: "",
+      excerpt: "",
       content: "",
       tags: ["", ""],
       imageBanner: "",
@@ -83,6 +87,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     {
       titleError: "A title is required to save this post to draft",
       descriptionError: "Provide post description",
+      excerptError: "Provide post excerpt",
       contentError: "Provide post content",
       tagsError: "Input post tags cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
@@ -93,6 +98,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     {
       title: "  ",
       description: " ",
+      excerpt: " ",
       content: "    ",
       tags: ["   ", "     "],
       imageBanner: "  ",
@@ -100,6 +106,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     {
       titleError: "A title is required to save this post to draft",
       descriptionError: "Provide post description",
+      excerptError: "Provide post excerpt",
       contentError: "Provide post content",
       tagsError: "Input post tags cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
@@ -111,6 +118,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
+      excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
       tagsError: "No post tags were provided",
       imageBannerError: nullOrUndefined,
@@ -122,6 +130,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
+      excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
       tagsError: "Input tags can only contain unique tags",
       imageBannerError: nullOrUndefined,
@@ -133,6 +142,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
+      excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
       tagsError: "Invalid post tag id",
       imageBannerError: nullOrUndefined,

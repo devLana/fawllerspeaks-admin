@@ -8,11 +8,16 @@ import * as mocks from "../utils/createPost.testUtils";
 import { mockContext, info } from "@tests/resolverArguments";
 import spyDb from "@tests/spyDb";
 import { urls } from "@utils/ClientUrls";
+import deleteSession from "@utils/deleteSession";
 
 type MockType<U extends string[] | null = null> = jest.MockedFunction<() => U>;
 
 jest.mock("@features/posts/utils/getPostTags", () => {
   return jest.fn().mockName("getPostTags");
+});
+
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
 });
 
 jest.mock("@lib/supabase/supabaseEvent");
@@ -32,6 +37,7 @@ describe("Test createPost resolver", () => {
 
       const result = await createPost({}, { post }, mockContext, info);
 
+      expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to create post");
       expect(result).toHaveProperty("status", "ERROR");
     });
@@ -43,6 +49,7 @@ describe("Test createPost resolver", () => {
 
       expect(getPostTags).not.toHaveBeenCalled();
       expect(result).toHaveProperty("titleError", errors.titleError);
+      expect(result).toHaveProperty("excerptError", errors.excerptError);
       expect(result).toHaveProperty("contentError", errors.contentError);
       expect(result).toHaveProperty("tagsError", errors.tagsError);
       expect(result).toHaveProperty("status", "ERROR");
@@ -146,6 +153,7 @@ describe("Test createPost resolver", () => {
       expect(getPostTags).toHaveReturnedWith(["tag", "tag", "tag"]);
       expect(result).toHaveProperty("post.id", mocks.dbPost.postId);
       expect(result).toHaveProperty("post.title", post.title);
+      expect(result).toHaveProperty("post.excerpt", post.excerpt);
       expect(result).toHaveProperty("post.description", post.description);
       expect(result).toHaveProperty("post.content", post.content);
       expect(result).toHaveProperty("post.author", author);
