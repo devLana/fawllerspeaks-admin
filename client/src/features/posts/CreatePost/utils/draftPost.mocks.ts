@@ -12,11 +12,15 @@ interface Redirects {
 }
 
 export const draftBtn = { name: /^save as draft$/i };
-export const regex = /^Select Post Image Banner$/i;
-export const main = { name: /^title$/i };
-export const description = { name: /^description$/i };
-export const next = { name: /^next$/i };
-export const form = { name: /^post metadata$/i };
+export const imageLabel = /^Select A Post Image Banner$/i;
+export const titleLabel = { name: /^post title$/i };
+export const description = { name: /^post description$/i };
+export const content = { name: /^post content$/i };
+export const excerpt = { name: /^post excerpt$/i };
+export const metadataNext = { name: /^proceed to post content$/i };
+export const contentNext = { name: /^preview post$/i };
+export const metadataRegion = { name: /^provide post metadata$/i };
+export const contentRegion = { name: /^provide post content$/i };
 const titleStr = (prefix: string) => `${prefix} Test Post Title`;
 const duplicateMsg = "Post title already exists";
 const unknownMsg = "Unknown post tag id provided";
@@ -69,6 +73,7 @@ export const server = setupServer(
       return mswData("draftPost", "PostValidationError", {
         titleError: null,
         descriptionError: null,
+        excerptError: null,
         contentError: contentErrorMsg,
         imageBannerError: contentErrorMsg,
         tagsError: "Invalid post tag id provided",
@@ -88,6 +93,8 @@ export const server = setupServer(
     if (title === titleStr("network")) {
       return mswErrors(new Error(), { status: 503 });
     }
+
+    return mswErrors(new Error(), { status: 400 });
   })
 );
 

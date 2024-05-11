@@ -95,6 +95,7 @@ const PostMetadata = ({
               onBlur={e => handleBlur(e, id)}
               id={id}
               autoComplete="on"
+              autoFocus={id === "title"}
               fullWidth
               label={label}
               defaultValue={defaultValues?.[id] ?? ""}
