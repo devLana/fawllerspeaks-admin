@@ -1,8 +1,5 @@
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import LoadingButton from "@mui/lab/LoadingButton";
-
 import SectionHeader from "../SectionHeader";
+import ActionButtons from "../ActionButtons";
 import CKEditorComponent from "./components/CKEditorComponent";
 import type { CreatePostAction, PostView } from "@types";
 
@@ -25,35 +22,24 @@ const PostContent = (props: PostContentProps) => {
   };
 
   return (
-    <section>
+    <section
+      aria-live="polite"
+      aria-busy="false"
+      aria-labelledby="post-content-label"
+    >
       <SectionHeader
         onClick={() => handleView("metadata")}
-        label="Go back to post metadata section"
-        heading="Provide blog post content"
+        id="post-content-label"
+        buttonLabel="Go back to provide post metadata section"
+        heading="Provide post content"
       />
       <CKEditorComponent data={content} dispatch={dispatch} />
-      <Box
-        display="flex"
-        justifyContent="center"
-        flexWrap="wrap"
-        rowGap={1}
-        columnGap={2}
-      >
-        <LoadingButton
-          variant="outlined"
-          loading={draftStatus === "loading"}
-          onClick={handleDraftPost}
-        >
-          <span>Save as draft</span>
-        </LoadingButton>
-        <Button
-          onClick={handleNext}
-          variant="contained"
-          disabled={draftStatus === "loading"}
-        >
-          Next
-        </Button>
-      </Box>
+      <ActionButtons
+        label="Preview post"
+        status={draftStatus}
+        onDraft={handleDraftPost}
+        onNext={handleNext}
+      />
     </section>
   );
 };

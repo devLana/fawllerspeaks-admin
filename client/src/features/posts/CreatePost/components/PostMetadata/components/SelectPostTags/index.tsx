@@ -2,12 +2,12 @@ import { useRouter } from "next/router";
 
 import { useApolloClient } from "@apollo/client";
 import Alert from "@mui/material/Alert";
-import Skeleton from "@mui/material/Skeleton";
 
 import useGetPostTags from "@hooks/useGetPostTags";
 import SelectPostTagsInput from "./SelectPostTagsInput";
-import { SESSION_ID } from "@utils/constants";
+import SelectPostTagsSkeleton from "./SelectPostTagsSkeleton";
 import TooltipHint from "../TooltipHint";
+import { SESSION_ID } from "@utils/constants";
 import type { CreatePostAction } from "@types";
 
 interface SelectPostTagsProps {
@@ -24,21 +24,12 @@ const SelectPostTags = ({ tags = [], dispatch }: SelectPostTagsProps) => {
   const msg =
     "You can't add post tags to this post at the moment. Please try again later";
 
-  const skeletonSx = { mt: 2, mb: 1, maxWidth: "none" };
-  const alertSx = { mt: 1.25, mb: 0.25 };
-
-  if (loading) {
-    return (
-      <Skeleton variant="rounded" width="100%" sx={skeletonSx}>
-        <SelectPostTagsInput />
-      </Skeleton>
-    );
-  }
+  if (loading) return <SelectPostTagsSkeleton />;
 
   if (error) {
     const message = error.graphQLErrors[0]?.message ?? msg;
     return (
-      <Alert severity="error" sx={alertSx}>
+      <Alert severity="error" sx={{ mb: 2.5 }} role="status" aria-busy="false">
         {message}
       </Alert>
     );
@@ -49,7 +40,7 @@ const SelectPostTags = ({ tags = [], dispatch }: SelectPostTagsProps) => {
       "No post tags found. Go to the 'Post Tags' page to create some post tags";
 
     return (
-      <Alert severity="info" sx={alertSx}>
+      <Alert severity="info" sx={{ mb: 2.5 }} role="status" aria-busy="false">
         {text}
       </Alert>
     );
@@ -60,32 +51,17 @@ const SelectPostTags = ({ tags = [], dispatch }: SelectPostTagsProps) => {
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
       void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
-
-      return (
-        <Skeleton variant="rounded" width="100%" sx={skeletonSx}>
-          <SelectPostTagsInput />
-        </Skeleton>
-      );
+      return <SelectPostTagsSkeleton />;
 
     case "UnknownError":
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
       void replace("/login?status=unauthorized");
-
-      return (
-        <Skeleton variant="rounded" width="100%" sx={skeletonSx}>
-          <SelectPostTagsInput />
-        </Skeleton>
-      );
+      return <SelectPostTagsSkeleton />;
 
     case "RegistrationError":
       void replace(`/register?status=unregistered&redirectTo=${pathname}`);
-
-      return (
-        <Skeleton variant="rounded" width="100%" sx={skeletonSx}>
-          <SelectPostTagsInput />
-        </Skeleton>
-      );
+      return <SelectPostTagsSkeleton />;
 
     case "PostTags":
       if (data.getPostTags.tags.length === 0) {
@@ -93,21 +69,29 @@ const SelectPostTags = ({ tags = [], dispatch }: SelectPostTagsProps) => {
           "No post tags have been created yet. Go to the 'Post Tags' page to get started";
 
         return (
-          <Alert severity="info" sx={alertSx}>
+          <Alert
+            severity="info"
+            sx={{ mb: 2.5 }}
+            role="status"
+            aria-busy="false"
+          >
             {text}
           </Alert>
         );
       }
 
       return (
-        <TooltipHint hint="An optional collection of labels used to categorize the post. Select as much as needed">
+        <TooltipHint
+          hint="An optional collection of labels used to categorize the post. Select as much as needed"
+          addAriaBusy
+        >
           <SelectPostTagsInput tags={tags} dispatch={dispatch} />
         </TooltipHint>
       );
 
     default:
       return (
-        <Alert severity="info" sx={alertSx}>
+        <Alert severity="info" sx={{ mb: 2.5 }} role="status" aria-busy="false">
           {msg}
         </Alert>
       );

@@ -5,17 +5,24 @@ import ChevronLeft from "@mui/icons-material/ChevronLeft";
 
 interface SectionHeaderProps {
   onClick: VoidFunction;
-  label: string;
+  id: string;
+  buttonLabel: string;
   heading: string;
 }
 
-const SectionHeader = ({ onClick, heading, label }: SectionHeaderProps) => (
-  <Box mb={1.5} display="flex" alignItems="center" columnGap={3}>
-    <IconButton color="primary" aria-label={label} onClick={onClick}>
-      <ChevronLeft fontSize="small" />
-    </IconButton>
-    <Typography variant="h2">{heading}</Typography>
-  </Box>
-);
+const SectionHeader = (props: SectionHeaderProps) => {
+  const { onClick, heading, buttonLabel, id } = props;
+
+  return (
+    <Box mb={1.5} display="flex" alignItems="center" columnGap={3}>
+      <IconButton color="primary" aria-label={buttonLabel} onClick={onClick}>
+        <ChevronLeft fontSize="small" />
+      </IconButton>
+      <Typography variant="h2" id={id}>
+        {heading}
+      </Typography>
+    </Box>
+  );
+};
 
 export default SectionHeader;

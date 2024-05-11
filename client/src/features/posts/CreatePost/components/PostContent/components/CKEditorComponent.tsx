@@ -32,7 +32,7 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
 
   return (
     <Box
-      mb={4}
+      mb={2.5}
       sx={({ shape, typography, palette, shadows, spacing }) => ({
         "--ck-color-toolbar-background": palette.background.default,
         "--ck-color-base-background": palette.background.default,

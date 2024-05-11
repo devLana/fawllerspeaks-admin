@@ -1,14 +1,13 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import LoadingButton from "@mui/lab/LoadingButton";
 
+import TooltipHint from "./components/TooltipHint";
+import ActionButtons from "../ActionButtons";
 import { postMetadataValidator } from "./utils/postMetadataValidator";
 import { metadataTextBoxes } from "./utils/metadataTextBoxes";
-import TooltipHint from "./components/TooltipHint";
 import type {
   CreatePostAction,
   RequiredPostMetadata,
@@ -77,9 +76,15 @@ const PostMetadata = ({
   };
 
   return (
-    <Box component="section" maxWidth={700}>
-      <Typography variant="h2" gutterBottom>
-        Provide post metadata below
+    <Box
+      component="section"
+      maxWidth={700}
+      aria-live="polite"
+      aria-busy="false"
+      aria-labelledby="post-metadata-label"
+    >
+      <Typography variant="h2" gutterBottom id="post-metadata-label">
+        Provide post metadata
       </Typography>
       <form aria-label="Post metadata" onSubmit={handleSubmit(submitHandler)}>
         {metadataTextBoxes.map(({ id, label, hint }) => (
@@ -101,29 +106,11 @@ const PostMetadata = ({
         ))}
         {selectPostTags}
         {fileInput}
-        <Box
-          display="flex"
-          justifyContent="center"
-          flexWrap="wrap"
-          rowGap={1}
-          columnGap={2}
-          mt={4}
-        >
-          <LoadingButton
-            variant="outlined"
-            loading={draftStatus === "loading"}
-            onClick={handleDraft}
-          >
-            <span>Save as draft</span>
-          </LoadingButton>
-          <Button
-            variant="contained"
-            type="submit"
-            disabled={draftStatus === "loading"}
-          >
-            Next
-          </Button>
-        </Box>
+        <ActionButtons
+          label="Proceed to post content"
+          status={draftStatus}
+          onDraft={handleDraft}
+        />
       </form>
     </Box>
   );
