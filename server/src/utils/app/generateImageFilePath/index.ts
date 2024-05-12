@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import util from "node:util";
 
-import { nodeEnv } from "./nodeEnv";
+import { nodeEnv } from "../nodeEnv";
 import type { ImageCategory } from "@types";
 
 const mimeTypeDict: Record<string, string | undefined> = {
