@@ -15,11 +15,13 @@ import { resolvers } from "@schema/resolvers";
 import { createTempDirectory } from "@middleware/createTempDirectory";
 import { authenticateUser } from "@middleware/authenticateUser";
 import { errorMiddleware } from "@middleware/errorMiddleware";
-import { multipartParser } from "@middleware/multipartParser";
+import { uploadImageParser } from "@middleware/uploadImageParser";
+import { postContentImageParser } from "@middleware/postContentImageParser";
 import { parseCookies } from "@middleware/parseCookies";
 
 import { healthCheck } from "@controllers/healthCheck";
 import { uploadImage } from "@controllers/uploadImage";
+import { uploadPostContentImage } from "@controllers/uploadPostContentImage";
 import { graphqlApi } from "@controllers/graphqlApi";
 import { catchAll } from "@controllers/catchAll";
 
@@ -54,11 +56,19 @@ export const startServer = async (port: number) => {
   );
 
   app.use(/^\/$/, [express.json(), parseCookies], graphqlApi(server));
+
   app.post(
     "/upload-image",
-    [authenticateUser, createTempDirectory, multipartParser],
+    [authenticateUser, createTempDirectory, uploadImageParser],
     uploadImage
   );
+
+  app.post(
+    "/upload-post-content-image",
+    [authenticateUser, createTempDirectory, postContentImageParser],
+    uploadPostContentImage
+  );
+
   app.get("/health-check", healthCheck);
   app.use("*", catchAll);
   app.use(errorMiddleware);

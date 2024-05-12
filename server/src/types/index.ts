@@ -97,8 +97,15 @@ interface UploadedFile {
   mimetype: string;
 }
 
-export interface UploadRequest extends Request {
-  upload?: { file: UploadedFile; imageCategory: "avatar" | "post" };
+export type ImageCategory = "avatar" | "postBanner" | "postContentImage";
+type ImageUploadCategory = Exclude<ImageCategory, "postContentImage">;
+
+export interface ImageUploadRequest extends Request {
+  upload?: { file: UploadedFile; imageCategory: ImageUploadCategory };
+}
+
+export interface PostContentImageRequest extends Request {
+  upload?: { file: UploadedFile };
 }
 
 export interface GQLRequest extends Request {

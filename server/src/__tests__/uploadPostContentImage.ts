@@ -28,7 +28,7 @@ type UploadReturn = () => Promise<{ error: Error | null }>;
 
 jest.mock("@utils/upload");
 
-describe("Upload image - E2E", () => {
+describe("Upload post content image - E2E", () => {
   const unknownUserId = randomUUID();
   let server: ApolloServer<APIContext>, url: string, unknownJwt: string;
   let unregisteredJwt: string, registeredJwt: string, expiredJwtUser: string;
@@ -69,8 +69,14 @@ describe("Upload image - E2E", () => {
       const formData2 = new FormData();
       const headers = { authorization: `Bear ${registeredJwt}` };
 
-      const req1 = postFormData(`${url}upload-image`, formData1);
-      const req2 = postFormData(`${url}upload-image`, formData2, headers);
+      const req1 = postFormData(`${url}upload-post-content-image`, formData1);
+
+      const req2 = postFormData(
+        `${url}upload-post-content-image`,
+        formData2,
+        headers
+      );
+
       const [res1, res2] = await Promise.all([req1, req2]);
 
       expect(res1.statusCode).toBe(401);
@@ -90,7 +96,11 @@ describe("Upload image - E2E", () => {
       const formData = new FormData();
       const headers = { authorization: "Bearer json.web.token" };
 
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(
+        `${url}upload-post-content-image`,
+        formData,
+        headers
+      );
 
       expect(res.statusCode).toBe(401);
       expect(res.statusMessage).toBe("Unauthorized");
@@ -103,7 +113,11 @@ describe("Upload image - E2E", () => {
       const formData = new FormData();
       const headers = { authorization: `Bearer ${expiredJwtUser}` };
 
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(
+        `${url}upload-post-content-image`,
+        formData,
+        headers
+      );
 
       expect(res.statusCode).toBe(401);
       expect(res.statusMessage).toBe("Unauthorized");
@@ -118,7 +132,11 @@ describe("Upload image - E2E", () => {
       const formData = new FormData();
       const headers = { authorization: `Bearer ${unknownJwt}` };
 
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(
+        `${url}upload-post-content-image`,
+        formData,
+        headers
+      );
 
       expect(res.statusCode).toBe(403);
       expect(res.statusMessage).toBe("Forbidden");
@@ -131,7 +149,11 @@ describe("Upload image - E2E", () => {
       const formData = new FormData();
       const headers = { authorization: `Bearer ${unregisteredJwt}` };
 
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(
+        `${url}upload-post-content-image`,
+        formData,
+        headers
+      );
 
       expect(res.statusCode).toBe(403);
       expect(res.statusMessage).toBe("Forbidden");
@@ -145,7 +167,7 @@ describe("Upload image - E2E", () => {
     // it.only("Should respond with a bad request error for a wrong request type", async () => {
     //   const json = { request: "json request" };
     //   const headers = { authorization: `Bearer ${registeredJwt}` };
-    //   const res = await postFormData(`${url}upload-image`, json, headers);
+    //   const res = await postFormData(`${url}upload-post-content-image`, json, headers);
 
     //   expect(res.statusCode).toBe(400);
     //   expect(res.statusMessage).toBe("Forbidden");
@@ -158,7 +180,11 @@ describe("Upload image - E2E", () => {
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
 
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(
+        `${url}upload-post-content-image`,
+        formData,
+        headers
+      );
 
       expect(res.statusCode).toBe(400);
       expect(res.statusMessage).toBe("Bad Request");
@@ -179,10 +205,14 @@ describe("Upload image - E2E", () => {
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("image", imageOne, imageName);
-      formData.append("image", imageTwo, "profile-image-1.png");
+      formData.append("file", imageOne, imageName);
+      formData.append("file", imageTwo, "profile-image-1.png");
 
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(
+        `${url}upload-post-content-image`,
+        formData,
+        headers
+      );
 
       expect(res.statusCode).toBe(400);
       expect(res.statusMessage).toBe("Bad Request");
@@ -198,70 +228,18 @@ describe("Upload image - E2E", () => {
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("image", fileBuf, "file.html");
+      formData.append("file", fileBuf, "file.html");
 
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(
+        `${url}upload-post-content-image`,
+        formData,
+        headers
+      );
 
       expect(res.statusCode).toBe(400);
       expect(res.statusMessage).toBe("Bad Request");
       expect(res.data).toStrictEqual({
         error: { message: "Only an image file can be uploaded" },
-      });
-    });
-
-    it("Should respond with a bad request error if an image category field is not provided", async () => {
-      const imageArrayBuffer = await image.arrayBuffer();
-      const imageBuf = Buffer.from(imageArrayBuffer);
-
-      const formData = new FormData();
-      const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("image", imageBuf, imageName);
-
-      const res = await postFormData(`${url}upload-image`, formData, headers);
-
-      expect(res.statusCode).toBe(400);
-      expect(res.statusMessage).toBe("Bad Request");
-      expect(res.data).toStrictEqual({
-        error: { message: "Image category type was not provided" },
-      });
-    });
-
-    it("Should respond with a bad request error if multiple image category fields are present", async () => {
-      const imageArrayBuffer = await image.arrayBuffer();
-      const imageBuf = Buffer.from(imageArrayBuffer);
-
-      const formData = new FormData();
-      const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("image", imageBuf, imageName);
-      formData.append("type", "music");
-      formData.append("type", "video");
-
-      const res = await postFormData(`${url}upload-image`, formData, headers);
-
-      expect(res.statusCode).toBe(400);
-      expect(res.statusMessage).toBe("Bad Request");
-      expect(res.data).toStrictEqual({
-        error: { message: "Only one image category type should be provided" },
-      });
-    });
-
-    it("Should respond with a bad request error if the image category is neither 'avatar' nor 'post'", async () => {
-      const imageArrayBuffer = await image.arrayBuffer();
-      const imageBuf = Buffer.from(imageArrayBuffer);
-
-      const formData = new FormData();
-      const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("image", imageBuf, imageName);
-      formData.append("type", "music");
-
-      const res = await postFormData(`${url}upload-image`, formData, headers);
-
-      expect(res.statusCode).toBe(400);
-      expect(res.statusMessage).toBe("Bad Request");
-      expect(res.data).toStrictEqual({
-        error: {
-          message: "Image category type must be 'avatar' or 'postBanner'",
-        },
       });
     });
   });
@@ -281,10 +259,13 @@ describe("Upload image - E2E", () => {
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("image", imageBuf, imageName);
-      formData.append("type", "avatar");
+      formData.append("file", imageBuf, imageName);
 
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(
+        `${url}upload-post-content-image`,
+        formData,
+        headers
+      );
 
       expect(res.statusCode).toBe(500);
       expect(res.statusMessage).toBe("Internal Server Error");
@@ -304,19 +285,18 @@ describe("Upload image - E2E", () => {
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("image", imageBuf, imageName);
-      formData.append("type", "postBanner");
+      formData.append("file", imageBuf, imageName);
 
-      const res = await postFormData<{ image: string }>(
-        `${url}upload-image`,
+      const res = await postFormData<{ url: string }>(
+        `${url}upload-post-content-image`,
         formData,
         headers
       );
 
       expect(res.statusCode).toBe(201);
       expect(res.statusMessage).toBe("Created");
-      expect(res.data).toHaveProperty("image");
-      expect(res.data.image).toMatch(/^post\/banner\/[\w-]+\.jpe?g$/);
+      expect(res.data).toHaveProperty("url");
+      expect(res.data.url).toMatch(/post\/content-image\/[\w-]+\.jpe?g$/);
     });
   });
 });

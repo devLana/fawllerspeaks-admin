@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import util from "node:util";
 
 import { nodeEnv } from "./nodeEnv";
+import type { ImageCategory } from "@types";
 
 const mimeTypeDict: Record<string, string | undefined> = {
   "image/avif": ".avif",
@@ -15,8 +16,8 @@ const mimeTypeDict: Record<string, string | undefined> = {
   "image/webp": ".webp",
 };
 
-export const generateSupabasePath = async (
-  imageCategory: string,
+export const generateImageFilePath = async (
+  imageCategory: ImageCategory,
   mimeType: string
 ) => {
   const randomBytes = util.promisify(crypto.randomBytes);
@@ -25,6 +26,24 @@ export const generateSupabasePath = async (
   const filename = filenameBuf.toString("base64url");
   const isDev = nodeEnv === "development" ? "dev/" : "";
   const extension = mimeTypeDict[mimeType] ?? "";
+  let folderName: string;
 
-  return `${isDev}${imageCategory}/${filename}${extension}`;
+  switch (imageCategory) {
+    case "avatar":
+      folderName = "avatar/";
+      break;
+
+    case "postBanner":
+      folderName = "post/banner/";
+      break;
+
+    case "postContentImage":
+      folderName = "post/content-image/";
+      break;
+
+    default:
+      folderName = "";
+  }
+
+  return `${isDev}${folderName}${filename}${extension}`;
 };

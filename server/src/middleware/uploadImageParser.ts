@@ -4,10 +4,10 @@ import type { Response, NextFunction } from "express";
 import { removeFile } from "@events/removeFile";
 import { ApiError, BadRequestError } from "@utils/Errors";
 import { UPLOAD_DIR } from "@utils/constants";
-import type { UploadRequest } from "@types";
+import type { ImageUploadRequest } from "@types";
 
-export const multipartParser = async (
-  req: UploadRequest,
+export const uploadImageParser = async (
+  req: ImageUploadRequest,
   _: Response,
   next: NextFunction
 ) => {
@@ -20,7 +20,7 @@ export const multipartParser = async (
     const form = formidable({ uploadDir: UPLOAD_DIR });
     const [fields, files] = await form.parse<"type", "image">(req);
 
-    if (!files.image) {
+    if (!files.image || files.image.length === 0) {
       throw new BadRequestError("No image file was uploaded");
     }
 
@@ -42,9 +42,9 @@ export const multipartParser = async (
       );
     }
 
-    if (fields.type[0] !== "avatar" && fields.type[0] !== "post") {
+    if (fields.type[0] !== "avatar" && fields.type[0] !== "postBanner") {
       throw new BadRequestError(
-        "Image category type must be 'avatar' or 'post'"
+        "Image category type must be 'avatar' or 'postBanner'"
       );
     }
 
@@ -62,8 +62,9 @@ export const multipartParser = async (
     if (err instanceof ApiError) return next(err);
 
     const error = new ApiError(
-      "There was an error parsing your request. Please try again later"
+      "There was an error processing your image upload. Please try again later"
     );
+
     next(error);
   }
 };

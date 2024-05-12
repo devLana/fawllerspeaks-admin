@@ -9,5 +9,5 @@ export const errorMiddleware = (
   __: NextFunction
 ): void => {
   const { message, statusCode = 500 } = err;
-  res.status(statusCode).json({ message, status: "ERROR" });
+  res.status(statusCode).json({ error: { message } });
 };

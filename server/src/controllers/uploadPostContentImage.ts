@@ -10,10 +10,10 @@ import { generateImageFilePath } from "@utils/generateImageFilePath";
 import { UPLOAD_DIR } from "@utils/constants";
 import { upload } from "@utils/upload";
 
-import type { ImageUploadRequest } from "@types";
+import type { PostContentImageRequest } from "@types";
 
-export const uploadImage = async (
-  req: ImageUploadRequest,
+export const uploadPostContentImage = async (
+  req: PostContentImageRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -24,11 +24,14 @@ export const uploadImage = async (
 
   try {
     const { storageUrl } = supabase();
-    const { file, imageCategory } = req.upload;
+    const { file } = req.upload;
     const { mimetype, filepath } = file;
 
     const imageFile = await readFile(filepath);
-    const imageFilePath = await generateImageFilePath(imageCategory, mimetype);
+    const imageFilePath = await generateImageFilePath(
+      "postContentImage",
+      mimetype
+    );
 
     const { error: supabaseErr } = await upload(
       imageFilePath,
@@ -44,10 +47,9 @@ export const uploadImage = async (
       );
     }
 
-    res
-      .status(201)
-      .set("Location", `${storageUrl}${imageFilePath}`)
-      .json({ image: imageFilePath });
+    const url = `${storageUrl}${imageFilePath}`;
+
+    res.status(201).set("Location", url).json({ url });
   } catch (err) {
     if (err instanceof ApiError) return next(err);
 
