@@ -3,7 +3,6 @@ import Image from "next/image";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -41,10 +40,14 @@ const Header = ({ onClick }: { onClick: () => void }) => (
           />
         </NextLink>
       </Box>
-      <Stack direction="row" spacing={{ xs: 1, sm: 2 }} alignItems="center">
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{ columnGap: { xs: 1, sm: 2 } }}
+      >
         <HeaderThemeButton />
         <UserAvatar renderWithLink />
-      </Stack>
+      </Box>
     </Toolbar>
   </AppBar>
 );

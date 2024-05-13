@@ -4,9 +4,9 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
-import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -157,7 +157,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
               : undefined,
           }}
         />
-        <Stack direction="row" justifyContent="center" mt={3} columnGap={2}>
+        <Box display="flex" justifyContent="center" mt={3} columnGap={2}>
           <Button onClick={onClick} disabled={status === "submitting"}>
             Cancel
           </Button>
@@ -168,7 +168,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
           >
             <span>Edit Tag</span>
           </LoadingButton>
-        </Stack>
+        </Box>
       </form>
       <Snackbar
         message={alertMessage}

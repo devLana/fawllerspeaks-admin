@@ -1,13 +1,18 @@
-import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import PostTagsWrapper from "./PostTagsWrapper";
 
 const PostTagsLoading = ({ id }: { id: string }) => (
   <PostTagsWrapper id={id}>
-    <Stack aria-busy={true} alignItems="center" justifyContent="center">
+    <Box
+      aria-busy={true}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+    >
       <CircularProgress size="1.9em" aria-describedby={id} />
-    </Stack>
+    </Box>
   </PostTagsWrapper>
 );
 

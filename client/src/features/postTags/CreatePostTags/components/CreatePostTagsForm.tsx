@@ -4,10 +4,10 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Snackbar from "@mui/material/Snackbar";
-import Stack from "@mui/material/Stack";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -140,7 +140,7 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
         >
           Add More
         </Button>
-        <Stack direction="row" justifyContent="center" mt={3} columnGap={2}>
+        <Box display="flex" justifyContent="center" mt={3} columnGap={2}>
           <Button onClick={onCloseDialog} disabled={status === "submitting"}>
             Cancel
           </Button>
@@ -151,7 +151,7 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
           >
             <span>Create {inputs.length > 1 ? "Tags" : "Tag"}</span>
           </LoadingButton>
-        </Stack>
+        </Box>
       </form>
       <Snackbar
         message={alertMessage}

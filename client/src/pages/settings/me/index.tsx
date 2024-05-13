@@ -1,3 +1,4 @@
+import Box from "@mui/material/Box";
 import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -16,7 +17,7 @@ const Me: NextPageWithLayout = () => {
 
   return (
     <>
-      <Stack direction="row" spacing={4} alignItems="center" pt={2}>
+      <Box display="flex" alignItems="center" pt={2} sx={{ columnGap: 4 }}>
         <UserAvatar
           sx={{
             width: { xs: 100, md: 115 },
@@ -30,7 +31,7 @@ const Me: NextPageWithLayout = () => {
           </Typography>
           <NextLink href="/settings/me/edit">Edit Profile</NextLink>
         </Stack>
-      </Stack>
+      </Box>
       <Snackbar
         message={alert.message}
         open={alert.open}
