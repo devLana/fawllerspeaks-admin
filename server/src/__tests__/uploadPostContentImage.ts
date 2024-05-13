@@ -205,8 +205,8 @@ describe("Upload post content image - E2E", () => {
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("file", imageOne, imageName);
-      formData.append("file", imageTwo, "profile-image-1.png");
+      formData.append("upload", imageOne, imageName);
+      formData.append("upload", imageTwo, "profile-image-1.png");
 
       const res = await postFormData(
         `${url}upload-post-content-image`,
@@ -228,7 +228,7 @@ describe("Upload post content image - E2E", () => {
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("file", fileBuf, "file.html");
+      formData.append("upload", fileBuf, "file.html");
 
       const res = await postFormData(
         `${url}upload-post-content-image`,
@@ -259,7 +259,7 @@ describe("Upload post content image - E2E", () => {
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("file", imageBuf, imageName);
+      formData.append("upload", imageBuf, imageName);
 
       const res = await postFormData(
         `${url}upload-post-content-image`,
@@ -285,7 +285,7 @@ describe("Upload post content image - E2E", () => {
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
-      formData.append("file", imageBuf, imageName);
+      formData.append("upload", imageBuf, imageName);
 
       const res = await postFormData<{ url: string }>(
         `${url}upload-post-content-image`,

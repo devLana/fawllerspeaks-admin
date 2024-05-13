@@ -20,19 +20,19 @@ export const postContentImageParser = async (
     const form = formidable({ uploadDir: UPLOAD_DIR });
     const [, files] = await form.parse(req);
 
-    if (!files.file || files.file.length === 0) {
+    if (!files.upload || files.upload.length === 0) {
       throw new BadRequestError("No image file was uploaded");
     }
 
-    if (files.file.length > 1) {
+    if (files.upload.length > 1) {
       throw new BadRequestError("Only one image file can be uploaded");
     }
 
-    if (!files.file[0].mimetype?.startsWith("image/")) {
+    if (!files.upload[0].mimetype?.startsWith("image/")) {
       throw new BadRequestError("Only an image file can be uploaded");
     }
 
-    const [{ filepath, mimetype }] = files.file;
+    const [{ filepath, mimetype }] = files.upload;
 
     const file = { filepath, mimetype };
     const uploadReq = req;
