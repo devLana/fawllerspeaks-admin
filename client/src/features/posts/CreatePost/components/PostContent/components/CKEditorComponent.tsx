@@ -283,7 +283,7 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
             },
           },
           simpleUpload: {
-            uploadUrl,
+            uploadUrl: `${uploadUrl}/upload-post-content-image`,
             headers: { Authorization: `Bearer ${jwt}` },
           },
         }}
