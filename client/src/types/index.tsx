@@ -155,7 +155,6 @@ export interface PostImageBanner {
 }
 
 export type CreatePostData = Omit<CreatePostInput, "imageBanner" | "tags"> & {
-  excerpt: string;
   tags?: string[];
   imageBanner?: PostImageBanner;
 };

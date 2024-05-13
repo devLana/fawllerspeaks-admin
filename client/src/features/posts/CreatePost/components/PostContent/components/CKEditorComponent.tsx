@@ -30,6 +30,8 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
     dispatch({ type: "ADD_POST_CONTENT", payload: { content } });
   };
 
+  const uploadUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+
   return (
     <Box
       mb={2.5}
@@ -281,9 +283,8 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
             },
           },
           simpleUpload: {
-            uploadUrl: "", // TODO
+            uploadUrl,
             headers: { Authorization: `Bearer ${jwt}` },
-            // withCredentials: true,
           },
         }}
       />

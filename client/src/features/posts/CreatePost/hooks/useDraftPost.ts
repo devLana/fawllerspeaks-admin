@@ -8,7 +8,7 @@ import { DRAFT_POST } from "../operations/DRAFT_POST";
 import { refetchQueries } from "../utils/refetchQueries";
 import { SESSION_ID } from "@utils/constants";
 import type { CreatePostData, CreatePostAction, Status } from "@types";
-import type { MutationDraftPostArgs } from "@apiTypes";
+import type { DraftPostInput } from "@apiTypes";
 
 export const useDraftPost = (
   postData: CreatePostData,
@@ -25,7 +25,7 @@ export const useDraftPost = (
     setDraftStatus("loading");
 
     let uploadHasError = false;
-    const post: MutationDraftPostArgs["post"] = {
+    const post: DraftPostInput = {
       title: postData.title,
       ...(postData.description ? { description: postData.description } : {}),
       ...(postData.excerpt ? { excerpt: postData.excerpt } : {}),
@@ -34,7 +34,7 @@ export const useDraftPost = (
     };
 
     if (postData.imageBanner) {
-      const imageData = await upload(postData.imageBanner.file, "post");
+      const imageData = await upload(postData.imageBanner.file, "postBanner");
       ({ uploadHasError } = imageData);
 
       if (imageData.imageLink) {

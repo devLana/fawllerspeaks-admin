@@ -8,7 +8,7 @@ interface UploadImage {
 const useUploadImage = () => {
   const { jwt } = useAuthHeader();
 
-  const upload = async (file: File, fileType: "avatar" | "post") => {
+  const upload = async (file: File, fileType: "avatar" | "postBanner") => {
     const url = process.env.NEXT_PUBLIC_API_URL ?? "";
     const headers = new Headers({ authorization: `Bearer ${jwt}` });
 

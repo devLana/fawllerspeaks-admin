@@ -49,7 +49,7 @@ const PostMetadata = ({
     dispatch({ type: "ADD_REQUIRED_METADATA", payload: { metadata: values } });
   };
 
-  const ariaErrorMessage = (key: keyof RequiredPostMetadata) => {
+  const ariaErrorMessage = (key: RequiredMetadataKeys) => {
     return errors[key] ? `${key}-helper-text` : undefined;
   };
 
