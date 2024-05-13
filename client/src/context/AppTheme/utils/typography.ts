@@ -1,9 +1,12 @@
+import { Lexend } from "next/font/google";
 import type { ThemeOptions } from "@mui/material/styles";
 
 type Typo = (fontSize: number) => NonNullable<ThemeOptions["typography"]>;
 
+const lexend = Lexend({ subsets: ["latin"], display: "swap" });
+
 export const typography: Typo = fontSize => ({
-  fontFamily: '"Lexend", sans-serif',
+  fontFamily: lexend.style.fontFamily,
   fontSize,
   h1: { fontSize: "2em" },
   h2: { fontSize: "1.58em" },
