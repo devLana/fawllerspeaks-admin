@@ -22,7 +22,7 @@ const Header = ({ onClick }: { onClick: () => void }) => (
         size="large"
         edge="start"
         color="primary"
-        aria-label="Show navbar"
+        aria-label="Show main sidebar navigation"
         sx={{ mr: 2, display: { sm: "none" } }}
         onClick={onClick}
       >

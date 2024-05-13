@@ -16,7 +16,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
   return (
     <Box
       component="nav"
-      aria-label="Main"
+      aria-label="Main sidebar"
       sx={theme => ({
         [theme.breakpoints.down("sm")]: {
           width: 0,

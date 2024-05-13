@@ -34,7 +34,11 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
 
   return (
     <NavbarContainer isOpen={isOpen} belowSm={belowSm} onClick={onCloseNav}>
-      <NavbarToggleButton isOpen={isOpen} onClick={onToggleNav} />
+      <NavbarToggleButton
+        isOpen={isOpen}
+        sm_Above={sm_Above}
+        onClick={onToggleNav}
+      />
       <Divider sx={{ mb: 2.5, mr: { sm: 3 } }} />
       <List>
         {topLinks.map(({ primary, ...link }) => {

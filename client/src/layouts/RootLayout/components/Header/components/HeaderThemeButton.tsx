@@ -1,5 +1,6 @@
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 
 import { useAppTheme } from "@context/AppTheme";
 import { themes } from "@utils/appThemes";
@@ -14,13 +15,14 @@ const HeaderThemeButton = () => {
   const { id } = themes[nextIndex];
 
   return (
-    <IconButton
-      onClick={() => handleAppTheme("themeMode", id)}
-      aria-label="Change app theme"
-      color="primary"
-    >
-      <Icon />
-    </IconButton>
+    <Tooltip title="Change app theme">
+      <IconButton
+        onClick={() => handleAppTheme("themeMode", id)}
+        color="primary"
+      >
+        <Icon />
+      </IconButton>
+    </Tooltip>
   );
 };
 
