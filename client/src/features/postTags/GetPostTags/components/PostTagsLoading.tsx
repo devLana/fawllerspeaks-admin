@@ -4,13 +4,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import PostTagsWrapper from "./PostTagsWrapper";
 
 const PostTagsLoading = ({ id }: { id: string }) => (
-  <PostTagsWrapper id={id}>
-    <Box
-      aria-busy={true}
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-    >
+  <PostTagsWrapper id={id} ariaBusy={true}>
+    <Box display="flex" alignItems="center" justifyContent="center">
       <CircularProgress size="1.9em" aria-describedby={id} />
     </Box>
   </PostTagsWrapper>

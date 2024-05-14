@@ -1,10 +1,10 @@
 import * as React from "react";
 
+import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import ListItem from "@mui/material/ListItem";
-import Stack from "@mui/material/Stack";
 
 import PostTagMenu from "./PostTagMenu";
 import type { PostTagsListAction } from "@types";
@@ -27,9 +27,9 @@ const PostTag = (props: PostTagProps) => {
 
   return (
     <Grid component={ListItem} disableGutters item xs={6} md={4} lg={3}>
-      <Stack
+      <Box
         aria-label={`${name} post tag container`}
-        direction="row"
+        display="flex"
         alignItems="center"
         justifyContent="space-between"
         columnGap={1}
@@ -69,7 +69,7 @@ const PostTag = (props: PostTagProps) => {
           })}
         />
         <PostTagMenu id={id} name={name} idName={idName} dispatch={dispatch} />
-      </Stack>
+      </Box>
     </Grid>
   );
 };

@@ -11,8 +11,8 @@ const PostTagsTextContent = (props: PostTagsTextContentProps) => {
   const { id, text, severity = "info" } = props;
 
   return (
-    <PostTagsWrapper id={id}>
-      <Alert aria-busy={false} severity={severity}>
+    <PostTagsWrapper id={id} ariaBusy={false}>
+      <Alert severity={severity} role="status">
         {text}
       </Alert>
     </PostTagsWrapper>

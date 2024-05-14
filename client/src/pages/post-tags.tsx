@@ -1,7 +1,7 @@
 import * as React from "react";
 
+import Box from "@mui/material/Box";
 import Snackbar from "@mui/material/Snackbar";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import RootLayout from "@layouts/RootLayout";
@@ -21,8 +21,8 @@ const PostTagsPage: NextPageWithLayout = () => {
 
   return (
     <PostTagsPageContext.Provider value={{ handleOpenAlert }}>
-      <Stack
-        direction="row"
+      <Box
+        display="flex"
         flexWrap="wrap"
         rowGap={2}
         columnGap={5}
@@ -33,7 +33,7 @@ const PostTagsPage: NextPageWithLayout = () => {
           Use post tags to categorize blog posts
         </Typography>
         <CreatePostTags />
-      </Stack>
+      </Box>
       <GetPostTags />
       <Snackbar
         message={alert.message}

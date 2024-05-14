@@ -15,11 +15,11 @@ const PostTags = ({ id }: { id: string }) => {
   const msg =
     "There was an error trying to display the list of post tags. Please try again later";
 
-  const alertProps = { severity: "error", "aria-busy": false } as const;
+  const alertProps = { severity: "error", role: "status" } as const;
   const selectedTagsIds = Object.keys(state.selectedTags);
 
   return (
-    <PostTagsWrapper id={id}>
+    <PostTagsWrapper id={id} ariaBusy={false}>
       <ErrorBoundary fallback={<Alert {...alertProps}>{msg}</Alert>}>
         <PostTagsList
           deleteTag={state.deleteTag}

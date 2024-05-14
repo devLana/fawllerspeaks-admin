@@ -71,7 +71,7 @@ const PostTagsList = (props: PostTagsListProps) => {
   };
 
   return (
-    <div aria-busy={false}>
+    <>
       <PostTagsToolbar
         numberOfSelectedPostTags={tagIdsLength}
         totalNumberOfPostTags={cachePostTags.length}
@@ -87,7 +87,7 @@ const PostTagsList = (props: PostTagsListProps) => {
       >
         {tagsList}
       </Grid>
-    </div>
+    </>
   );
 };
 
