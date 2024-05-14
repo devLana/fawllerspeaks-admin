@@ -21,14 +21,10 @@ const PostImagePreview = (props: PostImagePreviewProps) => {
     <Box
       position="relative"
       width="100%"
-      height={200}
+      height={{ height: 200, sm: 250, md: 280 }}
       maxWidth={700}
       borderRadius={1}
       overflow="hidden"
-      sx={theme => ({
-        [theme.breakpoints.up("sm")]: { height: 250 },
-        [theme.breakpoints.up("md")]: { height: 280 },
-      })}
     >
       <Image
         src={src}

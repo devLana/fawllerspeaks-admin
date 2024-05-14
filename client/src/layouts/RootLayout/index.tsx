@@ -51,12 +51,7 @@ const RootLayout = (props: RootLayoutProps) => {
         onToggleNav={handleToggleNavbar}
         onCloseNav={handleCloseNavbar}
       />
-      <Box
-        component="main"
-        py={4}
-        flexGrow={{ sm: 1 }}
-        sx={{ overflowX: "auto" }}
-      >
+      <Box component="main" py={4} flexGrow={{ sm: 1 }}>
         {content}
       </Box>
     </Container>

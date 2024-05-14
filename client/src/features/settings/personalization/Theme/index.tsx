@@ -11,7 +11,7 @@ const Theme = ({ themeMode }: { themeMode: ThemeMode }) => {
   const handleAppTheme = useAppTheme();
 
   return (
-    <Box component="section" sx={{ mb: 5, pt: 2 }}>
+    <Box component="section" mb={5} pt={2}>
       <Typography variant="h2" gutterBottom>
         Theme
       </Typography>
@@ -22,8 +22,8 @@ const Theme = ({ themeMode }: { themeMode: ThemeMode }) => {
         onChange={e => handleAppTheme("themeMode", e.target.value as ThemeMode)}
         sx={{
           bgcolor: "action.disabledBackground",
-          py: 2,
-          px: { xs: 2, sm: 1.5 },
+          p: 2,
+          px: { sm: 1.5 },
           borderRadius: 1,
           rowGap: 2.5,
           columnGap: 2.65,

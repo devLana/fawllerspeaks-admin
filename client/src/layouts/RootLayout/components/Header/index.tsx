@@ -40,11 +40,7 @@ const Header = ({ onClick }: { onClick: () => void }) => (
           />
         </NextLink>
       </Box>
-      <Box
-        display="flex"
-        alignItems="center"
-        sx={{ columnGap: { xs: 1, sm: 2 } }}
-      >
+      <Box display="flex" alignItems="center" columnGap={{ xs: 1, sm: 2 }}>
         <HeaderThemeButton />
         <UserAvatar renderWithLink />
       </Box>

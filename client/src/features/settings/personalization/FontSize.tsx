@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { useAppTheme } from "@context/AppTheme";
@@ -13,12 +12,12 @@ const FontSize = ({ fontSize }: { fontSize: number }) => {
       <Typography variant="h2" gutterBottom>
         Font Size
       </Typography>
-      <Stack
-        direction="row"
+      <Box
+        display="flex"
         alignItems="center"
-        spacing={2.5}
-        py={2}
-        px={{ xs: 2, sm: 1.5 }}
+        columnGap={2.5}
+        p={2}
+        px={{ sm: 1.5 }}
         bgcolor="action.disabledBackground"
         borderRadius={1}
       >
@@ -43,7 +42,7 @@ const FontSize = ({ fontSize }: { fontSize: number }) => {
         <Typography variant="caption" fontSize={18}>
           Aa
         </Typography>
-      </Stack>
+      </Box>
     </Box>
   );
 };

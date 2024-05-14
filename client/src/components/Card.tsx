@@ -18,20 +18,13 @@ const Card = ({
 
   return (
     <Box
-      sx={[
-        theme => ({
-          maxWidth,
-          [theme.breakpoints.up("sm")]: {
-            maxWidth: smMaxWidth,
-            p: "2rem",
-            borderRadius: 1,
-            boxShadow: 1,
-            border: 1,
-            borderColor: "action.disabledBackground",
-          },
-        }),
-        ...sxProp,
-      ]}
+      maxWidth={{ maxWidth, sm: smMaxWidth }}
+      p={{ sm: "2rem" }}
+      borderRadius={{ sm: 1 }}
+      boxShadow={{ sm: 2 }}
+      border={{ sm: 1 }}
+      borderColor={{ sm: "action.disabledBackground" }}
+      sx={[...sxProp]}
     >
       {children}
     </Box>

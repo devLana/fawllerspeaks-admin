@@ -1,6 +1,6 @@
 import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
 
@@ -22,8 +22,8 @@ const EditProfileImagePreview = (props: EditProfileImagePreviewProps) => {
         alt={alt}
         sx={{ width: 200, height: 200, mb: 2, mx: "auto" }}
       />
-      <Stack
-        direction="row"
+      <Box
+        display="flex"
         justifyContent="center"
         flexWrap="wrap"
         rowGap={1}
@@ -46,7 +46,7 @@ const EditProfileImagePreview = (props: EditProfileImagePreviewProps) => {
         >
           Change Image
         </Button>
-      </Stack>
+      </Box>
     </div>
   );
 };

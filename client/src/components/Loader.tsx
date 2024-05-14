@@ -32,15 +32,13 @@ const Loader = () => (
   <Box
     aria-label="authenticating user"
     role="progressbar"
-    sx={{
-      mx: "auto",
-      height: "4rem",
-      width: "6rem",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "flex-end",
-      columnGap: "1rem",
-    }}
+    mx="auto"
+    height="4rem"
+    width="6rem"
+    display="flex"
+    justifyContent="space-between"
+    alignItems="flex-end"
+    columnGap="1rem"
   >
     <Box
       sx={({ appTheme, palette: { secondary } }) => ({

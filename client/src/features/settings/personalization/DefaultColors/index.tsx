@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { useAppTheme } from "@context/AppTheme";
@@ -20,18 +19,12 @@ const DefaultColors = ({ color }: { color: ThemeColors }) => {
         Default Color
       </Typography>
       <Box
-        py={2}
-        px={{ xs: 2, sm: 1.5 }}
+        p={2}
+        px={{ sm: 1.5 }}
         bgcolor="action.disabledBackground"
         borderRadius={1}
       >
-        <Stack
-          direction="row"
-          flexWrap="wrap"
-          rowGap={2.5}
-          columnGap={5}
-          justifyContent={{ sm: "flex-start" }}
-        >
+        <Box display="flex" flexWrap="wrap" rowGap={2.5} columnGap={5}>
           {colors.map(currentColor => (
             <DefaultColor
               key={currentColor.label}
@@ -40,7 +33,7 @@ const DefaultColors = ({ color }: { color: ThemeColors }) => {
               {...currentColor}
             />
           ))}
-        </Stack>
+        </Box>
       </Box>
     </section>
   );
