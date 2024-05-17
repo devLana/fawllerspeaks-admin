@@ -5,50 +5,58 @@ import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded";
+import type { NavbarButtonItem, NavbarLinkItem } from "@types";
 
-export const topLinks = [
+interface LinkItem extends NavbarLinkItem {
+  type: "link";
+}
+
+interface ButtonItem extends NavbarButtonItem {
+  type: "button";
+}
+
+export const navbarItems: (LinkItem | ButtonItem)[] = [
   {
-    primary: true,
+    type: "link",
     href: "/posts/new",
+    isPrimary: true,
     label: "New Post",
     Icon: PostAddIcon,
   },
   {
-    primary: false,
+    type: "link",
     href: "/",
     label: "Dashboard",
     Icon: SpaceDashboardOutlinedIcon,
   },
-] as const;
-
-export const postLinks = [
   {
+    type: "link",
     href: "/posts",
     label: "Posts",
     Icon: ListAltIcon,
   },
   {
+    type: "link",
     href: "/post-tags",
     label: "Post Tags",
     Icon: StyleOutlinedIcon,
   },
   {
+    type: "link",
     href: "/posts/bin",
     label: "Bin",
     Icon: DeleteOutlinedIcon,
   },
-] as const;
-
-export const otherLinks = [
   {
     type: "link",
     href: "/settings",
     label: "Settings",
     Icon: SettingsOutlinedIcon,
+    hasDivider: true,
   },
   {
     type: "button",
     label: "Logout",
     Icon: ExitToAppRoundedIcon,
   },
-] as const;
+];

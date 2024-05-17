@@ -57,6 +57,20 @@ export type RefetchQueriesFn<T extends object> = Extract<
   FunctionLike
 >;
 
+/* Layout Types */
+export interface NavbarLinkItem {
+  href: string;
+  isPrimary?: true;
+  hasDivider?: true;
+  label: string;
+  Icon: MuiIconType;
+}
+
+export interface NavbarButtonItem {
+  label: string;
+  Icon: MuiIconType;
+}
+
 /* App Theme Types */
 export type ThemeMode = "sunny" | "sunset" | "pitch black";
 export type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";

@@ -8,53 +8,59 @@ import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
 import transition from "../utils/transition";
-import type { MuiIconType } from "@types";
+import type { NavbarLinkItem } from "@types";
 
-interface NavbarItemProps {
-  label: string;
-  href: string;
-  Icon: MuiIconType;
+interface NavbarItemLinkProps extends NavbarLinkItem {
   isOpen: boolean;
   showTooltip: boolean;
-  onClick: (() => void) | undefined;
+  onClick: VoidFunction | undefined;
 }
 
-const NavbarItem = (props: NavbarItemProps) => {
-  const { label, href, Icon, isOpen, showTooltip, onClick } = props;
+const NavbarItemLink = ({
+  isPrimary,
+  href,
+  label,
+  Icon,
+  hasDivider,
+  isOpen,
+  showTooltip,
+  onClick,
+}: NavbarItemLinkProps) => {
   const { pathname } = useRouter();
 
-  const multiPageHrefs = ["/posts", "/settings"];
-  let isActive = false;
-
-  if (href === pathname) {
-    isActive = true;
-  } else if (multiPageHrefs.includes(href) && pathname.startsWith(href)) {
-    isActive = true;
-  }
-
   return (
-    <Tooltip title={showTooltip ? label : null} placement="right">
-      <ListItem sx={{ py: 1, pr: 0, pl: { xs: 3, sm: 0 } }}>
+    <ListItem
+      sx={{
+        py: 2,
+        px: 0,
+        ...(hasDivider ? { borderBottom: 1, borderColor: "divider" } : {}),
+      }}
+    >
+      <Tooltip title={showTooltip ? label : null} placement="right">
         <ListItemButton
           sx={{
-            pl: 1.5,
-            pr: 0,
-            borderRadius: "1.5rem 0 0 1.5rem",
-            bgcolor: isActive ? "primary.main" : "transparent",
-            color: isActive ? "background.default" : "inherit",
+            px: 1.5,
+            borderRadius: 1,
+            border: 1,
+            borderColor: isPrimary ? "primary.main" : "transparent",
+            color: "primary.main",
+            flexGrow: { sm: 0 },
             whiteSpace: { sm: "nowrap" },
             overflow: { sm: "hidden" },
             transition: ({ transitions: transit }) => {
               return transition(transit, isOpen, ["background-color"]);
             },
-            "&:hover": {
-              bgcolor: isActive ? "primary.main" : "action.hover",
-              color: isActive ? "background.default" : "inherit",
+            "&:hover": { color: "primary.main" },
+            "&[aria-current=page]": {
+              bgcolor: "primary.main",
+              color: "background.default",
+              boxShadow: 3,
             },
           }}
           component={NextLink}
           href={href}
           onClick={onClick}
+          aria-current={pathname === href ? "page" : undefined}
         >
           <ListItemIcon sx={{ color: "inherit", minWidth: 0 }}>
             <Icon />
@@ -73,9 +79,9 @@ const NavbarItem = (props: NavbarItemProps) => {
             }}
           />
         </ListItemButton>
-      </ListItem>
-    </Tooltip>
+      </Tooltip>
+    </ListItem>
   );
 };
 
-export default NavbarItem;
+export default NavbarItemLink;

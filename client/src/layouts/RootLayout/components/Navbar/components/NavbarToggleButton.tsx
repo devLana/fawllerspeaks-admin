@@ -1,5 +1,5 @@
-import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
+import ListItem from "@mui/material/ListItem";
 import Tooltip from "@mui/material/Tooltip";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
@@ -22,8 +22,8 @@ const NavbarToggleButton = (props: NavbarToggleButtonProps) => {
   }
 
   return (
-    <Box display="flex" m={3} mt={{ sm: 0 }} ml={{ sm: 0 }}>
-      <Tooltip title={title}>
+    <ListItem sx={{ pb: 2, px: 0, borderBottom: 1, borderColor: "divider" }}>
+      <Tooltip title={title} placement="bottom-start">
         <IconButton
           onClick={onClick}
           sx={{
@@ -40,7 +40,7 @@ const NavbarToggleButton = (props: NavbarToggleButtonProps) => {
           <ChevronLeftIcon />
         </IconButton>
       </Tooltip>
-    </Box>
+    </ListItem>
   );
 };
 

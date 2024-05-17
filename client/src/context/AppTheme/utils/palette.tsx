@@ -12,8 +12,8 @@ const generatePalette = (hex: string, rgb: string) => ({
   },
   action: {
     active: `rgba(${rgb},0.22)`,
-    hover: `rgba(${rgb},0.04)`,
-    selected: `rgba(${rgb},0.08)`,
+    hover: `rgba(${rgb},0.06)`,
+    selected: `rgba(${rgb},0.095)`,
     disabled: `rgba(${rgb},0.18)`,
     disabledBackground: `rgba(${rgb},0.12)`,
   },

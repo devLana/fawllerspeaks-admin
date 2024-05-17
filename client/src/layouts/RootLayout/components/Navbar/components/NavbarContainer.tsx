@@ -32,12 +32,12 @@ const NavbarContainer = (props: NavbarContainerProps) => {
         },
         [theme.breakpoints.up("sm")]: {
           transition: transition(theme.transitions, isOpen, "width"),
-          width: isOpen ? "calc(42px + 8em)" : "calc(50px + 1.5em)",
+          width: isOpen ? "calc(51px + 8em)" : "calc(50px + 1.5em)",
           borderRight: 1,
           borderColor: "divider",
         },
         [theme.breakpoints.up("md")]: {
-          width: isOpen ? "calc(50px + 1.5em)" : "calc(42px + 8em)",
+          width: isOpen ? "calc(50px + 1.5em)" : "calc(51px + 8em)",
         },
       })}
     >
@@ -51,6 +51,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
       <Box
         sx={theme => ({
           [theme.breakpoints.down("sm")]: {
+            p: 3,
             transition: transition(theme.transitions, isOpen, "transform"),
             position: "fixed",
             top: 0,
@@ -65,7 +66,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
             }),
             transform: isOpen ? "translateX(0)" : "translateX(-150%)",
           },
-          [theme.breakpoints.up("sm")]: { pt: 3 },
+          [theme.breakpoints.up("sm")]: { pt: 3, pr: 3 },
         })}
       >
         {children}

@@ -9,27 +9,26 @@ import Tooltip from "@mui/material/Tooltip";
 
 import LogoutModal from "./LogoutModal";
 import transition from "../utils/transition";
-import type { MuiIconType } from "@types";
+import type { NavbarButtonItem } from "@types";
 
-interface NavbarLogoutButtonProps {
-  label: string;
-  Icon: MuiIconType;
+interface NavbarItemButtonProps extends NavbarButtonItem {
   isOpen: boolean;
   showTooltip: boolean;
 }
 
-const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
-  const { Icon, label, isOpen, showTooltip } = props;
+const NavbarItemButton = (props: NavbarItemButtonProps) => {
+  const { label, Icon, isOpen, showTooltip } = props;
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   return (
     <>
-      <Tooltip title={showTooltip ? label : null} placement="right">
-        <ListItem sx={{ py: 1, px: 3, pl: { sm: 0 } }}>
+      <ListItem sx={{ py: 2, px: 0 }}>
+        <Tooltip title={showTooltip ? label : null} placement="right">
           <ListItemButton
             sx={{
               px: 1.5,
               borderRadius: 1,
+              color: "primary.main",
               flexGrow: { sm: 0 },
               whiteSpace: { sm: "nowrap" },
               overflow: { sm: "hidden" },
@@ -39,7 +38,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
                   "padding",
                 ]);
               },
-              "&:hover": { bgcolor: "action.hover" },
+              "&:hover": { color: "primary.main" },
             }}
             component={Button}
             onClick={() => setModalIsOpen(true)}
@@ -65,8 +64,8 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
               }}
             />
           </ListItemButton>
-        </ListItem>
-      </Tooltip>
+        </Tooltip>
+      </ListItem>
       <LogoutModal
         isOpen={modalIsOpen}
         onCloseModal={() => setModalIsOpen(false)}
@@ -75,4 +74,4 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
   );
 };
 
-export default NavbarLogoutButton;
+export default NavbarItemButton;

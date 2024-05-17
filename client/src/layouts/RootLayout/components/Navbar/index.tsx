@@ -1,14 +1,12 @@
-import Divider from "@mui/material/Divider";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import List from "@mui/material/List";
 import type { Theme } from "@mui/material/styles";
 
 import NavbarContainer from "./components/NavbarContainer";
-import NavbarItem from "./components/NavbarItem";
-import NavbarLogoutButton from "./components/NavbarLogoutButton";
-import NavbarNewLink from "./components/NavbarNewLink";
+import NavbarItemLink from "./components/NavbarItemLink";
+import NavbarItemButton from "./components/NavbarItemButton";
 import NavbarToggleButton from "./components/NavbarToggleButton";
-import { topLinks, postLinks, otherLinks } from "./utils/navbarMenu";
+import { navbarItems } from "./utils/navbarItems";
 
 interface NavbarProps {
   isOpen: boolean;
@@ -32,67 +30,42 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
     showTooltip = false;
   }
 
+  const navItems = navbarItems.map(item => {
+    if (item.type === "link") {
+      const { type: _, ...items } = item;
+
+      return (
+        <NavbarItemLink
+          key={item.label}
+          {...items}
+          isOpen={isOpen}
+          showTooltip={showTooltip}
+          onClick={onClickNavLink}
+        />
+      );
+    }
+
+    const { type: _, ...items } = item;
+
+    return (
+      <NavbarItemButton
+        key={item.label}
+        {...items}
+        isOpen={isOpen}
+        showTooltip={showTooltip}
+      />
+    );
+  });
+
   return (
     <NavbarContainer isOpen={isOpen} belowSm={belowSm} onClick={onCloseNav}>
-      <NavbarToggleButton
-        isOpen={isOpen}
-        sm_Above={sm_Above}
-        onClick={onToggleNav}
-      />
-      <Divider sx={{ mb: 2.5, mr: { sm: 3 } }} />
       <List>
-        {topLinks.map(({ primary, ...link }) => {
-          return primary ? (
-            <NavbarNewLink
-              key={link.label}
-              {...link}
-              isOpen={isOpen}
-              showTooltip={showTooltip}
-              onClick={onClickNavLink}
-            />
-          ) : (
-            <NavbarItem
-              key={link.label}
-              {...link}
-              isOpen={isOpen}
-              showTooltip={showTooltip}
-              onClick={onClickNavLink}
-            />
-          );
-        })}
-      </List>
-      <Divider sx={{ mr: { sm: 3 } }} />
-      <List>
-        {postLinks.map(link => (
-          <NavbarItem
-            key={link.label}
-            {...link}
-            isOpen={isOpen}
-            showTooltip={showTooltip}
-            onClick={onClickNavLink}
-          />
-        ))}
-      </List>
-      <Divider sx={{ mr: { sm: 3 } }} />
-      <List>
-        {otherLinks.map(link => {
-          return link.type === "link" ? (
-            <NavbarItem
-              key={link.label}
-              {...link}
-              isOpen={isOpen}
-              showTooltip={showTooltip}
-              onClick={onClickNavLink}
-            />
-          ) : (
-            <NavbarLogoutButton
-              key={link.label}
-              {...link}
-              isOpen={isOpen}
-              showTooltip={showTooltip}
-            />
-          );
-        })}
+        <NavbarToggleButton
+          isOpen={isOpen}
+          sm_Above={sm_Above}
+          onClick={onToggleNav}
+        />
+        {navItems}
       </List>
     </NavbarContainer>
   );
