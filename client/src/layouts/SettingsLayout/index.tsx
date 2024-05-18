@@ -10,7 +10,7 @@ export interface SettingsLayoutProps {
 }
 
 const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => (
-  <Box columnGap={{ md: 5 }} display={{ md: "flex" }}>
+  <Box columnGap={{ md: 2 }} display={{ md: "flex" }}>
     <SettingsLayoutMenu />
     <Divider
       orientation="vertical"

@@ -17,25 +17,13 @@ interface SettingsMenuItemProps {
 
 const SettingsMenuItem = (props: SettingsMenuItemProps) => {
   const { to, label, Icon, onClick } = props;
-
   const { pathname } = useRouter();
-  let isActive = false;
-
-  if (to === pathname) {
-    isActive = true;
-  } else if (pathname === "/settings/me/edit" && to === "/settings/me") {
-    isActive = true;
-  }
 
   return (
     <MenuItem
       onClick={onClick}
       disableGutters
-      sx={{
-        py: 0,
-        minHeight: 0,
-        bgcolor: isActive ? "action.hover" : "inherit",
-      }}
+      sx={{ py: 0.125, "&:hover": { bgcolor: "transparent" } }}
     >
       <NextLink
         href={to}
@@ -44,12 +32,15 @@ const SettingsMenuItem = (props: SettingsMenuItemProps) => {
           display: "flex",
           alignItems: "center",
           p: 2,
-          color: isActive ? "text.primary" : "primary.main",
-          "&:hover": { color: isActive ? "text.primary" : "primary.main" },
+          color: "text.primary",
+          "&:hover": { bgcolor: "action.hover", color: "text.primary" },
+          "&[aria-current=page]": {
+            color: "primary.main",
+            bgcolor: "action.selected",
+          },
+          borderRadius: { md: 1 },
         }}
-        aria-current={
-          pathname === "/settings/me/edit" ? undefined : isActive || undefined
-        }
+        aria-current={pathname === to ? "page" : undefined}
       >
         <ListItemIcon sx={{ color: "inherit" }}>
           <Icon fontSize="small" />
