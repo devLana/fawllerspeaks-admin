@@ -44,7 +44,6 @@ const NavbarItemLink = ({
             border: 1,
             borderColor: isPrimary ? "primary.main" : "transparent",
             color: "primary.main",
-            flexGrow: { sm: 0 },
             whiteSpace: { sm: "nowrap" },
             overflow: { sm: "hidden" },
             transition: ({ transitions: transit }) => {

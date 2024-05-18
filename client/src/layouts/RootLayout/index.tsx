@@ -30,26 +30,22 @@ const RootLayout = (props: RootLayoutProps) => {
     );
   }
 
-  const handleOpenNavbar = () => setNavBarIsOpen(true);
-  const handleCloseNavbar = () => setNavBarIsOpen(false);
-  const handleToggleNavbar = () => setNavBarIsOpen(!navBarIsOpen);
-
   return (
     <Container
       sx={{
         minHeight: "100vh",
-        paddingTop: "56px",
-        pt: { sm: "64px" },
+        paddingTop: 7,
+        pt: { sm: 8 },
         display: { sm: "flex" },
-        columnGap: { sm: 4 },
+        columnGap: { sm: 5 },
       }}
     >
       <Metadata {...metaProps} />
-      <Header onClick={handleOpenNavbar} />
+      <Header onClick={() => setNavBarIsOpen(true)} />
       <Navbar
         isOpen={navBarIsOpen}
-        onToggleNav={handleToggleNavbar}
-        onCloseNav={handleCloseNavbar}
+        onToggleNav={() => setNavBarIsOpen(!navBarIsOpen)}
+        onCloseNav={() => setNavBarIsOpen(false)}
       />
       <Box component="main" py={4} flexGrow={{ sm: 1 }}>
         {content}
