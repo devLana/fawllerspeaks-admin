@@ -153,21 +153,30 @@ export const dbPost = {
 
 export const tags = [UUID, randomUUID(), randomUUID()];
 export const imageBanner = "post/image/banner";
+
+const content =
+  '<p>post content</p><a id="link" href="google.com">google link</a>';
+
+export const expectedContent =
+  '<p>post content</p><a href="google.com" target="_blank" rel="noopener noreferrer">google link</a>';
+
 const mockData = {
   description: "post description",
   excerpt: "mock excerpt",
-  content: "post content",
+  content,
 };
 
 export const argsWithImage = {
   ...mockData,
   title: "blog post title",
+  content: expectedContent,
   imageBanner,
 };
 
 export const argsWithNoImage = {
   ...mockData,
   title: "another blog post title",
+  content: expectedContent,
   imageBanner: null,
 };
 

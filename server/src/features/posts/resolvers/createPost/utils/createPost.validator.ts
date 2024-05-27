@@ -1,4 +1,13 @@
 import Joi from "joi";
+import sanitize from "sanitize-html";
+
+import { sanitizeOptions } from "@features/posts/utils/sanitizeOptions";
+
+import {
+  anchorTagRegex,
+  anchorTagReplacerFn,
+} from "@features/posts/utils/anchorTagReplacerFn";
+
 import type { CreatePostInput } from "@resolverTypes";
 
 export const createPostValidator = Joi.object<CreatePostInput>({
@@ -11,9 +20,19 @@ export const createPostValidator = Joi.object<CreatePostInput>({
   excerpt: Joi.string().required().trim().messages({
     "string.empty": "Provide post excerpt",
   }),
-  content: Joi.string().required().trim().messages({
-    "string.empty": "Provide post content",
-  }),
+  content: Joi.string()
+    .required()
+    .trim()
+    .custom((value: string) => {
+      const html = value
+        .replace(/<p>(<br>)*&nbsp;<\/p>/g, "")
+        .replace(/>&nbsp;<\//g, "></");
+
+      return sanitize(html, sanitizeOptions)
+        .replace(/\s\/>/g, "/>")
+        .replace(anchorTagRegex, anchorTagReplacerFn);
+    }, "Custom content sanitizer")
+    .messages({ "string.empty": "Provide post content" }),
   tags: Joi.array()
     .allow(null)
     .items(

@@ -152,7 +152,8 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.id", mocks.dbData.postId);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.description", undefined);
-      expect(result).toHaveProperty("post.content", post.content);
+      expect(result).toHaveProperty("post.excerpt", undefined);
+      expect(result).toHaveProperty("post.content", undefined);
       expect(result).toHaveProperty("post.author", author);
       expect(result).toHaveProperty("post.status", "Draft");
       expect(result).toHaveProperty("post.slug", "blog-post-title");
@@ -188,7 +189,8 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.id", mocks.dbData.postId);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.description", undefined);
-      expect(result).toHaveProperty("post.content", undefined);
+      expect(result).toHaveProperty("post.excerpt", undefined);
+      expect(result).toHaveProperty("post.content", mocks.expectedContent);
       expect(result).toHaveProperty("post.author", author);
       expect(result).toHaveProperty("post.status", "Draft");
       expect(result).toHaveProperty("post.slug", "another-blog-post-title");

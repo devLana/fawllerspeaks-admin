@@ -20,14 +20,17 @@ export const dateCreated = "2021-05-17 13:22:43.717+01";
 export const imageBanner = "post/image/banner";
 export const tags = [UUID, randomUUID(), randomUUID()];
 
-export const argsWithImage = {
-  title: "Blog Post Title",
-  content: null,
-  imageBanner,
-};
+const content =
+  '<h2 id="heading">heading element</h2><a href="blog/post/title">blog post link</a><p class="class-name">paragraph text</p><a href="//weird-link">weird link</a>';
+
+export const expectedContent =
+  '<h2>heading element</h2><a href="blog/post/title">blog post link</a><p>paragraph text</p><a href="https://weird-link" target="_blank" rel="noopener noreferrer">weird link</a>';
+
+export const argsWithImage = { title: "Blog Post Title", imageBanner };
 
 export const argsWithNoImage = {
   title: "Another Blog Post Title",
+  content,
   imageBanner: null,
 };
 
