@@ -8,13 +8,8 @@ export const registerUserValidator = yup
     firstName: yup
       .string()
       .required("Enter first name")
-      .trim("Enter first name")
-      .matches(/^[^\d]+$/, "First name cannot contain numbers"),
-    lastName: yup
-      .string()
-      .required("Enter last name")
-      .trim("Enter last name")
-      .matches(/^[^\d]+$/, "Last name cannot contain numbers"),
+      .trim("Enter first name"),
+    lastName: yup.string().required("Enter last name").trim("Enter last name"),
     password: yup
       .string()
       .required("Enter password")

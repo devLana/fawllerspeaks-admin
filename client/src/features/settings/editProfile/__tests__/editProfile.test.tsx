@@ -23,24 +23,6 @@ describe("Edit Profile", () => {
         expect(firstName).toHaveAccessibleErrorMessage("Enter first name");
         expect(lastName).toHaveAccessibleErrorMessage("Enter last name");
       });
-
-      it("Input fields should have an invalid error message if they have invalid values", async () => {
-        const { user } = renderUI(<EditMe />);
-        const firstName = screen.getByRole("textbox", fName);
-        const lastName = screen.getByRole("textbox", lName);
-
-        await user.type(firstName, "John1");
-        await user.type(lastName, "Doe2");
-        await user.click(screen.getByRole("button", { name: /^edit$/i }));
-
-        expect(firstName).toHaveAccessibleErrorMessage(
-          "First name cannot contain numbers"
-        );
-
-        expect(lastName).toHaveAccessibleErrorMessage(
-          "Last name cannot contain numbers"
-        );
-      });
     });
 
     describe("Validate image file upload", () => {

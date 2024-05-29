@@ -15,8 +15,8 @@ export interface Input {
 const passwordStr = (prefix: string) => `${prefix}_p@55W0rd`;
 const FIRST_NAME = "FIRST_NAME";
 const LAST_NAME = "LAST_NAME";
-export const invalidFirstName = "First name cannot contain numbers";
-export const invalidLastName = "Last name cannot contain numbers";
+export const invalidFirstName = "First name contains an invalid character";
+export const invalidLastName = "Last name contains an invalid character";
 export const shortPassword = "Password must be at least 8 characters long";
 
 export const invalidPassword =

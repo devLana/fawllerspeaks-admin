@@ -107,19 +107,6 @@ describe("Register User Page", () => {
         "Passwords do not match"
       );
     });
-
-    it("First and last name fields should have an error message for invalid values", async () => {
-      const { user } = renderUI(<RegisterUser />);
-      const firstName = screen.getByRole("textbox", { name: /^first name$/i });
-      const lastName = screen.getByRole("textbox", { name: /^last name$/i });
-
-      await user.type(firstName, "John123");
-      await user.type(lastName, "4D5o6e7");
-      await user.click(screen.getByRole("button", { name: /^register$/i }));
-
-      expect(firstName).toHaveAccessibleErrorMessage(mocks.invalidFirstName);
-      expect(lastName).toHaveAccessibleErrorMessage(mocks.invalidLastName);
-    });
   });
 
   describe("Make a register user api request", () => {
