@@ -4,6 +4,7 @@ import "@testing-library/jest-dom/vitest";
 loadEnvConfig(process.cwd());
 
 vi.mock("next/router");
+vi.mock("next/font/google");
 
 globalThis.URL.createObjectURL = vi.fn(() => "data:blob-image-url");
 globalThis.URL.revokeObjectURL = vi.fn(() => undefined);
