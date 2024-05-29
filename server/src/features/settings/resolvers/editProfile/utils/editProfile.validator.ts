@@ -5,18 +5,18 @@ export const editProfileValidator = Joi.object<MutationEditProfileArgs>({
   firstName: Joi.string()
     .required()
     .trim()
-    .pattern(/[\d]/, { invert: true })
+    .pattern(/^\p{L}{2,}([ -]?\p{L}{2,})*$/u, "firstName")
     .messages({
       "string.empty": "Enter first name",
-      "string.pattern.invert.base": "First name cannot contain numbers",
+      "string.pattern.name": "First name contains an invalid character",
     }),
   lastName: Joi.string()
     .required()
     .trim()
-    .pattern(/[\d]/, { invert: true })
+    .pattern(/^\p{L}{2,}([ -]?\p{L}{2,})*$/u, "firstName")
     .messages({
       "string.empty": "Enter last name",
-      "string.pattern.invert.base": "Last name cannot contain numbers",
+      "string.pattern.name": "Last name contains an invalid character",
     }),
   image: Joi.string().trim().allow(null).messages({
     "string.empty": "Profile image url cannot be empty",

@@ -42,8 +42,8 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
       confirmPassword: "",
     },
     {
-      firstNameError: "First name cannot contain numbers",
-      lastNameError: "Last name cannot contain numbers",
+      firstNameError: "First name contains an invalid character",
+      lastNameError: "Last name contains an invalid character",
       passwordError: "Password must be at least 8 characters long",
       confirmPasswordError: "Passwords do not match",
     },
@@ -82,8 +82,8 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
   [
     "Should return an error response if the confirm password does not match the password",
     {
-      firstName: "Samson",
-      lastName: "Jake",
+      firstName: "Ádël Õmàri",
+      lastName: "Jake-Jackson",
       password: "icbm73J_",
       confirmPassword: "jru73_",
     },

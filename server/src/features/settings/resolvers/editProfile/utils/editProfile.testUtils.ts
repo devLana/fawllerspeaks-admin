@@ -13,7 +13,7 @@ type Validations = [string, Input, InputErrors<Input>][];
 const image = "folder/image-folder/image.png";
 const { storageUrl } = supabase();
 
-export const args = { firstName: "Ade", lastName: "Lana" };
+export const args = { firstName: "Jõhn-Döe", lastName: "Smíth" };
 export const dateCreated = "2022-11-07 13:22:43.717+01";
 
 export const validations = (nullOrUndefined: null | undefined): Validations => [
@@ -39,8 +39,8 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
     "First name and last name input values are invalid, Return a validation error response",
     { firstName: "John3", lastName: "12sam" },
     {
-      firstNameError: "First name cannot contain numbers",
-      lastNameError: "Last name cannot contain numbers",
+      firstNameError: "First name contains an invalid character",
+      lastNameError: "Last name contains an invalid character",
       imageError: nullOrUndefined,
     },
   ],
