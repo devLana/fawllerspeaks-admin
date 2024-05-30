@@ -20,11 +20,13 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
   const mq = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
   const { jwt } = useAuthHeader();
 
+  const topOffset = mq ? 64 : 56;
+
   React.useEffect(() => {
     if (ckEditorRef.current) {
-      ckEditorRef.current.ui.viewportOffset = { top: mq ? 64 : 56 };
+      ckEditorRef.current.ui.viewportOffset = { top: topOffset };
     }
-  }, [mq]);
+  }, [topOffset]);
 
   const handleContent = (content: string) => {
     dispatch({ type: "ADD_POST_CONTENT", payload: { content } });
@@ -188,28 +190,15 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
         "&:focus-within>.ck-editor>.ck-editor__top>.ck-sticky-panel>.ck-sticky-panel__content,&>.ck-editor>.ck-editor__main>.ck-content.ck-focused":
           { borderColor: "primary.main" },
 
-        "&>.ck-editor>.ck-editor__main>.ck-content h2": {
-          fontSize: typography.h2.fontSize,
-          fontWeight: typography.h2.fontWeight,
-          lineHeight: typography.h2.lineHeight,
-        },
+        "&>.ck-editor>.ck-editor__main>.ck-content h2": { ...typography.h2 },
 
-        "&>.ck-editor>.ck-editor__main>.ck-content h3": {
-          fontSize: typography.h3.fontSize,
-          fontWeight: typography.h3.fontWeight,
-          lineHeight: typography.h3.lineHeight,
-        },
+        "&>.ck-editor>.ck-editor__main>.ck-content h3": { ...typography.h3 },
 
-        "&>.ck-editor>.ck-editor__main>.ck-content h4": {
-          fontSize: typography.h4.fontSize,
-          fontWeight: typography.h4.fontWeight,
-          lineHeight: typography.h4.lineHeight,
-        },
+        "&>.ck-editor>.ck-editor__main>.ck-content h4": { ...typography.h4 },
 
-        "&>.ck-editor>.ck-editor__main>.ck-content p": {
-          fontSize: typography.body1.fontSize,
-          fontWeight: typography.body1.fontWeight,
-        },
+        "&>.ck-editor>.ck-editor__main>.ck-content h5": { ...typography.h5 },
+
+        "&>.ck-editor>.ck-editor__main>.ck-content p": { ...typography.body1 },
 
         "&>.ck-editor>.ck-editor__main>.ck-content blockquote": {
           borderLeftColor: "primary.main",
@@ -263,25 +252,7 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
           ckEditorRef.current = null;
         }}
         config={{
-          ui: { viewportOffset: { top: mq ? 64 : 56 } },
-          link: {
-            decorators: {
-              openInNewTab: {
-                mode: "automatic",
-                attributes: { target: "_blank", rel: "noopener noreferrer" },
-                callback(url) {
-                  if (!url) return true;
-
-                  if (url.includes("fawllerspeaks.com")) return false;
-
-                  const regex = /^(https?:\/\/)?(w{3}\.)?[\w.-]+\.[a-z]{2,4}/i;
-                  if (url.startsWith("//") || regex.test(url)) return true;
-
-                  return false;
-                },
-              },
-            },
-          },
+          ui: { viewportOffset: { top: topOffset } },
           simpleUpload: {
             uploadUrl: `${uploadUrl}/upload-post-content-image`,
             headers: { Authorization: `Bearer ${jwt}` },
