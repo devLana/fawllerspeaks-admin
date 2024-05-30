@@ -37,7 +37,7 @@ const RootLayout = (props: RootLayoutProps) => {
         paddingTop: 7,
         pt: { sm: 8 },
         display: { sm: "flex" },
-        columnGap: { sm: 5 },
+        columnGap: { sm: 3 },
       }}
     >
       <Metadata {...metaProps} />
@@ -47,7 +47,7 @@ const RootLayout = (props: RootLayoutProps) => {
         onToggleNav={() => setNavBarIsOpen(!navBarIsOpen)}
         onCloseNav={() => setNavBarIsOpen(false)}
       />
-      <Box component="main" py={4} flexGrow={{ sm: 1 }}>
+      <Box component="main" py={4} flexGrow={{ sm: 1 }} minWidth={{ sm: 0 }}>
         {content}
       </Box>
     </Container>
