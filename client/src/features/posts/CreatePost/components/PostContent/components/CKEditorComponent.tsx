@@ -11,10 +11,14 @@ import type { CreatePostAction } from "@types";
 
 interface CKEditorComponentProps {
   data: string;
+  contentIsEmpty: boolean;
   dispatch: React.Dispatch<CreatePostAction>;
+  onFocus: VoidFunction;
+  onBlur: (value: boolean) => void;
 }
 
-const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
+const CKEditorComponent = (props: CKEditorComponentProps) => {
+  const { data, contentIsEmpty, dispatch, onBlur, onFocus } = props;
   const ckEditorRef = React.useRef<CustomEditor | null>(null);
 
   const mq = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
@@ -30,13 +34,14 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
 
   const handleContent = (content: string) => {
     dispatch({ type: "ADD_POST_CONTENT", payload: { content } });
+    onBlur(!content.trim().replace(/<p>(<br>)*&nbsp;<\/p>/g, ""));
   };
 
   const uploadUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
 
   return (
     <Box
-      mb={2.5}
+      mb={contentIsEmpty ? 0 : 2.5}
       sx={({ shape, typography, palette, shadows, spacing }) => ({
         "--ck-color-toolbar-background": palette.background.default,
         "--ck-color-base-background": palette.background.default,
@@ -179,15 +184,15 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
 
         "&>.ck-editor>.ck-editor__main>.ck.ck-content": {
           minHeight: 400,
-          borderColor: "divider",
+          borderColor: contentIsEmpty ? "error.main" : "divider",
           borderRadius: 1,
         },
 
         "&>.ck-editor>.ck-editor__main>.ck-content:hover": {
-          borderColor: "action.disabled",
+          borderColor: contentIsEmpty ? "error.main" : "action.disabled",
         },
 
-        "&:focus-within>.ck-editor>.ck-editor__top>.ck-sticky-panel>.ck-sticky-panel__content,&>.ck-editor>.ck-editor__main>.ck-content.ck-focused":
+        "&>.ck-editor:focus-within>.ck-editor__top>.ck-sticky-panel>.ck-sticky-panel__content,&>.ck-editor>.ck-editor__main>.ck-content.ck-focused":
           { borderColor: "primary.main" },
 
         "&>.ck-editor>.ck-editor__main>.ck-content h2": { ...typography.h2 },
@@ -245,6 +250,7 @@ const CKEditorComponent = ({ data, dispatch }: CKEditorComponentProps) => {
         editor={CustomEditor}
         data={data}
         onBlur={(_, editorRef) => handleContent(editorRef.getData())}
+        onFocus={onFocus}
         onReady={editorRef => {
           ckEditorRef.current = editorRef;
         }}

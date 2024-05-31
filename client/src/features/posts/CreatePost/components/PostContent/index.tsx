@@ -1,24 +1,33 @@
+import * as React from "react";
+
+import FormHelperText from "@mui/material/FormHelperText";
+
 import SectionHeader from "../SectionHeader";
 import ActionButtons from "../ActionButtons";
 import CKEditorComponent from "./components/CKEditorComponent";
-import type { CreatePostAction, PostView } from "@types";
+import type { CreatePostAction, PostView, Status } from "@types";
 
 interface PostContentProps {
   content: string;
-  draftStatus: "idle" | "loading" | "error";
+  draftStatus: Status;
   handleDraftPost: () => Promise<void>;
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
 const PostContent = (props: PostContentProps) => {
   const { content, draftStatus, handleDraftPost, dispatch } = props;
+  const [contentIsEmpty, setContentIsEmpty] = React.useState(false);
 
   const handleView = (view: PostView) => {
     dispatch({ type: "CHANGE_VIEW", payload: { view } });
   };
 
   const handleNext = () => {
-    if (content) handleView("preview");
+    if (content.trim().replace(/<p>(<br>)*&nbsp;<\/p>/g, "")) {
+      handleView("preview");
+    } else {
+      setContentIsEmpty(true);
+    }
   };
 
   return (
@@ -33,7 +42,18 @@ const PostContent = (props: PostContentProps) => {
         buttonLabel="Go back to provide post metadata section"
         heading="Provide post content"
       />
-      <CKEditorComponent data={content} dispatch={dispatch} />
+      <CKEditorComponent
+        data={content}
+        dispatch={dispatch}
+        contentIsEmpty={contentIsEmpty}
+        onBlur={value => setContentIsEmpty(value)}
+        onFocus={() => setContentIsEmpty(false)}
+      />
+      {contentIsEmpty && (
+        <FormHelperText error sx={{ mb: 2.5 }}>
+          Provide post content
+        </FormHelperText>
+      )}
       <ActionButtons
         label="Preview post"
         status={draftStatus}

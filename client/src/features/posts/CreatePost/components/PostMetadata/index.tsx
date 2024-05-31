@@ -12,18 +12,21 @@ import type {
   CreatePostAction,
   RequiredPostMetadata,
   RequiredMetadataKeys,
+  Status,
 } from "@types";
 
 interface PostMetadataProps {
   title: string;
   description: string;
   excerpt: string;
-  draftStatus: "idle" | "loading" | "error";
+  draftStatus: Status;
   fileInput: React.ReactElement;
   selectPostTags: React.ReactElement;
   dispatch: React.Dispatch<CreatePostAction>;
   handleDraftPost: () => Promise<void>;
 }
+
+type BlurEvent = React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>;
 
 const PostMetadata = ({
   title,
@@ -49,10 +52,6 @@ const PostMetadata = ({
     dispatch({ type: "ADD_REQUIRED_METADATA", payload: { metadata: values } });
   };
 
-  const ariaErrorMessage = (key: RequiredMetadataKeys) => {
-    return errors[key] ? `${key}-helper-text` : undefined;
-  };
-
   const handleDraft = () => {
     if (!title) {
       const message = "Provide post title";
@@ -64,14 +63,12 @@ const PostMetadata = ({
     void handleDraftPost();
   };
 
-  const handleBlur = (
-    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
-    id: RequiredMetadataKeys
-  ) => {
+  const handleBlur = (e: BlurEvent) => {
+    const key = e.target.name as RequiredMetadataKeys;
     const { value } = e.target;
 
     if (value) {
-      dispatch({ type: "CHANGE_METADATA_FIELD", payload: { key: id, value } });
+      dispatch({ type: "CHANGE_METADATA_FIELD", payload: { key, value } });
     }
   };
 
@@ -92,14 +89,19 @@ const PostMetadata = ({
             <TextField
               type="text"
               {...register(id)}
-              onBlur={e => handleBlur(e, id)}
+              onBlur={handleBlur}
               id={id}
+              name={id}
               autoComplete="on"
               autoFocus={id === "title"}
               fullWidth
               label={label}
               defaultValue={defaultValues?.[id] ?? ""}
-              inputProps={{ "aria-errormessage": ariaErrorMessage(id) }}
+              inputProps={{
+                "aria-errormessage": errors[id]
+                  ? `${id}-helper-text`
+                  : undefined,
+              }}
               error={!!errors[id]}
               helperText={errors[id]?.message ?? null}
             />
