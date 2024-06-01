@@ -102,9 +102,8 @@ describe("Delete post tags", () => {
 
       mocks.server.use(graphql.query("GetPostTags", mocks.unknownResolver));
 
-      const alerts = await screen.findAllByRole("alert");
-
-      expect(alerts[1]).toHaveTextContent(msg);
+      await expect(screen.findByRole("alert")).resolves.toHaveTextContent(msg);
+      await expect(screen.findByRole("status")).resolves.toBeInTheDocument();
       expect(modal).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[0]))).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[1]))).not.toBeInTheDocument();
@@ -193,9 +192,7 @@ describe("Delete post tags", () => {
       expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
       expect(within(modal).getByRole("button", mocks.cancelBtn)).toBeDisabled();
 
-      const elem = await screen.findByRole("presentation");
-
-      expect(within(elem).getByRole("alert")).toHaveTextContent(msg);
+      await expect(screen.findByRole("alert")).resolves.toHaveTextContent(msg);
       expect(modal).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[0]))).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[1]))).not.toBeInTheDocument();
@@ -225,9 +222,7 @@ describe("Delete post tags", () => {
       expect(within(modal).getByRole("button", deleteBtn2)).toBeDisabled();
       expect(within(modal).getByRole("button", mocks.cancelBtn)).toBeDisabled();
 
-      const elem = await screen.findByRole("presentation");
-
-      expect(within(elem).getByRole("alert")).toHaveTextContent(msg);
+      await expect(screen.findByRole("alert")).resolves.toHaveTextContent(msg);
       expect(modal).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[0]))).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[2]))).not.toBeInTheDocument();
@@ -260,9 +255,7 @@ describe("Delete post tags", () => {
       expect(within(modal).getByRole("button", deleteBtn1)).toBeDisabled();
       expect(within(modal).getByRole("button", mocks.cancelBtn)).toBeDisabled();
 
-      const elem = await screen.findByRole("presentation");
-
-      expect(within(elem).getByRole("alert")).toHaveTextContent(msg);
+      await expect(screen.findByRole("alert")).resolves.toHaveTextContent(msg);
       expect(modal).not.toBeInTheDocument();
       expect(screen.queryByLabelText(wrapper(tags[2]))).not.toBeInTheDocument();
       expect(screen.getByRole("checkbox", tagLabel(tags[1]))).toBeChecked();

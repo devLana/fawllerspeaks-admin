@@ -35,14 +35,14 @@ describe("View/Get post tags", () => {
     });
   });
 
-  describe("Api response should display a notification message", () => {
+  describe("Api response should display a status message", () => {
     it.each(mocks.alerts)("%s", async (_, message, resolver) => {
       mocks.server.use(graphql.query("GetPostTags", resolver));
 
       renderUI(<PostTagsPage />);
 
       expect(screen.getByRole("progressbar")).toBeInTheDocument();
-      expect(await screen.findByRole("alert")).toHaveTextContent(message);
+      expect(await screen.findByRole("status")).toHaveTextContent(message);
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     });
   });
@@ -63,7 +63,7 @@ describe("View/Get post tags", () => {
       expect(listItem[3]).toHaveTextContent(mocks.getTags[3]);
       expect(listItem[4]).toHaveTextContent(mocks.getTags[4]);
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
     });
   });
 
@@ -86,7 +86,7 @@ describe("View/Get post tags", () => {
       expect(screen.getByRole("progressbar")).toBeInTheDocument();
       await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
       expect(screen.getByRole("checkbox", selectAll)).not.toBeChecked();
 
       await user.click(screen.getByRole("checkbox", name(0)));
@@ -126,7 +126,7 @@ describe("View/Get post tags", () => {
       expect(screen.getByRole("progressbar")).toBeInTheDocument();
       await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
       expect(screen.getByRole("checkbox", selectAll)).not.toBeChecked();
 
       await user.click(screen.getByRole("checkbox", name(1)));
@@ -162,7 +162,7 @@ describe("View/Get post tags", () => {
       expect(screen.getByRole("progressbar")).toBeInTheDocument();
       await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
       expect(screen.getByRole("checkbox", selectAll)).not.toBeChecked();
       expect(screen.getByRole("checkbox", name(0))).not.toBeChecked();
       expect(screen.getByRole("checkbox", name(1))).not.toBeChecked();
@@ -204,7 +204,7 @@ describe("View/Get post tags", () => {
       expect(screen.getByRole("progressbar")).toBeInTheDocument();
       await expect(screen.findByRole("list")).resolves.toBeInTheDocument();
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
       expect(screen.getByRole("checkbox", selectAll)).not.toBeChecked();
       expect(screen.getByRole("checkbox", name(0))).not.toBeChecked();
       expect(screen.getByRole("checkbox", name(1))).not.toBeChecked();

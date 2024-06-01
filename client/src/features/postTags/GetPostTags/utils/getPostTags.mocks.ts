@@ -73,7 +73,7 @@ export const redirects: [string, Redirects, () => MswData][] = [
 const network = () => mswErrors(new Error(), { status: 503 });
 const gql = () => mswErrors(new GraphQLError(gqlMsg));
 
-const text = "Should display a notification alert toast if the api";
+const text = "Should display a notification status message if the api";
 export const alerts: [string, string, () => StrictResponse<Res>][] = [
   [`${text} throws a graphql error`, gqlMsg, gql],
   [`${text} request fails with a network error`, message, network],
