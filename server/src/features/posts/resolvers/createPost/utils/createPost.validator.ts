@@ -25,7 +25,7 @@ export const createPostValidator = Joi.object<CreatePostInput>({
     .trim()
     .custom((value: string) => {
       const html = value
-        .replace(/<p>(<br>)*&nbsp;<\/p>/g, "")
+        .replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")
         .replace(/>&nbsp;<\//g, "></");
 
       return sanitize(html, sanitizeOptions)

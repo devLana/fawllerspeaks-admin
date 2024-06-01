@@ -34,7 +34,7 @@ const useVerifySession = (handleRefreshToken: HandleRefreshToken) => {
 
   React.useEffect(() => {
     const sessionId = localStorage.getItem(SESSION_ID);
-    const regex = /^\/(login|forgot-password|reset-password|404|500)/;
+    const regex = /^\/(?:login|forgot-password|reset-password|404|500)/;
 
     if (sessionId) {
       client
@@ -80,7 +80,7 @@ const useVerifySession = (handleRefreshToken: HandleRefreshToken) => {
 
             case "VerifiedSession": {
               const { __typename = "User", ...user } = data.verifySession.user;
-              const re = /^\/(login|forgot-password|reset-password|register)/;
+              const re = /^\/(?:login|forgot-password|reset-password|register)/;
 
               handleRefreshToken(data.verifySession.accessToken);
 

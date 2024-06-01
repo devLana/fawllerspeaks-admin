@@ -26,7 +26,7 @@ export const draftPostSchema = Joi.object<DraftPostInput>({
       if (!value) return value;
 
       const html = value
-        .replace(/<p>(<br>)*&nbsp;<\/p>/g, "")
+        .replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")
         .replace(/>&nbsp;<\//g, "></");
 
       return sanitize(html, sanitizeOptions)

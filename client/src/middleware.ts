@@ -7,14 +7,14 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (authCookie && sigCookie && tokenCookie) {
-    if (/^\/(login|forgot-password|reset-password)/.test(pathname)) {
+    if (/^\/(?:login|forgot-password|reset-password)/.test(pathname)) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
     return NextResponse.next();
   }
 
-  const regex = /^\/(post-tags|register|settings\/?|posts\/?)/;
+  const regex = /^\/(?:post-tags|register|settings\/?|posts\/?)/;
 
   if (pathname === "/" || regex.test(pathname)) {
     return NextResponse.redirect(new URL("/login", request.url));

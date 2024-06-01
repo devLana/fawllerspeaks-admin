@@ -16,7 +16,7 @@ export const anchorTagReplacerFn = (match: string, ...rest: ReplaceParams) => {
 
   let href = url;
 
-  if (/^(w{3}\.)?[^/]+?(?=\.[a-z]{2,4})/i.test(url)) {
+  if (/^(?:w{3}\.)?[^/]+?(?=\.[a-z]{2,4})/i.test(url)) {
     href = `https://${url}`;
   } else if (url.startsWith("//")) {
     href = `https:${url}`;
