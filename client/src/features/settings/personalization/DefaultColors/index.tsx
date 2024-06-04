@@ -14,8 +14,8 @@ const DefaultColors = ({ color }: { color: ThemeColors }) => {
   const handleAppTheme = useAppTheme();
 
   return (
-    <section>
-      <Typography variant="h2" gutterBottom>
+    <section aria-labelledby="color-settings">
+      <Typography variant="h2" gutterBottom id="color-settings">
         Default Color
       </Typography>
       <Box

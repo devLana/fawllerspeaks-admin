@@ -8,8 +8,8 @@ const FontSize = ({ fontSize }: { fontSize: number }) => {
   const handleAppTheme = useAppTheme();
 
   return (
-    <Box component="section" mb={5}>
-      <Typography variant="h2" gutterBottom>
+    <Box component="section" mb={5} aria-labelledby="font-size-settings">
+      <Typography variant="h2" gutterBottom id="font-size-settings">
         Font Size
       </Typography>
       <Box

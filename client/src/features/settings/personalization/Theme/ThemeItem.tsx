@@ -23,31 +23,28 @@ const color: Record<ThemeMode, string> = {
 const ThemeItem = ({ id, name, Icon, isCurrentTheme }: ThemeItemProps) => (
   <FormControlLabel
     sx={{
-      flexGrow: 1,
-      columnGap: 3,
+      columnGap: 2,
       m: 0,
       py: 0.4,
-      pl: 0.4,
-      pr: 1.3,
+      pl: 0.625,
+      pr: 1.75,
       color: color[id],
       bgcolor: bgColor[id],
       borderRadius: 1,
-      ...(isCurrentTheme && {
-        borderColor: "primary.main",
-        borderWidth: 1,
-        borderStyle: "solid",
-      }),
+      ...(isCurrentTheme
+        ? { border: "1px solid", borderColor: "primary.main" }
+        : {}),
       "&>span:last-child": {
         display: "inline-flex",
         alignItems: "center",
-        columnGap: 2,
+        columnGap: 1,
       },
     }}
     value={id}
     control={<Radio size="small" sx={{ color: "primary.main" }} />}
     label={
       <>
-        {name} <Icon />
+        {name} <Icon fontSize="small" />
       </>
     }
   />

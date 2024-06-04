@@ -11,8 +11,8 @@ const Theme = ({ themeMode }: { themeMode: ThemeMode }) => {
   const handleAppTheme = useAppTheme();
 
   return (
-    <Box component="section" mb={5} pt={2}>
-      <Typography variant="h2" gutterBottom>
+    <Box component="section" mb={5} pt={2} aria-labelledby="theme-settings">
+      <Typography variant="h2" gutterBottom id="theme-settings">
         Theme
       </Typography>
       <RadioGroup
@@ -25,8 +25,10 @@ const Theme = ({ themeMode }: { themeMode: ThemeMode }) => {
           p: 2,
           px: { sm: 1.5 },
           borderRadius: 1,
-          rowGap: 2.5,
-          columnGap: 2.65,
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(calc(8em + 63px), 1fr))",
+          gap: 2.5,
         }}
       >
         {themes.map(theme => (
