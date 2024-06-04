@@ -22,6 +22,6 @@ export const typography: Typo = fontSize => {
     h4: { fontSize: "1.2em", ...styles },
     h5: { fontSize: "1em", ...styles },
     h6: { fontSize: "0.85em", ...styles },
-    body1: { lineHeight: 1.6, ...styles },
+    body1: { lineHeight: 1.6 },
   };
 };

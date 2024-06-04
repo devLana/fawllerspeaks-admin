@@ -93,6 +93,10 @@ export const components: Components = {
       html {
         font-size: 16px;
       }
+      p {
+        word-break: break-word;
+        hyphens: auto;
+      }
     `,
   },
   MuiDialog: {
