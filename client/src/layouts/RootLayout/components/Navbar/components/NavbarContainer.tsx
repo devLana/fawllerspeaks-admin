@@ -38,7 +38,11 @@ const NavbarContainer = (props: NavbarContainerProps) => {
         <Backdrop
           open={isOpen}
           onClick={onClick}
-          sx={{ zIndex: -1, display: { sm: "none" } }}
+          sx={{
+            zIndex: -1,
+            display: { sm: "none" },
+            backdropFilter: "blur(3px)",
+          }}
         />
       )}
       <Box
