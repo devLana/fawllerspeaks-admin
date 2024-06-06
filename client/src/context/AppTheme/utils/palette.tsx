@@ -4,7 +4,7 @@ import type { ThemeColors, ThemeMode } from "@types";
 type Palette = NonNullable<ThemeOptions["palette"]>;
 type AppThemePalette = (themeMode: ThemeMode, color: ThemeColors) => Palette;
 
-const generatePalette = (hex: string, rgb: string) => ({
+const generatePalette = (hex: string, rgb: string, color: ThemeColors) => ({
   text: {
     primary: hex,
     secondary: `rgba(${rgb},0.7)`,
@@ -18,6 +18,11 @@ const generatePalette = (hex: string, rgb: string) => ({
     disabledBackground: `rgba(${rgb},0.12)`,
   },
   divider: `rgba(${rgb},0.12)`,
+  themeColor: {
+    main: color,
+    transparent:
+      color === "#7dd1f3" ? "rgba(125,209,243,0.8)" : "rgba(106,106,106,0.5)",
+  },
 });
 
 export const palette: AppThemePalette = (themeMode, color) => {
@@ -29,12 +34,12 @@ export const palette: AppThemePalette = (themeMode, color) => {
         ? {
             primary: { light: "#7dd1f3", main: "#149cd2", dark: "#09455d" },
             secondary: { light: "#ccc", main: "#6a6a6a", dark: "#404040" },
-            ...generatePalette("#04232f", "4,35,47"),
+            ...generatePalette("#04232f", "4,35,47", color),
           }
         : {
             primary: { light: "#ccc", main: "#6a6a6a", dark: "#404040" },
             secondary: { light: "#7dd1f3", main: "#149cd2", dark: "#09455d" },
-            ...generatePalette("#09455d", "9,69,93"),
+            ...generatePalette("#09455d", "9,69,93", color),
           }),
     };
   }
@@ -48,12 +53,12 @@ export const palette: AppThemePalette = (themeMode, color) => {
         ? {
             primary: { light: "#d0effb", main: "#7dd1f3", dark: "#0d688c" },
             secondary: { light: "#e6e6e6", main: "#ccc", dark: "#6a6a6a" },
-            ...generatePalette("#d9d9d9", "217,217,217"),
+            ...generatePalette("#d9d9d9", "217,217,217", color),
           }
         : {
             primary: { light: "#e6e6e6", main: "#ccc", dark: "#6a6a6a" },
             secondary: { light: "#d0effb", main: "#7dd1f3", dark: "#0d688c" },
-            ...generatePalette("#a2def6", "162,222,246"),
+            ...generatePalette("#a2def6", "162,222,246", color),
           }),
     };
   }
@@ -67,12 +72,12 @@ export const palette: AppThemePalette = (themeMode, color) => {
       ? {
           primary: { light: "#d0effb", main: "#7dd1f3", dark: "#0d688c" },
           secondary: { light: "#e6e6e6", main: "#ccc", dark: "#6a6a6a" },
-          ...generatePalette("#fff", "255,255,255"),
+          ...generatePalette("#fff", "255,255,255", color),
         }
       : {
           primary: { light: "#e6e6e6", main: "#ccc", dark: "#6a6a6a" },
           secondary: { light: "#d0effb", main: "#7dd1f3", dark: "#0d688c" },
-          ...generatePalette("#a2def6", "162,222,246"),
+          ...generatePalette("#a2def6", "162,222,246", color),
         }),
   };
 };
