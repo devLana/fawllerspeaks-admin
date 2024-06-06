@@ -63,8 +63,8 @@ const PostFileInput = ({ dispatch, imageBanner }: PostFileInputProps) => {
           />
         ) : (
           <Button
+            variant="outlined"
             component="label"
-            size="large"
             htmlFor={id}
             startIcon={<AddPhotoAlternateOutlinedIcon />}
             onDrop={handleDrop}
@@ -73,15 +73,15 @@ const PostFileInput = ({ dispatch, imageBanner }: PostFileInputProps) => {
             onDragLeave={handleDragEvent(false)}
             onKeyDown={handleKeydown}
             sx={theme => ({
-              [theme.breakpoints.down("md")]: { alignSelf: "flex-start" },
+              width: "100%",
+              [theme.breakpoints.down("md")]: {
+                py: 2,
+                pl: 2.25,
+                justifyContent: "flex-start",
+              },
               [theme.breakpoints.up("md")]: {
-                color: "text.primary",
-                width: "100%",
                 height: 280,
-                border: 1,
-                borderColor: hasEnteredDropZone ? "primary.main" : "divider",
                 ...(hasEnteredDropZone && { borderStyle: "dashed" }),
-                "&:hover": { borderColor: "text.primary" },
               },
             })}
           >

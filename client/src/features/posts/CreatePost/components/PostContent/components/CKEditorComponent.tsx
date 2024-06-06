@@ -73,6 +73,7 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
         "--ck-color-base-border": palette.text.disabled,
         "--ck-color-focus-border": palette.text.primary,
         "--ck-color-link-selected-background": palette.action.selected,
+        "--border-radius": `${shape.borderRadius}px`,
 
         "&>.ck-editor>.ck-editor__top": { mb: 1 },
 
@@ -163,14 +164,14 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
 
         "&>.ck-editor .ck.ck-toolbar__items .ck.ck-splitbutton>.ck-button:first-of-type":
           {
-            borderTopLeftRadius: `${shape.borderRadius}px`,
-            borderBottomLeftRadius: `${shape.borderRadius}px`,
+            borderTopLeftRadius: "var(--border-radius)",
+            borderBottomLeftRadius: "var(--border-radius)",
           },
 
         "&>.ck-editor .ck.ck-toolbar__items .ck.ck-splitbutton>.ck-button:last-of-type":
           {
-            borderTopRightRadius: `${shape.borderRadius}px`,
-            borderBottomRightRadius: `${shape.borderRadius}px`,
+            borderTopRightRadius: "var(--border-radius)",
+            borderBottomRightRadius: "var(--border-radius)",
           },
 
         "&>.ck-editor .ck.ck-toolbar__items .ck-color-ui-dropdown .ck-color-selector .ck-color-picker,&>.ck-editor .ck.ck-toolbar__items .ck-insert-table-dropdown__grid,&>.ck-editor .ck.ck-toolbar__items .ck-list-properties>.ck-list-styles-list":
@@ -208,8 +209,8 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
         "&>.ck-editor>.ck-editor__main>.ck-content blockquote": {
           borderLeftColor: "primary.main",
           bgcolor: "action.selected",
-          borderTopRightRadius: `${shape.borderRadius}px`,
-          borderBottomRightRadius: `${shape.borderRadius}px`,
+          borderTopRightRadius: "var(--border-radius)",
+          borderBottomRightRadius: "var(--border-radius)",
         },
 
         "&>.ck-editor>.ck-editor__main>.ck-content .text-big": {
@@ -232,7 +233,10 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
 
         "&>.ck-editor>.ck-editor__main>.ck-content a": {
           color: "primary.main",
-          textDecoration: "none",
+        },
+
+        "&>.ck-editor>.ck-editor__main>.ck-content a:hover": {
+          cursor: "pointer",
         },
 
         "&>.ck-editor>.ck-editor__main>.ck-content a:not(.ck-link_selected):hover":

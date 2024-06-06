@@ -12,13 +12,11 @@ import RenderSelectedPostTags from "./RenderSelectedPostTags";
 import type { CreatePostAction } from "@types";
 
 interface SelectPostTagsInputProps {
-  tags?: string[];
-  dispatch?: React.Dispatch<CreatePostAction>;
+  tags: string[];
+  dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
-  const { tags = [], dispatch } = props;
-
+const SelectPostTagsInput = ({ tags, dispatch }: SelectPostTagsInputProps) => {
   const postTags = useGetCachePostTags();
 
   const postTagsMap = React.useMemo(() => {

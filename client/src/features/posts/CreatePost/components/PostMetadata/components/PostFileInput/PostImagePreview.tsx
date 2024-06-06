@@ -25,6 +25,8 @@ const PostImagePreview = (props: PostImagePreviewProps) => {
       maxWidth={700}
       borderRadius={1}
       overflow="hidden"
+      border="1px solid"
+      borderColor="primary.light"
     >
       <Image
         src={src}
@@ -40,12 +42,13 @@ const PostImagePreview = (props: PostImagePreviewProps) => {
             size="small"
             onKeyDown={onKeydown}
             sx={{
-              bgcolor: "background.default",
-              color: "text.primary",
-              "&:hover": { bgcolor: "background.default" },
+              p: 1,
+              bgcolor: "themeColor.transparent",
+              color: "#fff",
+              "&:hover": { bgcolor: "themeColor.transparent" },
             }}
           >
-            <AddPhotoAlternateOutlinedIcon />
+            <AddPhotoAlternateOutlinedIcon sx={{ fontSize: 28 }} />
           </IconButton>
         </Tooltip>
         <Tooltip title="Remove Image" placement="left">
@@ -53,12 +56,13 @@ const PostImagePreview = (props: PostImagePreviewProps) => {
             size="small"
             onClick={onClick}
             sx={{
-              bgcolor: "background.default",
-              color: "text.primary",
-              "&:hover": { bgcolor: "background.default" },
+              p: 1,
+              bgcolor: "themeColor.transparent",
+              color: "#fff",
+              "&:hover": { bgcolor: "themeColor.transparent" },
             }}
           >
-            <HideImageOutlinedIcon />
+            <HideImageOutlinedIcon sx={{ fontSize: 28 }} />
           </IconButton>
         </Tooltip>
       </Stack>
