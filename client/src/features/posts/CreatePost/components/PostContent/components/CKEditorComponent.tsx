@@ -42,7 +42,7 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
   return (
     <Box
       mb={contentIsEmpty ? 0 : 2.5}
-      sx={({ shape, typography, palette, shadows, spacing }) => ({
+      sx={({ appTheme, shape, typography, palette, shadows, spacing }) => ({
         "--ck-color-toolbar-background": palette.background.default,
         "--ck-color-base-background": palette.background.default,
         "--ck-color-toolbar-border": palette.divider,
@@ -187,10 +187,9 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
           minHeight: 400,
           borderColor: contentIsEmpty ? "error.main" : "divider",
           borderRadius: 1,
-        },
-
-        "&>.ck-editor>.ck-editor__main>.ck-content:hover": {
-          borderColor: contentIsEmpty ? "error.main" : "action.disabled",
+          "&:hover": {
+            borderColor: contentIsEmpty ? "error.main" : "action.disabled",
+          },
         },
 
         "&>.ck-editor:focus-within>.ck-editor__top>.ck-sticky-panel>.ck-sticky-panel__content,&>.ck-editor>.ck-editor__main>.ck-content.ck-focused":
@@ -233,21 +232,37 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
 
         "&>.ck-editor>.ck-editor__main>.ck-content a": {
           color: "primary.main",
+          "&:hover": {
+            cursor: "pointer",
+            color:
+              appTheme.themeMode === "sunny" ? "primary.dark" : "primary.light",
+          },
         },
-
-        "&>.ck-editor>.ck-editor__main>.ck-content a:hover": {
-          cursor: "pointer",
-        },
-
-        "&>.ck-editor>.ck-editor__main>.ck-content a:not(.ck-link_selected):hover":
-          { textDecoration: "underline" },
 
         "&>.ck-editor>.ck-editor__main>.ck-content .table>figcaption": {
           captionSide: "bottom",
         },
 
-        "&>.ck-editor>.ck-editor__main>.ck-content .todo-list__label input[type=checkbox]::before":
+        "&>.ck-editor>.ck-editor__main>.ck-content .table table td,&>.ck-editor>.ck-editor__main>.ck-content .table table th":
           { borderColor: "text.secondary" },
+
+        "&>.ck-editor>.ck-editor__main>.ck-content .table table th": {
+          bgcolor: "action.disabledBackground",
+        },
+
+        "&>.ck-editor>.ck-editor__main>.ck-content .todo-list": { pl: "1.2em" },
+
+        "&>.ck-editor>.ck-editor__main>.ck-content .todo-list .todo-list__label>span[contenteditable]>input[type=checkbox]":
+          { left: 0, mr: 2 },
+
+        "&>.ck-editor>.ck-editor__main>.ck-content .todo-list .todo-list__label>span[contenteditable]>input[type=checkbox]::before":
+          { borderColor: "text.disabled", borderRadius: 1 },
+
+        "&>.ck-editor>.ck-editor__main>.ck-content .todo-list .todo-list__label>span[contenteditable]>input[checked]::before":
+          { bgcolor: "primary.main", borderColor: "primary.main" },
+
+        "&>.ck-editor>.ck-editor__main>.ck-content .todo-list .todo-list__label>span[contenteditable]>input[checked]::after":
+          { borderColor: "secondary.dark" },
       })}
     >
       <CKEditor

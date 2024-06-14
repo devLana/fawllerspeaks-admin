@@ -17,9 +17,8 @@ const SelectPostTagsSkeleton = () => (
     <Skeleton
       variant="circular"
       sx={theme => ({
-        mt: 0.625,
-        lineHeight: 0,
         [theme.breakpoints.down("sm")]: { display: "none" },
+        [theme.breakpoints.up("sm")]: { mt: 0.625, lineHeight: 0 },
       })}
     >
       <HelpOutlineIcon fontSize="small" />
