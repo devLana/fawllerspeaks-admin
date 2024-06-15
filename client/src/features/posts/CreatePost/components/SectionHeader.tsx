@@ -9,13 +9,14 @@ interface SectionHeaderProps {
   id: string;
   buttonLabel: string;
   heading: string;
+  actionsMenu?: React.ReactElement;
 }
 
 const SectionHeader = (props: SectionHeaderProps) => {
-  const { onClick, heading, buttonLabel, id } = props;
+  const { onClick, heading, buttonLabel, id, actionsMenu } = props;
 
   return (
-    <Box mb={1.5} display="flex" alignItems="center" columnGap={3}>
+    <Box mb={1.5} display="flex" alignItems="flex-start" columnGap={3}>
       <Tooltip title={buttonLabel}>
         <IconButton color="primary" onClick={onClick}>
           <ChevronLeft fontSize="small" />
@@ -24,6 +25,7 @@ const SectionHeader = (props: SectionHeaderProps) => {
       <Typography variant="h2" id={id}>
         {heading}
       </Typography>
+      {actionsMenu}
     </Box>
   );
 };

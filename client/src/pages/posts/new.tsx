@@ -6,10 +6,11 @@ import Typography from "@mui/material/Typography";
 
 import { useDraftPost } from "@features/posts/CreatePost/hooks/useDraftPost";
 import RootLayout from "@layouts/RootLayout";
-import PostContentSkeleton from "@features/posts/CreatePost/components/PostContent/components/PostContentSkeleton";
 import PostMetadata from "@features/posts/CreatePost/components/PostMetadata";
 import PostFileInput from "@features/posts/CreatePost/components/PostMetadata/components/PostFileInput";
 import SelectPostTags from "@features/posts/CreatePost/components/PostMetadata/components/SelectPostTags";
+import PostContentSkeleton from "@features/posts/CreatePost/components/PostContent/components/PostContentSkeleton";
+import PostPreviewSkeleton from "@features/posts/CreatePost/components/PostPreview/components/PostPreviewSkeleton";
 import * as post from "@features/posts/CreatePost/utils/createPostReducer";
 import uiLayout from "@utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
@@ -22,6 +23,15 @@ const PostContent = dynamic(
     );
   },
   { loading: () => <PostContentSkeleton />, ssr: false }
+);
+
+const PostPreview = dynamic(
+  () => {
+    return import(
+      /* webpackChunkName: "PostPreview" */ "@features/posts/CreatePost/components/PostPreview"
+    );
+  },
+  { loading: () => <PostPreviewSkeleton />, ssr: false }
 );
 
 const CreatePostPage: NextPageWithLayout = () => {
@@ -62,7 +72,19 @@ const CreatePostPage: NextPageWithLayout = () => {
           handleDraftPost={handleDraftPost}
           dispatch={dispatch}
         />
-      ) : /* TODO: <PostPreview /> */ null}
+      ) : (
+        <PostPreview
+          content={state.postData.content}
+          description={state.postData.description}
+          excerpt={state.postData.excerpt}
+          imageBanner={state.postData.imageBanner?.blobUrl}
+          title={state.postData.title}
+          tags={state.postData.tags}
+          draftStatus={draftStatus}
+          dispatch={dispatch}
+          handleDraftPost={handleDraftPost}
+        />
+      )}
       <Snackbar
         message={msg}
         open={draftStatus === "error"}
