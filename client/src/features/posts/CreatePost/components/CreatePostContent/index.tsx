@@ -7,14 +7,14 @@ import ActionButtons from "../ActionButtons";
 import CKEditorComponent from "./components/CKEditorComponent";
 import type { CreatePostAction, PostView, Status } from "@types";
 
-interface PostContentProps {
+interface CreatePostContentProps {
   content: string;
   draftStatus: Status;
   handleDraftPost: () => Promise<void>;
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const PostContent = (props: PostContentProps) => {
+const CreatePostContent = (props: CreatePostContentProps) => {
   const { content, draftStatus, handleDraftPost, dispatch } = props;
   const [contentIsEmpty, setContentIsEmpty] = React.useState(false);
 
@@ -64,4 +64,4 @@ const PostContent = (props: PostContentProps) => {
   );
 };
 
-export default PostContent;
+export default CreatePostContent;

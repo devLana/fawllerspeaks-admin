@@ -10,14 +10,14 @@ import PostContentPreview from "./components/PostContent/PostContentPreview";
 import PostPreviewActionsMenu from "./components/PostPreviewActionsMenu";
 import type { CreatePostAction, CreatePostData, Status } from "@types";
 
-interface PostPreviewProps extends Omit<CreatePostData, "imageBanner"> {
+interface CreatePostPreviewProps extends Omit<CreatePostData, "imageBanner"> {
   imageBanner: string | undefined;
   draftStatus: Status;
   dispatch: React.Dispatch<CreatePostAction>;
   handleDraftPost: () => Promise<void>;
 }
 
-const PostPreview = ({
+const CreatePostPreview = ({
   draftStatus,
   dispatch,
   handleDraftPost,
@@ -27,7 +27,7 @@ const PostPreview = ({
   content,
   imageBanner,
   tags,
-}: PostPreviewProps) => {
+}: CreatePostPreviewProps) => {
   const handlePublish = async () => {};
 
   const handleGoBack = () => {
@@ -115,4 +115,4 @@ const PostPreview = ({
   );
 };
 
-export default PostPreview;
+export default CreatePostPreview;

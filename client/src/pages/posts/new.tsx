@@ -6,29 +6,29 @@ import Typography from "@mui/material/Typography";
 
 import { useDraftPost } from "@features/posts/CreatePost/hooks/useDraftPost";
 import RootLayout from "@layouts/RootLayout";
-import PostMetadata from "@features/posts/CreatePost/components/PostMetadata";
-import PostFileInput from "@features/posts/CreatePost/components/PostMetadata/components/PostFileInput";
-import SelectPostTags from "@features/posts/CreatePost/components/PostMetadata/components/SelectPostTags";
-import PostContentSkeleton from "@features/posts/CreatePost/components/PostContent/components/PostContentSkeleton";
-import PostPreviewSkeleton from "@features/posts/CreatePost/components/PostPreview/components/PostPreviewSkeleton";
+import CreatePostMetadata from "@features/posts/CreatePost/components/CreatePostMetadata";
+import PostFileInput from "@features/posts/CreatePost/components/CreatePostMetadata/components/PostFileInput";
+import SelectPostTags from "@features/posts/CreatePost/components/CreatePostMetadata/components/SelectPostTags";
+import CreatePostContentSkeleton from "@features/posts/CreatePost/components/CreatePostContent/components/CreatePostContentSkeleton";
+import PostPreviewSkeleton from "@features/posts/CreatePost/components/CreatePostPreview/components/PostPreviewSkeleton";
 import * as post from "@features/posts/CreatePost/utils/createPostReducer";
 import uiLayout from "@utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout, Status } from "@types";
 
-const PostContent = dynamic(
+const CreatePostContent = dynamic(
   () => {
     return import(
-      /* webpackChunkName: "PostContent" */ "@features/posts/CreatePost/components/PostContent"
+      /* webpackChunkName: "CreatePostContent" */ "@features/posts/CreatePost/components/CreatePostContent"
     );
   },
-  { loading: () => <PostContentSkeleton />, ssr: false }
+  { loading: () => <CreatePostContentSkeleton />, ssr: false }
 );
 
-const PostPreview = dynamic(
+const CreatePostPreview = dynamic(
   () => {
     return import(
-      /* webpackChunkName: "PostPreview" */ "@features/posts/CreatePost/components/PostPreview"
+      /* webpackChunkName: "CreatePostPreview" */ "@features/posts/CreatePost/components/CreatePostPreview"
     );
   },
   { loading: () => <PostPreviewSkeleton />, ssr: false }
@@ -48,7 +48,7 @@ const CreatePostPage: NextPageWithLayout = () => {
         Create A New Blog Post
       </Typography>
       {state.view === "metadata" ? (
-        <PostMetadata
+        <CreatePostMetadata
           title={state.postData.title}
           description={state.postData.description}
           excerpt={state.postData.excerpt}
@@ -66,14 +66,14 @@ const CreatePostPage: NextPageWithLayout = () => {
           }
         />
       ) : state.view === "content" ? (
-        <PostContent
+        <CreatePostContent
           content={state.postData.content}
           draftStatus={draftStatus}
           handleDraftPost={handleDraftPost}
           dispatch={dispatch}
         />
       ) : (
-        <PostPreview
+        <CreatePostPreview
           content={state.postData.content}
           description={state.postData.description}
           excerpt={state.postData.excerpt}

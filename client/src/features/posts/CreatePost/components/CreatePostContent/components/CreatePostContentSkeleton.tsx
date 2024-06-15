@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 
-const PostContentSkeleton = () => (
+const CreatePostContentSkeleton = () => (
   <section
     aria-live="polite"
     aria-busy="true"
@@ -29,4 +29,4 @@ const PostContentSkeleton = () => (
   </section>
 );
 
-export default PostContentSkeleton;
+export default CreatePostContentSkeleton;

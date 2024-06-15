@@ -15,7 +15,7 @@ import type {
   Status,
 } from "@types";
 
-interface PostMetadataProps {
+interface CreatePostMetadataProps {
   title: string;
   description: string;
   excerpt: string;
@@ -28,7 +28,7 @@ interface PostMetadataProps {
 
 type BlurEvent = React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>;
 
-const PostMetadata = ({
+const CreatePostMetadata = ({
   title,
   description,
   excerpt,
@@ -37,7 +37,7 @@ const PostMetadata = ({
   selectPostTags,
   dispatch,
   handleDraftPost,
-}: PostMetadataProps) => {
+}: CreatePostMetadataProps) => {
   const {
     register,
     handleSubmit,
@@ -119,4 +119,4 @@ const PostMetadata = ({
   );
 };
 
-export default PostMetadata;
+export default CreatePostMetadata;
