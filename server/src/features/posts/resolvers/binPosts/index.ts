@@ -141,7 +141,7 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
     const binnedPostIds: string[] = [];
 
     const mappedBinnedPosts = binnedPosts.map<Post>(binnedPost => {
-      const { url, slug } = getPostUrl(binnedPost.title);
+      const { href, slug } = getPostUrl(binnedPost.title);
       // const tags = binnedPost.tags ? mapPostTags(binnedPost.tags, map) : null;
 
       set.add(binnedPost.postId);
@@ -151,11 +151,10 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
         id: binnedPost.postId,
         title: binnedPost.title,
         description: binnedPost.description,
-        content: binnedPost.content,
+        content: null,
         author: { name, image },
         status: binnedPost.status,
-        url,
-        slug,
+        url: { slug, href },
         imageBanner: binnedPost.imageBanner,
         dateCreated: dateToISOString(binnedPost.dateCreated),
         datePublished: binnedPost.datePublished

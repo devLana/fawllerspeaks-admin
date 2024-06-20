@@ -45,7 +45,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
     content: Joi.string().required().trim().messages({
       "string.empty": "Provide post content",
     }),
-    tags: Joi.array()
+    tagIds: Joi.array()
       .items(
         Joi.string()
           .trim()
@@ -76,16 +76,16 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       title,
       description,
       content,
-      tags,
+      tagIds,
       imageBanner = null,
     } = input;
 
     let postTags: PostTag[] = [];
 
-    if (tags) {
-      const gottenTags = await getPostTags(db, tags);
+    if (tagIds) {
+      const gottenTags = await getPostTags(db, tagIds);
 
-      if (!gottenTags || gottenTags.length < tags.length) {
+      if (!gottenTags || gottenTags.length < tagIds.length) {
         return new UnknownError("Unknown post tag id provided");
       }
 
@@ -157,13 +157,13 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       );
     }
 
-    if (!tags && foundTags) {
+    if (!tagIds && foundTags) {
       const gottenTags = await getPostTags(db, foundTags);
       postTags = gottenTags ?? [];
     }
 
     const dbImageBanner = imageBanner ?? foundImageBanner;
-    const tagsToSave = tags ?? foundTags;
+    const tagsToSave = tagIds ?? foundTags;
     const dbTags = tagsToSave ? `{${tagsToSave.join(", ")}}` : null;
 
     const { rows: editedPost } = await db.query<Omit<PostDBData, "postId">>(
@@ -196,7 +196,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
     );
 
     const [edited] = editedPost;
-    const { url, slug } = getPostUrl(dbImageBanner ?? title);
+    const { href, slug } = getPostUrl(dbImageBanner ?? title);
     const returnTags = postTags.length === 0 ? null : postTags;
 
     return new SinglePost({
@@ -207,8 +207,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       content,
       author: { name: authorName, image: authorImage },
       status: postStatus,
-      url,
-      slug,
+      url: { href, slug },
       imageBanner: dbImageBanner,
       dateCreated: dateToISOString(edited.dateCreated),
       datePublished: edited.datePublished

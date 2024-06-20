@@ -12,7 +12,7 @@ export class EditPostValidationError implements Errors {
   readonly titleError?: string;
   readonly descriptionError?: string;
   readonly contentError?: string;
-  readonly tagsError?: string;
+  readonly tagIdsError?: string;
   readonly imageBannerError?: string;
   readonly status: Status;
 
@@ -21,7 +21,7 @@ export class EditPostValidationError implements Errors {
     this.titleError = errors.titleError;
     this.descriptionError = errors.descriptionError;
     this.contentError = errors.contentError;
-    this.tagsError = errors.tagsError;
+    this.tagIdsError = errors.tagIdsError;
     this.imageBannerError = errors.imageBannerError;
     this.status = "ERROR";
   }

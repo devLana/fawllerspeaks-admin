@@ -93,18 +93,17 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
     }
 
     const posts = emptiedPosts.map(post => {
-      const { slug, url } = getPostUrl(post.title);
+      const { slug, href } = getPostUrl(post.title);
       // const tags = post.tags ? mapPostTags(post.tags, map) : null;
 
       return {
         id: post.postId,
         title: post.title,
         description: post.description,
-        content: post.content,
+        content: null,
         author: { name, image },
         status: post.status,
-        url,
-        slug,
+        url: { href, slug },
         imageBanner: post.imageBanner,
         dateCreated: dateToISOString(post.dateCreated),
         datePublished: post.datePublished

@@ -132,7 +132,7 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
     const set = new Set<string>();
 
     const mappedDeletedPosts = deletedPosts.map<Post>(deletedPost => {
-      const { url, slug } = getPostUrl(deletedPost.title);
+      const { href, slug } = getPostUrl(deletedPost.title);
       // const tags = deletedPost.tags ? mapPostTags(deletedPost.tags, map) : null;
 
       set.add(deletedPost.postId);
@@ -141,11 +141,10 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
         id: deletedPost.postId,
         title: deletedPost.title,
         description: deletedPost.description,
-        content: deletedPost.content,
+        content: null,
         author: { name, image },
         status: deletedPost.status,
-        url,
-        slug,
+        url: { href, slug },
         imageBanner: deletedPost.imageBanner,
         dateCreated: dateToISOString(deletedPost.dateCreated),
         datePublished: deletedPost.datePublished

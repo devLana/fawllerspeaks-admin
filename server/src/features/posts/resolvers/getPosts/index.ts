@@ -6,7 +6,7 @@ import getPostUrl from "@features/posts/utils/getPostUrl";
 import { NotAllowedError } from "@utils/ObjectTypes";
 import dateToISOString from "@utils/dateToISOString";
 
-import type { QueryResolvers, PostTag } from "@resolverTypes";
+import type { QueryResolvers, PostTag, PostAuthor } from "@resolverTypes";
 import type { GetPostDBData, ResolverFunc } from "@types";
 
 type GetPosts = ResolverFunc<QueryResolvers["getPosts"]>;
@@ -29,7 +29,7 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
       FROM post_tags`
     );
 
-    const allPosts = db.query<GetPostDBData>(`
+    const allPosts = db.query<GetPostDBData & { author: PostAuthor }>(`
       SELECT
         post_id "postId",
         title,
@@ -76,18 +76,17 @@ const getPosts: GetPosts = async (_, __, { db, user }) => {
     });
 
     const posts = savedPosts.rows.map(post => {
-      const { url, slug } = getPostUrl(post.title);
+      const { href, slug } = getPostUrl(post.title);
       // const tags = post.tags ? mapPostTags(post.tags, map) : null;
 
       return {
         id: post.postId,
         title: post.title,
         description: post.description,
-        content: post.content,
+        content: null,
         author: post.author,
         status: post.status,
-        url,
-        slug,
+        url: { href, slug },
         imageBanner: post.imageBanner,
         dateCreated: dateToISOString(post.dateCreated),
         datePublished: post.datePublished

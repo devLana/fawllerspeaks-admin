@@ -134,7 +134,7 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
     const set = new Set<string>();
 
     const mappedUnBinnedPosts = unBinnedPosts.map<Post>(unBinnedPost => {
-      const { url, slug } = getPostUrl(unBinnedPost.title);
+      const { href, slug } = getPostUrl(unBinnedPost.title);
 
       // const tags = unBinnedPost.tags
       //   ? mapPostTags(unBinnedPost.tags, map)
@@ -146,11 +146,10 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
         id: unBinnedPost.postId,
         title: unBinnedPost.title,
         description: unBinnedPost.description,
-        content: unBinnedPost.content,
+        content: null,
         author: { name, image },
         status: unBinnedPost.status,
-        url,
-        slug,
+        url: { href, slug },
         imageBanner: unBinnedPost.imageBanner,
         dateCreated: dateToISOString(unBinnedPost.dateCreated),
         datePublished: unBinnedPost.datePublished

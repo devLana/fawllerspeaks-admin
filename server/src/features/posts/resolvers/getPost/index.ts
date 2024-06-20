@@ -8,11 +8,11 @@ import dateToISOString from "@utils/dateToISOString";
 import getPostUrl from "@features/posts/utils/getPostUrl";
 // import getPostTags  from "@features/posts/utils/getPostTags";
 
-import type { QueryResolvers } from "@resolverTypes";
+import type { PostAuthor, QueryResolvers } from "@resolverTypes";
 import type { GetPostDBData, ResolverFunc } from "@types";
 
 type GetPost = ResolverFunc<QueryResolvers["getPost"]>;
-type Post = Omit<GetPostDBData, "postId">;
+type Post = Omit<GetPostDBData, "postId"> & { author: PostAuthor };
 
 const getPost: GetPost = async (_, { postId }, { user, db }) => {
   const schema = Joi.string()
@@ -40,6 +40,7 @@ const getPost: GetPost = async (_, { postId }, { user, db }) => {
         description,
         content,
         first_name || ' ' || last_name author,
+        image,
         status,
         slug,
         image_banner "imageBanner",
@@ -70,31 +71,31 @@ const getPost: GetPost = async (_, { postId }, { user, db }) => {
 
     const [found] = foundPost;
 
-    const { slug, url } = getPostUrl(found.title);
+    const { slug, href } = getPostUrl(found.title);
     // const tags = found.tags ? await getPostTags(db, found.tags) : null;
 
-    return new SinglePost({
-      id: post,
-      title: found.title,
-      description: found.description,
-      content: found.content,
-      author: found.author,
-      status: found.status,
-      url,
-      slug,
-      imageBanner: found.imageBanner,
-      dateCreated: dateToISOString(found.dateCreated),
-      datePublished: found.datePublished
-        ? dateToISOString(found.datePublished)
-        : found.datePublished,
-      lastModified: found.lastModified
-        ? dateToISOString(found.lastModified)
-        : found.lastModified,
-      views: found.views,
-      isInBin: found.isInBin,
-      isDeleted: found.isDeleted,
-      tags: null,
-    });
+    return new UnknownError("Unable to retrieve a post with that id");
+    // return new SinglePost({
+    //   id: post,
+    //   title: found.title,
+    //   description: found.description,
+    //   content: null,
+    //   author: found.author,
+    //   status: found.status,
+    //   url: { href, slug },
+    //   imageBanner: found.imageBanner,
+    //   dateCreated: dateToISOString(found.dateCreated),
+    //   datePublished: found.datePublished
+    //     ? dateToISOString(found.datePublished)
+    //     : found.datePublished,
+    //   lastModified: found.lastModified
+    //     ? dateToISOString(found.lastModified)
+    //     : found.lastModified,
+    //   views: found.views,
+    //   isInBin: found.isInBin,
+    //   isDeleted: found.isDeleted,
+    //   tags: null,
+    // });
   } catch (err) {
     if (err instanceof ValidationError) {
       return new PostIdValidationError(err.message);

@@ -106,32 +106,34 @@ const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
 
     const [updated] = updatePost;
 
-    const { url, slug } = getPostUrl(updated.title);
+    const { href, slug } = getPostUrl(updated.title);
     // const tags = updated.tags ? await getPostTags(db, updated.tags) : null;
 
-    return new SinglePost({
-      id: post,
-      title: updated.title,
-      description: updated.description,
-      content: updated.content,
-      author: {
-        name: foundPost[0].authorName,
-        image: foundPost[0].authorImage,
-      },
-      status: "Unpublished",
-      url,
-      slug,
-      imageBanner: updated.imageBanner,
-      dateCreated: dateToISOString(updated.dateCreated),
-      datePublished: null,
-      lastModified: updated.lastModified
-        ? dateToISOString(updated.lastModified)
-        : updated.lastModified,
-      views: updated.views,
-      isInBin: updated.isInBin,
-      isDeleted: updated.isDeleted,
-      tags: null,
-    });
+    return new NotAllowedPostActionError(
+      "Only published posts can be unpublished"
+    );
+    // return new SinglePost({
+    //   id: post,
+    //   title: updated.title,
+    //   description: updated.description,
+    //   content: updated.content,
+    //   author: {
+    //     name: foundPost[0].authorName,
+    //     image: foundPost[0].authorImage,
+    //   },
+    //   status: "Unpublished",
+    //   url: { href, slug },
+    //   imageBanner: updated.imageBanner,
+    //   dateCreated: dateToISOString(updated.dateCreated),
+    //   datePublished: null,
+    //   lastModified: updated.lastModified
+    //     ? dateToISOString(updated.lastModified)
+    //     : updated.lastModified,
+    //   views: updated.views,
+    //   isInBin: updated.isInBin,
+    //   isDeleted: updated.isDeleted,
+    //   tags: null,
+    // });
   } catch (err) {
     if (err instanceof ValidationError) {
       return new PostIdValidationError(err.message);
