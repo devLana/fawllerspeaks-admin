@@ -1,11 +1,12 @@
 import type { Pool } from "pg";
 
 import supabase from "@lib/supabase/supabaseClient";
+import { getPostContentResponse } from "@features/posts/utils/getPostContentResponse";
 import getPostUrl from "@features/posts/utils/getPostUrl";
 import dateToISOString from "@utils/dateToISOString";
 
 import type { GetPostDBData, TestPostAuthor, TestPostData } from "@types";
-import type { Post, PostTag } from "@resolverTypes";
+import type { Post, PostAuthor, PostTag } from "@resolverTypes";
 
 interface Params {
   db: Pool;
@@ -22,6 +23,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
     const { rows } = await db.query<GetPostDBData>(
       `INSERT INTO posts (
         title,
+        slug,
         description,
         excerpt,
         content,
@@ -33,7 +35,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
         is_in_bin,
         is_deleted
       ) VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING
         id,
         post_id "postId",
@@ -41,7 +43,6 @@ const createTestPost = async (params: Params): Promise<Post> => {
         description,
         excerpt,
         content,
-        author,
         status,
         image_banner "imageBanner",
         date_created "dateCreated",
@@ -52,6 +53,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
         is_deleted "isDeleted"`,
       [
         postData.title,
+        postData.slug,
         postData.description,
         postData.excerpt,
         postData.content,
@@ -77,9 +79,9 @@ const createTestPost = async (params: Params): Promise<Post> => {
     }
 
     const { storageUrl } = supabase();
-    const { url, slug } = getPostUrl(post.title);
 
-    const author = {
+    const author: PostAuthor = {
+      __typename: "PostAuthor",
       name: `${postAuthor.firstName} ${postAuthor.lastName}`,
       image: postAuthor.image ? `${storageUrl}${postAuthor.image}` : null,
     };
@@ -92,17 +94,18 @@ const createTestPost = async (params: Params): Promise<Post> => {
       ? dateToISOString(post.lastModified)
       : post.lastModified;
 
+    const { slug, href } = getPostUrl(post.title);
+
     return {
       __typename: "Post",
       id: post.postId,
       title: post.title,
       description: post.description,
       excerpt: post.excerpt,
-      content: post.content,
+      content: post.content ? getPostContentResponse(post.content) : null,
       author,
       status: post.status,
-      url,
-      slug,
+      url: { __typename: "PostUrl", slug, href },
       imageBanner: post.imageBanner ? `${storageUrl}${post.imageBanner}` : null,
       dateCreated: dateToISOString(post.dateCreated),
       datePublished,

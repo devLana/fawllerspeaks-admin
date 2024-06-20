@@ -3,6 +3,7 @@ import { nodeEnv } from "./nodeEnv";
 
 class ClientUrls implements IClientUrls {
   private readonly env = nodeEnv;
+  private testUrl = "https://test-url.com";
 
   get login() {
     if (this.env === "production") {
@@ -13,7 +14,7 @@ class ClientUrls implements IClientUrls {
       return "http://localhost:4040/login";
     }
 
-    return "#";
+    return this.testUrl;
   }
 
   get forgotPassword() {
@@ -25,7 +26,7 @@ class ClientUrls implements IClientUrls {
       return "http://localhost:4040/forgot-password";
     }
 
-    return "#";
+    return this.testUrl;
   }
 
   get resetPassword() {
@@ -37,7 +38,7 @@ class ClientUrls implements IClientUrls {
       return "http://localhost:4040/reset-password";
     }
 
-    return "#";
+    return this.testUrl;
   }
 
   get siteUrl() {
@@ -49,7 +50,7 @@ class ClientUrls implements IClientUrls {
       return "http://localhost:4000";
     }
 
-    return "#";
+    return this.testUrl;
   }
 }
 

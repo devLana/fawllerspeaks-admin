@@ -1,13 +1,15 @@
 import { randomUUID } from "node:crypto";
+
 import type { InputErrors } from "@types";
+import type { PostContent } from "@resolverTypes";
 
 interface Input {
   title: string;
   description: string;
   excerpt: string;
   content: string;
-  tags: string[] | null;
-  imageBanner: string;
+  tagIds?: string[] | null;
+  imageBanner?: string | null;
 }
 
 type Validations = [string, Input, InputErrors<Input>][];
@@ -23,7 +25,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       description: "",
       excerpt: "",
       content: "",
-      tags: ["", ""],
+      tagIds: ["", ""],
       imageBanner: "",
     },
     {
@@ -31,7 +33,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       descriptionError: "Provide post description",
       excerptError: "Provide post excerpt",
       contentError: "Provide post content",
-      tagsError: "Input post tags cannot be empty values",
+      tagIdsError: "Input post tag ids cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
     },
   ],
@@ -42,7 +44,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       description: " ",
       excerpt: " ",
       content: "    ",
-      tags: ["   ", "     "],
+      tagIds: ["   ", "     "],
       imageBanner: "  ",
     },
     {
@@ -50,7 +52,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       descriptionError: "Provide post description",
       excerptError: "Provide post excerpt",
       contentError: "Provide post content",
-      tagsError: "Input post tags cannot be empty values",
+      tagIdsError: "Input post tag ids cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
     },
   ],
@@ -61,7 +63,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       description: "description",
       excerpt: "excerpt",
       content: "content",
-      tags: [],
+      tagIds: [],
       imageBanner: "post/image/storage/path",
     },
     {
@@ -69,7 +71,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       descriptionError: nullOrUndefined,
       excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
-      tagsError: "No post tags were provided",
+      tagIdsError: "No post tag id was provided",
       imageBannerError: nullOrUndefined,
     },
   ],
@@ -80,15 +82,14 @@ export const validations = (nullOrUndefined?: null): Validations => [
       description: "description",
       excerpt: "excerpt",
       content: "content",
-      tags: [tagId, tagId],
-      imageBanner: "slug/image/storage/path",
+      tagIds: [tagId, tagId],
     },
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
       excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
-      tagsError: "Input tags can only contain unique tags",
+      tagIdsError: "The provided input post tag ids should be unique ids",
       imageBannerError: nullOrUndefined,
     },
   ],
@@ -99,15 +100,38 @@ export const validations = (nullOrUndefined?: null): Validations => [
       description: "description",
       excerpt: "excerpt",
       content: "content",
-      tags: [tagId, "tagId"],
-      imageBanner: "post/image/storage/path",
+      tagIds: [tagId, "tagId"],
+      imageBanner: null,
     },
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
       excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
-      tagsError: "Invalid post tag id",
+      tagIdsError: "Invalid post tag id provided",
+      imageBannerError: nullOrUndefined,
+    },
+  ],
+  [
+    "Should return title, description and excerpt input validation error messages if the values exceed the maximum length",
+    {
+      title:
+        "256 characters max 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters",
+      description:
+        "256 characters max 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters",
+      excerpt:
+        "300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max 300 characters max",
+      content: "<p>post html content</p>",
+    },
+    {
+      titleError:
+        "Post title character limit can not be more than 255 characters",
+      descriptionError:
+        "Post description character limit can not be more than 255 characters",
+      excerptError:
+        "Post excerpt character limit can not be more than 300 characters",
+      contentError: nullOrUndefined,
+      tagIdsError: nullOrUndefined,
       imageBannerError: nullOrUndefined,
     },
   ],
@@ -121,7 +145,7 @@ export const gqlValidations: [string, object][] = [
       description: undefined,
       excerpt: undefined,
       content: null,
-      tags: undefined,
+      tagIds: undefined,
       imageBanner: undefined,
     },
   ],
@@ -132,7 +156,7 @@ export const gqlValidations: [string, object][] = [
       description: 34646,
       excerpt: 34646,
       content: true,
-      tags: [9877, true],
+      tagIds: [9877, true],
       imageBanner: 21314,
     },
   ],
@@ -151,33 +175,48 @@ export const dbPost = {
   isDeleted: false,
 };
 
-export const tags = [UUID, randomUUID(), randomUUID()];
+export const tagIds = [UUID, tagId, randomUUID()];
 export const imageBanner = "post/image/banner";
-
-const content =
-  '<p>post content</p><a id="link" href="google.com">google link</a>';
-
-export const expectedContent =
-  '<p>post content</p><a href="google.com" target="_blank" rel="noopener noreferrer">google link</a>';
-
-const mockData = {
-  description: "post description",
-  excerpt: "mock excerpt",
-  content,
-};
+const mockData = { description: "post description", excerpt: "mock excerpt" };
 
 export const argsWithImage = {
   ...mockData,
   title: "blog post title",
-  content: expectedContent,
+  content: '<p>post content</p><a id="link" href="google.com">google link</a>',
   imageBanner,
+};
+
+export const postContentWithImage: PostContent = {
+  __typename: "PostContent",
+  html: '<p>post content</p><a href="https://google.com" target="_blank" rel="noopener noreferrer">google link</a>',
+  tableOfContents: null,
 };
 
 export const argsWithNoImage = {
   ...mockData,
   title: "another blog post title",
-  content: expectedContent,
+  content:
+    '<h2>Opening Heading</h2><p>post content</p><a id="link" href="/blog/post-one-title">Post One Link</a><h4>Closing Heading.</h4><p>Closing Paragraph</p>',
   imageBanner: null,
+};
+
+export const postContentWithNoImage: PostContent = {
+  __typename: "PostContent",
+  html: '<h2 id="opening-heading">Opening Heading</h2><p>post content</p><a href="/blog/post-one-title">Post One Link</a><h4 id="closing-heading">Closing Heading.</h4><p>Closing Paragraph</p>',
+  tableOfContents: [
+    {
+      __typename: "PostTableOfContents",
+      heading: "Opening Heading",
+      level: 2,
+      href: "#opening-heading",
+    },
+    {
+      __typename: "PostTableOfContents",
+      heading: "Closing Heading.",
+      level: 4,
+      href: "#closing-heading",
+    },
+  ],
 };
 
 export const verifyUser: [string, object[]][] = [
@@ -185,5 +224,18 @@ export const verifyUser: [string, object[]][] = [
   [
     "Should return an error object if the user is unregistered",
     [{ isRegistered: false }],
+  ],
+];
+
+export const verifyTitleSlug: [string, string, object][] = [
+  [
+    "Should return an error object if the post url slug generated from the provided post title already exists",
+    "The generated url slug for the provided post title already exists. Please ensure every post has a unique title",
+    { slug: "another-blog-post-title" },
+  ],
+  [
+    "Should return an error object if the post title already exists",
+    "A post with that title has already been created",
+    {},
   ],
 ];

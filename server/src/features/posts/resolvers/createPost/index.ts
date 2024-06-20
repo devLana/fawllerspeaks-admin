@@ -10,6 +10,7 @@ import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
 import { PostValidationError } from "../types/PostValidationError";
 import {
   AuthenticationError,
+  ForbiddenError,
   NotAllowedError,
   RegistrationError,
   UnknownError,
@@ -37,7 +38,8 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     }
 
     const input = await schema.validateAsync(post, { abortEarly: false });
-    const { title, description, excerpt, content, tags, imageBanner } = input;
+    const { title, description, excerpt, content, tagIds, imageBanner } = input;
+    const { slug, href } = getPostUrl(title);
 
     const checkUser = db.query<User>(
       `SELECT
@@ -49,16 +51,21 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       [user]
     );
 
-    const checkTitle = db.query(
-      `SELECT id
+    const checkTitleSlug = db.query<{ slug: string }>(
+      `SELECT slug
       FROM posts
-      WHERE lower(replace(replace(replace(title, '-', ''), ' ', ''), '_', '')) = $1`,
-      [title.toLowerCase().replace(/[\s_-]/g, "")]
+      WHERE lower(replace(replace(replace(title, '-', ''), ' ', ''), '_', '')) = $1
+      OR slug = $2`,
+      [title.toLowerCase().replace(/[\s_-]/g, ""), slug]
     );
 
-    const [foundUser, foundTitle] = await Promise.all([checkUser, checkTitle]);
+    const [foundUser, foundTitle] = await Promise.all([
+      checkUser,
+      checkTitleSlug,
+    ]);
+
     const { rows: loggedInUser } = foundUser;
-    const { rows: savedTitle } = foundTitle;
+    const { rows: savedTitleSlug } = foundTitle;
 
     if (loggedInUser.length === 0) {
       await deleteSession(db, req, res);
@@ -73,8 +80,16 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       return new RegistrationError("Unable to create post");
     }
 
-    if (savedTitle.length > 0) {
+    if (savedTitleSlug.length > 0) {
+      const [{ slug: savedSlug }] = savedTitleSlug;
+
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+
+      if (savedSlug === slug) {
+        return new ForbiddenError(
+          "The generated url slug for the provided post title already exists. Please ensure every post has a unique title"
+        );
+      }
 
       return new DuplicatePostTitleError(
         "A post with that title has already been created"
@@ -82,18 +97,16 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     }
 
     let postTags: PostTag[] | null = null;
-    let passedTags: readonly string[] | null = null;
 
-    if (tags) {
-      const gottenTags = await getPostTags(db, tags);
+    if (tagIds) {
+      const gottenTags = await getPostTags(db, tagIds);
 
-      if (!gottenTags || gottenTags.length < tags.length) {
+      if (!gottenTags || gottenTags.length < tagIds.length) {
         if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
         return new UnknownError("Unknown post tag id provided");
       }
 
       postTags = gottenTags;
-      passedTags = tags;
     }
 
     const { rows: savedPost } = await db.query<PostDBData>(
@@ -102,11 +115,13 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
         description,
         excerpt,
         content,
+        slug,
         author,
         status,
         image_banner,
         date_published
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING
         id,
         post_id "postId",
@@ -121,6 +136,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
         description,
         excerpt,
         content,
+        slug,
         user,
         "Published",
         imageBanner,
@@ -130,16 +146,14 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
 
     const [saved] = savedPost;
 
-    if (passedTags && passedTags.length > 0) {
+    if (tagIds) {
       void db.query(
         `UPDATE post_tags
         SET posts = array_append(posts, $1)
         WHERE tag_id = ANY ($2)`,
-        [saved.id, passedTags]
+        [saved.id, tagIds]
       );
     }
-
-    const { url, slug } = getPostUrl(title);
 
     return new SinglePost({
       id: saved.postId,
@@ -149,8 +163,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       content,
       author: { name, image },
       status: "Published",
-      url,
-      slug,
+      url: { href, slug },
       imageBanner,
       dateCreated: saved.dateCreated,
       datePublished: saved.datePublished,

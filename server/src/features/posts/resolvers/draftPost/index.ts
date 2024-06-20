@@ -8,6 +8,7 @@ import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
 import { PostValidationError } from "../types/PostValidationError";
 import {
   AuthenticationError,
+  ForbiddenError,
   NotAllowedError,
   RegistrationError,
   UnknownError,
@@ -40,7 +41,8 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     }
 
     const input = await schema.validateAsync(post, { abortEarly: false });
-    const { title, description, excerpt, content, tags, imageBanner } = input;
+    const { title, description, excerpt, content, tagIds, imageBanner } = input;
+    const { slug, href } = getPostUrl(title);
 
     const findUser = db.query<User>(
       `SELECT
@@ -52,16 +54,17 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       [user]
     );
 
-    const findTitle = db.query(
-      `SELECT id
+    const findTitleSlug = db.query<{ slug: string }>(
+      `SELECT slug
       FROM posts
-      WHERE lower(replace(replace(replace(title, '-', ''), ' ', ''), '_', '')) = $1`,
-      [title.toLowerCase().replace(/[\s_-]/g, "")]
+      WHERE lower(replace(replace(replace(title, '-', ''), ' ', ''), '_', '')) = $1
+      OR slug = $2`,
+      [title.toLowerCase().replace(/[\s_-]/g, ""), slug]
     );
 
-    const [{ rows: foundUser }, { rows: foundTitle }] = await Promise.all([
+    const [{ rows: foundUser }, { rows: foundTitleSlug }] = await Promise.all([
       findUser,
-      findTitle,
+      findTitleSlug,
     ]);
 
     if (foundUser.length === 0) {
@@ -77,8 +80,16 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       return new RegistrationError("Unable to save post to draft");
     }
 
-    if (foundTitle.length > 0) {
+    if (foundTitleSlug.length > 0) {
+      const [{ slug: savedSlug }] = foundTitleSlug;
+
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+
+      if (savedSlug === slug) {
+        return new ForbiddenError(
+          "The generated url slug for the provided post title already exists. Please ensure every post has a unique title"
+        );
+      }
 
       return new DuplicatePostTitleError(
         "A post with that title has already been created"
@@ -86,18 +97,16 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     }
 
     let postTags: PostTag[] | null = null;
-    let passedTags: readonly string[] | null = null;
 
-    if (tags) {
-      const gottenTags = await getPostTags(db, tags);
+    if (tagIds) {
+      const gottenTags = await getPostTags(db, tagIds);
 
-      if (!gottenTags || gottenTags.length < tags.length) {
+      if (!gottenTags || gottenTags.length < tagIds.length) {
         if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
         return new UnknownError("Unknown post tag id provided");
       }
 
       postTags = gottenTags;
-      passedTags = tags;
     }
 
     const { rows: draftedPost } = await db.query<PostDBData>(
@@ -106,10 +115,12 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
         description,
         excerpt,
         content,
+        slug,
         author,
         status,
         image_banner
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING
         id,
         post_id "postId",
@@ -119,21 +130,19 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
         views,
         is_in_bin "isInBin",
         is_deleted "isDeleted"`,
-      [title, description, excerpt, content, user, "Draft", imageBanner]
+      [title, description, excerpt, content, slug, user, "Draft", imageBanner]
     );
 
     const [drafted] = draftedPost;
 
-    if (passedTags && passedTags.length > 0) {
+    if (tagIds) {
       void db.query(
         `UPDATE post_tags
         SET posts = array_append(posts, $1)
         WHERE tag_id = ANY ($2)`,
-        [drafted.id, passedTags]
+        [drafted.id, tagIds]
       );
     }
-
-    const { url, slug } = getPostUrl(title);
 
     return new SinglePost({
       id: drafted.postId,
@@ -143,8 +152,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       content,
       author: { name, image },
       status: "Draft",
-      url,
-      slug,
+      url: { href, slug },
       imageBanner,
       dateCreated: drafted.dateCreated,
       datePublished: drafted.datePublished,

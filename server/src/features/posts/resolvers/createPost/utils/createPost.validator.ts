@@ -11,14 +11,20 @@ import {
 import type { CreatePostInput } from "@resolverTypes";
 
 export const createPostValidator = Joi.object<CreatePostInput>({
-  title: Joi.string().required().trim().messages({
+  title: Joi.string().required().trim().max(255).messages({
     "string.empty": "Provide post title",
+    "string.max":
+      "Post title character limit can not be more than 255 characters",
   }),
-  description: Joi.string().required().trim().messages({
+  description: Joi.string().required().trim().max(255).messages({
     "string.empty": "Provide post description",
+    "string.max":
+      "Post description character limit can not be more than 255 characters",
   }),
-  excerpt: Joi.string().required().trim().messages({
+  excerpt: Joi.string().required().trim().max(300).messages({
     "string.empty": "Provide post excerpt",
+    "string.max":
+      "Post excerpt character limit can not be more than 300 characters",
   }),
   content: Joi.string()
     .required()
@@ -33,20 +39,20 @@ export const createPostValidator = Joi.object<CreatePostInput>({
         .replace(anchorTagRegex, anchorTagReplacerFn);
     }, "Custom content sanitizer")
     .messages({ "string.empty": "Provide post content" }),
-  tags: Joi.array()
+  tagIds: Joi.array()
     .allow(null)
     .items(
       Joi.string().trim().uuid({ version: "uuidv4", separator: "-" }).messages({
-        "string.empty": "Input post tags cannot be empty values",
-        "string.guid": "Invalid post tag id",
+        "string.empty": "Input post tag ids cannot be empty values",
+        "string.guid": "Invalid post tag id provided",
       })
     )
     .min(1)
     .unique()
     .messages({
-      "array.unique": "Input tags can only contain unique tags",
-      "array.min": "No post tags were provided",
-      "array.base": "Post tags input must be an array",
+      "array.unique": "The provided input post tag ids should be unique ids",
+      "array.min": "No post tag id was provided",
+      "array.base": "Input value must be an array",
     }),
   imageBanner: Joi.string().allow(null).trim().messages({
     "string.empty": "Post image banner url cannot be empty",

@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import type { Pool } from "pg";
 import type { BaseContext } from "@apollo/server";
 
-import type { Author, PostStatus } from "@resolverTypes";
+import type { Post, PostStatus } from "@resolverTypes";
 
 export interface IClientUrls {
   readonly login: string;
@@ -54,17 +54,16 @@ export interface PostDBData {
 
 export interface GetPostDBData extends PostDBData {
   readonly title: string;
+  readonly slug: string;
   readonly description: string | null;
   readonly excerpt: string | null;
   readonly content: string | null;
-  readonly author: Omit<Author, "__typename">;
   readonly status: PostStatus;
   readonly imageBanner: string | null;
 }
 
-type TestPostKeys = "id" | "postId" | "dateCreated" | "views" | "author";
+type TestPostKeys = "id" | "postId" | "dateCreated" | "views";
 export type TestPostData = Omit<GetPostDBData, TestPostKeys>;
-export type CreateTestPostData = Partial<TestPostData>;
 
 export interface TestPostAuthor {
   readonly userId: string;
@@ -118,3 +117,13 @@ export interface APIContext extends BaseContext {
   db: Pool;
   user: string | null;
 }
+
+export interface PostData extends Omit<Post, "content"> {
+  readonly content?: string | null;
+}
+
+export type PostDataMapper<T extends object> = T extends { post: Post }
+  ? Omit<T, "post"> & { post: PostData }
+  : T extends { posts: Post[] }
+  ? Omit<T, "posts"> & { posts: PostData[] }
+  : T;

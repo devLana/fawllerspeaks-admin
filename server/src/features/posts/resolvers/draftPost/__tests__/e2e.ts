@@ -19,7 +19,7 @@ import loginTestUser from "@tests/loginTestUser";
 import post from "@tests/post";
 
 import type { APIContext, TestData } from "@types";
-import type { PostTag, Post } from "@resolverTypes";
+import type { PostTag } from "@resolverTypes";
 
 type Draft = TestData<{ draftPost: Record<string, unknown> }>;
 
@@ -29,7 +29,7 @@ const mockEvent = jest.spyOn(supabaseEvent, "emit");
 mockEvent.mockImplementation(() => true);
 
 describe("Draft post - E2E", () => {
-  let server: ApolloServer<APIContext>, url: string, dbPost: Post;
+  let server: ApolloServer<APIContext>, url: string;
   let registeredJwt: string, unRegisteredJwt: string, postTags: PostTag[];
 
   beforeAll(async () => {
@@ -46,7 +46,7 @@ describe("Draft post - E2E", () => {
       createPostTags,
     ]);
 
-    dbPost = await createTestPost({
+    await createTestPost({
       db,
       postTags,
       postAuthor: {
@@ -56,6 +56,7 @@ describe("Draft post - E2E", () => {
         image: user.image,
       },
       postData: testPostData({
+        title: "Draft Post Title",
         content: null,
         status: "Draft",
         datePublished: null,
@@ -91,8 +92,7 @@ describe("Draft post - E2E", () => {
 
   describe("Validate user input", () => {
     it.each(mocks.gqlValidations)("%s", async (_, postData) => {
-      const variables = { post: postData };
-      const payload = { query: DRAFT_POST, variables };
+      const payload = { query: DRAFT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
 
       const { data } = await post<Draft>(url, payload, options);
@@ -119,8 +119,7 @@ describe("Draft post - E2E", () => {
 
   describe("Verify logged in user", () => {
     it("Should send an error response if the user is unregistered", async () => {
-      const postData = { ...mocks.argsWithNoImage, tags: mocks.tags };
-      const variables = { post: postData };
+      const variables = { post: { ...mocks.argsWithNoImage } };
       const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
 
@@ -136,10 +135,28 @@ describe("Draft post - E2E", () => {
     });
   });
 
-  describe("Verify post title", () => {
+  describe("Verify post title and post url slug", () => {
+    it("Should respond with an error if the post slug generated from the provided post title already exists", async () => {
+      const title = "Draft Post.Title";
+      const variables = { post: { ...mocks.argsWithNoImage, title } };
+      const payload = { query: DRAFT_POST, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<Draft>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.draftPost).toStrictEqual({
+        __typename: "ForbiddenError",
+        message:
+          "The generated url slug for the provided post title already exists. Please ensure every post has a unique title",
+        status: "ERROR",
+      });
+    });
+
     it("Should respond with an error if the provided post title already exists", async () => {
-      const testData = { ...mocks.argsWithNoImage, title: dbPost.title };
-      const variables = { post: testData };
+      const title = "Draft Po-st Title";
+      const variables = { post: { ...mocks.argsWithNoImage, title } };
       const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -158,7 +175,7 @@ describe("Draft post - E2E", () => {
   describe("Verify post tag ids", () => {
     it("Should send an error response if at least one of the provided post tags ids is unknown", async () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
-      const testData = { ...mocks.argsWithImage, tags: mocks.tags };
+      const testData = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
       const variables = { post: testData };
       const payload = { query: DRAFT_POST, variables };
 
@@ -178,14 +195,15 @@ describe("Draft post - E2E", () => {
     const { storageUrl } = supabase();
 
     const author = {
+      __typename: "PostAuthor",
       name: `${user.firstName} ${user.lastName}`,
       image: `${storageUrl}${user.image}`,
     };
 
     it("Should save a new post with an image and post tags as draft", async () => {
       const [tag1, tag2, tag3, tag4, tag5] = postTags;
-      const tags = [tag1.id, tag2.id, tag3.id, tag4.id, tag5.id];
-      const variables = { post: { ...mocks.argsWithImage, tags } };
+      const tagIds = [tag1.id, tag2.id, tag3.id, tag4.id, tag5.id];
+      const variables = { post: { ...mocks.argsWithImage, tagIds } };
       const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -204,8 +222,11 @@ describe("Draft post - E2E", () => {
           content: null,
           author,
           status: "Draft",
-          slug: "blog-post-title",
-          url: `${urls.siteUrl}/blog/blog-post-title`,
+          url: {
+            __typename: "PostUrl",
+            href: `${urls.siteUrl}/blog/blog-post-title`,
+            slug: "blog-post-title",
+          },
           imageBanner: `${storageUrl}${mocks.imageBanner}`,
           dateCreated: expect.stringMatching(DATE_REGEX),
           datePublished: null,
@@ -220,7 +241,7 @@ describe("Draft post - E2E", () => {
     });
 
     it("Should save a new post without an image and post tags as draft", async () => {
-      const variables = { post: { ...mocks.argsWithNoImage, tags: null } };
+      const variables = { post: { ...mocks.argsWithNoImage, tagIds: null } };
       const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -236,11 +257,14 @@ describe("Draft post - E2E", () => {
           title: mocks.argsWithNoImage.title,
           description: null,
           excerpt: null,
-          content: mocks.expectedContent,
+          content: mocks.expectedPostContent,
           author,
           status: "Draft",
-          slug: "another-blog-post-title",
-          url: `${urls.siteUrl}/blog/another-blog-post-title`,
+          url: {
+            __typename: "PostUrl",
+            href: `${urls.siteUrl}/blog/another-blog-post-title`,
+            slug: "another-blog-post-title",
+          },
           imageBanner: null,
           dateCreated: expect.stringMatching(DATE_REGEX),
           datePublished: null,

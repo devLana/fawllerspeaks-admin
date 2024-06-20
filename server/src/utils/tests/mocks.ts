@@ -1,9 +1,5 @@
-import type {
-  TestUser,
-  TestPostData,
-  RemoveNull,
-  CreateTestPostData,
-} from "@types";
+import getPostUrl from "@features/posts/utils/getPostUrl";
+import type { TestUser, TestPostData, RemoveNull } from "@types";
 
 type RemoveNullFromTestUser = RemoveNull<TestUser>;
 
@@ -37,23 +33,15 @@ export const newRegisteredUser: RemoveNullFromTestUser = {
   resetToken: ["new_registered_user_reset_token", "203"],
 };
 
-const description = "Test post description";
-const excerpt = "Test post excerpt";
-const content = "Test post content";
-const imageBanner = "post/image/banner/storage/path";
-const datePublished = new Date().toISOString();
-
-export const testPostData = (params?: CreateTestPostData): TestPostData => ({
+export const testPostData = (params?: Partial<TestPostData>): TestPostData => ({
   title: params?.title ?? "Test post default title",
-  description:
-    params?.description === undefined ? description : params.description,
-  excerpt: params?.excerpt === undefined ? excerpt : params.excerpt,
-  content: params?.content === undefined ? content : params.content,
+  slug: getPostUrl(params?.title ?? "Test post default title").slug,
+  description: params?.description ?? "Test post description",
+  excerpt: params?.excerpt ?? "Test post excerpt",
+  content: params?.content ?? "<p>Test post content</p>",
   status: params?.status ?? "Published",
-  imageBanner:
-    params?.imageBanner === undefined ? imageBanner : params.imageBanner,
-  datePublished:
-    params?.datePublished === undefined ? datePublished : params.datePublished,
+  imageBanner: params?.imageBanner ?? "post/image/banner/storage/path",
+  datePublished: params?.datePublished ?? new Date().toISOString(),
   lastModified: params?.lastModified ?? null,
   isInBin: params?.isInBin ?? false,
   isDeleted: params?.isDeleted ?? false,
