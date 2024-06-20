@@ -55,11 +55,11 @@ const types = `#graphql
 
     ####POSTS####
     "Create a new post"
-    createPost(post: CreatePostInput!): CreatePost!
+    createPost(post: CreatePostInput!): CreateDraftPost!
+    "Draft a post"
+    draftPost(post: DraftPostInput!): CreateDraftPost!
     "Edit a created/published post"
     editPost(post: EditPostInput!): EditPost!
-    "Draft a post"
-    draftPost(post: DraftPostInput!): DraftPost!
     "Publish a post"
     publishPost(postId: ID!): Publish_Unpublish!
     "Un-publish a post"

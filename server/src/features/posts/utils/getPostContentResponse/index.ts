@@ -1,4 +1,4 @@
-import type { PostContent, TableOfContents } from "@resolverTypes";
+import type { PostContent, PostTableOfContents } from "@resolverTypes";
 
 interface Groups {
   level: string | undefined;
@@ -10,7 +10,7 @@ type ReplaceParams = [SorU, SorU, number, string, Groups];
 
 export const getPostContentResponse = (content: string): PostContent => {
   const regex = /<h(?<level>[2-5])>(?<textContent>.+?)<\/h\k<level>>/gi;
-  const tableContentsArr: TableOfContents[] = [];
+  const tableContentsArr: PostTableOfContents[] = [];
 
   const html = content.replace(regex, (match, ...rest: ReplaceParams) => {
     const [, , , , groups] = rest;

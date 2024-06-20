@@ -1,7 +1,23 @@
 export const postsTypeDefs = `#graphql
-  type Author {
+  type PostAuthor {
     name: String!
     image: String
+  }
+
+  type PostUrl {
+    href: String!
+    slug: String!
+  }
+
+  type PostTableOfContents {
+    heading: String!
+    level: Int!
+    href: String!
+  }
+
+  type PostContent {
+    html: String!
+    tableOfContents: [PostTableOfContents!]
   }
 
   type Post {
@@ -9,11 +25,10 @@ export const postsTypeDefs = `#graphql
     title: String!
     description: String
     excerpt: String
-    content: String
-    author: Author!
+    content: PostContent
+    author: PostAuthor!
     status: PostStatus!
-    slug: String!
-    url: String!
+    url: PostUrl!
     imageBanner: String
     dateCreated: String!
     datePublished: String
@@ -60,23 +75,13 @@ export const postsTypeDefs = `#graphql
     status: Status!
   }
 
-  type DraftPostValidationError {
-    titleError: String
-    descriptionError: String
-    excerptError: String
-    contentError: String
-    tagsError: String
-    imageBannerError: String
-    status: Status!
-  }
-
   type EditPostValidationError {
     postIdError: String
     titleError: String
     descriptionError: String
     excerptError: String
     contentError: String
-    tagsError: String
+    tagIdsError: String
     imageBannerError: String
     status: Status!
   }
@@ -96,16 +101,14 @@ export const postsTypeDefs = `#graphql
     descriptionError: String
     excerptError: String
     contentError: String
-    tagsError: String
+    tagIdsError: String
     imageBannerError: String
     status: Status!
   }
 
   union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
 
-  union CreatePost = SinglePost | PostValidationError | DuplicatePostTitleError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
-
-  union DraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
+  union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
 
   union EditPost = SinglePost | EditPostValidationError | DuplicatePostTitleError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
 
@@ -128,7 +131,7 @@ export const postsTypeDefs = `#graphql
     description: String!
     excerpt: String!
     content: String!
-    tags: [ID!]
+    tagIds: [ID!]
     imageBanner: String
   }
 
@@ -137,7 +140,7 @@ export const postsTypeDefs = `#graphql
     description: String
     excerpt: String
     content: String
-    tags: [ID!]
+    tagIds: [ID!]
     imageBanner: String
   }
 
@@ -147,7 +150,7 @@ export const postsTypeDefs = `#graphql
     description: String!
     excerpt: String!
     content: String!
-    tags: [ID!]
+    tagIds: [ID!]
     imageBanner: String
   }
 `;

@@ -1,14 +1,15 @@
 import type {
   SinglePost as BlogPost,
   SinglePostResolvers,
-  Post,
   Status,
 } from "@resolverTypes";
 
-export class SinglePost implements BlogPost {
+import type { PostData, PostDataMapper } from "@types";
+
+export class SinglePost implements PostDataMapper<BlogPost> {
   readonly status: Status;
 
-  constructor(public readonly post: Post) {
+  constructor(public readonly post: PostData) {
     this.status = "SUCCESS";
   }
 }

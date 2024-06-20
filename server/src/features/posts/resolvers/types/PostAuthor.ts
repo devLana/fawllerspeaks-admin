@@ -1,7 +1,7 @@
 import supabase from "@lib/supabase/supabaseClient";
-import type { AuthorResolvers as Resolvers } from "@resolverTypes";
+import type { PostAuthorResolvers as Resolvers } from "@resolverTypes";
 
-export const AuthorResolvers: Resolvers = {
+export const PostAuthorResolvers: Resolvers = {
   image: parent => {
     const { storageUrl } = supabase();
     return parent.image ? `${storageUrl}${parent.image}` : null;

@@ -5,14 +5,27 @@ const POST_FIELDS = `#graphql
     title
     description
     excerpt
-    content
+    content {
+      __typename
+      html
+      tableOfContents {
+        __typename
+        href
+        level
+        heading
+      }
+    }
     author {
+      __typename
       name
       image
     }
     status
-    url
-    slug
+    url {
+      __typename
+      href
+      slug
+    }
     imageBanner
     dateCreated
     datePublished
@@ -54,7 +67,7 @@ export const CREATE_POST = `#graphql
         descriptionError
         excerptError
         contentError
-        tagsError
+        tagIdsError
         imageBannerError
         status
       }
@@ -87,7 +100,7 @@ export const EDIT_POST = `#graphql
         descriptionError
         excerptError
         contentError
-        tagsError
+        tagIdsError
         imageBannerError
         status
       }
@@ -119,7 +132,7 @@ export const DRAFT_POST = `#graphql
         descriptionError
         excerptError
         contentError
-        tagsError
+        tagIdsError
         imageBannerError
         status
       }
