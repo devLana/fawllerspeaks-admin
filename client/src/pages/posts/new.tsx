@@ -56,7 +56,10 @@ const CreatePostPage: NextPageWithLayout = () => {
           dispatch={dispatch}
           handleDraftPost={handleDraftPost}
           selectPostTags={
-            <SelectPostTags tags={state.postData.tags} dispatch={dispatch} />
+            <SelectPostTags
+              tagIds={state.postData.tagIds}
+              dispatch={dispatch}
+            />
           }
           fileInput={
             <PostFileInput
@@ -77,9 +80,9 @@ const CreatePostPage: NextPageWithLayout = () => {
           content={state.postData.content}
           description={state.postData.description}
           excerpt={state.postData.excerpt}
-          imageBanner={state.postData.imageBanner?.blobUrl}
+          imageBanner={state.postData.imageBanner}
           title={state.postData.title}
-          tags={state.postData.tags}
+          tagIds={state.postData.tagIds}
           draftStatus={draftStatus}
           dispatch={dispatch}
           handleDraftPost={handleDraftPost}

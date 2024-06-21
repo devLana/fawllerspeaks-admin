@@ -30,7 +30,7 @@ export const useDraftPost = (
       ...(postData.description ? { description: postData.description } : {}),
       ...(postData.excerpt ? { excerpt: postData.excerpt } : {}),
       ...(postData.content ? { content: postData.content } : {}),
-      ...(postData.tags ? { tags: postData.tags } : {}),
+      ...(postData.tagIds ? { tagIds: postData.tagIds } : {}),
     };
 
     if (postData.imageBanner) {
@@ -108,8 +108,8 @@ export const useDraftPost = (
       msg = data.draftPost.contentError;
     } else if (data.draftPost.imageBannerError) {
       msg = data.draftPost.imageBannerError;
-    } else if (data.draftPost.tagsError) {
-      msg = data.draftPost.tagsError;
+    } else if (data.draftPost.tagIdsError) {
+      msg = data.draftPost.tagIdsError;
     }
   }
 

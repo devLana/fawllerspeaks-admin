@@ -14,18 +14,18 @@ export const reducer: Reducer = (state, action) => {
     }
 
     case "SELECT_POST_TAGS": {
-      const { tags } = action.payload;
+      const { tagIds } = action.payload;
 
-      if (tags.length === 0) {
-        const { tags: _, ...rest } = state.postData;
+      if (tagIds.length === 0) {
+        const { tagIds: _, ...rest } = state.postData;
         return { ...state, postData: rest };
       } else {
-        return { ...state, postData: { ...state.postData, tags } };
+        return { ...state, postData: { ...state.postData, tagIds } };
       }
     }
 
     case "UNKNOWN_POST_TAGS": {
-      const { tags: _, ...rest } = state.postData;
+      const { tagIds: _, ...rest } = state.postData;
       return { ...state, postData: rest };
     }
 

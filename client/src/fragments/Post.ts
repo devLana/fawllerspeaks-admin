@@ -7,14 +7,24 @@ export const POST_FIELDS = gql`
     id
     title
     description
-    content
+    excerpt
+    content {
+      html
+      tableOfContents {
+        heading
+        level
+        href
+      }
+    }
     author {
-      name
       image
+      name
     }
     status
-    slug
-    url
+    url {
+      href
+      slug
+    }
     imageBanner
     dateCreated
     datePublished

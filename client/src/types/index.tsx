@@ -173,8 +173,8 @@ export interface PostImageBanner {
   blobUrl: string;
 }
 
-export type CreatePostData = Omit<CreatePostInput, "imageBanner" | "tags"> & {
-  tags?: string[];
+export type CreatePostData = Omit<CreatePostInput, "imageBanner" | "tagIds"> & {
+  tagIds?: string[];
   imageBanner?: PostImageBanner;
 };
 
@@ -188,7 +188,7 @@ export type RequiredPostMetadata = Pick<CreatePostData, RequiredMetadataKeys>;
 
 export type CreatePostAction =
   | { type: "CHANGE_VIEW"; payload: { view: PostView } }
-  | { type: "SELECT_POST_TAGS"; payload: { tags: string[] } }
+  | { type: "SELECT_POST_TAGS"; payload: { tagIds: string[] } }
   | { type: "UNKNOWN_POST_TAGS" }
   | { type: "ADD_POST_BANNER_IMAGE"; payload: { imageFile: File } }
   | { type: "REMOVE_POST_BANNER_IMAGE" }
@@ -214,4 +214,5 @@ type PostDataMapper<T extends Record<string, object>> = {
   [Key in keyof T]: PostDataHelper<T[Key]>;
 };
 
+export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;

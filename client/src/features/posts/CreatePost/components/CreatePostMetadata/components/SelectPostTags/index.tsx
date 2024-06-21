@@ -11,11 +11,11 @@ import { SESSION_ID } from "@utils/constants";
 import type { CreatePostAction } from "@types";
 
 interface SelectPostTagsProps {
-  tags?: string[];
+  tagIds?: string[];
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const SelectPostTags = ({ tags = [], dispatch }: SelectPostTagsProps) => {
+const SelectPostTags = ({ tagIds = [], dispatch }: SelectPostTagsProps) => {
   const { replace, pathname } = useRouter();
 
   const client = useApolloClient();
@@ -85,7 +85,7 @@ const SelectPostTags = ({ tags = [], dispatch }: SelectPostTagsProps) => {
           hint="An optional collection of labels used to categorize the post. Select as much as needed"
           addAriaBusy
         >
-          <SelectPostTagsInput tags={tags} dispatch={dispatch} />
+          <SelectPostTagsInput tagIds={tagIds} dispatch={dispatch} />
         </TooltipHint>
       );
 

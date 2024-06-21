@@ -12,11 +12,12 @@ import RenderSelectedPostTags from "./RenderSelectedPostTags";
 import type { CreatePostAction } from "@types";
 
 interface SelectPostTagsInputProps {
-  tags: string[];
+  tagIds: string[];
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const SelectPostTagsInput = ({ tags, dispatch }: SelectPostTagsInputProps) => {
+const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
+  const { tagIds, dispatch } = props;
   const postTags = useGetCachePostTags();
 
   const postTagsMap = React.useMemo(() => {
@@ -46,7 +47,7 @@ const SelectPostTagsInput = ({ tags, dispatch }: SelectPostTagsInputProps) => {
     const { value } = e.target;
     const selectedTags = typeof value === "string" ? value.split(",") : value;
 
-    dispatch?.({ type: "SELECT_POST_TAGS", payload: { tags: selectedTags } });
+    dispatch?.({ type: "SELECT_POST_TAGS", payload: { tagIds: selectedTags } });
   };
 
   return (
@@ -58,7 +59,7 @@ const SelectPostTagsInput = ({ tags, dispatch }: SelectPostTagsInputProps) => {
         labelId="post-tags-label"
         id="post-tags"
         multiple
-        value={tags}
+        value={tagIds}
         onChange={handleChange}
         input={<OutlinedInput id="post-tags-input" label="Post Tags" />}
         renderValue={selected => (
