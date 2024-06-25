@@ -13,18 +13,15 @@ import type { CreatePostInput } from "@resolverTypes";
 export const createPostValidator = Joi.object<CreatePostInput>({
   title: Joi.string().required().trim().max(255).messages({
     "string.empty": "Provide post title",
-    "string.max":
-      "Post title character limit can not be more than 255 characters",
+    "string.max": "Post title can not be more than 255 characters",
   }),
   description: Joi.string().required().trim().max(255).messages({
     "string.empty": "Provide post description",
-    "string.max":
-      "Post description character limit can not be more than 255 characters",
+    "string.max": "Post description can not be more than 255 characters",
   }),
   excerpt: Joi.string().required().trim().max(300).messages({
     "string.empty": "Provide post excerpt",
-    "string.max":
-      "Post excerpt character limit can not be more than 300 characters",
+    "string.max": "Post excerpt can not be more than 300 characters",
   }),
   content: Joi.string()
     .required()

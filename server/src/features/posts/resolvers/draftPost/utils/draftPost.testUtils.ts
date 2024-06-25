@@ -167,12 +167,9 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
       imageBanner: null,
     },
     {
-      titleError:
-        "Post title character limit can not be more than 255 characters",
-      descriptionError:
-        "Post description character limit can not be more than 255 characters",
-      excerptError:
-        "Post excerpt character limit can not be more than 300 characters",
+      titleError: "Post title can not be more than 255 characters",
+      descriptionError: "Post description can not be more than 255 characters",
+      excerptError: "Post excerpt can not be more than 300 characters",
       contentError: nullOrUndefined,
       tagIdsError: nullOrUndefined,
       imageBannerError: nullOrUndefined,
