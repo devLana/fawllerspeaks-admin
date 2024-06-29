@@ -13,6 +13,7 @@ import type {
   Mutation,
   Post,
   PostTag,
+  PostValidationError,
   Query,
 } from "@apiTypes";
 
@@ -44,9 +45,9 @@ export interface RootLayoutProps extends MetaInfo {
   children: React.ReactElement;
 }
 
-type Keys = ((...theme: never[]) => unknown) | Record<string, unknown>;
+type SxTypeKeys = ((...theme: never[]) => unknown) | Record<string, unknown>;
 type FunctionLike = (...args: never[]) => unknown;
-export type SxPropsArray = NonNullable<Exclude<SxProps, Keys>>;
+export type SxPropsArray = NonNullable<Exclude<SxProps, SxTypeKeys>>;
 export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
 export type AuthPageView = "form" | "unregistered error" | "success";
 export type Status = "idle" | "error" | "loading";
@@ -216,3 +217,18 @@ type PostDataMapper<T extends Record<string, object>> = {
 
 export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
+
+type MetadataErrorKeys = "titleError" | "descriptionError" | "excerptError";
+type DraftErrorParam = Pick<PostValidationError, MetadataErrorKeys>;
+type DraftErrorKeys = keyof Omit<PostValidationError, "__typename" | "status">;
+export type DraftErrorCb = (errors: DraftErrorParam) => void;
+export type DraftErrors = { [Key in DraftErrorKeys]?: string };
+
+export interface CKEditorComponentProps {
+  id: string;
+  data: string;
+  contentHasError: boolean;
+  dispatch: React.Dispatch<CreatePostAction>;
+  onFocus: VoidFunction;
+  onBlur: (value: boolean) => void;
+}

@@ -1,20 +1,21 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
-// import { POST_FIELDS } from "@fragments/Post";
+import { POST_FIELDS } from "@fragments/Post";
 import type { MutationDraftPostArgs } from "@apiTypes";
 import type { DraftPostData } from "@types";
 
 type DraftPost = TypedDocumentNode<DraftPostData, MutationDraftPostArgs>;
 
-// ${POST_FIELDS}
 export const DRAFT_POST: DraftPost = gql`
+  ${POST_FIELDS}
   mutation DraftPost($post: DraftPostInput!) {
     draftPost(post: $post) {
       ... on PostValidationError {
         titleError
         descriptionError
+        excerptError
         contentError
-        tagsError
+        tagIdsError
         imageBannerError
       }
       ... on BaseResponse {
@@ -23,11 +24,16 @@ export const DRAFT_POST: DraftPost = gql`
       ... on DuplicatePostTitleError {
         message
       }
+      ... on ForbiddenError {
+        message
+      }
       ... on UnknownError {
         message
       }
       ... on SinglePost {
-        __typename
+        post {
+          ...PostFields
+        }
       }
     }
   }

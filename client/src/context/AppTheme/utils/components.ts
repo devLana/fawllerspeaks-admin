@@ -110,5 +110,4 @@ export const components: Components = {
       },
     },
   },
-  MuiAlert: { styleOverrides: { root: { display: "inline-flex" } } },
 };

@@ -4,18 +4,10 @@ import { useApolloClient } from "@apollo/client";
 import Alert from "@mui/material/Alert";
 
 import useGetPostTags from "@hooks/useGetPostTags";
-import SelectPostTagsInput from "./SelectPostTagsInput";
 import SelectPostTagsSkeleton from "./SelectPostTagsSkeleton";
-import TooltipHint from "../TooltipHint";
 import { SESSION_ID } from "@utils/constants";
-import type { CreatePostAction } from "@types";
 
-interface SelectPostTagsProps {
-  tagIds?: string[];
-  dispatch: React.Dispatch<CreatePostAction>;
-}
-
-const SelectPostTags = ({ tagIds = [], dispatch }: SelectPostTagsProps) => {
+const SelectPostTags = ({ children }: { children: React.ReactElement }) => {
   const { replace, pathname } = useRouter();
 
   const client = useApolloClient();
@@ -63,7 +55,7 @@ const SelectPostTags = ({ tagIds = [], dispatch }: SelectPostTagsProps) => {
       void replace(`/register?status=unregistered&redirectTo=${pathname}`);
       return <SelectPostTagsSkeleton />;
 
-    case "PostTags":
+    case "PostTags": {
       if (data.getPostTags.tags.length === 0) {
         const text =
           "No post tags have been created yet. Go to the 'Post Tags' page to get started";
@@ -80,14 +72,8 @@ const SelectPostTags = ({ tagIds = [], dispatch }: SelectPostTagsProps) => {
         );
       }
 
-      return (
-        <TooltipHint
-          hint="An optional collection of labels used to categorize the post. Select as much as needed"
-          addAriaBusy
-        >
-          <SelectPostTagsInput tagIds={tagIds} dispatch={dispatch} />
-        </TooltipHint>
-      );
+      return children;
+    }
 
     default:
       return (

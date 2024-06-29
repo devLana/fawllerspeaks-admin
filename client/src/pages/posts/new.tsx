@@ -8,7 +8,7 @@ import { useDraftPost } from "@features/posts/CreatePost/hooks/useDraftPost";
 import RootLayout from "@layouts/RootLayout";
 import CreatePostMetadata from "@features/posts/CreatePost/components/CreatePostMetadata";
 import PostFileInput from "@features/posts/CreatePost/components/CreatePostMetadata/components/PostFileInput";
-import SelectPostTags from "@features/posts/CreatePost/components/CreatePostMetadata/components/SelectPostTags";
+import SelectPostTagsInput from "@features/posts/CreatePost/components/CreatePostMetadata/components/SelectPostTags/SelectPostTagsInput";
 import CreatePostContentSkeleton from "@features/posts/CreatePost/components/CreatePostContent/components/CreatePostContentSkeleton";
 import PostPreviewSkeleton from "@features/posts/CreatePost/components/CreatePostPreview/components/PostPreviewSkeleton";
 import * as post from "@features/posts/CreatePost/utils/createPostReducer";
@@ -37,10 +37,7 @@ const CreatePostPreview = dynamic(
 const CreatePostPage: NextPageWithLayout = () => {
   const [state, dispatch] = React.useReducer(post.reducer, post.initialState);
 
-  const { handleDraftPost, setDraftStatus, draftStatus, msg } = useDraftPost(
-    state.postData,
-    dispatch
-  );
+  const draft = useDraftPost(state.postData, dispatch);
 
   return (
     <>
@@ -52,17 +49,20 @@ const CreatePostPage: NextPageWithLayout = () => {
           title={state.postData.title}
           description={state.postData.description}
           excerpt={state.postData.excerpt}
-          draftStatus={draftStatus}
+          draftStatus={draft.draftStatus}
+          contentError={draft.errors.contentError}
           dispatch={dispatch}
-          handleDraftPost={handleDraftPost}
-          selectPostTags={
-            <SelectPostTags
+          handleDraftPost={draft.handleDraftPost}
+          selectPostTagsInput={
+            <SelectPostTagsInput
+              tagIdsError={draft.errors.tagIdsError}
               tagIds={state.postData.tagIds}
               dispatch={dispatch}
             />
           }
           fileInput={
             <PostFileInput
+              imageBannerError={draft.errors.imageBannerError}
               dispatch={dispatch}
               imageBanner={state.postData.imageBanner}
             />
@@ -71,8 +71,9 @@ const CreatePostPage: NextPageWithLayout = () => {
       ) : state.view === "content" ? (
         <CreatePostContent
           content={state.postData.content}
-          draftStatus={draftStatus}
-          handleDraftPost={handleDraftPost}
+          draftStatus={draft.draftStatus}
+          draftErrors={draft.errors}
+          handleDraftPost={draft.handleDraftPost}
           dispatch={dispatch}
         />
       ) : (
@@ -83,15 +84,15 @@ const CreatePostPage: NextPageWithLayout = () => {
           imageBanner={state.postData.imageBanner}
           title={state.postData.title}
           tagIds={state.postData.tagIds}
-          draftStatus={draftStatus}
+          draftStatus={draft.draftStatus}
           dispatch={dispatch}
-          handleDraftPost={handleDraftPost}
+          handleDraftPost={draft.handleDraftPost}
         />
       )}
       <Snackbar
-        message={msg}
-        open={draftStatus === "error"}
-        onClose={handleCloseAlert<Status>("idle", setDraftStatus)}
+        message={draft.msg}
+        open={draft.draftStatus === "error"}
+        onClose={handleCloseAlert<Status>("idle", draft.setDraftStatus)}
       />
     </>
   );

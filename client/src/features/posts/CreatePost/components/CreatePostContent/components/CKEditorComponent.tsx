@@ -1,24 +1,16 @@
 import * as React from "react";
 
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Box from "@mui/material/Box";
 import type { Theme } from "@mui/material/styles";
 
 import { useAuthHeader } from "@context/AuthHeader";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
 import CustomEditor from "ckeditor5-custom-build";
-import type { CreatePostAction } from "@types";
-
-interface CKEditorComponentProps {
-  data: string;
-  contentIsEmpty: boolean;
-  dispatch: React.Dispatch<CreatePostAction>;
-  onFocus: VoidFunction;
-  onBlur: (value: boolean) => void;
-}
+import type { CKEditorComponentProps } from "@types";
 
 const CKEditorComponent = (props: CKEditorComponentProps) => {
-  const { data, contentIsEmpty, dispatch, onBlur, onFocus } = props;
+  const { id, data, contentHasError, dispatch, onBlur, onFocus } = props;
   const ckEditorRef = React.useRef<CustomEditor | null>(null);
 
   const mq = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
@@ -32,16 +24,38 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
     }
   }, [topOffset]);
 
+  React.useEffect(() => {
+    if (ckEditorRef.current) {
+      const { view } = ckEditorRef.current.editing;
+
+      view.change(writer => {
+        const editableRoot = view.document.getRoot();
+
+        if (editableRoot) {
+          writer.setAttribute("aria-invalid", contentHasError, editableRoot);
+
+          if (contentHasError) {
+            writer.setAttribute("aria-errormessage", id, editableRoot);
+            writer.setAttribute("aria-describedby", id, editableRoot);
+          } else {
+            writer.removeAttribute("aria-errormessage", editableRoot);
+            writer.removeAttribute("aria-describedby", editableRoot);
+          }
+        }
+      });
+    }
+  }, [contentHasError, id]);
+
   const handleContent = (content: string) => {
     dispatch({ type: "ADD_POST_CONTENT", payload: { content } });
-    onBlur(!content.trim().replace(/<p>(<br>)*&nbsp;<\/p>/g, ""));
+    onBlur(!content.trim().replace(/<p>(?:<br>)*&nbsp;<\/p>/g, ""));
   };
 
   const uploadUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
 
   return (
     <Box
-      mb={contentIsEmpty ? 0 : 2.5}
+      mb={contentHasError ? undefined : 2.5}
       sx={({ appTheme, shape, typography, palette, shadows, spacing }) => ({
         "--ck-color-toolbar-background": palette.background.default,
         "--ck-color-base-background": palette.background.default,
@@ -185,10 +199,10 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
 
         "&>.ck-editor>.ck-editor__main>.ck.ck-content": {
           minHeight: 400,
-          borderColor: contentIsEmpty ? "error.main" : "divider",
+          borderColor: contentHasError ? "error.main" : "divider",
           borderRadius: 1,
           "&:hover": {
-            borderColor: contentIsEmpty ? "error.main" : "action.disabled",
+            borderColor: contentHasError ? "error.main" : "action.disabled",
           },
         },
 

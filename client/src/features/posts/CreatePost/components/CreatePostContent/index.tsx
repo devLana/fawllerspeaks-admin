@@ -5,17 +5,30 @@ import FormHelperText from "@mui/material/FormHelperText";
 import SectionHeader from "../SectionHeader";
 import ActionButtons from "../ActionButtons";
 import CKEditorComponent from "./components/CKEditorComponent";
-import type { CreatePostAction, PostView, Status } from "@types";
+import CreatePostContentAlert from "./components/CreatePostContentAlert";
+import type {
+  CreatePostAction,
+  DraftErrorCb,
+  DraftErrors,
+  PostView,
+  Status,
+} from "@types";
 
 interface CreatePostContentProps {
   content: string;
   draftStatus: Status;
-  handleDraftPost: () => Promise<void>;
+  draftErrors: DraftErrors;
+  handleDraftPost: (errorCb?: DraftErrorCb) => Promise<void>;
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const CreatePostContent = (props: CreatePostContentProps) => {
-  const { content, draftStatus, handleDraftPost, dispatch } = props;
+const CreatePostContent = ({
+  content,
+  draftStatus,
+  draftErrors: { contentError, ...rest },
+  handleDraftPost,
+  dispatch,
+}: CreatePostContentProps) => {
   const [contentIsEmpty, setContentIsEmpty] = React.useState(false);
 
   const handleView = (view: PostView) => {
@@ -23,12 +36,16 @@ const CreatePostContent = (props: CreatePostContentProps) => {
   };
 
   const handleNext = () => {
-    if (content.trim().replace(/<p>(<br>)*&nbsp;<\/p>/g, "")) {
+    if (content.trim().replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")) {
       handleView("preview");
     } else {
       setContentIsEmpty(true);
     }
   };
+
+  const id = "post-content-helper-text";
+  const contentHasError = contentIsEmpty || !!contentError;
+  const contentErrorMsg = contentIsEmpty ? "Enter post content" : contentError;
 
   return (
     <section
@@ -43,21 +60,23 @@ const CreatePostContent = (props: CreatePostContentProps) => {
         heading="Provide post content"
       />
       <CKEditorComponent
+        id={id}
         data={content}
+        contentHasError={contentHasError}
         dispatch={dispatch}
-        contentIsEmpty={contentIsEmpty}
         onBlur={value => setContentIsEmpty(value)}
         onFocus={() => setContentIsEmpty(false)}
       />
-      {contentIsEmpty && (
-        <FormHelperText error sx={{ mb: 2.5 }}>
-          Provide post content
+      {contentHasError && (
+        <FormHelperText id={id} error sx={{ mb: 2.5 }}>
+          {contentErrorMsg}
         </FormHelperText>
       )}
+      <CreatePostContentAlert {...rest} />
       <ActionButtons
         label="Preview post"
         status={draftStatus}
-        onDraft={handleDraftPost}
+        onDraft={() => handleDraftPost()}
         onNext={handleNext}
       />
     </section>

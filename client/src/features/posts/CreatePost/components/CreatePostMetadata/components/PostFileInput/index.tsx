@@ -12,11 +12,13 @@ import TooltipHint from "../TooltipHint";
 import type { CreatePostAction, PostImageBanner } from "@types";
 
 interface PostFileInputProps {
-  imageBanner?: PostImageBanner;
+  imageBannerError: string | undefined;
+  imageBanner: PostImageBanner | undefined;
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
-const PostFileInput = ({ dispatch, imageBanner }: PostFileInputProps) => {
+const PostFileInput = (props: PostFileInputProps) => {
+  const { dispatch, imageBanner, imageBannerError } = props;
   const [imageError, setImageError] = React.useState("");
 
   const {
@@ -48,12 +50,15 @@ const PostFileInput = ({ dispatch, imageBanner }: PostFileInputProps) => {
 
   const id = "post-image-banner";
 
+  const hasError = !!(imageError || imageBannerError);
+  const errorMsg = imageError || imageBannerError;
+
   return (
     <TooltipHint
       hint="An optional image banner that gives visual meaning to the post"
-      childHasError={!!imageError}
+      childHasError={hasError}
     >
-      <FormControl fullWidth>
+      <FormControl fullWidth error={hasError}>
         {imageBanner?.blobUrl ? (
           <PostImagePreview
             id={id}
@@ -73,9 +78,19 @@ const PostFileInput = ({ dispatch, imageBanner }: PostFileInputProps) => {
             onDragLeave={handleDragEvent(false)}
             onKeyDown={handleKeydown}
             sx={theme => ({
+              color: hasError ? "error.main" : "text.secondary",
+              fontSize: "1rem",
+              fontWeight: 400,
               width: "100%",
+              borderColor: hasError ? "error.main" : "action.active",
+              transition: "none",
+              "&:hover": {
+                color: hasError ? "error.main" : "text.secondary",
+                bgcolor: "transparent",
+                borderColor: hasError ? "error.main" : "text.primary",
+              },
               [theme.breakpoints.down("md")]: {
-                py: 2,
+                py: 1.625,
                 pl: 2.25,
                 justifyContent: "flex-start",
               },
@@ -95,14 +110,15 @@ const PostFileInput = ({ dispatch, imageBanner }: PostFileInputProps) => {
           accept="image/*"
           tabIndex={-1}
           onChange={handleChange}
-          aria-invalid={!!imageError}
-          aria-errormessage={imageError ? "image-helper-text" : undefined}
+          aria-invalid={!!hasError}
+          aria-errormessage={hasError ? "image-helper-text" : undefined}
+          aria-describedby={hasError ? "image-helper-text" : undefined}
           ref={fileInputRef}
           key={imageBanner?.file.name}
         />
-        {imageError && (
+        {hasError && (
           <FormHelperText error id="image-helper-text">
-            {imageError}
+            {errorMsg}
           </FormHelperText>
         )}
       </FormControl>

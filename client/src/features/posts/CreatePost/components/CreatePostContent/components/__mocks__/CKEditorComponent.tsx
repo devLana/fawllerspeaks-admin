@@ -1,21 +1,15 @@
-import type { CreatePostAction } from "@types";
-
-interface CKEditorComponentProps {
-  data: string;
-  contentIsEmpty: boolean;
-  dispatch: React.Dispatch<CreatePostAction>;
-  onFocus: VoidFunction;
-  onBlur: (value: boolean) => void;
-}
+import type { CKEditorComponentProps } from "@types";
 
 const CKEditorComponent = (props: CKEditorComponentProps) => {
-  const { data, dispatch, onBlur, onFocus } = props;
+  const { id, data, contentHasError, dispatch, onBlur, onFocus } = props;
 
   return (
     <div>
-      <label htmlFor="post-content">Post Content</label>
       <textarea
-        id="post-content"
+        aria-label="Editor editing area"
+        aria-invalid={contentHasError}
+        aria-describedby={contentHasError ? id : undefined}
+        aria-errormessage={contentHasError ? id : undefined}
         defaultValue={data}
         onFocus={onFocus}
         onBlur={e => {
@@ -27,4 +21,5 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
     </div>
   );
 };
+
 export default CKEditorComponent;

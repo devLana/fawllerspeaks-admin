@@ -7,7 +7,13 @@ import useUploadImage from "@hooks/useUploadImage";
 import { DRAFT_POST } from "../operations/DRAFT_POST";
 import { refetchQueries } from "../utils/refetchQueries";
 import { SESSION_ID } from "@utils/constants";
-import type { CreatePostData, CreatePostAction, Status } from "@types";
+import type {
+  CreatePostData,
+  CreatePostAction,
+  Status,
+  DraftErrorCb,
+  DraftErrors,
+} from "@types";
 import type { DraftPostInput } from "@apiTypes";
 
 export const useDraftPost = (
@@ -21,16 +27,16 @@ export const useDraftPost = (
 
   const upload = useUploadImage();
 
-  const handleDraftPost = async () => {
+  const handleDraftPost = async (errorCb?: DraftErrorCb) => {
     setDraftStatus("loading");
 
     let uploadHasError = false;
     const post: DraftPostInput = {
       title: postData.title,
-      ...(postData.description ? { description: postData.description } : {}),
-      ...(postData.excerpt ? { excerpt: postData.excerpt } : {}),
-      ...(postData.content ? { content: postData.content } : {}),
-      ...(postData.tagIds ? { tagIds: postData.tagIds } : {}),
+      ...(postData.description && { description: postData.description }),
+      ...(postData.excerpt && { excerpt: postData.excerpt }),
+      ...(postData.content && { content: postData.content }),
+      ...(postData.tagIds && { tagIds: postData.tagIds }),
     };
 
     if (postData.imageBanner) {
@@ -68,14 +74,25 @@ export const useDraftPost = (
             void router.replace("/login?status=unauthorized");
             break;
 
-          case "PostValidationError":
-          case "DuplicatePostTitleError":
-          default:
-            setDraftStatus("error");
+          case "PostValidationError": {
+            const { titleError, descriptionError, excerptError } =
+              draftData.draftPost;
+
+            errorCb?.({ titleError, descriptionError, excerptError });
+            setDraftStatus("idle");
             break;
+          }
+
+          case "DuplicatePostTitleError":
+          case "ForbiddenError": {
+            const { message } = draftData.draftPost;
+            errorCb?.({ titleError: message });
+            setDraftStatus("idle");
+            break;
+          }
 
           case "UnknownError": {
-            setDraftStatus("error");
+            setDraftStatus("idle");
             dispatch({ type: "UNKNOWN_POST_TAGS" });
             break;
           }
@@ -83,10 +100,23 @@ export const useDraftPost = (
           case "SinglePost": {
             const status = uploadHasError ? "?status=draft-upload-error" : "";
             void router.push(`/posts${status}`);
+            break;
           }
+
+          default:
+            setDraftStatus("error");
         }
       },
     });
+  };
+
+  let errors: DraftErrors = {
+    // titleError: "rest.titleError",
+    // descriptionError: "rest.descriptionError",
+    // excerptError: "rest.excerptError",
+    // contentError: "rest.contentError",
+    // tagIdsError: "rest.tagIdsError",
+    // imageBannerError: "rest.imageBannerError",
   };
 
   let msg =
@@ -94,24 +124,27 @@ export const useDraftPost = (
 
   if (error?.graphQLErrors[0]) {
     msg = error.graphQLErrors[0].message;
-  } else if (
-    data?.draftPost.__typename === "UnknownError" ||
-    data?.draftPost.__typename === "DuplicatePostTitleError"
-  ) {
-    msg = data.draftPost.message;
-  } else if (data?.draftPost.__typename === "PostValidationError") {
-    if (data.draftPost.titleError) {
-      msg = data.draftPost.titleError;
-    } else if (data.draftPost.descriptionError) {
-      msg = data.draftPost.descriptionError;
-    } else if (data.draftPost.contentError) {
-      msg = data.draftPost.contentError;
-    } else if (data.draftPost.imageBannerError) {
-      msg = data.draftPost.imageBannerError;
-    } else if (data.draftPost.tagIdsError) {
-      msg = data.draftPost.tagIdsError;
-    }
   }
 
-  return { msg, handleDraftPost, draftStatus, setDraftStatus };
+  if (data?.draftPost.__typename === "PostValidationError") {
+    const { descriptionError, imageBannerError, ...rest } = data.draftPost;
+
+    errors = {
+      ...(rest.titleError && { titleError: rest.titleError }),
+      ...(descriptionError && { descriptionError }),
+      ...(rest.excerptError && { excerptError: rest.excerptError }),
+      ...(rest.contentError && { contentError: rest.contentError }),
+      ...(rest.tagIdsError && { tagIdsError: rest.tagIdsError }),
+      ...(imageBannerError && { imageBannerError }),
+    };
+  } else if (
+    data?.draftPost.__typename === "ForbiddenError" ||
+    data?.draftPost.__typename === "DuplicatePostTitleError"
+  ) {
+    errors.titleError = data.draftPost.message;
+  } else if (data?.draftPost.__typename === "UnknownError") {
+    errors.tagIdsError = data.draftPost.message;
+  }
+
+  return { msg, draftStatus, errors, handleDraftPost, setDraftStatus };
 };
