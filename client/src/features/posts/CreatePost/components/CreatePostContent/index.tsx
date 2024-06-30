@@ -5,7 +5,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import SectionHeader from "../SectionHeader";
 import ActionButtons from "../ActionButtons";
 import CKEditorComponent from "./components/CKEditorComponent";
-import CreatePostContentAlert from "./components/CreatePostContentAlert";
+import CreatePostErrorsAlert from "../CreatePostErrorsAlert";
 import type {
   CreatePostAction,
   DraftErrorCb,
@@ -72,11 +72,11 @@ const CreatePostContent = ({
           {contentErrorMsg}
         </FormHelperText>
       )}
-      <CreatePostContentAlert {...rest} />
+      <CreatePostErrorsAlert {...rest} />
       <ActionButtons
         label="Preview post"
         status={draftStatus}
-        onDraft={() => handleDraftPost()}
+        onDraft={() => void handleDraftPost()}
         onNext={handleNext}
       />
     </section>

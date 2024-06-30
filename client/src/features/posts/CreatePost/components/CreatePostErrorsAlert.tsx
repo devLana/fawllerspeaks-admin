@@ -7,19 +7,21 @@ import ListItemText from "@mui/material/ListItemText";
 
 import type { DraftErrors } from "@types";
 
-const CreatePostContentAlert = ({
+const CreatePostErrorsAlert = ({
+  titleError,
   descriptionError,
   excerptError,
-  imageBannerError,
+  contentError,
   tagIdsError,
-  titleError,
-}: Omit<DraftErrors, "contentError">) => {
+  imageBannerError,
+}: DraftErrors) => {
   const isOpen = !!(
+    titleError ||
     descriptionError ||
     excerptError ||
-    imageBannerError ||
+    contentError ||
     tagIdsError ||
-    titleError
+    imageBannerError
   );
 
   return (
@@ -45,6 +47,11 @@ const CreatePostContentAlert = ({
               <ListItemText primary="Post Excerpt" secondary={excerptError} />
             </ListItem>
           )}
+          {contentError && (
+            <ListItem disableGutters disablePadding>
+              <ListItemText primary="Post Content" secondary={contentError} />
+            </ListItem>
+          )}
           {tagIdsError && (
             <ListItem disableGutters disablePadding>
               <ListItemText primary="Post Tags" secondary={tagIdsError} />
@@ -64,4 +71,4 @@ const CreatePostContentAlert = ({
   );
 };
 
-export default CreatePostContentAlert;
+export default CreatePostErrorsAlert;
