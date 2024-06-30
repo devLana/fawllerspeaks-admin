@@ -1,13 +1,8 @@
-import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
-import type { DraftPostData } from "@types";
+import type { DraftPostData, RefetchQueriesFn } from "@types";
 
-type FunctionLike = (...args: never[]) => unknown;
-type RefetchQueries = Extract<
-  MutationBaseOptions<DraftPostData>["refetchQueries"],
-  FunctionLike
->;
+type DraftPostRefetchQueriesFn = RefetchQueriesFn<DraftPostData>;
 
-export const refetchQueries: RefetchQueries = result => {
+export const refetchQueries: DraftPostRefetchQueriesFn = result => {
   if (result.data?.draftPost.__typename === "UnknownError") {
     return ["GetPostTags"];
   }

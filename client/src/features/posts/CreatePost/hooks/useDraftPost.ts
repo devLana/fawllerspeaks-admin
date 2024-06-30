@@ -31,6 +31,7 @@ export const useDraftPost = (
     setDraftStatus("loading");
 
     let uploadHasError = false;
+
     const post: DraftPostInput = {
       title: postData.title,
       ...(postData.description && { description: postData.description }),
