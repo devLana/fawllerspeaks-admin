@@ -46,7 +46,7 @@ export interface RootLayoutProps extends MetaInfo {
 }
 
 type SxTypeKeys = ((...theme: never[]) => unknown) | Record<string, unknown>;
-type FunctionLike = (...args: never[]) => unknown;
+export type FunctionLike = (...args: never[]) => unknown;
 export type SxPropsArray = NonNullable<Exclude<SxProps, SxTypeKeys>>;
 export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
 export type AuthPageView = "form" | "unregistered error" | "success";
@@ -219,10 +219,10 @@ export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
 
 type MetadataErrorKeys = "titleError" | "descriptionError" | "excerptError";
-type DraftErrorParam = Pick<PostValidationError, MetadataErrorKeys>;
-type DraftErrorKeys = keyof Omit<PostValidationError, "__typename" | "status">;
-export type DraftErrorCb = (errors: DraftErrorParam) => void;
-export type DraftErrors = { [Key in DraftErrorKeys]?: string };
+type CreateErrorParam = Pick<PostValidationError, MetadataErrorKeys>;
+type CreateErrorKeys = keyof Omit<PostValidationError, "__typename" | "status">;
+export type DraftErrorCb = (errors: CreateErrorParam) => void;
+export type CreateInputErrors = { [Key in CreateErrorKeys]?: string };
 
 export interface CKEditorComponentProps {
   id: string;

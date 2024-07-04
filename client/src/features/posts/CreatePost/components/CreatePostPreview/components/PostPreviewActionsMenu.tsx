@@ -4,21 +4,32 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import type { DraftErrorCb, FunctionLike, Status } from "@types";
 
 interface PostPreviewActionsMenuProps {
-  onPublish: () => Promise<void>;
-  onDraft: () => Promise<void>;
+  draftStatus: Status;
+  onCreate: () => void;
+  onDraft: (errorCb?: DraftErrorCb) => Promise<void>;
 }
 
 const PostPreviewActionsMenu = (props: PostPreviewActionsMenuProps) => {
-  const { onDraft, onPublish } = props;
+  const { draftStatus, onDraft, onCreate } = props;
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
 
+  const handler = (callback: FunctionLike) => {
+    setAnchor(null);
+    void callback();
+  };
+
   const isOpen = !!anchor;
+
   return (
     <>
       <IconButton
+        disabled={draftStatus === "loading"}
         id="post-preview-actions-btn"
+        size="small"
+        color="secondary"
         aria-label="Post preview actions menu"
         aria-controls={isOpen ? "post-preview-actions-menu" : undefined}
         aria-haspopup="true"
@@ -37,21 +48,17 @@ const PostPreviewActionsMenu = (props: PostPreviewActionsMenuProps) => {
         anchorEl={anchor}
         MenuListProps={{ "aria-labelledby": "post-preview-actions-btn" }}
         onClose={() => setAnchor(null)}
-        // anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        // transformOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <MenuItem
-          onClick={onPublish}
+          onClick={() => handler(onCreate)}
           dense
-          // aria-haspopup="dialog"
+          aria-haspopup="dialog"
         >
-          Publish Post
+          Create Post
         </MenuItem>
-        <MenuItem
-          onClick={onDraft}
-          dense
-          // aria-haspopup="dialog"
-        >
+        <MenuItem onClick={() => handler(onDraft)} dense>
           Save Post As Draft
         </MenuItem>
       </Menu>

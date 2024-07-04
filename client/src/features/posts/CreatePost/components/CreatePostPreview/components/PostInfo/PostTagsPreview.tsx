@@ -1,12 +1,8 @@
-import { gql, useApolloClient, type TypedDocumentNode } from "@apollo/client";
+import { useApolloClient } from "@apollo/client";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 
-const GET_POST_TAG_NAME: TypedDocumentNode<{ name: string }> = gql`
-  fragment GetPostPreviewPostTags on PostTag {
-    name
-  }
-`;
+import { GET_POST_TAG_NAME } from "../../operations/GET_POST_TAG_NAME";
 
 const PostTagsPreview = ({ tagIds }: { tagIds: string[] }) => {
   const client = useApolloClient();
@@ -25,8 +21,8 @@ const PostTagsPreview = ({ tagIds }: { tagIds: string[] }) => {
       display="flex"
       flexWrap="wrap"
       gap={1.25}
-      mt={2}
-      pt={{ md: 2 }}
+      mt={3}
+      pt={{ md: 3 }}
       borderTop={{ md: "1px solid" }}
       borderColor={{ md: "divider" }}
     >

@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 
 const PostContentPreview = ({ content }: { content: string }) => (
   <Box
+    component="article"
     dangerouslySetInnerHTML={{ __html: content }}
     sx={({ appTheme, shape, typography, spacing, transitions }) => ({
       "--ck-image-style-spacing": spacing(3),

@@ -1,11 +1,12 @@
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
-import Collapse from "@mui/material/Collapse";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
+import Snackbar from "@mui/material/Snackbar";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 
-import type { DraftErrors } from "@types";
+import type { CreateInputErrors } from "@types";
 
 const CreatePostErrorsAlert = ({
   titleError,
@@ -14,7 +15,7 @@ const CreatePostErrorsAlert = ({
   contentError,
   tagIdsError,
   imageBannerError,
-}: DraftErrors) => {
+}: CreateInputErrors) => {
   const isOpen = !!(
     titleError ||
     descriptionError ||
@@ -25,9 +26,17 @@ const CreatePostErrorsAlert = ({
   );
 
   return (
-    <Collapse in={isOpen} sx={{ mb: isOpen ? 2.5 : undefined }}>
-      <Alert severity="error">
-        <AlertTitle>Errors</AlertTitle>
+    <Snackbar
+      open={isOpen}
+      autoHideDuration={null}
+      // anchorOrigin={{ horizontal, vertical }}
+    >
+      <Alert
+        severity="error"
+        icon={<CancelOutlinedIcon />}
+        sx={{ width: "100%" }}
+      >
+        <AlertTitle sx={{ fontSize: "1.2rem" }}>Errors</AlertTitle>
         <List disablePadding aria-label="Draft post errors">
           {titleError && (
             <ListItem disableGutters disablePadding>
@@ -67,7 +76,7 @@ const CreatePostErrorsAlert = ({
           )}
         </List>
       </Alert>
-    </Collapse>
+    </Snackbar>
   );
 };
 

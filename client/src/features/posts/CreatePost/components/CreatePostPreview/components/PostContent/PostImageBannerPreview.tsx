@@ -9,27 +9,25 @@ interface PostImageBannerPreviewProps {
 const PostImageBannerPreview = (props: PostImageBannerPreviewProps) => {
   const { imageBanner, title } = props;
 
+  if (!imageBanner) return null;
+
   return (
-    <>
-      {imageBanner ? (
-        <Box
-          position="relative"
-          width="100%"
-          height={{ height: 200, sm: 250, md: 320 }}
-          maxWidth={700}
-          borderRadius={1}
-          overflow="hidden"
-          mb={3}
-        >
-          <Image
-            src={imageBanner}
-            alt={`Image banner for: "${title}"`}
-            style={{ objectFit: "cover" }}
-            fill
-          />
-        </Box>
-      ) : null}
-    </>
+    <Box
+      position="relative"
+      height={{ height: 200, sm: 250, md: 300 }}
+      maxWidth={700}
+      borderRadius={1}
+      overflow="hidden"
+      mb={3}
+      mx="auto"
+    >
+      <Image
+        src={imageBanner}
+        alt={`Image banner for: "${title}"`}
+        style={{ objectFit: "cover" }}
+        fill
+      />
+    </Box>
   );
 };
 

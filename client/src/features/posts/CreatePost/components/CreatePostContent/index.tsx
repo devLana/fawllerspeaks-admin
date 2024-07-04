@@ -9,7 +9,7 @@ import CreatePostErrorsAlert from "../CreatePostErrorsAlert";
 import type {
   CreatePostAction,
   DraftErrorCb,
-  DraftErrors,
+  CreateInputErrors,
   PostView,
   Status,
 } from "@types";
@@ -17,7 +17,7 @@ import type {
 interface CreatePostContentProps {
   content: string;
   draftStatus: Status;
-  draftErrors: DraftErrors;
+  draftErrors: CreateInputErrors;
   handleDraftPost: (errorCb?: DraftErrorCb) => Promise<void>;
   dispatch: React.Dispatch<CreatePostAction>;
 }
@@ -68,7 +68,7 @@ const CreatePostContent = ({
         onFocus={() => setContentIsEmpty(false)}
       />
       {contentHasError && (
-        <FormHelperText id={id} error sx={{ mb: 2.5 }}>
+        <FormHelperText id={id} error>
           {contentErrorMsg}
         </FormHelperText>
       )}

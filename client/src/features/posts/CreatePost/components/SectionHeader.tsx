@@ -16,9 +16,9 @@ const SectionHeader = (props: SectionHeaderProps) => {
   const { onClick, heading, buttonLabel, id, actionsMenu } = props;
 
   return (
-    <Box mb={1.5} display="flex" alignItems="flex-start" columnGap={3}>
+    <Box mb={3} display="flex" alignItems="flex-start" columnGap={3}>
       <Tooltip title={buttonLabel}>
-        <IconButton color="primary" onClick={onClick}>
+        <IconButton color="secondary" size="small" onClick={onClick}>
           <ChevronLeft fontSize="small" />
         </IconButton>
       </Tooltip>

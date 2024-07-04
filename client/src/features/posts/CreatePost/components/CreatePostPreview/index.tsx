@@ -1,38 +1,53 @@
+import * as React from "react";
+
 import Box from "@mui/material/Box";
+import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
 import SectionHeader from "../SectionHeader";
 import ActionButtons from "../ActionButtons";
+import CreatePostErrorsAlert from "../CreatePostErrorsAlert";
 import PostInfoPreview from "./components/PostInfo/PostInfoPreview";
 import PostTagsPreview from "./components/PostInfo/PostTagsPreview";
 import PostImageBannerPreview from "./components/PostContent/PostImageBannerPreview";
 import PostContentPreview from "./components/PostContent/PostContentPreview";
 import PostPreviewActionsMenu from "./components/PostPreviewActionsMenu";
-import type { CreatePostAction, CreatePostData, Status } from "@types";
+import PostPreviewDialog from "./components/PostPreviewDialog";
 
-interface CreatePostPreviewProps extends Omit<CreatePostData, "imageBanner"> {
-  imageBanner: string | undefined;
+import { handleCloseAlert } from "@utils/handleCloseAlert";
+import type {
+  CreatePostAction,
+  CreatePostData,
+  DraftErrorCb,
+  CreateInputErrors,
+  Status,
+} from "@types";
+import { useCreatePost } from "./hooks/useCreatePost";
+
+interface CreatePostPreviewProps {
+  post: CreatePostData;
   draftStatus: Status;
+  draftErrors: CreateInputErrors;
+  handleDraftPost: (errorCb?: DraftErrorCb) => Promise<void>;
   dispatch: React.Dispatch<CreatePostAction>;
-  handleDraftPost: () => Promise<void>;
 }
 
 const CreatePostPreview = ({
+  post,
   draftStatus,
-  dispatch,
+  draftErrors,
   handleDraftPost,
-  title,
-  description,
-  excerpt,
-  content,
-  imageBanner,
-  tags,
+  dispatch,
 }: CreatePostPreviewProps) => {
-  const handlePublish = async () => {};
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const create = useCreatePost(post, () => setIsOpen(false), dispatch);
 
   const handleGoBack = () => {
     dispatch({ type: "CHANGE_VIEW", payload: { view: "content" } });
   };
+
+  const apiErrors: CreateInputErrors = { ...draftErrors, ...create.errors };
 
   return (
     <section
@@ -47,7 +62,8 @@ const CreatePostPreview = ({
         heading="Preview blog post"
         actionsMenu={
           <PostPreviewActionsMenu
-            onPublish={handlePublish}
+            draftStatus={draftStatus}
+            onCreate={() => setIsOpen(true)}
             onDraft={handleDraftPost}
           />
         }
@@ -55,20 +71,19 @@ const CreatePostPreview = ({
       <Box
         mt={{ md: 6 }}
         display={{ md: "grid" }}
-        gridTemplateColumns={{ md: "1fr 2fr" }}
-        gridTemplateRows={{ md: "1fr 1fr" }}
+        gridTemplateColumns={{ md: "1.2fr 2fr" }}
+        gridTemplateRows={{ md: "auto auto" }}
         columnGap={{ md: 4 }}
         rowGap={{ md: 5 }}
       >
         <Box
           component="aside"
-          pb={{ md: 2 }}
-          px={{ md: 2 }}
-          gridArea={{ md: "1 / 1 / 3 / 2" }}
-          alignSelf={{ md: "start" }}
+          p={{ md: 2 }}
           border={{ md: "1px solid" }}
           borderColor={{ md: "divider" }}
           borderRadius={{ md: 1 }}
+          gridArea={{ md: "1 / 1 / 3 / 2" }}
+          alignSelf={{ md: "start" }}
           sx={({ breakpoints: { down } }) => ({
             [down("md")]: {
               pb: 5,
@@ -79,11 +94,10 @@ const CreatePostPreview = ({
           })}
         >
           <PostInfoPreview
-            title={title}
-            description={description}
-            excerpt={excerpt}
+            description={post.description}
+            excerpt={post.excerpt}
           />
-          <PostTagsPreview tagIds={tags ?? []} />
+          <PostTagsPreview tagIds={post.tagIds ?? []} />
         </Box>
         <Box
           component="article"
@@ -98,19 +112,34 @@ const CreatePostPreview = ({
             gutterBottom
             sx={({ typography }) => ({ ...typography.h1 })}
           >
-            {title}
+            {post.title}
           </Typography>
-          <PostImageBannerPreview imageBanner={imageBanner} title={title} />
-          <PostContentPreview content={content} />
+          <PostImageBannerPreview
+            imageBanner={post.imageBanner?.blobUrl}
+            title={post.title}
+          />
+          <PostContentPreview content={post.content} />
         </Box>
         <ActionButtons
-          label="Publish post"
+          label="Create post"
           status={draftStatus}
-          onDraft={handleDraftPost}
-          onNext={handlePublish}
+          onDraft={() => void handleDraftPost()}
+          onNext={() => setIsOpen(true)}
           sx={{ gridArea: { md: "2 / 2 / 3 / 3" }, alignSelf: { md: "start" } }}
         />
       </Box>
+      <CreatePostErrorsAlert {...apiErrors} />
+      <PostPreviewDialog
+        isOpen={isOpen}
+        createStatus={create.createStatus}
+        onCloseDialog={() => setIsOpen(false)}
+        handleCreatePost={create.handleCreatePost}
+      />
+      <Snackbar
+        message={create.msg}
+        open={create.createStatus === "error"}
+        onClose={handleCloseAlert<Status>("idle", create.setCreateStatus)}
+      />
     </section>
   );
 };

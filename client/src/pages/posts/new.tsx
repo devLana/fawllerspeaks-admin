@@ -51,20 +51,20 @@ const CreatePostPage: NextPageWithLayout = () => {
           excerpt={state.postData.excerpt}
           draftStatus={draft.draftStatus}
           contentError={draft.errors.contentError}
-          dispatch={dispatch}
           handleDraftPost={draft.handleDraftPost}
+          dispatch={dispatch}
           selectPostTagsInput={
             <SelectPostTagsInput
-              tagIdsError={draft.errors.tagIdsError}
               tagIds={state.postData.tagIds}
+              tagIdsError={draft.errors.tagIdsError}
               dispatch={dispatch}
             />
           }
           fileInput={
             <PostFileInput
+              imageBanner={state.postData.imageBanner}
               imageBannerError={draft.errors.imageBannerError}
               dispatch={dispatch}
-              imageBanner={state.postData.imageBanner}
             />
           }
         />
@@ -78,15 +78,11 @@ const CreatePostPage: NextPageWithLayout = () => {
         />
       ) : (
         <CreatePostPreview
-          content={state.postData.content}
-          description={state.postData.description}
-          excerpt={state.postData.excerpt}
-          imageBanner={state.postData.imageBanner}
-          title={state.postData.title}
-          tagIds={state.postData.tagIds}
+          post={state.postData}
           draftStatus={draft.draftStatus}
-          dispatch={dispatch}
+          draftErrors={draft.errors}
           handleDraftPost={draft.handleDraftPost}
+          dispatch={dispatch}
         />
       )}
       <Snackbar

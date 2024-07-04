@@ -12,7 +12,7 @@ import type {
   CreatePostAction,
   Status,
   DraftErrorCb,
-  DraftErrors,
+  CreateInputErrors,
 } from "@types";
 import type { DraftPostInput } from "@apiTypes";
 
@@ -92,11 +92,10 @@ export const useDraftPost = (
             break;
           }
 
-          case "UnknownError": {
+          case "UnknownError":
             setDraftStatus("idle");
             dispatch({ type: "UNKNOWN_POST_TAGS" });
             break;
-          }
 
           case "SinglePost": {
             const status = uploadHasError ? "?status=draft-upload-error" : "";
@@ -111,13 +110,13 @@ export const useDraftPost = (
     });
   };
 
-  let errors: DraftErrors = {
-    // titleError: "rest.titleError",
-    // descriptionError: "rest.descriptionError",
-    // excerptError: "rest.excerptError",
-    // contentError: "rest.contentError",
-    // tagIdsError: "rest.tagIdsError",
-    // imageBannerError: "rest.imageBannerError",
+  let errors: CreateInputErrors = {
+    // titleError: "Post title can not be more than 255 characters",
+    // descriptionError: "Post description can not be more than 255 characters",
+    // excerptError: "Post excerpt can not be more than 300 characters",
+    // contentError: "Provide post content",
+    // tagIdsError: "The provided input post tag ids should be unique ids",
+    // imageBannerError: "Post image banner url cannot be empty",
   };
 
   let msg =
