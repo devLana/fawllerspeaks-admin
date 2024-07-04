@@ -9,10 +9,10 @@ import { refetchQueries } from "../utils/refetchQueries";
 import { SESSION_ID } from "@utils/constants";
 import type { CreatePostInput } from "@apiTypes";
 import type {
+  CreateInputErrors,
   CreatePostAction,
   CreatePostData,
-  CreateInputErrors,
-  Status,
+  CreateStatus,
 } from "@types";
 
 export const useCreatePost = (
@@ -20,7 +20,7 @@ export const useCreatePost = (
   handleCloseDialog: VoidFunction,
   dispatch: React.Dispatch<CreatePostAction>
 ) => {
-  const [createStatus, setCreateStatus] = React.useState<Status>("idle");
+  const [createStatus, setCreateStatus] = React.useState<CreateStatus>("idle");
   const { push, replace, pathname } = useRouter();
 
   const [createPost, { client, data, error }] = useMutation(CREATE_POST);
@@ -75,13 +75,13 @@ export const useCreatePost = (
           case "PostValidationError":
           case "DuplicatePostTitleError":
           case "ForbiddenError":
-            setCreateStatus("idle");
+            setCreateStatus("inputError");
             handleCloseDialog();
             break;
 
           case "UnknownError":
             dispatch({ type: "UNKNOWN_POST_TAGS" });
-            setCreateStatus("idle");
+            setCreateStatus("inputError");
             handleCloseDialog();
             break;
 
@@ -99,14 +99,7 @@ export const useCreatePost = (
     });
   };
 
-  let errors: CreateInputErrors = {
-    // titleError: "Post title can not be more than 255 characters",
-    // descriptionError: "Post description can not be more than 255 characters",
-    // excerptError: "Post excerpt can not be more than 300 characters",
-    // contentError: "Provide post content",
-    // tagIdsError: "The provided input post tag ids should be unique ids",
-    // imageBannerError: "Post image banner url cannot be empty",
-  };
+  let errors: CreateInputErrors = {};
 
   let msg =
     "You are unable to create and publish this post at the moment. Please try again later";
@@ -135,5 +128,7 @@ export const useCreatePost = (
     errors.tagIdsError = data.createPost.message;
   }
 
-  return { createStatus, msg, errors, handleCreatePost, setCreateStatus };
+  const handleCloseError = () => setCreateStatus("idle");
+
+  return { createStatus, msg, errors, handleCreatePost, handleCloseError };
 };

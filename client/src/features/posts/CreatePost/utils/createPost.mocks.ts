@@ -35,6 +35,7 @@ export const previewMenu = { name: /^post preview actions menu$/i };
 export const createMenuItem = { name: /^create post$/i };
 export const draftMenuItem = { name: /^save post as draft$/i };
 export const draftValidationErrors = { name: /^draft post errors$/i };
+export const createValidationErrors = { name: /^create post errors$/i };
 export const dialog = { name: /^Create blog post$/i };
 export const dialogCancel = { name: /^cancel$/i };
 export const dialogCreate = { name: /^create post$/i };

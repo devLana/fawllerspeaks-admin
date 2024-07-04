@@ -12,11 +12,11 @@ import ActionButtons from "../ActionButtons";
 import { postMetadataValidator } from "./utils/postMetadataValidator";
 import { metadataTextBoxes } from "./utils/metadataTextBoxes";
 import type {
+  DraftErrorCb,
   CreatePostAction,
+  CreateStatus,
   RequiredPostMetadata,
   RequiredMetadataKeys,
-  Status,
-  DraftErrorCb,
 } from "@types";
 
 type BlurEvent = React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>;
@@ -26,7 +26,7 @@ interface CreatePostMetadataProps {
   description: string;
   excerpt: string;
   contentError: string | undefined;
-  draftStatus: Status;
+  draftStatus: CreateStatus;
   fileInput: React.ReactElement;
   selectPostTagsInput: React.ReactElement;
   dispatch: React.Dispatch<CreatePostAction>;
@@ -130,7 +130,7 @@ const CreatePostMetadata = ({
           </Collapse>
         )}
         {metadataTextBoxes.map(({ id, label, hint }) => (
-          <TooltipHint key={id} hint={hint} childHasError={!!errors[id]}>
+          <TooltipHint key={id} hint={hint}>
             <TextField
               type="text"
               {...register(id)}

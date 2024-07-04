@@ -6,11 +6,11 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import type { Status } from "@types";
+import type { CreateStatus } from "@types";
 
 interface PostPreviewDialogProps {
   isOpen: boolean;
-  createStatus: Status;
+  createStatus: CreateStatus;
   onCloseDialog: () => void;
   handleCreatePost: () => Promise<void>;
 }

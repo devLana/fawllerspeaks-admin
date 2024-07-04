@@ -4,10 +4,10 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import type { DraftErrorCb, FunctionLike, Status } from "@types";
+import type { DraftErrorCb, FunctionLike, CreateStatus } from "@types";
 
 interface PostPreviewActionsMenuProps {
-  draftStatus: Status;
+  draftStatus: CreateStatus;
   onCreate: () => void;
   onDraft: (errorCb?: DraftErrorCb) => Promise<void>;
 }

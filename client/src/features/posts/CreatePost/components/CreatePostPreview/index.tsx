@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
+import { useCreatePost } from "./hooks/useCreatePost";
 import SectionHeader from "../SectionHeader";
 import ActionButtons from "../ActionButtons";
 import CreatePostErrorsAlert from "../CreatePostErrorsAlert";
@@ -13,22 +14,20 @@ import PostImageBannerPreview from "./components/PostContent/PostImageBannerPrev
 import PostContentPreview from "./components/PostContent/PostContentPreview";
 import PostPreviewActionsMenu from "./components/PostPreviewActionsMenu";
 import PostPreviewDialog from "./components/PostPreviewDialog";
-
-import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type {
+  CreateInputErrors,
   CreatePostAction,
   CreatePostData,
+  CreateStatus,
   DraftErrorCb,
-  CreateInputErrors,
-  Status,
 } from "@types";
-import { useCreatePost } from "./hooks/useCreatePost";
 
 interface CreatePostPreviewProps {
   post: CreatePostData;
-  draftStatus: Status;
+  draftStatus: CreateStatus;
   draftErrors: CreateInputErrors;
   handleDraftPost: (errorCb?: DraftErrorCb) => Promise<void>;
+  handleCloseDraftError: () => void;
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
@@ -37,6 +36,7 @@ const CreatePostPreview = ({
   draftStatus,
   draftErrors,
   handleDraftPost,
+  handleCloseDraftError,
   dispatch,
 }: CreatePostPreviewProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -48,6 +48,11 @@ const CreatePostPreview = ({
   };
 
   const apiErrors: CreateInputErrors = { ...draftErrors, ...create.errors };
+
+  const handleCloseErrorsList =
+    create.createStatus === "inputError"
+      ? create.handleCloseError
+      : handleCloseDraftError;
 
   return (
     <section
@@ -128,7 +133,14 @@ const CreatePostPreview = ({
           sx={{ gridArea: { md: "2 / 2 / 3 / 3" }, alignSelf: { md: "start" } }}
         />
       </Box>
-      <CreatePostErrorsAlert {...apiErrors} />
+      <CreatePostErrorsAlert
+        ariaLabel="Create post errors"
+        shouldOpen={
+          create.createStatus === "inputError" || draftStatus === "inputError"
+        }
+        onClick={handleCloseErrorsList}
+        {...apiErrors}
+      />
       <PostPreviewDialog
         isOpen={isOpen}
         createStatus={create.createStatus}
@@ -138,7 +150,7 @@ const CreatePostPreview = ({
       <Snackbar
         message={create.msg}
         open={create.createStatus === "error"}
-        onClose={handleCloseAlert<Status>("idle", create.setCreateStatus)}
+        onClose={create.handleCloseError}
       />
     </section>
   );

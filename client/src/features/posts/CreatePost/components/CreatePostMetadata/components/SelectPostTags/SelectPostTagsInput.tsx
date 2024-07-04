@@ -58,7 +58,6 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
   return (
     <TooltipHint
       hint="An optional collection of labels used to categorize the post. Select as much as needed"
-      childHasError={!!tagIdsError}
       addAriaBusy
     >
       <FormControl fullWidth error={!!tagIdsError}>

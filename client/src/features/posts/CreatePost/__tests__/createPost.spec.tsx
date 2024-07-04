@@ -405,7 +405,7 @@ describe("Create Post", () => {
         expect(screen.getByRole("button", mocks.previewMenuBtn)).toBeDisabled();
         await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
 
-        const list = screen.getByRole("list", mocks.draftValidationErrors);
+        const list = screen.getByRole("list", mocks.createValidationErrors);
 
         expect(within(list).getByText(message)).toBeInTheDocument();
         expect(screen.getByRole("button", mocks.draftBtn)).toBeEnabled();
@@ -429,7 +429,7 @@ describe("Create Post", () => {
         expect(screen.getByRole("button", mocks.previewBtn)).toBeDisabled();
         await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
 
-        const list = screen.getByRole("list", mocks.draftValidationErrors);
+        const list = screen.getByRole("list", mocks.createValidationErrors);
 
         expect(within(list).getByText(unknown.message)).toBeInTheDocument();
         expect(screen.getByRole("button", mocks.previewMenuBtn)).toBeEnabled();
@@ -449,7 +449,7 @@ describe("Create Post", () => {
         expect(screen.getByRole("button", mocks.previewMenuBtn)).toBeDisabled();
         await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
 
-        const list = screen.getByRole("list", mocks.draftValidationErrors);
+        const list = screen.getByRole("list", mocks.createValidationErrors);
 
         expect(within(list).getAllByRole("listitem")).toHaveLength(5);
         expect(within(list).getByText(descriptionMsg)).toBeInTheDocument();
@@ -531,7 +531,7 @@ describe("Create Post", () => {
 
         expect(screen.getByRole("alert")).toBeInTheDocument();
 
-        const list = screen.getByRole("list", mocks.draftValidationErrors);
+        const list = screen.getByRole("list", mocks.createValidationErrors);
 
         expect(within(list).getByText(message)).toBeInTheDocument();
       });
@@ -558,7 +558,7 @@ describe("Create Post", () => {
 
         expect(screen.getByRole("alert")).toBeInTheDocument();
 
-        const list = screen.getByRole("list", mocks.draftValidationErrors);
+        const list = screen.getByRole("list", mocks.createValidationErrors);
 
         expect(within(list).getByText(unknown.message)).toBeInTheDocument();
       });
@@ -585,7 +585,7 @@ describe("Create Post", () => {
 
         expect(screen.getByRole("alert")).toBeInTheDocument();
 
-        const list = screen.getByRole("list", mocks.draftValidationErrors);
+        const list = screen.getByRole("list", mocks.createValidationErrors);
 
         expect(within(list).getAllByRole("listitem")).toHaveLength(5);
         expect(within(list).getByText(mocks.excerptMsg)).toBeInTheDocument();

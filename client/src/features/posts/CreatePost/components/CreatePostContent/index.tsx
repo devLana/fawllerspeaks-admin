@@ -7,18 +7,19 @@ import ActionButtons from "../ActionButtons";
 import CKEditorComponent from "./components/CKEditorComponent";
 import CreatePostErrorsAlert from "../CreatePostErrorsAlert";
 import type {
-  CreatePostAction,
-  DraftErrorCb,
   CreateInputErrors,
+  CreatePostAction,
+  CreateStatus,
+  DraftErrorCb,
   PostView,
-  Status,
 } from "@types";
 
 interface CreatePostContentProps {
   content: string;
-  draftStatus: Status;
+  draftStatus: CreateStatus;
   draftErrors: CreateInputErrors;
   handleDraftPost: (errorCb?: DraftErrorCb) => Promise<void>;
+  handleCloseDraftError: () => void;
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
@@ -27,6 +28,7 @@ const CreatePostContent = ({
   draftStatus,
   draftErrors: { contentError, ...rest },
   handleDraftPost,
+  handleCloseDraftError,
   dispatch,
 }: CreatePostContentProps) => {
   const [contentIsEmpty, setContentIsEmpty] = React.useState(false);
@@ -72,7 +74,12 @@ const CreatePostContent = ({
           {contentErrorMsg}
         </FormHelperText>
       )}
-      <CreatePostErrorsAlert {...rest} />
+      <CreatePostErrorsAlert
+        ariaLabel="Draft post errors"
+        shouldOpen={draftStatus === "inputError"}
+        onClick={handleCloseDraftError}
+        {...rest}
+      />
       <ActionButtons
         label="Preview post"
         status={draftStatus}

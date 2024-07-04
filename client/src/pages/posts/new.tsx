@@ -13,8 +13,7 @@ import CreatePostContentSkeleton from "@features/posts/CreatePost/components/Cre
 import PostPreviewSkeleton from "@features/posts/CreatePost/components/CreatePostPreview/components/PostPreviewSkeleton";
 import * as post from "@features/posts/CreatePost/utils/createPostReducer";
 import uiLayout from "@utils/uiLayout";
-import { handleCloseAlert } from "@utils/handleCloseAlert";
-import type { NextPageWithLayout, Status } from "@types";
+import type { NextPageWithLayout } from "@types";
 
 const CreatePostContent = dynamic(
   () => {
@@ -74,6 +73,7 @@ const CreatePostPage: NextPageWithLayout = () => {
           draftStatus={draft.draftStatus}
           draftErrors={draft.errors}
           handleDraftPost={draft.handleDraftPost}
+          handleCloseDraftError={draft.handleCloseError}
           dispatch={dispatch}
         />
       ) : (
@@ -82,13 +82,14 @@ const CreatePostPage: NextPageWithLayout = () => {
           draftStatus={draft.draftStatus}
           draftErrors={draft.errors}
           handleDraftPost={draft.handleDraftPost}
+          handleCloseDraftError={draft.handleCloseError}
           dispatch={dispatch}
         />
       )}
       <Snackbar
         message={draft.msg}
         open={draft.draftStatus === "error"}
-        onClose={handleCloseAlert<Status>("idle", draft.setDraftStatus)}
+        onClose={draft.handleCloseError}
       />
     </>
   );

@@ -2,10 +2,10 @@ import Box, { type BoxProps } from "@mui/material/Box";
 import Button, { type ButtonProps } from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import type { Status, SxPropsArray } from "@types";
+import type { CreateStatus, SxPropsArray } from "@types";
 
 interface ActionButtonsProps {
-  status: Status;
+  status: CreateStatus;
   label: string;
   onDraft: VoidFunction;
   onNext?: VoidFunction;

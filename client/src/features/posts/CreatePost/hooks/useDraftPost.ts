@@ -8,11 +8,11 @@ import { DRAFT_POST } from "../operations/DRAFT_POST";
 import { refetchQueries } from "../utils/refetchQueries";
 import { SESSION_ID } from "@utils/constants";
 import type {
+  CreateInputErrors,
   CreatePostData,
   CreatePostAction,
-  Status,
+  CreateStatus,
   DraftErrorCb,
-  CreateInputErrors,
 } from "@types";
 import type { DraftPostInput } from "@apiTypes";
 
@@ -20,7 +20,7 @@ export const useDraftPost = (
   postData: CreatePostData,
   dispatch: React.Dispatch<CreatePostAction>
 ) => {
-  const [draftStatus, setDraftStatus] = React.useState<Status>("idle");
+  const [draftStatus, setDraftStatus] = React.useState<CreateStatus>("idle");
   const router = useRouter();
 
   const [draftPost, { client, data, error }] = useMutation(DRAFT_POST);
@@ -80,7 +80,7 @@ export const useDraftPost = (
               draftData.draftPost;
 
             errorCb?.({ titleError, descriptionError, excerptError });
-            setDraftStatus("idle");
+            setDraftStatus("inputError");
             break;
           }
 
@@ -88,12 +88,12 @@ export const useDraftPost = (
           case "ForbiddenError": {
             const { message } = draftData.draftPost;
             errorCb?.({ titleError: message });
-            setDraftStatus("idle");
+            setDraftStatus("inputError");
             break;
           }
 
           case "UnknownError":
-            setDraftStatus("idle");
+            setDraftStatus("inputError");
             dispatch({ type: "UNKNOWN_POST_TAGS" });
             break;
 
@@ -110,14 +110,7 @@ export const useDraftPost = (
     });
   };
 
-  let errors: CreateInputErrors = {
-    // titleError: "Post title can not be more than 255 characters",
-    // descriptionError: "Post description can not be more than 255 characters",
-    // excerptError: "Post excerpt can not be more than 300 characters",
-    // contentError: "Provide post content",
-    // tagIdsError: "The provided input post tag ids should be unique ids",
-    // imageBannerError: "Post image banner url cannot be empty",
-  };
+  let errors: CreateInputErrors = {};
 
   let msg =
     "You are unable to save this post as draft at the moment. Please try again later";
@@ -146,5 +139,7 @@ export const useDraftPost = (
     errors.tagIdsError = data.draftPost.message;
   }
 
-  return { msg, draftStatus, errors, handleDraftPost, setDraftStatus };
+  const handleCloseError = () => setDraftStatus("idle");
+
+  return { msg, draftStatus, errors, handleDraftPost, handleCloseError };
 };

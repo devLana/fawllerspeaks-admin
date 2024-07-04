@@ -167,6 +167,7 @@ export type PostTagsListAction =
     };
 
 /* Posts Feature Types */
+export type CreateStatus = Status | "inputError";
 export type PostView = "metadata" | "content" | "preview";
 
 export interface PostImageBanner {

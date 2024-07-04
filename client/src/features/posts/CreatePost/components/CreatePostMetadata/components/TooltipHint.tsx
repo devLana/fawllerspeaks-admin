@@ -6,15 +6,14 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 interface TooltipHintProps {
   children: React.ReactElement;
   hint: string;
-  childHasError?: boolean;
   addAriaBusy?: boolean;
 }
 
 const TooltipHint = (props: TooltipHintProps) => {
-  const { children, hint, childHasError = false, addAriaBusy = false } = props;
+  const { children, hint, addAriaBusy = false } = props;
 
   const boxProps: BoxProps = {
-    mb: childHasError ? 1.5 : 2.5,
+    mb: 2.5,
     display: "flex",
     columnGap: 1.5,
     alignItems: "flex-start",
