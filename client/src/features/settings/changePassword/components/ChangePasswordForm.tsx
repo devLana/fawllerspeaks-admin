@@ -16,7 +16,9 @@ import { changePasswordValidator } from "../utils/changePasswordValidator";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { SESSION_ID } from "@utils/constants";
 import type { MutationChangePasswordArgs } from "@apiTypes";
-import type { RequestStatus } from "@types";
+import type { Status } from "@types";
+
+type RequestStatus = Status | "success";
 
 const ChangePasswordForm = () => {
   const [formStatus, setFormStatus] = React.useState<RequestStatus>("idle");

@@ -51,7 +51,6 @@ export type SxPropsArray = NonNullable<Exclude<SxProps, SxTypeKeys>>;
 export type StateSetterFn<T> = React.Dispatch<React.SetStateAction<T>>;
 export type AuthPageView = "form" | "unregistered error" | "success";
 export type Status = "idle" | "error" | "loading";
-export type RequestStatus = Status | "success";
 
 export type RefetchQueriesFn<T extends object> = Extract<
   MutationBaseOptions<T>["refetchQueries"],
