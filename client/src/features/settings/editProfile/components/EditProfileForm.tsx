@@ -33,6 +33,14 @@ const EditProfileForm = () => {
     blobUrl: "",
   });
 
+  React.useEffect(() => {
+    return () => {
+      if (image.blobUrl) {
+        window.URL.revokeObjectURL(image.blobUrl);
+      }
+    };
+  }, [image.blobUrl]);
+
   const [editProfile, { error, client }] = useMutation(EDIT_PROFILE);
 
   const upload = useUploadImage();

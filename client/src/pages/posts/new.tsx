@@ -36,6 +36,14 @@ const CreatePostPreview = dynamic(
 const CreatePostPage: NextPageWithLayout = () => {
   const [state, dispatch] = React.useReducer(post.reducer, post.initialState);
 
+  React.useEffect(() => {
+    return () => {
+      if (state.postData.imageBanner) {
+        window.URL.revokeObjectURL(state.postData.imageBanner.blobUrl);
+      }
+    };
+  }, [state.postData.imageBanner]);
+
   const draft = useDraftPost(state.postData, dispatch);
 
   return (
