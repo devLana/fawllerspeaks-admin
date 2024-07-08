@@ -86,7 +86,7 @@ export const useCreatePost = (
             break;
 
           case "SinglePost": {
-            const status = uploadHasError ? "?status=create-upload-error" : "";
+            const status = uploadHasError ? "?image=create-upload-error" : "";
             void push(`/posts${status}`);
             break;
           }

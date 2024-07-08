@@ -98,7 +98,7 @@ export const useDraftPost = (
             break;
 
           case "SinglePost": {
-            const status = uploadHasError ? "?status=draft-upload-error" : "";
+            const status = uploadHasError ? "?image=draft-upload-error" : "";
             void router.push(`/posts${status}`);
             break;
           }

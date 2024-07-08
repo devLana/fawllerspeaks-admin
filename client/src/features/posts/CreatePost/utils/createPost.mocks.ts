@@ -323,7 +323,7 @@ export const saved = (isCreate = false): Saved => {
     ? "Should create and publish the new blog post without an image"
     : "Should save the post as draft without an image";
 
-  const path = `/posts?status=${isCreate ? "create" : "draft"}-upload-error`;
+  const path = `/posts?image=${isCreate ? "create" : "draft"}-upload-error`;
 
   return [
     [
