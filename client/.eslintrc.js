@@ -19,9 +19,16 @@ module.exports = {
   plugins: ["@typescript-eslint"],
   overrides: [
     {
-      files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      files: [
+        "**/__tests__/**/*.[jt]s?(x)",
+        "**/?(*.)+(spec|test).[jt]s?(x)",
+        "__mocks__/**/*",
+      ],
       extends: ["plugin:testing-library/react"],
-      rules: { "testing-library/no-global-regexp-flag-in-query": 1 },
+      rules: {
+        "testing-library/no-global-regexp-flag-in-query": 1,
+        "@typescript-eslint/unbound-method": 0,
+      },
     },
   ],
   rules: {

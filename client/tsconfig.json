@@ -30,7 +30,8 @@
       "@apiTypes": ["types/graphql"],
       "@utils/*": ["utils/*"],
       "@lib/*": ["lib/*"],
-      "@fragments/*": ["fragments/*"]
+      "@fragments/*": ["fragments/*"],
+      "@services/*": ["services/*"]
     },
     "types": ["vitest/globals"]
   },

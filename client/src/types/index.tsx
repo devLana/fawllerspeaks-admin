@@ -57,6 +57,13 @@ export type RefetchQueriesFn<T extends object> = Extract<
   FunctionLike
 >;
 
+/* Next.js MiddleWare Types */
+export interface MiddlewareAuthCookies {
+  authCookie: string | undefined;
+  sigCookie: string | undefined;
+  tokenCookie: string | undefined;
+}
+
 /* Layout Types */
 export interface NavbarLinkItem {
   href: string;

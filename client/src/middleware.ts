@@ -1,4 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
+import { middlewareService } from "@services/middleware";
 
 export function middleware(request: NextRequest) {
   const authCookie = request.cookies.get("auth")?.value;
@@ -6,21 +7,11 @@ export function middleware(request: NextRequest) {
   const tokenCookie = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
 
-  if (authCookie && sigCookie && tokenCookie) {
-    if (/^\/(?:login|forgot-password|reset-password)/.test(pathname)) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    return NextResponse.next();
-  }
-
-  const regex = /^\/(?:post-tags|register|settings\/?|posts\/?)/;
-
-  if (pathname === "/" || regex.test(pathname)) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  return NextResponse.next();
+  return middlewareService(
+    { authCookie, sigCookie, tokenCookie },
+    pathname,
+    request.url
+  );
 }
 
 export const config = {
