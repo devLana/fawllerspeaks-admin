@@ -97,6 +97,13 @@ test.each([
       href: `${urls.siteUrl}/blog/won-t-the-government-reduce-oil-prices`,
     },
   ],
+  [
+    "\"Let's Go Fishing At Dexter's Creek\", Jack Told Jill",
+    {
+      slug: "let-us-go-fishing-at-dexters-creek-jack-told-jill",
+      href: `${urls.siteUrl}/blog/let-us-go-fishing-at-dexters-creek-jack-told-jill`,
+    },
+  ],
 ])(
   "Posts | Should return lowercase slug and url string built from the post title",
   (title, expected) => {

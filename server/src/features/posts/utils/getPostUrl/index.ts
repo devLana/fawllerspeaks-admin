@@ -4,13 +4,15 @@ import { urls } from "@utils/ClientUrls";
 import type { PostUrl } from "@resolverTypes";
 
 const getPostUrl = (title: string): PostUrl => {
-  const regex = /it's|s's|'s|won't|n't|'\p{L}{1,5}|(?: *[^\p{L}\p{N}]+ *)+/gu;
+  const regex =
+    /let's|it's|s's|'s|won't|n't|'\p{L}{1,5}|(?: *[^\p{L}\p{N}]+ *)+/gu;
 
   const sluggedTitle = title
     .toLowerCase()
     .replace(regex, (match, ...rest: [number, string]) => {
       const [, titleStr] = rest;
 
+      if (match === "let's") return "let-us";
       if (match === "it's") return "it-is";
       if (match === "s's" || match === "'s") return "s";
 
@@ -30,7 +32,7 @@ const getPostUrl = (title: string): PostUrl => {
 
       return "-";
     })
-    .replace(/(?:^-)|(?:-$)/g, "");
+    .replace(/^-+|-+$/g, "");
 
   const { href, pathname } = new URL(sluggedTitle, `${urls.siteUrl}/blog/`);
 
