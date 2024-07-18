@@ -12,6 +12,7 @@ import type {
   CreatePostInput,
   Mutation,
   Post,
+  PostStatus,
   PostTag,
   PostValidationError,
   Query,
@@ -224,6 +225,7 @@ type PostDataMapper<T extends Record<string, object>> = {
 
 export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
+export type GetPostsData = PostDataMapper<Pick<Query, "getPosts">>;
 
 type MetadataErrorKeys = "titleError" | "descriptionError" | "excerptError";
 type CreateErrorParam = Pick<PostValidationError, MetadataErrorKeys>;
@@ -239,3 +241,17 @@ export interface CKEditorComponentProps {
   onFocus: VoidFunction;
   onBlur: (value: boolean) => void;
 }
+
+export interface PostsQueryParams {
+  q?: string;
+  "post-tag"?: string;
+  status?: Lowercase<PostStatus>;
+  sort?: string;
+}
+
+export type PostsQueryParamsHandler = <T extends keyof PostsQueryParams>(
+  key: T,
+  value: NonNullable<PostsQueryParams[T]>
+) => void;
+
+export type PostsView = "list" | "grid";

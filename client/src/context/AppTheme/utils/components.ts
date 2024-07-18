@@ -110,4 +110,5 @@ export const components: Components = {
       },
     },
   },
+  MuiButtonGroup: { styleOverrides: { root: { display: "flex" } } },
 };
