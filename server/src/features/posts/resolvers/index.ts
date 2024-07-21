@@ -13,6 +13,7 @@ import emptyBin from "./emptyBin";
 
 import { PostResolvers } from "./types/Post";
 import { PostAuthorResolvers } from "./types/PostAuthor";
+import { PostUrlResolvers } from "./types/PostUrl";
 import { SinglePostResolver } from "./types/SinglePost";
 import { PostsResolver } from "./types/Posts";
 import { PostsWarningResolver } from "./types/PostsWarning";
@@ -47,6 +48,7 @@ type MutationsKeys =
 type TypeKeys =
   | "Post"
   | "PostAuthor"
+  | "PostUrl"
   | "SinglePost"
   | "Posts"
   | "PostsWarning"
@@ -86,6 +88,7 @@ export const postsResolvers: PostsResolvers = {
   Types: {
     Post: PostResolvers,
     PostAuthor: PostAuthorResolvers,
+    PostUrl: PostUrlResolvers,
     SinglePost: SinglePostResolver,
     Posts: PostsResolver,
     PostsWarning: PostsWarningResolver,

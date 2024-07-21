@@ -1,7 +1,8 @@
 import supabase from "@lib/supabase/supabaseClient";
 import dateToISOString from "@utils/dateToISOString";
-import type { PostResolvers as Resolvers } from "@resolverTypes";
 import { getPostContentResponse } from "@features/posts/utils/getPostContentResponse";
+
+import type { PostResolvers as Resolvers } from "@resolverTypes";
 
 export const PostResolvers: Resolvers = {
   content: parent => {

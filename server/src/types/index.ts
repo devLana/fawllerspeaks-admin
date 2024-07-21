@@ -118,12 +118,13 @@ export interface APIContext extends BaseContext {
   user: string | null;
 }
 
-export interface PostData extends Omit<Post, "content"> {
+export interface PostData extends Omit<Post, "content" | "url"> {
   readonly content?: string | null;
+  readonly url: string;
 }
 
 export type PostDataMapper<T extends object> = T extends { post: Post }
   ? Omit<T, "post"> & { post: PostData }
-  : T extends { posts: Post[] }
+  : T extends { posts: readonly Post[] }
   ? Omit<T, "posts"> & { posts: PostData[] }
   : T;
