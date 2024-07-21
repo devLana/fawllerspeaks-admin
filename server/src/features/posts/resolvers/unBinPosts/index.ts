@@ -5,7 +5,7 @@ import { PostIdsValidationError } from "../types/PostIdsValidationError";
 import { Posts } from "../types/Posts";
 import { PostsWarning } from "../types/PostsWarning";
 import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 // import  mapPostTags from "@features/posts/utils/mapPostTags";
 import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
 import dateToISOString from "@utils/dateToISOString";
@@ -134,7 +134,7 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
     const set = new Set<string>();
 
     const mappedUnBinnedPosts = unBinnedPosts.map<Post>(unBinnedPost => {
-      const { href, slug } = getPostUrl(unBinnedPost.title);
+      const slug = getPostSlug(unBinnedPost.title);
 
       // const tags = unBinnedPost.tags
       //   ? mapPostTags(unBinnedPost.tags, map)
@@ -149,7 +149,7 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
         content: null,
         author: { name, image },
         status: unBinnedPost.status,
-        url: { href, slug },
+        url: { href: "", slug },
         imageBanner: unBinnedPost.imageBanner,
         dateCreated: dateToISOString(unBinnedPost.dateCreated),
         datePublished: unBinnedPost.datePublished

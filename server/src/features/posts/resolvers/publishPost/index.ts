@@ -6,7 +6,7 @@ import { PostIdValidationError } from "../types/PostIdValidationError";
 import { SinglePost } from "../types/SinglePost";
 import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
 // import  getPostTags from "@features/posts/utils/getPostTags";
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
 import dateToISOString from "@utils/dateToISOString";
 
@@ -108,7 +108,7 @@ const publishPost: PublishPost = async (_, { postId }, { user, db }) => {
     );
 
     const [updated] = updatePost;
-    const { href, slug } = getPostUrl(updated.title);
+    const slug = getPostSlug(updated.title);
     // const tags = updated.tags ? await getPostTags(db, updated.tags) : null;
     return new NotAllowedPostActionError(
       "Only unpublished posts can be published"

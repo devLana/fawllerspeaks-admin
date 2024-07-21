@@ -7,7 +7,6 @@ import * as mocks from "../utils/createPost.testUtils";
 
 import { mockContext, info } from "@tests/resolverArguments";
 import spyDb from "@tests/spyDb";
-import { urls } from "@utils/ClientUrls";
 import deleteSession from "@utils/deleteSession";
 
 type MockType<U extends string[] | null = null> = jest.MockedFunction<() => U>;
@@ -152,6 +151,7 @@ describe("Test createPost resolver", () => {
       expect(result).toHaveProperty("post.excerpt", post.excerpt);
       expect(result).toHaveProperty("post.description", post.description);
       expect(result).toHaveProperty("post.author", author);
+      expect(result).toHaveProperty("post.url", "blog-post-title");
       expect(result).toHaveProperty("post.status", "Published");
       expect(result).toHaveProperty("post.imageBanner", mocks.imageBanner);
       expect(result).toHaveProperty("post.dateCreated", mocks.dateCreated);
@@ -167,11 +167,6 @@ describe("Test createPost resolver", () => {
         "post.content",
         mocks.postContentWithImage.html
       );
-
-      expect(result).toHaveProperty("post.url", {
-        href: `${urls.siteUrl}/blog/blog-post-title`,
-        slug: "blog-post-title",
-      });
     });
 
     it("Should create and publish a new post without an image banner and post tags", async () => {
@@ -189,12 +184,8 @@ describe("Test createPost resolver", () => {
       expect(getPostTags).not.toHaveBeenCalled();
       expect(result).toHaveProperty("post.imageBanner", null);
       expect(result).toHaveProperty("post.tags", null);
+      expect(result).toHaveProperty("post.url", "another-blog-post-title");
       expect(result).toHaveProperty("status", "SUCCESS");
-
-      expect(result).toHaveProperty("post.url", {
-        href: `${urls.siteUrl}/blog/another-blog-post-title`,
-        slug: "another-blog-post-title",
-      });
     });
   });
 });

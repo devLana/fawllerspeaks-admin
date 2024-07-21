@@ -3,7 +3,7 @@ import { ValidationError } from "joi";
 
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import getPostTags from "@features/posts/utils/getPostTags";
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 import { createPostValidator as schema } from "./utils/createPost.validator";
 import { SinglePost } from "../types/SinglePost";
 import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
@@ -39,7 +39,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
 
     const input = await schema.validateAsync(post, { abortEarly: false });
     const { title, description, excerpt, content, tagIds, imageBanner } = input;
-    const { slug, href } = getPostUrl(title);
+    const slug = getPostSlug(title);
 
     const checkUser = db.query<User>(
       `SELECT
@@ -163,7 +163,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       content,
       author: { name, image },
       status: "Published",
-      url: { href, slug },
+      url: slug,
       imageBanner,
       dateCreated: saved.dateCreated,
       datePublished: saved.datePublished,

@@ -5,7 +5,7 @@ import { PostIdValidationError } from "../types/PostIdValidationError";
 import { SinglePost } from "../types/SinglePost";
 import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
 import dateToISOString from "@utils/dateToISOString";
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 // import getPostTags  from "@features/posts/utils/getPostTags";
 
 import type { PostAuthor, QueryResolvers } from "@resolverTypes";
@@ -71,7 +71,7 @@ const getPost: GetPost = async (_, { postId }, { user, db }) => {
 
     const [found] = foundPost;
 
-    const { slug, href } = getPostUrl(found.title);
+    const slug = getPostSlug(found.title);
     // const tags = found.tags ? await getPostTags(db, found.tags) : null;
 
     return new UnknownError("Unable to retrieve a post with that id");

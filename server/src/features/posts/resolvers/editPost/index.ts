@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
 import getPostTags from "@features/posts/utils/getPostTags";
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 import { EditPostValidationError } from "./types/EditPostValidationError";
 import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
 import { NotAllowedPostActionError } from "../types/NotAllowedPostActionError";
@@ -196,7 +196,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
     );
 
     const [edited] = editedPost;
-    const { href, slug } = getPostUrl(dbImageBanner ?? title);
+    const slug = getPostSlug(dbImageBanner ?? title);
     const returnTags = postTags.length === 0 ? null : postTags;
 
     return new SinglePost({
@@ -207,7 +207,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       content,
       author: { name: authorName, image: authorImage },
       status: postStatus,
-      url: { href, slug },
+      url: slug,
       imageBanner: dbImageBanner,
       dateCreated: dateToISOString(edited.dateCreated),
       datePublished: edited.datePublished

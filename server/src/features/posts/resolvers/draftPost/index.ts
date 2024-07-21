@@ -15,7 +15,7 @@ import {
 } from "@utils/ObjectTypes";
 
 import getPostTags from "@features/posts/utils/getPostTags";
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 
 import { draftPostSchema as schema } from "./utils/draftPost.validator";
 import generateErrorsObject from "@utils/generateErrorsObject";
@@ -42,7 +42,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
 
     const input = await schema.validateAsync(post, { abortEarly: false });
     const { title, description, excerpt, content, tagIds, imageBanner } = input;
-    const { slug, href } = getPostUrl(title);
+    const slug = getPostSlug(title);
 
     const findUser = db.query<User>(
       `SELECT
@@ -152,7 +152,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       content,
       author: { name, image },
       status: "Draft",
-      url: { href, slug },
+      url: slug,
       imageBanner,
       dateCreated: drafted.dateCreated,
       datePublished: drafted.datePublished,

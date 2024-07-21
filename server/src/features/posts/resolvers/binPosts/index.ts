@@ -4,7 +4,7 @@ import path from "node:path";
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 // import  mapPostTags from "@features/posts/utils/mapPostTags";
 import { Posts } from "../types/Posts";
 import { PostIdsValidationError } from "../types/PostIdsValidationError";
@@ -19,7 +19,7 @@ import {
   type PostTag,
   type Post,
 } from "@resolverTypes";
-import type { GetPostDBData, ResolverFunc } from "@types";
+import type { GetPostDBData, PostData, ResolverFunc } from "@types";
 
 type BinPosts = ResolverFunc<MutationResolvers["binPosts"]>;
 type DbPost = Omit<GetPostDBData, "author" | "isInBin">;
@@ -140,8 +140,8 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
     const set = new Set<string>();
     const binnedPostIds: string[] = [];
 
-    const mappedBinnedPosts = binnedPosts.map<Post>(binnedPost => {
-      const { href, slug } = getPostUrl(binnedPost.title);
+    const mappedBinnedPosts = binnedPosts.map(binnedPost => {
+      const slug = getPostSlug(binnedPost.title);
       // const tags = binnedPost.tags ? mapPostTags(binnedPost.tags, map) : null;
 
       set.add(binnedPost.postId);
@@ -154,7 +154,7 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
         content: null,
         author: { name, image },
         status: binnedPost.status,
-        url: { slug, href },
+        url: slug,
         imageBanner: binnedPost.imageBanner,
         dateCreated: dateToISOString(binnedPost.dateCreated),
         datePublished: binnedPost.datePublished
@@ -204,10 +204,10 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
 
       const message = `${msg}. ${notBinnedPosts.length} other ${notBinnedPostOrPosts} could not be moved to bin`;
 
-      return new PostsWarning(mappedBinnedPosts, message);
+      return new PostsWarning([], message);
     }
 
-    return new Posts(mappedBinnedPosts);
+    return new Posts([]);
   } catch (err) {
     if (err instanceof ValidationError) {
       return new PostIdsValidationError(err.message);

@@ -1,13 +1,8 @@
-import { URL } from "node:url";
-
-import { urls } from "@utils/ClientUrls";
-import type { PostUrl } from "@resolverTypes";
-
-const getPostUrl = (title: string): PostUrl => {
+const getPostSlug = (title: string) => {
   const regex =
     /let's|it's|s's|'s|won't|n't|'\p{L}{1,5}|(?: *[^\p{L}\p{N}]+ *)+/gu;
 
-  const sluggedTitle = title
+  return title
     .toLowerCase()
     .replace(regex, (match, ...rest: [number, string]) => {
       const [, titleStr] = rest;
@@ -33,10 +28,6 @@ const getPostUrl = (title: string): PostUrl => {
       return "-";
     })
     .replace(/^-+|-+$/g, "");
-
-  const { href, pathname } = new URL(sluggedTitle, `${urls.siteUrl}/blog/`);
-
-  return { href, slug: pathname.substring(6) };
 };
 
-export default getPostUrl;
+export default getPostSlug;

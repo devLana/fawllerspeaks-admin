@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 
 import { Posts } from "../types/Posts";
 import { EmptyBinWarning } from "./EmptyBinWarning";
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 // import mapPostTags from "@features/posts/utils/mapPostTags";
 import { NotAllowedError } from "@utils/ObjectTypes";
 import dateToISOString from "@utils/dateToISOString";
@@ -93,7 +93,7 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
     }
 
     const posts = emptiedPosts.map(post => {
-      const { slug, href } = getPostUrl(post.title);
+      const slug = getPostSlug(post.title);
       // const tags = post.tags ? mapPostTags(post.tags, map) : null;
 
       return {
@@ -103,7 +103,7 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
         content: null,
         author: { name, image },
         status: post.status,
-        url: { href, slug },
+        url: { href: "", slug },
         imageBanner: post.imageBanner,
         dateCreated: dateToISOString(post.dateCreated),
         datePublished: post.datePublished

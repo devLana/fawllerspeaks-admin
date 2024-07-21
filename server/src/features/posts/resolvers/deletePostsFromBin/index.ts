@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import Joi, { ValidationError } from "joi";
 
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 // import  mapPostTags from "@features/posts/utils/mapPostTags";
 import { Posts } from "../types/Posts";
 import { PostIdsValidationError } from "../types/PostIdsValidationError";
@@ -132,7 +132,7 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
     const set = new Set<string>();
 
     const mappedDeletedPosts = deletedPosts.map<Post>(deletedPost => {
-      const { href, slug } = getPostUrl(deletedPost.title);
+      const slug = getPostSlug(deletedPost.title);
       // const tags = deletedPost.tags ? mapPostTags(deletedPost.tags, map) : null;
 
       set.add(deletedPost.postId);
@@ -144,7 +144,7 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
         content: null,
         author: { name, image },
         status: deletedPost.status,
-        url: { href, slug },
+        url: { href: "", slug },
         imageBanner: deletedPost.imageBanner,
         dateCreated: dateToISOString(deletedPost.dateCreated),
         datePublished: deletedPost.datePublished

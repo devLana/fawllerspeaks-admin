@@ -2,7 +2,8 @@ import type { Pool } from "pg";
 
 import supabase from "@lib/supabase/supabaseClient";
 import { getPostContentResponse } from "@features/posts/utils/getPostContentResponse";
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
+import { urls } from "@utils/ClientUrls";
 import dateToISOString from "@utils/dateToISOString";
 
 import type { GetPostDBData, TestPostAuthor, TestPostData } from "@types";
@@ -94,7 +95,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
       ? dateToISOString(post.lastModified)
       : post.lastModified;
 
-    const { slug, href } = getPostUrl(post.title);
+    const slug = getPostSlug(post.title);
 
     return {
       __typename: "Post",
@@ -105,7 +106,11 @@ const createTestPost = async (params: Params): Promise<Post> => {
       content: post.content ? getPostContentResponse(post.content) : null,
       author,
       status: post.status,
-      url: { __typename: "PostUrl", slug, href },
+      url: {
+        __typename: "PostUrl",
+        slug,
+        href: `${urls.siteUrl}/blog/${slug}`,
+      },
       imageBanner: post.imageBanner ? `${storageUrl}${post.imageBanner}` : null,
       dateCreated: dateToISOString(post.dateCreated),
       datePublished,

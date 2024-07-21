@@ -6,7 +6,6 @@ import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import getPostTags from "@features/posts/utils/getPostTags";
 import * as mocks from "../utils/draftPost.testUtils";
 
-import { urls } from "@utils/ClientUrls";
 import deleteSession from "@utils/deleteSession";
 import { mockContext, info } from "@tests/resolverArguments";
 import spyDb from "@tests/spyDb";
@@ -150,6 +149,7 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.description", undefined);
       expect(result).toHaveProperty("post.excerpt", undefined);
       expect(result).toHaveProperty("post.content", undefined);
+      expect(result).toHaveProperty("post.url", "blog-post-title");
       expect(result).toHaveProperty("post.author", author);
       expect(result).toHaveProperty("post.status", "Draft");
       expect(result).toHaveProperty("post.imageBanner", mocks.imageBanner);
@@ -161,11 +161,6 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.isDeleted", false);
       expect(result).toHaveProperty("post.tags", mocks.mockPostTagsData);
       expect(result).toHaveProperty("status", "SUCCESS");
-
-      expect(result).toHaveProperty("post.url", {
-        href: `${urls.siteUrl}/blog/blog-post-title`,
-        slug: "blog-post-title",
-      });
     });
 
     it("Should save a new post with an image banner and post tags as draft", async () => {
@@ -192,16 +187,12 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.dateCreated", mocks.dateCreated);
       expect(result).toHaveProperty("post.datePublished", null);
       expect(result).toHaveProperty("post.lastModified", null);
+      expect(result).toHaveProperty("post.url", "another-blog-post-title");
       expect(result).toHaveProperty("post.views", 0);
       expect(result).toHaveProperty("post.isInBin", false);
       expect(result).toHaveProperty("post.isDeleted", false);
       expect(result).toHaveProperty("post.tags", null);
       expect(result).toHaveProperty("status", "SUCCESS");
-
-      expect(result).toHaveProperty("post.url", {
-        href: `${urls.siteUrl}/blog/another-blog-post-title`,
-        slug: "another-blog-post-title",
-      });
     });
   });
 });

@@ -1,4 +1,4 @@
-import getPostUrl from "@features/posts/utils/getPostUrl";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 import type { TestUser, TestPostData, RemoveNull } from "@types";
 
 type RemoveNullFromTestUser = RemoveNull<TestUser>;
@@ -35,7 +35,7 @@ export const newRegisteredUser: RemoveNullFromTestUser = {
 
 export const testPostData = (params?: Partial<TestPostData>): TestPostData => ({
   title: params?.title ?? "Test post default title",
-  slug: getPostUrl(params?.title ?? "Test post default title").slug,
+  slug: getPostSlug(params?.title ?? "Test post default title"),
   description: params?.description ?? "Test post description",
   excerpt: params?.excerpt ?? "Test post excerpt",
   content: params?.content ?? "<p>Test post content</p>",
