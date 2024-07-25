@@ -1,13 +1,18 @@
 import type { ValidationErrorItem } from "joi";
 
-type ErrorResult = Record<string, string>;
-
 const generateErrorsObject = (errorList: ValidationErrorItem[]) => {
-  return errorList.reduce<ErrorResult>((errors, errorItem) => {
+  return errorList.reduce<Record<string, string>>((errors, errorItem) => {
     const errorsMap = { ...errors };
-    const [field] = errorItem.path;
-    const key = `${field}Error`;
     const value = errorItem.message;
+    let field: string;
+
+    if (errorItem.context?.label && errorItem.context.label.includes(".")) {
+      field = errorItem.context.key as string;
+    } else {
+      [field] = errorItem.path as string[];
+    }
+
+    const key = `${field}Error`;
 
     if (Object.hasOwn(errorsMap, key)) return errorsMap;
 
