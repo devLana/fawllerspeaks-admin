@@ -23,12 +23,6 @@ import type { ResolverFunc, PostDBData, ValidationErrorObject } from "@types";
 
 type CreatePost = ResolverFunc<MutationResolvers["createPost"]>;
 
-interface User {
-  isRegistered: boolean;
-  image: string | null;
-  name: string;
-}
-
 const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
   try {
     if (!user) {
@@ -41,11 +35,10 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     const { title, description, excerpt, content, tagIds, imageBanner } = input;
     const slug = getPostSlug(title);
 
-    const checkUser = db.query<User>(
+    const checkUser = db.query<{ isRegistered: boolean; author: string }>(
       `SELECT
         is_registered "isRegistered",
-        image,
-        concat(first_name,' ', last_name) name
+        concat(first_name,' ',last_name,' ',image) author
       FROM users
       WHERE user_id = $1`,
       [user]
@@ -59,13 +52,8 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       [title.toLowerCase().replace(/[\s_-]/g, ""), slug]
     );
 
-    const [foundUser, foundTitle] = await Promise.all([
-      checkUser,
-      checkTitleSlug,
-    ]);
-
-    const { rows: loggedInUser } = foundUser;
-    const { rows: savedTitleSlug } = foundTitle;
+    const [{ rows: loggedInUser }, { rows: savedTitleSlug }] =
+      await Promise.all([checkUser, checkTitleSlug]);
 
     if (loggedInUser.length === 0) {
       await deleteSession(db, req, res);
@@ -73,7 +61,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       return new NotAllowedError("Unable to create post");
     }
 
-    const [{ name, image, isRegistered }] = loggedInUser;
+    const [{ author, isRegistered }] = loggedInUser;
 
     if (!isRegistered) {
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
@@ -161,7 +149,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       description,
       excerpt,
       content,
-      author: { name, image },
+      author,
       status: "Published",
       url: slug,
       imageBanner,

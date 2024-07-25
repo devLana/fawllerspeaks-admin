@@ -124,8 +124,8 @@ describe("Test draft post resolver", () => {
   });
 
   describe("Draft a new post", () => {
-    const author = { name: "Author Name", image: "/author/image/path" };
-    const spyData = [{ isRegistered: true, ...author }];
+    const author = "Author Name /author/image/path";
+    const spyData = [{ isRegistered: true, author }];
 
     it("Should save a new post with an image banner and post tags as draft", async () => {
       const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };

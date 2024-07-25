@@ -118,7 +118,8 @@ export interface APIContext extends BaseContext {
   user: string | null;
 }
 
-export interface PostData extends Omit<Post, "content" | "url"> {
+export interface PostData extends Omit<Post, "content" | "url" | "author"> {
+  readonly author: string;
   readonly content?: string | null;
   readonly url: string;
 }

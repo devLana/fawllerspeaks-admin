@@ -123,8 +123,8 @@ describe("Test createPost resolver", () => {
   });
 
   describe("Create post", () => {
-    const author = { name: "Author Name", image: "/author/image/path" };
-    const mockRows = [{ isRegistered: true, ...author }];
+    const author = "Author Name /author/image/path";
+    const mockRows = [{ isRegistered: true, author }];
 
     it("Should create and publish a new post with an image banner and post tags", async () => {
       const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };

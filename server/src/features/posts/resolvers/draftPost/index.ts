@@ -26,12 +26,6 @@ import type { ResolverFunc, PostDBData, ValidationErrorObject } from "@types";
 
 type DraftPost = ResolverFunc<MutationResolvers["draftPost"]>;
 
-interface User {
-  isRegistered: boolean;
-  name: string;
-  image: string | null;
-}
-
 const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
   try {
     if (!user) {
@@ -44,17 +38,16 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     const { title, description, excerpt, content, tagIds, imageBanner } = input;
     const slug = getPostSlug(title);
 
-    const findUser = db.query<User>(
+    const checkUser = db.query<{ isRegistered: boolean; author: string }>(
       `SELECT
         is_registered "isRegistered",
-        concat(first_name,' ', last_name) name,
-        image
+        concat(first_name,' ',last_name,' ',image) author
       FROM users
       WHERE user_id = $1`,
       [user]
     );
 
-    const findTitleSlug = db.query<{ slug: string }>(
+    const checkTitleSlug = db.query<{ slug: string }>(
       `SELECT slug
       FROM posts
       WHERE lower(replace(replace(replace(title, '-', ''), ' ', ''), '_', '')) = $1
@@ -62,26 +55,24 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       [title.toLowerCase().replace(/[\s_-]/g, ""), slug]
     );
 
-    const [{ rows: foundUser }, { rows: foundTitleSlug }] = await Promise.all([
-      findUser,
-      findTitleSlug,
-    ]);
+    const [{ rows: loggedInUser }, { rows: savedTitleSlug }] =
+      await Promise.all([checkUser, checkTitleSlug]);
 
-    if (foundUser.length === 0) {
+    if (loggedInUser.length === 0) {
       await deleteSession(db, req, res);
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new NotAllowedError("Unable to save post to draft");
     }
 
-    const [{ name, image, isRegistered }] = foundUser;
+    const [{ author, isRegistered }] = loggedInUser;
 
     if (!isRegistered) {
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new RegistrationError("Unable to save post to draft");
     }
 
-    if (foundTitleSlug.length > 0) {
-      const [{ slug: savedSlug }] = foundTitleSlug;
+    if (savedTitleSlug.length > 0) {
+      const [{ slug: savedSlug }] = savedTitleSlug;
 
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
 
@@ -150,7 +141,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       description,
       excerpt,
       content,
-      author: { name, image },
+      author,
       status: "Draft",
       url: slug,
       imageBanner,

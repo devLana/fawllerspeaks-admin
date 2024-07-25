@@ -205,7 +205,7 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       title,
       description,
       content,
-      author: { name: authorName, image: authorImage },
+      author: "{ name: authorName, image: authorImage }",
       status: postStatus,
       url: slug,
       imageBanner: dbImageBanner,
