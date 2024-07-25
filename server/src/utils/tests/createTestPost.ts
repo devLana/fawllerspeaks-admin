@@ -21,7 +21,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
   const tagIds = postTags?.map(postTag => postTag.id);
 
   try {
-    const { rows } = await db.query<GetPostDBData>(
+    const { rows } = await db.query<Omit<GetPostDBData, "author" | "url">>(
       `INSERT INTO posts (
         title,
         slug,

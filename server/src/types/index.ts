@@ -54,16 +54,19 @@ export interface PostDBData {
 
 export interface GetPostDBData extends PostDBData {
   readonly title: string;
-  readonly slug: string;
   readonly description: string | null;
   readonly excerpt: string | null;
   readonly content: string | null;
+  readonly author: string;
   readonly status: PostStatus;
+  readonly url: string;
   readonly imageBanner: string | null;
 }
 
-type TestPostKeys = "id" | "postId" | "dateCreated" | "views";
-export type TestPostData = Omit<GetPostDBData, TestPostKeys>;
+export type TestPostData = Omit<
+  GetPostDBData,
+  "id" | "postId" | "dateCreated" | "views" | "url" | "author"
+> & { slug: string };
 
 export interface TestPostAuthor {
   readonly userId: string;
