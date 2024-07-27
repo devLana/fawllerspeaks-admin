@@ -186,7 +186,7 @@ describe("Edit post tags - E2E", () => {
 
   describe("Edit post tag", () => {
     it("Should update the post tag if the new post tag name equals old post tag name but differs by case sensitivity", async () => {
-      const [, { id, name, dateCreated }] = postTags;
+      const [, { id, tagId, name, dateCreated }] = postTags;
       const variables = { tagId: id, name: name.toUpperCase() };
       const payload = { query: EDIT_POST_TAG, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -200,6 +200,7 @@ describe("Edit post tags - E2E", () => {
         tag: {
           __typename: "PostTag",
           id,
+          tagId,
           name: variables.name,
           lastModified: expect.stringMatching(DATE_REGEX),
           dateCreated,
@@ -222,6 +223,7 @@ describe("Edit post tags - E2E", () => {
         tag: {
           __typename: "PostTag",
           id: postTags[0].id,
+          tagId: postTags[0].tagId,
           name: variables.name,
           lastModified: expect.stringMatching(DATE_REGEX),
           dateCreated: postTags[0].dateCreated,

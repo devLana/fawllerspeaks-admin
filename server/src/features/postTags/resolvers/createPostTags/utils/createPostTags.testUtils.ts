@@ -41,24 +41,28 @@ export const tags = ["tag1", "tag2", "tag3", "tag4"];
 
 export const tag1 = {
   id: "100",
+  tagId: 1,
   name: tags[0],
   dateCreated,
   lastModified: null,
 };
 export const tag2 = {
   id: "500",
+  tagId: 2,
   name: tags[1],
   dateCreated,
   lastModified: null,
 };
 export const tag3 = {
   id: "21",
+  tagId: 3,
   name: tags[2],
   dateCreated,
   lastModified: null,
 };
 export const tag4 = {
   id: "436921",
+  tagId: 4,
   name: tags[3],
   dateCreated,
   lastModified: null,

@@ -1,6 +1,7 @@
 export const postTagsTypeDefs = `#graphql
   type PostTag {
     id: ID!
+    tagId: Int!
     name: String!
     dateCreated: String!
     lastModified: String

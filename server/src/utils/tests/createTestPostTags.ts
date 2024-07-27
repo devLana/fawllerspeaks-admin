@@ -12,6 +12,7 @@ const createTestPostTags = async (db: Pool): Promise<PostTag[]> => {
         ($1), ($2), ($3), ($4), ($5)
       RETURNING
         tag_id id,
+        id "tagId",
         name,
         date_created "dateCreated",
         last_Modified "lastModified"`,

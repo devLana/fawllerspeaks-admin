@@ -50,6 +50,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user, req, res }) => {
       `SELECT
         name,
         tag_id id,
+        id "tagId",
         date_created "dateCreated",
         last_Modified "lastModified"
       FROM post_tags
@@ -79,6 +80,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user, req, res }) => {
         WHERE tag_id = $3
         RETURNING
           tag_id id,
+          id "tagId",
           name,
           date_created "dateCreated",
           last_Modified "lastModified"`,
@@ -112,6 +114,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user, req, res }) => {
       WHERE tag_id = $3
       RETURNING
         tag_id id,
+        id "tagId",
         name,
         date_created "dateCreated",
         last_Modified "lastModified"`,

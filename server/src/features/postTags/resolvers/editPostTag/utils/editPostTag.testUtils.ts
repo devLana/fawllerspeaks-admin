@@ -54,6 +54,7 @@ export const lastModified = "2022-12-15 02:00:15.126+01";
 export const mockData = {
   name: tag.name,
   id: tag.tagId,
+  tagId: 3456,
   dateCreated,
   lastModified: null,
 };
@@ -61,6 +62,7 @@ export const mockData = {
 export const mockTag = {
   name: newTag.name,
   id: newTag.tagId,
+  tagId: 1045,
   dateCreated,
   lastModified: null,
 };

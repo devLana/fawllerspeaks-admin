@@ -93,6 +93,7 @@ const createPostTags: CreatePostTags = async (_, { tags }, ctx) => {
           ${sqlParams}
         RETURNING
           tag_id id,
+          id "tagId",
           name,
           date_created "dateCreated",
           last_Modified "lastModified"`,

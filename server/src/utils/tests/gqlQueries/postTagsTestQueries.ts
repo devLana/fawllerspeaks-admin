@@ -1,6 +1,7 @@
 const POST_TAG_FIELDS = `#graphql
   fragment postTagFields on PostTag {
     id
+    tagId
     name
     dateCreated
     lastModified
