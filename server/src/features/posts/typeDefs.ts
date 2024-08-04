@@ -131,7 +131,7 @@ export const postsTypeDefs = `#graphql
     description: String!
     excerpt: String!
     content: String!
-    tagIds: [ID!]
+    tagIds: [Int!]
     imageBanner: String
   }
 
@@ -140,7 +140,7 @@ export const postsTypeDefs = `#graphql
     description: String
     excerpt: String
     content: String
-    tagIds: [ID!]
+    tagIds: [Int!]
     imageBanner: String
   }
 
@@ -150,7 +150,7 @@ export const postsTypeDefs = `#graphql
     description: String!
     excerpt: String!
     content: String!
-    tagIds: [ID!]
+    tagIds: [Int!]
     imageBanner: String
   }
 `;

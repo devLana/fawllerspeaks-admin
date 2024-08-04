@@ -22,7 +22,7 @@ import generateErrorsObject from "@utils/generateErrorsObject";
 import deleteSession from "@utils/deleteSession";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
-import type { ResolverFunc, PostDBData, ValidationErrorObject } from "@types";
+import type { ResolverFunc, PostDBData } from "@types";
 
 type DraftPost = ResolverFunc<MutationResolvers["draftPost"]>;
 
@@ -100,6 +100,8 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       postTags = gottenTags;
     }
 
+    const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
+
     const { rows: draftedPost } = await db.query<PostDBData>(
       `INSERT INTO posts (
         title,
@@ -109,34 +111,35 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
         slug,
         author,
         status,
-        image_banner
+        image_banner,
+        tags
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING
-        id,
-        post_id "postId",
+        post_id "id",
         date_created "dateCreated",
         date_published "datePublished",
         last_modified "lastModified",
         views,
         is_in_bin "isInBin",
         is_deleted "isDeleted"`,
-      [title, description, excerpt, content, slug, user, "Draft", imageBanner]
+      [
+        title,
+        description,
+        excerpt,
+        content,
+        slug,
+        user,
+        "Draft",
+        imageBanner,
+        dbTags,
+      ]
     );
 
     const [drafted] = draftedPost;
 
-    if (tagIds) {
-      void db.query(
-        `UPDATE post_tags
-        SET posts = array_append(posts, $1)
-        WHERE tag_id = ANY ($2)`,
-        [drafted.id, tagIds]
-      );
-    }
-
     return new SinglePost({
-      id: drafted.postId,
+      id: drafted.id,
       title,
       description,
       excerpt,
@@ -157,11 +160,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
 
     if (err instanceof ValidationError) {
-      const errors = generateErrorsObject(err.details) as ValidationErrorObject<
-        typeof post
-      >;
-
-      return new PostValidationError(errors);
+      return new PostValidationError(generateErrorsObject(err.details));
     }
 
     throw new GraphQLError(

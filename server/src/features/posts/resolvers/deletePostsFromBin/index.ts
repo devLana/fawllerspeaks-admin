@@ -135,10 +135,10 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
       const slug = getPostSlug(deletedPost.title);
       // const tags = deletedPost.tags ? mapPostTags(deletedPost.tags, map) : null;
 
-      set.add(deletedPost.postId);
+      // set.add(deletedPost.postId);
 
       return {
-        id: deletedPost.postId,
+        id: deletedPost.id,
         title: deletedPost.title,
         description: deletedPost.description,
         content: null,

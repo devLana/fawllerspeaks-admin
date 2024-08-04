@@ -132,19 +132,17 @@ describe("Test draft post resolver", () => {
       const spy = spyDb({ rows: spyData });
       spy.mockReturnValueOnce({ rows: [] });
       spy.mockReturnValueOnce({ rows: [mocks.dbData] });
-      spy.mockReturnValueOnce({ rows: [] });
 
       const result = await draftPost({}, { post }, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(4);
+      expect(spy).toHaveBeenCalledTimes(3);
       expect(spy).toHaveNthReturnedWith(1, { rows: spyData });
       expect(spy).toHaveNthReturnedWith(2, { rows: [] });
       expect(spy).toHaveNthReturnedWith(3, { rows: [mocks.dbData] });
-      expect(spy).toHaveNthReturnedWith(4, { rows: [] });
       expect(getPostTags).toHaveBeenCalledTimes(1);
       expect(getPostTags).toHaveBeenCalledWith(mockContext.db, post.tagIds);
       expect(getPostTags).toHaveReturnedWith(mocks.mockPostTagsData);
-      expect(result).toHaveProperty("post.id", mocks.dbData.postId);
+      expect(result).toHaveProperty("post.id", mocks.dbData.id);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.description", undefined);
       expect(result).toHaveProperty("post.excerpt", undefined);
@@ -176,7 +174,7 @@ describe("Test draft post resolver", () => {
       expect(spy).toHaveNthReturnedWith(2, { rows: [] });
       expect(spy).toHaveNthReturnedWith(3, { rows: [mocks.dbData] });
       expect(getPostTags).not.toHaveBeenCalled();
-      expect(result).toHaveProperty("post.id", mocks.dbData.postId);
+      expect(result).toHaveProperty("post.id", mocks.dbData.id);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.description", undefined);
       expect(result).toHaveProperty("post.excerpt", undefined);

@@ -97,7 +97,7 @@ const emptyBin: EmptyBin = async (_, __, { db, user }) => {
       // const tags = post.tags ? mapPostTags(post.tags, map) : null;
 
       return {
-        id: post.postId,
+        id: post.id,
         title: post.title,
         description: post.description,
         content: null,

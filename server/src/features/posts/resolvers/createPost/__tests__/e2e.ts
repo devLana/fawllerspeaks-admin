@@ -170,7 +170,7 @@ describe("Create post - E2E", () => {
   describe("Verify post tag ids", () => {
     it("Should respond with an error if at least one unknown post tag id was passed", async () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
-      const tagIds = [mocks.UUID];
+      const tagIds = [mocks.ID];
       const variables = { post: { ...mocks.argsWithNoImage, tagIds } };
       const payload = { query: CREATE_POST, variables };
 
@@ -197,8 +197,8 @@ describe("Create post - E2E", () => {
 
     it("Should create and publish a new post with an image banner and post tags", async () => {
       const [tag1, tag2, tag3, tag4, tag5] = postTags;
-      const tagIds = [tag1.id, tag2.id, tag3.id, tag4.id, tag5.id];
-      const variables = { post: { ...mocks.argsWithImage, tagIds } };
+      const tags = [tag1.tagId, tag2.tagId, tag3.tagId, tag4.tagId, tag5.tagId];
+      const variables = { post: { ...mocks.argsWithImage, tagIds: tags } };
       const payload = { query: CREATE_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 

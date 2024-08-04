@@ -19,7 +19,7 @@ import generateErrorsObject from "@utils/generateErrorsObject";
 import deleteSession from "@utils/deleteSession";
 
 import type { MutationResolvers, PostTag } from "@resolverTypes";
-import type { ResolverFunc, PostDBData, ValidationErrorObject } from "@types";
+import type { ResolverFunc, PostDBData } from "@types";
 
 type CreatePost = ResolverFunc<MutationResolvers["createPost"]>;
 
@@ -97,6 +97,8 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       postTags = gottenTags;
     }
 
+    const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
+
     const { rows: savedPost } = await db.query<PostDBData>(
       `INSERT INTO posts (
         title,
@@ -107,12 +109,12 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
         author,
         status,
         image_banner,
-        date_published
+        date_published,
+        tags
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING
-        id,
-        post_id "postId",
+        post_id id,
         date_created "dateCreated",
         date_published "datePublished",
         last_modified "lastModified",
@@ -129,22 +131,14 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
         "Published",
         imageBanner,
         new Date().toISOString(),
+        dbTags,
       ]
     );
 
     const [saved] = savedPost;
 
-    if (tagIds) {
-      void db.query(
-        `UPDATE post_tags
-        SET posts = array_append(posts, $1)
-        WHERE tag_id = ANY ($2)`,
-        [saved.id, tagIds]
-      );
-    }
-
     return new SinglePost({
-      id: saved.postId,
+      id: saved.id,
       title,
       description,
       excerpt,
@@ -165,11 +159,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
 
     if (err instanceof ValidationError) {
-      const errors = generateErrorsObject(err.details) as ValidationErrorObject<
-        typeof post
-      >;
-
-      return new PostValidationError(errors);
+      return new PostValidationError(generateErrorsObject(err.details));
     }
 
     throw new GraphQLError("Unable to create post. Please try again later");

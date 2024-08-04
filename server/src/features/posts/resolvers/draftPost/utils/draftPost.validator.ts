@@ -40,9 +40,10 @@ export const draftPostSchema = Joi.object<DraftPostInput>({
   tagIds: Joi.array()
     .allow(null)
     .items(
-      Joi.string().trim().uuid({ version: "uuidv4", separator: "-" }).messages({
-        "string.empty": "Input post tag ids cannot be empty values",
-        "string.guid": "Invalid post tag id provided",
+      Joi.number().integer().positive().min(1).messages({
+        "number.base": "Input post tag ids must be integer numbers",
+        "number.positive": "Only positive post tag id numbers are allowed",
+        "number.min": "The provided post tag ids must all be greater than 0",
       })
     )
     .min(1)

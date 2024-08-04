@@ -1,15 +1,16 @@
 import type { Pool } from "pg";
 import type { PostTag } from "@resolverTypes";
 
-const getPostTags = async (db: Pool, tags: readonly string[]) => {
+const getPostTags = async (db: Pool, tags: readonly number[]) => {
   const { rows } = await db.query<PostTag>(
     `SELECT
       tag_id id,
+      id "tagId",
       name,
       date_created "dateCreated",
       last_modified "lastModified"
     FROM post_tags
-    WHERE tag_id = ANY ($1)`,
+    WHERE id = ANY ($1)`,
     [tags]
   );
 

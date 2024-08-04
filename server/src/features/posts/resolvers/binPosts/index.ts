@@ -144,8 +144,8 @@ const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
       const slug = getPostSlug(binnedPost.title);
       // const tags = binnedPost.tags ? mapPostTags(binnedPost.tags, map) : null;
 
-      set.add(binnedPost.postId);
-      binnedPostIds.push(binnedPost.postId);
+      // set.add(binnedPost.postId);
+      // binnedPostIds.push(binnedPost.postId);
 
       return {
         id: binnedPost.postId,

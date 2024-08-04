@@ -26,6 +26,8 @@ import { PostIdsValidationErrorResolver } from "./types/PostIdsValidationError";
 
 import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
 import { EditPostValidationErrorResolver } from "./editPost/types/EditPostValidationError";
+import { GetPostsResponseResolvers } from "./getPosts/types/GetPostsResponse";
+import { GetPostsValidationErrorResolvers } from "./getPosts/types/GetPostsValidationError";
 
 import type {
   MutationResolvers,
@@ -51,6 +53,7 @@ type TypeKeys =
   | "PostUrl"
   | "SinglePost"
   | "Posts"
+  | "GetPostsResponse"
   | "PostsWarning"
   | "EmptyBinWarning"
   | "DuplicatePostTitleError"
@@ -59,7 +62,8 @@ type TypeKeys =
   | "PostValidationError"
   | "PostIdValidationError"
   | "PostIdsValidationError"
-  | "EditPostValidationError";
+  | "EditPostValidationError"
+  | "GetPostsValidationError";
 
 interface PostsResolvers {
   Queries: ResolversMapper<Pick<QueryResolvers, "getPosts" | "getPost">>;
@@ -91,6 +95,7 @@ export const postsResolvers: PostsResolvers = {
     PostUrl: PostUrlResolvers,
     SinglePost: SinglePostResolver,
     Posts: PostsResolver,
+    GetPostsResponse: GetPostsResponseResolvers,
     PostsWarning: PostsWarningResolver,
     EmptyBinWarning: EmptyBinWarningResolver,
     DuplicatePostTitleError: DuplicatePostTitleErrorResolver,
@@ -100,5 +105,6 @@ export const postsResolvers: PostsResolvers = {
     PostIdValidationError: PostIdValidationErrorResolver,
     PostIdsValidationError: PostIdsValidationErrorResolver,
     EditPostValidationError: EditPostValidationErrorResolver,
+    GetPostsValidationError: GetPostsValidationErrorResolvers,
   },
 };

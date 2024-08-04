@@ -18,7 +18,8 @@ interface Params {
 
 const createTestPost = async (params: Params): Promise<Post> => {
   const { db, postTags, postAuthor, postData } = params;
-  const tagIds = postTags?.map(postTag => postTag.id);
+  const tagIds = postTags?.map(postTag => postTag.tagId);
+  const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
   try {
     const { rows } = await db.query<Omit<GetPostDBData, "author" | "url">>(
@@ -34,12 +35,12 @@ const createTestPost = async (params: Params): Promise<Post> => {
         date_published,
         last_modified,
         is_in_bin,
-        is_deleted
+        is_deleted,
+        tags
       ) VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING
-        id,
-        post_id "postId",
+        post_id id,
         title,
         description,
         excerpt,
@@ -65,20 +66,11 @@ const createTestPost = async (params: Params): Promise<Post> => {
         postData.lastModified,
         postData.isInBin,
         postData.isDeleted,
+        dbTags,
       ]
     );
 
     const [post] = rows;
-
-    if (tagIds) {
-      void db.query(
-        `UPDATE post_tags
-        SET posts = array_append(posts, $1)
-        WHERE tag_id = ANY ($2)`,
-        [post.id, tagIds]
-      );
-    }
-
     const { storageUrl } = supabase();
 
     const author: PostAuthor = {
@@ -99,7 +91,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
 
     return {
       __typename: "Post",
-      id: post.postId,
+      id: post.id,
       title: post.title,
       description: post.description,
       excerpt: post.excerpt,

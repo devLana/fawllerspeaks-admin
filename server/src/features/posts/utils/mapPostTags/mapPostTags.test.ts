@@ -8,11 +8,11 @@ const dateCreated = new Date().toISOString();
 const lastModified = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
 const postTags: PostTag[] = [
-  { id: "1", name: "tag1", dateCreated, lastModified: null },
-  { id: "2", name: "tag2", dateCreated, lastModified },
-  { id: "3", name: "tag3", dateCreated, lastModified },
-  { id: "4", name: "tag4", dateCreated, lastModified },
-  { id: "5", name: "tag5", dateCreated, lastModified: null },
+  { tagId: 1, id: "1", name: "tag1", dateCreated, lastModified: null },
+  { tagId: 2, id: "2", name: "tag2", dateCreated, lastModified },
+  { tagId: 3, id: "3", name: "tag3", dateCreated, lastModified },
+  { tagId: 4, id: "4", name: "tag4", dateCreated, lastModified },
+  { tagId: 5, id: "5", name: "tag5", dateCreated, lastModified: null },
 ];
 
 beforeAll(() => {

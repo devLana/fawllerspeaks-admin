@@ -134,19 +134,17 @@ describe("Test createPost resolver", () => {
       const spy = spyDb({ rows: mockRows });
       spy.mockReturnValueOnce({ rows: [] });
       spy.mockReturnValueOnce({ rows: [mocks.dbPost] });
-      spy.mockReturnValueOnce({ rows: [] });
 
       const result = await createPost({}, { post }, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(4);
+      expect(spy).toHaveBeenCalledTimes(3);
       expect(spy).toHaveNthReturnedWith(1, { rows: mockRows });
       expect(spy).toHaveNthReturnedWith(2, { rows: [] });
       expect(spy).toHaveNthReturnedWith(3, { rows: [mocks.dbPost] });
-      expect(spy).toHaveNthReturnedWith(4, { rows: [] });
       expect(getPostTags).toHaveBeenCalledTimes(1);
       expect(getPostTags).toHaveBeenCalledWith(mockContext.db, post.tagIds);
       expect(getPostTags).toHaveReturnedWith(["tag", "tag", "tag"]);
-      expect(result).toHaveProperty("post.id", mocks.dbPost.postId);
+      expect(result).toHaveProperty("post.id", mocks.dbPost.id);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.excerpt", post.excerpt);
       expect(result).toHaveProperty("post.description", post.description);

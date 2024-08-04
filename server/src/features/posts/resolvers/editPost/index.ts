@@ -157,10 +157,10 @@ const editPost: EditPost = async (_, { post }, { user, db }) => {
       );
     }
 
-    if (!tagIds && foundTags) {
-      const gottenTags = await getPostTags(db, foundTags);
-      postTags = gottenTags ?? [];
-    }
+    // if (!tagIds && foundTags) {
+    //   const gottenTags = await getPostTags(db, foundTags);
+    //   postTags = gottenTags ?? [];
+    // }
 
     const dbImageBanner = imageBanner ?? foundImageBanner;
     const tagsToSave = tagIds ?? foundTags;

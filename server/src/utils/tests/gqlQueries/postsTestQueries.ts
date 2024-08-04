@@ -36,6 +36,7 @@ const POST_FIELDS = `#graphql
     tags {
       __typename
       id
+      tagId
       name
       dateCreated
       lastModified

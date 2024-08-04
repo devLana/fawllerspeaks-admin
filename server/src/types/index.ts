@@ -43,7 +43,6 @@ export interface DbTestUser {
 
 export interface PostDBData {
   readonly id: string;
-  readonly postId: string;
   readonly dateCreated: string;
   readonly datePublished: string | null;
   readonly lastModified: string | null;
@@ -53,6 +52,7 @@ export interface PostDBData {
 }
 
 export interface GetPostDBData extends PostDBData {
+  readonly postId: number;
   readonly title: string;
   readonly description: string | null;
   readonly excerpt: string | null;

@@ -140,10 +140,10 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
       //   ? mapPostTags(unBinnedPost.tags, map)
       //   : null;
 
-      set.add(unBinnedPost.postId);
+      set.add(unBinnedPost.id);
 
       return {
-        id: unBinnedPost.postId,
+        id: unBinnedPost.id,
         title: unBinnedPost.title,
         description: unBinnedPost.description,
         content: null,
