@@ -110,7 +110,7 @@ const authUsers = async (db: Pool): Promise<Users> => {
       },
     };
   } catch (err) {
-    console.log("Create Reset Password Users Error - ", err);
+    console.error("Create Reset Password Users Error - ", err);
     throw new Error("Unable to create reset password test users");
   }
 };

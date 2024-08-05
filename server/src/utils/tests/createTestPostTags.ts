@@ -28,7 +28,7 @@ const createTestPostTags = async (db: Pool): Promise<PostTag[]> => {
         : row.lastModified,
     }));
   } catch (err) {
-    console.log("Create Test Post Tags Error - ", err);
+    console.error("Create Test Post Tags Error - ", err);
     throw new Error("Unable to create test post tags");
   }
 };

@@ -22,9 +22,7 @@ const testSession = async (db: Pool, userId: string, expiresIn = "15m") => {
 
     const randomBytes = util.promisify(crypto.randomBytes);
     const buf = randomBytes(28);
-
     const [refreshToken, sessionBuffer] = await Promise.all([refresh, buf]);
-
     const sessionId = sessionBuffer.toString("base64url");
 
     await db.query(
@@ -48,7 +46,7 @@ const testSession = async (db: Pool, userId: string, expiresIn = "15m") => {
 
     return { cookies: `auth=${auth};token=${token};sig=${sig}`, sessionId };
   } catch (err) {
-    console.log("Create Test User Session Error - ", err);
+    console.error("Create Test User Session Error - ", err);
     throw new Error("Unable to create test user session");
   }
 };

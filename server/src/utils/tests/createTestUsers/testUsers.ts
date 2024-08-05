@@ -78,7 +78,7 @@ const testUsers = async (db: Pool): Promise<Users> => {
       },
     };
   } catch (err) {
-    console.log("Create Test Users Error - ", err);
+    console.error("Create Test Users Error - ", err);
     throw new Error("Unable to create test users");
   }
 };
