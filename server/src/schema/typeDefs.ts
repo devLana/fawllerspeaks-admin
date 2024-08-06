@@ -10,8 +10,8 @@ const types = `#graphql
     getPostTags: GetPostTags!
 
     ####POSTS####
-    "Get all posts"
-    getPosts: GetPosts!
+    "Get posts"
+    getPosts(page: GetPostsPageInput, filters: GetPostsFiltersInput): GetPosts!
     "Get one post"
     getPost(postId: ID!): GetPost!
   }

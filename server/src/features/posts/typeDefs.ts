@@ -20,6 +20,11 @@ export const postsTypeDefs = `#graphql
     tableOfContents: [PostTableOfContents!]
   }
 
+  type GetPostsPageData {
+    after: ID
+    before: ID
+  }
+
   type Post {
     id: ID!
     title: String!
@@ -46,6 +51,12 @@ export const postsTypeDefs = `#graphql
 
   type Posts {
     posts: [Post!]!
+    status: Status!
+  }
+
+  type GetPostsData {
+    posts: [Post!]!
+    pageData: GetPostsPageData!
     status: Status!
   }
 
@@ -106,6 +117,16 @@ export const postsTypeDefs = `#graphql
     status: Status!
   }
 
+  type GetPostsValidationError {
+    cursorError: String
+    typeError: String
+    qError: String
+    postTagError: String
+    statusError: String
+    sortError: String
+    status: Status! 
+  }
+
   union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
 
   union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
@@ -116,7 +137,7 @@ export const postsTypeDefs = `#graphql
 
   union GetPost = SinglePost | PostIdValidationError | NotAllowedError | UnknownError
 
-  union GetPosts = Posts | NotAllowedError
+  union GetPosts = GetPostsData | GetPostsValidationError | AuthenticationError | NotAllowedError | RegistrationError | ForbiddenError
 
   union Publish_Unpublish = SinglePost | PostIdValidationError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
 
@@ -124,6 +145,18 @@ export const postsTypeDefs = `#graphql
     Draft
     Published
     Unpublished
+  }
+
+  enum GetPostsPageType {
+    after
+    before
+  }
+
+  enum SortPostsBy {
+    date_asc
+    title_asc
+    date_desc
+    title_desc
   }
 
   input CreatePostInput {
@@ -142,6 +175,18 @@ export const postsTypeDefs = `#graphql
     content: String
     tagIds: [Int!]
     imageBanner: String
+  }
+
+  input GetPostsPageInput {
+    type: GetPostsPageType!
+    cursor: ID!
+  }
+
+  input GetPostsFiltersInput {
+    q: String
+    postTag: Int
+    status: PostStatus
+    sort: SortPostsBy
   }
 
   input EditPostInput {

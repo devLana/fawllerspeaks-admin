@@ -26,7 +26,7 @@ import { PostIdsValidationErrorResolver } from "./types/PostIdsValidationError";
 
 import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
 import { EditPostValidationErrorResolver } from "./editPost/types/EditPostValidationError";
-import { GetPostsResponseResolvers } from "./getPosts/types/GetPostsResponse";
+import { GetPostsDataResolvers } from "./getPosts/types/GetPostsData";
 import { GetPostsValidationErrorResolvers } from "./getPosts/types/GetPostsValidationError";
 
 import type {
@@ -53,7 +53,7 @@ type TypeKeys =
   | "PostUrl"
   | "SinglePost"
   | "Posts"
-  | "GetPostsResponse"
+  | "GetPostsData"
   | "PostsWarning"
   | "EmptyBinWarning"
   | "DuplicatePostTitleError"
@@ -95,7 +95,7 @@ export const postsResolvers: PostsResolvers = {
     PostUrl: PostUrlResolvers,
     SinglePost: SinglePostResolver,
     Posts: PostsResolver,
-    GetPostsResponse: GetPostsResponseResolvers,
+    GetPostsData: GetPostsDataResolvers,
     PostsWarning: PostsWarningResolver,
     EmptyBinWarning: EmptyBinWarningResolver,
     DuplicatePostTitleError: DuplicatePostTitleErrorResolver,

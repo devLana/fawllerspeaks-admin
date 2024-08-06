@@ -170,19 +170,35 @@ export const GET_POST = `#graphql
 
 export const GET_POSTS = `#graphql
   ${POST_FIELDS}
-  query GetPosts {
-    getPosts {
-      ... on  NotAllowedError {
-        __typename
-        message
-        status
-      }
-
-      ... on Posts {
+  query GetPosts($page: GetPostsPageInput, $filters: GetPostsFiltersInput) {
+    getPosts(page: $page, filters: $filters) {
+      ... on GetPostsData {
         __typename
         posts {
           ...postFields
         }
+        pageData {
+          __typename
+          after
+          before
+        }
+        status
+      }
+
+      ... on GetPostsValidationError {
+        __typename
+        cursorError
+        typeError
+        qError
+        postTagError
+        statusError
+        sortError
+        status
+      }
+
+      ... on BaseResponse {
+        __typename
+        message
         status
       }
     }
