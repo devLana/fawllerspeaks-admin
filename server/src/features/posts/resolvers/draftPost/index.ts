@@ -11,17 +11,15 @@ import {
   ForbiddenError,
   NotAllowedError,
   RegistrationError,
-  UnknownError,
 } from "@utils/ObjectTypes";
 
-import getPostTags from "@features/posts/utils/getPostTags";
 import getPostSlug from "@features/posts/utils/getPostSlug";
 
 import { draftPostSchema as schema } from "./utils/draftPost.validator";
 import generateErrorsObject from "@utils/generateErrorsObject";
 import deleteSession from "@utils/deleteSession";
 
-import type { MutationResolvers, PostTag } from "@resolverTypes";
+import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, PostDBData } from "@types";
 
 type DraftPost = ResolverFunc<MutationResolvers["draftPost"]>;
@@ -50,9 +48,9 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     const checkTitleSlug = db.query<{ slug: string }>(
       `SELECT slug
       FROM posts
-      WHERE lower(replace(replace(replace(title, '-', ''), ' ', ''), '_', '')) = $1
+      WHERE regexp_replace(title, '[-_\\s]', '', 'g') ~* $1
       OR slug = $2`,
-      [title.toLowerCase().replace(/[\s_-]/g, ""), slug]
+      [title.replace(/[\s_-]/g, ""), slug]
     );
 
     const [{ rows: loggedInUser }, { rows: savedTitleSlug }] =
@@ -87,53 +85,59 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       );
     }
 
-    let postTags: PostTag[] | null = null;
-
-    if (tagIds) {
-      const gottenTags = await getPostTags(db, tagIds);
-
-      if (!gottenTags || gottenTags.length < tagIds.length) {
-        if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
-        return new UnknownError("Unknown post tag id provided");
-      }
-
-      postTags = gottenTags;
-    }
-
     const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
     const { rows: draftedPost } = await db.query<PostDBData>(
-      `INSERT INTO posts (
-        title,
-        description,
-        excerpt,
-        content,
-        slug,
-        author,
-        status,
-        image_banner,
-        tags
+      `WITH drafted_post AS (
+        INSERT INTO posts (
+          title,
+          description,
+          excerpt,
+          content,
+          slug,
+          author,
+          status,
+          image_banner,
+          tags
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, 'Draft', $7, $8)
+        RETURNING
+          post_id,
+          date_created,
+          date_published,
+          last_modified,
+          views,
+          is_in_bin,
+          is_deleted,
+          tags
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING
-        post_id "id",
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
-        views,
-        is_in_bin "isInBin",
-        is_deleted "isDeleted"`,
-      [
-        title,
-        description,
-        excerpt,
-        content,
-        slug,
-        user,
-        "Draft",
-        imageBanner,
-        dbTags,
-      ]
+      SELECT
+        dp.post_id id,
+        dp.date_created "dateCreated",
+        dp.date_published "datePublished",
+        dp.last_modified "lastModified",
+        dp.views,
+        dp.is_in_bin "isInBin",
+        dp.is_deleted "isDeleted",
+        json_agg(json_build_object(
+          'id', pt.tag_id,
+          'tagId', pt.id,
+          'name', pt.name,
+          'dateCreated', pt.date_created,
+          'lastModified', pt.last_modified
+        )) FILTER (WHERE pt.id IS NOT NULL) tags
+      FROM drafted_post dp
+      LEFT JOIN post_tags pt
+      ON pt.id = ANY (dp.tags)
+      GROUP BY
+        dp.post_id,
+        dp.date_created,
+        dp.date_published,
+        dp.last_modified,
+        dp.views,
+        dp.is_in_bin,
+        dp.is_deleted`,
+      [title, description, excerpt, content, slug, user, imageBanner, dbTags]
     );
 
     const [drafted] = draftedPost;
@@ -154,7 +158,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       views: drafted.views,
       isInBin: drafted.isInBin,
       isDeleted: drafted.isDeleted,
-      tags: postTags,
+      tags: drafted.tags,
     });
   } catch (err) {
     if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);

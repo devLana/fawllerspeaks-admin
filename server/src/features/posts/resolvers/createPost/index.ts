@@ -2,7 +2,6 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
-import getPostTags from "@features/posts/utils/getPostTags";
 import getPostSlug from "@features/posts/utils/getPostSlug";
 import { createPostValidator as schema } from "./utils/createPost.validator";
 import { SinglePost } from "../types/SinglePost";
@@ -13,12 +12,11 @@ import {
   ForbiddenError,
   NotAllowedError,
   RegistrationError,
-  UnknownError,
 } from "@utils/ObjectTypes";
 import generateErrorsObject from "@utils/generateErrorsObject";
 import deleteSession from "@utils/deleteSession";
 
-import type { MutationResolvers, PostTag } from "@resolverTypes";
+import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc, PostDBData } from "@types";
 
 type CreatePost = ResolverFunc<MutationResolvers["createPost"]>;
@@ -47,9 +45,9 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     const checkTitleSlug = db.query<{ slug: string }>(
       `SELECT slug
       FROM posts
-      WHERE lower(replace(replace(replace(title, '-', ''), ' ', ''), '_', '')) = $1
+      WHERE regexp_replace(title, '[-_\\s]', '', 'g') ~* $1
       OR slug = $2`,
-      [title.toLowerCase().replace(/[\s_-]/g, ""), slug]
+      [title.replace(/[\s_-]/g, ""), slug]
     );
 
     const [{ rows: loggedInUser }, { rows: savedTitleSlug }] =
@@ -84,55 +82,60 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       );
     }
 
-    let postTags: PostTag[] | null = null;
-
-    if (tagIds) {
-      const gottenTags = await getPostTags(db, tagIds);
-
-      if (!gottenTags || gottenTags.length < tagIds.length) {
-        if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
-        return new UnknownError("Unknown post tag id provided");
-      }
-
-      postTags = gottenTags;
-    }
-
     const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
     const { rows: savedPost } = await db.query<PostDBData>(
-      `INSERT INTO posts (
-        title,
-        description,
-        excerpt,
-        content,
-        slug,
-        author,
-        status,
-        image_banner,
-        date_published,
-        tags
+      `WITH created_post AS (
+        INSERT INTO posts (
+          title,
+          description,
+          excerpt,
+          content,
+          slug,
+          author,
+          status,
+          image_banner,
+          date_published,
+          tags
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, 'Published', $7, CURRENT_TIMESTAMP(3), $8)
+        RETURNING
+          post_id,
+          date_created,
+          date_published,
+          last_modified,
+          views,
+          is_in_bin,
+          is_deleted,
+          tags
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      RETURNING
-        post_id id,
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
-        views,
-        is_in_bin "isInBin",
-        is_deleted "isDeleted"`,
-      [
-        title,
-        description,
-        excerpt,
-        content,
-        slug,
-        user,
-        "Published",
-        imageBanner,
-        new Date().toISOString(),
-        dbTags,
-      ]
+      SELECT
+        cp.post_id id,
+        cp.date_created "dateCreated",
+        cp.date_published "datePublished",
+        cp.last_modified "lastModified",
+        cp.views,
+        cp.is_in_bin "isInBin",
+        cp.is_deleted "isDeleted",
+        json_agg(json_build_object(
+          'id', pt.tag_id,
+          'tagId', pt.id,
+          'name', pt.name,
+          'dateCreated', pt.date_created,
+          'lastModified', pt.last_modified
+        )) FILTER (WHERE pt.id IS NOT NULL) tags
+      FROM created_post cp
+      LEFT JOIN post_tags pt
+      ON pt.id = ANY (cp.tags)
+      GROUP BY
+        cp.post_id,
+        cp.date_created,
+        cp.date_published,
+        cp.last_modified,
+        cp.views,
+        cp.is_in_bin,
+        cp.is_deleted`,
+      [title, description, excerpt, content, slug, user, imageBanner, dbTags]
     );
 
     const [saved] = savedPost;
@@ -153,7 +156,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       views: saved.views,
       isInBin: saved.isInBin,
       isDeleted: saved.isDeleted,
-      tags: postTags,
+      tags: saved.tags,
     });
   } catch (err) {
     if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
@@ -161,6 +164,8 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     if (err instanceof ValidationError) {
       return new PostValidationError(generateErrorsObject(err.details));
     }
+
+    console.log(err);
 
     throw new GraphQLError("Unable to create post. Please try again later");
   }

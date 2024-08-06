@@ -12,7 +12,6 @@ interface Input {
   imageBanner?: string | null;
 }
 
-export type Tags = { id: number }[];
 type Validations = [string, Input, InputErrors<Input>];
 
 export const userId = randomUUID();
@@ -58,11 +57,7 @@ export const dbData = {
   isDeleted: false,
 };
 
-export const mockPostTagsData: Tags = [
-  { id: tagIds[0] },
-  { id: tagIds[1] },
-  { id: tagIds[2] },
-];
+export const tags = [{ id: tagIds[0] }, { id: tagIds[1] }, { id: tagIds[2] }];
 
 export const gqlValidations: [string, object][] = [
   [

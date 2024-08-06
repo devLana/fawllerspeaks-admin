@@ -65,12 +65,11 @@ describe("Draft post - E2E", () => {
   });
 
   afterAll(async () => {
-    const clearPosts = db.query(`DELETE FROM posts`);
-    const clearPostTags = db.query(`DELETE FROM post_tags`);
-    const stop = server.stop();
-    await Promise.all([clearPosts, clearPostTags, stop]);
-    await db.query(`DELETE FROM users`);
-    await db.end();
+    await db.query(
+      "TRUNCATE TABLE posts, post_tags, users RESTART IDENTITY CASCADE"
+    );
+
+    await Promise.all([server.stop(), db.end()]);
   });
 
   describe("Verify user authentication", () => {
@@ -167,25 +166,6 @@ describe("Draft post - E2E", () => {
       expect(data.data?.draftPost).toStrictEqual({
         __typename: "DuplicatePostTitleError",
         message: "A post with that title has already been created",
-        status: "ERROR",
-      });
-    });
-  });
-
-  describe("Verify post tag ids", () => {
-    it("Should send an error response if at least one of the provided post tags ids is unknown", async () => {
-      const options = { authorization: `Bearer ${registeredJwt}` };
-      const testData = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
-      const variables = { post: testData };
-      const payload = { query: DRAFT_POST, variables };
-
-      const { data } = await post<Draft>(url, payload, options);
-
-      expect(data.errors).toBeUndefined();
-      expect(data.data).toBeDefined();
-      expect(data.data?.draftPost).toStrictEqual({
-        __typename: "UnknownError",
-        message: "Unknown post tag id provided",
         status: "ERROR",
       });
     });

@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import type { Pool } from "pg";
 import type { BaseContext } from "@apollo/server";
 
-import type { Post, PostStatus } from "@resolverTypes";
+import type { Post, PostStatus, PostTag } from "@resolverTypes";
 
 export interface IClientUrls {
   readonly login: string;
@@ -49,6 +49,7 @@ export interface PostDBData {
   readonly views: number;
   readonly isInBin: boolean;
   readonly isDeleted: boolean;
+  readonly tags: PostTag[] | null;
 }
 
 export interface GetPostDBData extends PostDBData {
@@ -65,7 +66,7 @@ export interface GetPostDBData extends PostDBData {
 
 export type TestPostData = Omit<
   GetPostDBData,
-  "id" | "postId" | "dateCreated" | "views" | "url" | "author"
+  "id" | "postId" | "dateCreated" | "views" | "url" | "author" | "tags"
 > & { slug: string };
 
 export interface TestPostAuthor {

@@ -129,7 +129,7 @@ export const postsTypeDefs = `#graphql
 
   union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
 
-  union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
+  union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError
 
   union EditPost = SinglePost | EditPostValidationError | DuplicatePostTitleError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
 
