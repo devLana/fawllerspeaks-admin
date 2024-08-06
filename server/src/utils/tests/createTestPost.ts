@@ -7,7 +7,13 @@ import { urls } from "@utils/ClientUrls";
 import dateToISOString from "@utils/dateToISOString";
 
 import type { GetPostDBData, TestPostAuthor, TestPostData } from "@types";
-import type { Post, PostAuthor, PostTag } from "@resolverTypes";
+import type {
+  Post,
+  PostAuthor,
+  PostContent,
+  PostTableOfContents,
+  PostTag,
+} from "@resolverTypes";
 
 interface Params {
   db: Pool;
@@ -72,6 +78,8 @@ const createTestPost = async (params: Params): Promise<Post> => {
 
     const [post] = rows;
     const { storageUrl } = supabase();
+    const slug = getPostSlug(post.title);
+    let content: PostContent | null = null;
 
     const author: PostAuthor = {
       __typename: "PostAuthor",
@@ -87,7 +95,23 @@ const createTestPost = async (params: Params): Promise<Post> => {
       ? dateToISOString(post.lastModified)
       : post.lastModified;
 
-    const slug = getPostSlug(post.title);
+    if (post.content) {
+      const { html, tableOfContents } = getPostContentResponse(post.content);
+      let toc: PostTableOfContents[] | null = null;
+
+      if (tableOfContents) {
+        toc = tableOfContents.map(item => ({
+          __typename: "PostTableOfContents",
+          ...item,
+        }));
+      }
+
+      content = {
+        __typename: "PostContent",
+        html,
+        tableOfContents: toc,
+      };
+    }
 
     return {
       __typename: "Post",
@@ -95,7 +119,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
       title: post.title,
       description: post.description,
       excerpt: post.excerpt,
-      content: post.content ? getPostContentResponse(post.content) : null,
+      content,
       author,
       status: post.status,
       url: {

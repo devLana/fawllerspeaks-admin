@@ -2,6 +2,7 @@ import getPostSlug from "@features/posts/utils/getPostSlug";
 import type { TestUser, TestPostData, RemoveNull } from "@types";
 
 type RemoveNullFromTestUser = RemoveNull<TestUser>;
+type Params = Omit<Partial<TestPostData>, "slug" | "imageBanner">;
 
 export const unRegisteredUser: TestUser = {
   firstName: null,
@@ -33,16 +34,36 @@ export const newRegisteredUser: RemoveNullFromTestUser = {
   resetToken: ["new_registered_user_reset_token", "203"],
 };
 
-export const testPostData = (params?: Partial<TestPostData>): TestPostData => ({
-  title: params?.title ?? "Test post default title",
-  slug: getPostSlug(params?.title ?? "Test post default title"),
-  description: params?.description ?? "Test post description",
-  excerpt: params?.excerpt ?? "Test post excerpt",
-  content: params?.content ?? "<p>Test post content</p>",
-  status: params?.status ?? "Published",
-  imageBanner: params?.imageBanner ?? "post/image/banner/storage/path",
-  datePublished: params?.datePublished ?? new Date().toISOString(),
-  lastModified: params?.lastModified ?? null,
-  isInBin: params?.isInBin ?? false,
-  isDeleted: params?.isDeleted ?? false,
-});
+const html =
+  "<h2>heading 2</h2><p>Test post content</p><h3>heading 3</h3><p>paragraph</p>";
+
+export const testPostData = (params?: Params): TestPostData => {
+  let status: Params["status"];
+  let postContent: Params["content"];
+
+  if (params?.content === null) {
+    postContent = null;
+  } else {
+    postContent = params?.content ?? html;
+  }
+
+  if (params?.datePublished) {
+    status = "Published";
+  } else {
+    status = params?.status ?? "Draft";
+  }
+
+  return {
+    title: params?.title ?? "Test post default title",
+    slug: getPostSlug(params?.title ?? "Test post default title"),
+    description: params?.description ?? "Test post description",
+    excerpt: params?.excerpt ?? "Test post excerpt",
+    content: postContent,
+    status,
+    imageBanner: "post/image/banner/storage/path",
+    datePublished: params?.datePublished ?? null,
+    lastModified: params?.lastModified ?? null,
+    isInBin: params?.isInBin ?? false,
+    isDeleted: params?.isDeleted ?? false,
+  };
+};
