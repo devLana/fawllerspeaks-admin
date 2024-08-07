@@ -2,21 +2,25 @@ import type { PostContent, PostTableOfContents } from "@resolverTypes";
 
 interface Groups {
   level: string | undefined;
-  textContent: string | undefined;
+  innerHTML: string | undefined;
 }
 
 type SorU = string | undefined;
 type ReplaceParams = [SorU, SorU, number, string, Groups];
 
 export const getPostContentResponse = (content: string): PostContent => {
-  const regex = /<h(?<level>[2-5])>(?<textContent>.+?)<\/h\k<level>>/gi;
+  const regex = /<h(?<level>[2-5])>(?<innerHTML>.+?)<\/h\k<level>>/gi;
   const tableContentsArr: PostTableOfContents[] = [];
 
   const html = content.replace(regex, (match, ...rest: ReplaceParams) => {
     const [, , , , groups] = rest;
-    const { level, textContent } = groups;
+    const { level, innerHTML } = groups;
 
-    if (!level || !textContent) return match;
+    if (!level || !innerHTML) return match;
+
+    const tagRegex =
+      /<\/?[a-z][a-z0-9]*(?:.+?=(['"])(?:(?!\1|\\).|\\.)*\1)*>/gi;
+    const textContent = innerHTML.replace(tagRegex, "");
 
     const id = textContent
       .toLowerCase()
@@ -29,7 +33,7 @@ export const getPostContentResponse = (content: string): PostContent => {
       href: `#${id}`,
     });
 
-    return `<h${level} id="${id}">${textContent}</h${level}>`;
+    return `<h${level} id="${id}">${innerHTML}</h${level}>`;
   });
 
   return {

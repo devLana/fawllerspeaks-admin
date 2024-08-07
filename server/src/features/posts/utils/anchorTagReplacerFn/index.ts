@@ -6,7 +6,8 @@ interface Groups {
 type SorU = string | undefined;
 type ReplaceParams = [SorU, SorU, number, string, Groups];
 
-export const anchorTagRegex = /<a href="(?<url>[^"]+)">(?<content>.+?)<\/a>/gi;
+export const anchorTagRegex =
+  /<a href=(['"])(?<url>.*?)\1>(?<content>.+?)<\/a>/gi;
 
 export const anchorTagReplacerFn = (match: string, ...rest: ReplaceParams) => {
   const groups = rest.at(-1) as Groups;
