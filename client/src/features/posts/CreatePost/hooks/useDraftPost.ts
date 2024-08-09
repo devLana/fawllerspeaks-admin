@@ -5,21 +5,16 @@ import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
 import { DRAFT_POST } from "../operations/DRAFT_POST";
-import { refetchQueries } from "../utils/refetchQueries";
 import { SESSION_ID } from "@utils/constants";
 import type {
   CreateInputErrors,
   CreatePostData,
-  CreatePostAction,
   CreateStatus,
   DraftErrorCb,
 } from "@types";
 import type { DraftPostInput } from "@apiTypes";
 
-export const useDraftPost = (
-  postData: CreatePostData,
-  dispatch: React.Dispatch<CreatePostAction>
-) => {
+export const useDraftPost = (postData: CreatePostData) => {
   const [draftStatus, setDraftStatus] = React.useState<CreateStatus>("idle");
   const router = useRouter();
 
@@ -51,7 +46,6 @@ export const useDraftPost = (
 
     void draftPost({
       variables: { post },
-      refetchQueries,
       onError: () => setDraftStatus("error"),
       onCompleted(draftData) {
         switch (draftData.draftPost.__typename) {
@@ -92,11 +86,6 @@ export const useDraftPost = (
             break;
           }
 
-          case "UnknownError":
-            setDraftStatus("inputError");
-            dispatch({ type: "UNKNOWN_POST_TAGS" });
-            break;
-
           case "SinglePost": {
             const status = uploadHasError ? "?image=draft-upload-error" : "";
             void router.push(`/posts${status}`);
@@ -115,7 +104,7 @@ export const useDraftPost = (
   let msg =
     "You are unable to save this post as draft at the moment. Please try again later";
 
-  if (error?.graphQLErrors[0]) {
+  if (error?.graphQLErrors?.[0]) {
     msg = error.graphQLErrors[0].message;
   }
 
@@ -135,8 +124,6 @@ export const useDraftPost = (
     data?.draftPost.__typename === "DuplicatePostTitleError"
   ) {
     errors.titleError = data.draftPost.message;
-  } else if (data?.draftPost.__typename === "UnknownError") {
-    errors.tagIdsError = data.draftPost.message;
   }
 
   const handleCloseError = () => setDraftStatus("idle");

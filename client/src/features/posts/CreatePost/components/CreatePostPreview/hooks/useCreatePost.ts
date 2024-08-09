@@ -5,20 +5,13 @@ import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
 import { CREATE_POST } from "@features/posts/CreatePost/components/CreatePostPreview/operations/CREATE_POST";
-import { refetchQueries } from "../utils/refetchQueries";
 import { SESSION_ID } from "@utils/constants";
 import type { CreatePostInput } from "@apiTypes";
-import type {
-  CreateInputErrors,
-  CreatePostAction,
-  CreatePostData,
-  CreateStatus,
-} from "@types";
+import type { CreateInputErrors, CreatePostData, CreateStatus } from "@types";
 
 export const useCreatePost = (
   post: CreatePostData,
-  handleCloseDialog: VoidFunction,
-  dispatch: React.Dispatch<CreatePostAction>
+  handleCloseDialog: VoidFunction
 ) => {
   const [createStatus, setCreateStatus] = React.useState<CreateStatus>("idle");
   const { push, replace, pathname } = useRouter();
@@ -45,7 +38,6 @@ export const useCreatePost = (
 
     void createPost({
       variables: { post: postInput },
-      refetchQueries,
       onError: () => {
         setCreateStatus("error");
         handleCloseDialog();
@@ -79,12 +71,6 @@ export const useCreatePost = (
             handleCloseDialog();
             break;
 
-          case "UnknownError":
-            dispatch({ type: "UNKNOWN_POST_TAGS" });
-            setCreateStatus("inputError");
-            handleCloseDialog();
-            break;
-
           case "SinglePost": {
             const status = uploadHasError ? "?image=create-upload-error" : "";
             void push(`/posts${status}`);
@@ -104,7 +90,7 @@ export const useCreatePost = (
   let msg =
     "You are unable to create and publish this post at the moment. Please try again later";
 
-  if (error?.graphQLErrors[0]) {
+  if (error?.graphQLErrors?.[0]) {
     msg = error.graphQLErrors[0].message;
   }
 
@@ -124,8 +110,6 @@ export const useCreatePost = (
     data?.createPost.__typename === "DuplicatePostTitleError"
   ) {
     errors.titleError = data.createPost.message;
-  } else if (data?.createPost.__typename === "UnknownError") {
-    errors.tagIdsError = data.createPost.message;
   }
 
   const handleCloseError = () => setCreateStatus("idle");

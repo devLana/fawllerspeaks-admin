@@ -183,7 +183,7 @@ export interface PostImageBanner {
 }
 
 export type CreatePostData = Omit<CreatePostInput, "imageBanner" | "tagIds"> & {
-  tagIds?: string[];
+  tagIds?: number[];
   imageBanner?: PostImageBanner;
 };
 
@@ -197,7 +197,7 @@ export type RequiredPostMetadata = Pick<CreatePostData, RequiredMetadataKeys>;
 
 export type CreatePostAction =
   | { type: "CHANGE_VIEW"; payload: { view: PostView } }
-  | { type: "SELECT_POST_TAGS"; payload: { tagIds: string[] } }
+  | { type: "SELECT_POST_TAGS"; payload: { tagIds: number[] } }
   | { type: "UNKNOWN_POST_TAGS" }
   | { type: "ADD_POST_BANNER_IMAGE"; payload: { imageFile: File } }
   | { type: "REMOVE_POST_BANNER_IMAGE" }

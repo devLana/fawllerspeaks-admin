@@ -15,7 +15,7 @@ import type { CreatePostAction } from "@types";
 
 interface SelectPostTagsInputProps {
   tagIdsError: string | undefined;
-  tagIds: string[] | undefined;
+  tagIds: number[] | undefined;
   dispatch: React.Dispatch<CreatePostAction>;
 }
 
@@ -27,10 +27,10 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
     const map = new Map<string, string>();
     const options: React.ReactElement[] = [];
 
-    postTags?.forEach(({ id, name }) => {
+    postTags?.forEach(({ id, name, tagId }) => {
       map.set(id, name);
       options.push(
-        <MenuItem key={id} value={id}>
+        <MenuItem key={id} value={tagId}>
           <Box
             component="span"
             width="100%"
@@ -49,8 +49,9 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
   const handleChange = (e: SelectChangeEvent<string[]>) => {
     const { value } = e.target;
     const selectedTags = typeof value === "string" ? value.split(",") : value;
+    const ids = selectedTags.map(id => +id);
 
-    dispatch?.({ type: "SELECT_POST_TAGS", payload: { tagIds: selectedTags } });
+    dispatch?.({ type: "SELECT_POST_TAGS", payload: { tagIds: ids } });
   };
 
   const ariaId = tagIdsError ? "post-tags-error-message" : undefined;
@@ -68,7 +69,7 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
           labelId="post-tags-label"
           id="post-tags"
           multiple
-          value={tagIds}
+          value={tagIds.map(id => `${id}`)}
           onChange={handleChange}
           input={<OutlinedInput id="post-tags-input" label="Post Tags" />}
           MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}

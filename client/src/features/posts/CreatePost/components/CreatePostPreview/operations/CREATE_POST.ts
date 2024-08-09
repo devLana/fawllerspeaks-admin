@@ -27,9 +27,6 @@ export const CREATE_POST: CreatePost = gql`
       ... on ForbiddenError {
         message
       }
-      ... on UnknownError {
-        message
-      }
       ... on SinglePost {
         post {
           ...PostFields

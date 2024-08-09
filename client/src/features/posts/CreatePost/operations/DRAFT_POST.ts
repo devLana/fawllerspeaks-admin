@@ -27,9 +27,6 @@ export const DRAFT_POST: DraftPost = gql`
       ... on ForbiddenError {
         message
       }
-      ... on UnknownError {
-        message
-      }
       ... on SinglePost {
         post {
           ...PostFields

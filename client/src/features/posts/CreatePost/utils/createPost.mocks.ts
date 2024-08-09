@@ -15,7 +15,6 @@ interface Redirects {
 const titleStr = (prefix: string) => `${prefix} Test Post Title`;
 const duplicateMsg = "Post title already exists";
 const forbidMsg = "Generated post slug from post title already exists. Change!";
-const unknownMsg = "Unknown post tag id provided";
 const gqlMsg = "Graphql server error ocurred";
 export const draftBtn = { name: /^save as draft$/i };
 export const imageLabel = /^Select A Post Image Banner$/i;
@@ -65,9 +64,9 @@ export const postTagsErrorMsg =
   "You can't add post tags to this post at the moment. Please try again later";
 
 const tags = [
-  testPostTag("Tag 1", "1"),
-  testPostTag("Tag 2", "2"),
-  testPostTag("Tag 3", "3"),
+  testPostTag("Tag 1", "1", 1),
+  testPostTag("Tag 2", "2", 2),
+  testPostTag("Tag 3", "3", 3),
 ];
 
 const resolver = (field: "draftPost" | "createPost", title: string) => {
@@ -93,10 +92,6 @@ const resolver = (field: "draftPost" | "createPost", title: string) => {
     return mswData(field, "ForbiddenError", {
       message: forbidMsg,
     });
-  }
-
-  if (title === titleStr("unknown")) {
-    return mswData(field, "UnknownError", { message: unknownMsg });
   }
 
   if (title === titleStr("validate")) {
@@ -196,7 +191,6 @@ const auth = mock("auth", undefined);
 const unregister = mock("unregister", undefined);
 const notAllowed = mock("not allowed", undefined);
 export const validate = mock("validate", undefined);
-export const unknown = mock("unknown", unknownMsg);
 const duplicate = mock("duplicate", duplicateMsg);
 const forbid = mock("forbid", forbidMsg);
 const draftUnsupported = mock("unsupported", DRAFT_MESSAGE);

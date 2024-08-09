@@ -41,7 +41,7 @@ const CreatePostPreview = ({
 }: CreatePostPreviewProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const create = useCreatePost(post, () => setIsOpen(false), dispatch);
+  const create = useCreatePost(post, () => setIsOpen(false));
 
   const handleGoBack = () => {
     dispatch({ type: "CHANGE_VIEW", payload: { view: "content" } });

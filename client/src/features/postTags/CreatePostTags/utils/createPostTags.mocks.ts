@@ -47,9 +47,9 @@ const validation = new Mock("validate", 2, tagsError);
 const duplicate = new Mock("duplicate", 2, message);
 
 const mocks = (mock: Mock<string>) => [
-  testPostTag(mock.tags[0], "1"),
-  testPostTag(mock.tags[1], "2"),
-  testPostTag(mock.tags[2], "3"),
+  testPostTag(mock.tags[0], "1", 1),
+  testPostTag(mock.tags[1], "2", 2),
+  testPostTag(mock.tags[2], "3", 3),
 ];
 
 const cb = (mock: Mock<string>) => {
@@ -98,7 +98,10 @@ export const server = setupServer(
     if (tags[0].startsWith("warn")) {
       return mswData("createPostTags", "CreatedPostTagsWarning", {
         message: warnMsg,
-        tags: [testPostTag(warn.tags[0], "1"), testPostTag(warn.tags[2], "3")],
+        tags: [
+          testPostTag(warn.tags[0], "1", 1),
+          testPostTag(warn.tags[2], "3", 3),
+        ],
       });
     }
 

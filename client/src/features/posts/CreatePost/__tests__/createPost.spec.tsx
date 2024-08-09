@@ -230,30 +230,6 @@ describe("Create Post", () => {
         expect(screen.getByRole("button", mocks.metadataNext)).toBeEnabled();
       });
 
-      it("When an unknown post tag is added to the post, Expect the post tag field to have an error message", async () => {
-        const { user } = renderUI(<CreatePostPage />);
-        const { title, message } = mocks.unknown;
-
-        await expect(
-          screen.findByRole("combobox", mocks.postTag)
-        ).resolves.toBeInTheDocument();
-
-        await user.type(screen.getByRole("textbox", mocks.titleLabel), title);
-        await user.click(screen.getByRole("button", mocks.draftBtn));
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeDisabled();
-
-        await waitFor(() => {
-          expect(
-            screen.getByRole("combobox", mocks.postTag)
-          ).toHaveAccessibleErrorMessage(message);
-        });
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeEnabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeEnabled();
-      });
-
       it("When the API response is a PostValidationError object, Expect the respective input fields to have an error message", async () => {
         const { user } = renderUI(<CreatePostPage />);
         const { contentMsg, validate } = mocks;
@@ -344,25 +320,6 @@ describe("Create Post", () => {
         expect(screen.getByRole("button", mocks.contentNext)).toBeEnabled();
       });
 
-      it("When an unknown post tag is added to the post, Expect an error alert list with a post tags error message", async () => {
-        const { message } = mocks.unknown;
-        const { user } = renderUI(<CreatePostPage />);
-
-        await contentSectionUtils(user, mocks.unknown.title);
-        await user.click(screen.getByRole("button", mocks.draftBtn));
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.contentNext)).toBeDisabled();
-
-        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
-
-        const list = screen.getByRole("list", mocks.draftValidationErrors);
-
-        expect(within(list).getByText(message)).toBeInTheDocument();
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeEnabled();
-        expect(screen.getByRole("button", mocks.contentNext)).toBeEnabled();
-      });
-
       it("When the API response is a PostValidationError object, Expect an error alert list with validation error messages", async () => {
         const { validate, descriptionMsg, imageBannerMsg } = mocks;
         const { user } = renderUI(<CreatePostPage />);
@@ -411,30 +368,6 @@ describe("Create Post", () => {
         expect(screen.getByRole("button", mocks.draftBtn)).toBeEnabled();
         expect(screen.getByRole("button", mocks.previewBtn)).toBeEnabled();
         expect(screen.getByRole("button", mocks.previewMenuBtn)).toBeEnabled();
-      });
-
-      it("When an unknown post tag is added to the post, Expect an error alert list with a post tags error message", async () => {
-        const { unknown, draftMenuItem } = mocks;
-        const { user } = renderUI(<CreatePostPage />);
-
-        await previewSectionUtils(user, unknown.title);
-        await user.click(screen.getByRole("button", mocks.previewMenuBtn));
-
-        const menu = screen.getByRole("menu", mocks.previewMenu);
-
-        await user.click(within(menu).getByRole("menuitem", draftMenuItem));
-
-        expect(screen.getByRole("button", mocks.previewMenuBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.previewBtn)).toBeDisabled();
-        await expect(screen.findByRole("alert")).resolves.toBeInTheDocument();
-
-        const list = screen.getByRole("list", mocks.createValidationErrors);
-
-        expect(within(list).getByText(unknown.message)).toBeInTheDocument();
-        expect(screen.getByRole("button", mocks.previewMenuBtn)).toBeEnabled();
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeEnabled();
-        expect(screen.getByRole("button", mocks.previewBtn)).toBeEnabled();
       });
 
       it("When the API response is a PostValidationError object, Expect an error alert list with validation error messages", async () => {
@@ -534,33 +467,6 @@ describe("Create Post", () => {
         const list = screen.getByRole("list", mocks.createValidationErrors);
 
         expect(within(list).getByText(message)).toBeInTheDocument();
-      });
-
-      it("When an unknown post tag is added to the post, Expect an error alert list with a post tags error message", async () => {
-        const { dialogCancel, dialogCreate, unknown, createMenuItem } = mocks;
-        const { user } = renderUI(<CreatePostPage />);
-
-        await previewSectionUtils(user, unknown.title);
-        await user.click(screen.getByRole("button", mocks.previewMenuBtn));
-
-        const menu = screen.getByRole("menu", mocks.previewMenu);
-
-        await user.click(within(menu).getByRole("menuitem", createMenuItem));
-
-        const dialog = screen.getByRole("dialog", mocks.dialog);
-
-        await user.click(within(dialog).getByRole("button", dialogCreate));
-
-        expect(within(dialog).getByRole("button", dialogCreate)).toBeDisabled();
-        expect(within(dialog).getByRole("button", dialogCancel)).toBeDisabled();
-
-        await waitForElementToBeRemoved(dialog);
-
-        expect(screen.getByRole("alert")).toBeInTheDocument();
-
-        const list = screen.getByRole("list", mocks.createValidationErrors);
-
-        expect(within(list).getByText(unknown.message)).toBeInTheDocument();
       });
 
       it("When the API response is a PostValidationError object, Expect an error alert list with validation error messages", async () => {

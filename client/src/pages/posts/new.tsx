@@ -44,7 +44,7 @@ const CreatePostPage: NextPageWithLayout = () => {
     };
   }, [state.postData.imageBanner]);
 
-  const draft = useDraftPost(state.postData, dispatch);
+  const draft = useDraftPost(state.postData);
 
   return (
     <>
