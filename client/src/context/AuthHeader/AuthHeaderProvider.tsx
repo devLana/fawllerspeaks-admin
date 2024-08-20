@@ -3,7 +3,7 @@ import * as React from "react";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 import { AuthHeaderContext } from ".";
-import { BaseResponse, UserData } from "@utils/cachePossibleTypes";
+import { BaseResponse, UserData } from "./cachePossibleTypes";
 
 const AuthHeaderProvider = ({ children }: { children: React.ReactNode }) => {
   const [jwt, setJwt] = React.useState("");
