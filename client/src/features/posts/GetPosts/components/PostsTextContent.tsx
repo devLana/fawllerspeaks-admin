@@ -3,20 +3,16 @@ import PostsWrapper from "./PostsWrapper";
 
 interface PostsTextContentProps {
   id: string;
-  text: React.ReactElement | string;
+  node: React.ReactElement | string;
   severity?: AlertColor;
 }
 
-const PostsTextContent = (props: PostsTextContentProps) => {
-  const { id, text, severity = "info" } = props;
-
-  return (
-    <PostsWrapper id={id} ariaBusy={false}>
-      <Alert severity={severity} role="status">
-        {text}
-      </Alert>
-    </PostsWrapper>
-  );
-};
+const PostsTextContent = (props: PostsTextContentProps) => (
+  <PostsWrapper id={props.id} ariaBusy={false}>
+    <Alert severity={props.severity ?? "info"} role="status">
+      {props.node}
+    </Alert>
+  </PostsWrapper>
+);
 
 export default PostsTextContent;

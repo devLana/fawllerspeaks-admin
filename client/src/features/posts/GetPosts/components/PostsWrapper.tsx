@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import useStatusAlert from "../hooks/useStatusAlert";
 
 interface PostsWrapperProps {
-  children: React.ReactElement;
+  children: React.ReactNode;
   id: string;
   ariaBusy: boolean;
 }

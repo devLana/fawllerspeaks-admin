@@ -18,24 +18,22 @@ const Posts = ({ id }: { id: string }) => {
 
   return (
     <PostsWrapper id={id} ariaBusy={false}>
-      <>
-        <PostsMenu />
-        <PostsList
-          postsView={postsView}
-          toolbar={
-            <PostsToolbar
-              onChangeCheckbox={() => {}}
-              viewButtons={
-                <ToolbarViewButtons
-                  onChangePostsViewXs={handleViewXs}
-                  onChangePostsViewSm={view => setPostsView(view)}
-                  postsView={postsView}
-                />
-              }
-            />
-          }
-        />
-      </>
+      <PostsMenu />
+      <PostsList
+        postsView={postsView}
+        toolbar={
+          <PostsToolbar
+            onChangeCheckbox={() => {}}
+            viewButtons={
+              <ToolbarViewButtons
+                onChangePostsViewXs={handleViewXs}
+                onChangePostsViewSm={view => setPostsView(view)}
+                postsView={postsView}
+              />
+            }
+          />
+        }
+      />
     </PostsWrapper>
   );
 };
