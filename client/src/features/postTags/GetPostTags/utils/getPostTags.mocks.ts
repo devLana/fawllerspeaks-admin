@@ -27,11 +27,11 @@ const noTagsMsg =
   "No post tags have been created yet. Click on 'Create Post Tags' above to get started";
 
 const tags = [
-  testPostTag(getTags[0], "1", 1),
-  testPostTag(getTags[1], "2", 2),
-  testPostTag(getTags[2], "3", 3),
-  testPostTag(getTags[3], "4", 4),
-  testPostTag(getTags[4], "5", 5),
+  testPostTag(getTags[0], "1"),
+  testPostTag(getTags[1], "2"),
+  testPostTag(getTags[2], "3"),
+  testPostTag(getTags[3], "4"),
+  testPostTag(getTags[4], "5"),
 ];
 
 export const server = setupServer(

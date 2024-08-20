@@ -8,17 +8,17 @@ interface Input {
   description?: string | null;
   excerpt?: string | null;
   content?: string | null;
-  tagIds?: number[] | null;
+  tagIds?: string[] | null;
   imageBanner?: string | null;
 }
 
 type Validations = [string, Input, InputErrors<Input>];
 
-export const userId = randomUUID();
-export const ID = 7623;
+export const USER_ID = randomUUID();
+export const UUID = randomUUID();
 export const dateCreated = "2021-05-17 13:22:43.717+01";
 export const imageBanner = "post/image/banner";
-export const tagIds = [ID, 9264, 575];
+export const tagIds = [UUID, USER_ID, randomUUID()];
 
 const content =
   '<h2 class="heading">heading element</h2><a href="blog/post/title">blog post link</a><p id="class-name">paragraph text</p><a href="//weird-link">weird link</a>';
@@ -86,13 +86,13 @@ export const gqlValidations: [string, object][] = [
 
 export const validations = (nullOrUndefined?: null): Validations[] => [
   [
-    "Should return a validation error response for empty whitespace inputs and tag ids less than 1",
+    "Should return a validation error response for empty input strings",
     {
       title: "",
       description: "",
       excerpt: "",
       content: "",
-      tagIds: [0],
+      tagIds: ["", ""],
       imageBanner: "",
     },
     {
@@ -100,18 +100,18 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
       descriptionError: "Provide post description",
       excerptError: "Provide post excerpt",
       contentError: "Provide post content",
-      tagIdsError: "Only positive post tag id numbers are allowed",
+      tagIdsError: "Input post tag ids cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
     },
   ],
   [
-    "Should return a validation error response for empty whitespace inputs and negative tag ids",
+    "Should return a validation error response for empty whitespace input strings",
     {
       title: "  ",
       description: " ",
       excerpt: " ",
       content: "    ",
-      tagIds: [-45, -399],
+      tagIds: ["   ", "     "],
       imageBanner: "  ",
     },
     {
@@ -119,7 +119,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
       descriptionError: "Provide post description",
       excerptError: "Provide post excerpt",
       contentError: "Provide post content",
-      tagIdsError: "Only positive post tag id numbers are allowed",
+      tagIdsError: "Input post tag ids cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
     },
   ],
@@ -137,7 +137,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   ],
   [
     "Should return a post tags input validation error if duplicate post tag ids was provided",
-    { title: "title", tagIds: [ID, ID], imageBanner: null },
+    { title: "title", tagIds: [UUID, UUID], imageBanner: null },
     {
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,

@@ -57,7 +57,7 @@ const mock = <T extends string | undefined = undefined>(
     tagNames.push(tagName);
     tagIds.push(tagId);
 
-    return testPostTag(tagName, tagId, idx + 1);
+    return testPostTag(tagName, tagId);
   });
 
   return { tags, tagIds, msg, tagNames, resolver: dataCb(tags) };

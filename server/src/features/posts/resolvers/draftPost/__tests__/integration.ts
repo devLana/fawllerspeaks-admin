@@ -20,7 +20,7 @@ describe("Test draft post resolver", () => {
   mockEvent.mockImplementation(() => true);
 
   beforeEach(() => {
-    mockContext.user = mocks.userId;
+    mockContext.user = mocks.USER_ID;
   });
 
   describe("Verify user authentication", () => {
@@ -86,22 +86,6 @@ describe("Test draft post resolver", () => {
       expect(spy).toHaveNthReturnedWith(2, { rows: [mock] });
       expect(result).toHaveProperty("status", "ERROR");
       expect(result).toHaveProperty("message", errorMsg);
-    });
-  });
-
-  describe.skip("Verify post tag ids", () => {
-    it("Should return an error object if at least one of the provided post tag ids is unknown", async () => {
-      const post = { ...mocks.argsWithNoImage, tagIds: mocks.tagIds };
-      const spy = spyDb({ rows: [{ isRegistered: true }] });
-      spy.mockReturnValue({ rows: [] });
-
-      const result = await draftPost({}, { post }, mockContext, info);
-
-      expect(spy).toHaveBeenCalledTimes(2);
-      expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-      expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-      expect(result).toHaveProperty("message", "Unknown post tag id provided");
-      expect(result).toHaveProperty("status", "ERROR");
     });
   });
 

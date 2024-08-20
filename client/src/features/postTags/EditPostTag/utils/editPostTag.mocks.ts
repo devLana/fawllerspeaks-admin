@@ -45,14 +45,14 @@ const network = new Mock("network", message);
 const gql = new Mock("graphql", gqlMsg);
 export const edit = new Mock("edit", "Post tag edited");
 
-const tag = testPostTag(edit.name, tagId, 1);
+const tag = testPostTag(edit.name, tagId);
 
 export const server = setupServer(
   graphql.query("GetPostTags", async () => {
     await delay();
 
     return mswData("getPostTags", "PostTags", {
-      tags: [testPostTag(tagName, tagId, 2)],
+      tags: [testPostTag(tagName, tagId)],
     });
   }),
 
@@ -102,7 +102,7 @@ export const server = setupServer(
     if (name === nameStr("warn")) {
       return mswData("editPostTag", "EditedPostTagWarning", {
         message: warnMsg,
-        tag: testPostTag(warn.name, tagId, 3),
+        tag: testPostTag(warn.name, tagId),
       });
     }
 

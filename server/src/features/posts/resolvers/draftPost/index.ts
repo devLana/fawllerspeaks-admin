@@ -2,6 +2,7 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
+import getPostSlug from "@features/posts/utils/getPostSlug";
 
 import { SinglePost } from "../types/SinglePost";
 import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
@@ -12,8 +13,6 @@ import {
   NotAllowedError,
   RegistrationError,
 } from "@utils/ObjectTypes";
-
-import getPostSlug from "@features/posts/utils/getPostSlug";
 
 import { draftPostSchema as schema } from "./utils/draftPost.validator";
 import generateErrorsObject from "@utils/generateErrorsObject";
@@ -88,7 +87,14 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
     const { rows: draftedPost } = await db.query<PostDBData>(
-      `WITH drafted_post AS (
+      `WITH post_tag_ids AS (
+        SELECT ARRAY(
+          SELECT id
+          FROM post_tags
+          WHERE tag_id = ANY ($8::uuid[])
+        ) AS tag_ids
+      ),
+      drafted_post AS (
         INSERT INTO posts (
           title,
           description,
@@ -100,7 +106,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
           image_banner,
           tags
         )
-        VALUES ($1, $2, $3, $4, $5, $6, 'Draft', $7, $8)
+        VALUES ($1, $2, $3, $4, $5, $6, 'Draft', $7, (SELECT tag_ids FROM post_tag_ids))
         RETURNING
           post_id,
           date_created,
@@ -121,11 +127,10 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
         dp.is_deleted "isDeleted",
         json_agg(json_build_object(
           'id', pt.tag_id,
-          'tagId', pt.id,
           'name', pt.name,
           'dateCreated', pt.date_created,
           'lastModified', pt.last_modified
-        )) FILTER (WHERE pt.id IS NOT NULL) tags
+        )) FILTER (WHERE pt.tag_id IS NOT NULL) tags
       FROM drafted_post dp
       LEFT JOIN post_tags pt
       ON pt.id = ANY (dp.tags)

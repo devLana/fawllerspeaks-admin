@@ -85,7 +85,14 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
     const { rows: savedPost } = await db.query<PostDBData>(
-      `WITH created_post AS (
+      `WITH post_tag_ids AS (
+        SELECT ARRAY(
+          SELECT id
+          FROM post_tags
+          WHERE tag_id = ANY ($8::uuid[])
+        ) AS tag_ids
+      ),
+      created_post AS (
         INSERT INTO posts (
           title,
           description,
@@ -98,7 +105,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
           date_published,
           tags
         )
-        VALUES ($1, $2, $3, $4, $5, $6, 'Published', $7, CURRENT_TIMESTAMP(3), $8)
+        VALUES ($1, $2, $3, $4, $5, $6, 'Published', $7, CURRENT_TIMESTAMP(3), (SELECT tag_ids FROM post_tag_ids))
         RETURNING
           post_id,
           date_created,
@@ -119,11 +126,10 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
         cp.is_deleted "isDeleted",
         json_agg(json_build_object(
           'id', pt.tag_id,
-          'tagId', pt.id,
           'name', pt.name,
           'dateCreated', pt.date_created,
           'lastModified', pt.last_modified
-        )) FILTER (WHERE pt.id IS NOT NULL) tags
+        )) FILTER (WHERE pt.tag_id IS NOT NULL) tags
       FROM created_post cp
       LEFT JOIN post_tags pt
       ON pt.id = ANY (cp.tags)
@@ -164,8 +170,6 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     if (err instanceof ValidationError) {
       return new PostValidationError(generateErrorsObject(err.details));
     }
-
-    console.log(err);
 
     throw new GraphQLError("Unable to create post. Please try again later");
   }

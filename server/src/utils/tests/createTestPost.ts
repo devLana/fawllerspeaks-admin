@@ -9,7 +9,6 @@ import dateToISOString from "@utils/dateToISOString";
 import type { GetPostDBData, TestPostAuthor, TestPostData } from "@types";
 import type {
   Post,
-  PostAuthor,
   PostContent,
   PostTableOfContents,
   PostTag,
@@ -22,14 +21,23 @@ interface Params {
   postData: TestPostData;
 }
 
+type OmitKeys = "author" | "url" | "tags" | "postId";
+
 const createTestPost = async (params: Params): Promise<Post> => {
   const { db, postTags, postAuthor, postData } = params;
-  const tagIds = postTags?.map(postTag => postTag.tagId);
+  const tagIds = postTags?.map(postTag => postTag.id);
   const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
   try {
-    const { rows } = await db.query<Omit<GetPostDBData, "author" | "url">>(
-      `INSERT INTO posts (
+    const { rows } = await db.query<Omit<GetPostDBData, OmitKeys>>(
+      `WITH post_tag_ids AS (
+        SELECT ARRAY(
+          SELECT id
+          FROM post_tags
+          WHERE tag_id = ANY ($13::uuid[])
+        ) AS tag_ids
+      )
+      INSERT INTO posts (
         title,
         slug,
         description,
@@ -44,7 +52,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
         is_deleted,
         tags
       ) VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, (SELECT tag_ids FROM post_tag_ids))
       RETURNING
         post_id id,
         title,
@@ -58,7 +66,7 @@ const createTestPost = async (params: Params): Promise<Post> => {
         last_modified "lastModified",
         views,
         is_in_bin "isInBin",
-        is_deleted "isDeleted"`,
+        is_deleted "isDeleted";`,
       [
         postData.title,
         postData.slug,
@@ -80,12 +88,6 @@ const createTestPost = async (params: Params): Promise<Post> => {
     const { storageUrl } = supabase();
     const slug = getPostSlug(post.title);
     let content: PostContent | null = null;
-
-    const author: PostAuthor = {
-      __typename: "PostAuthor",
-      name: `${postAuthor.firstName} ${postAuthor.lastName}`,
-      image: postAuthor.image ? `${storageUrl}${postAuthor.image}` : null,
-    };
 
     const datePublished = post.datePublished
       ? dateToISOString(post.datePublished)
@@ -120,7 +122,11 @@ const createTestPost = async (params: Params): Promise<Post> => {
       description: post.description,
       excerpt: post.excerpt,
       content,
-      author,
+      author: {
+        __typename: "PostAuthor",
+        name: `${postAuthor.firstName} ${postAuthor.lastName}`,
+        image: postAuthor.image ? `${storageUrl}${postAuthor.image}` : null,
+      },
       status: post.status,
       url: {
         __typename: "PostUrl",

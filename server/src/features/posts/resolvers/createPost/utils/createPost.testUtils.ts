@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import type { InputErrors } from "@types";
 import type { PostContent } from "@resolverTypes";
 
@@ -6,23 +8,24 @@ interface Input {
   description: string;
   excerpt: string;
   content: string;
-  tagIds?: number[] | null;
+  tagIds?: string[] | null;
   imageBanner?: string | null;
 }
 
 type Validations = [string, Input, InputErrors<Input>][];
 
-export const ID = 7452;
+const TAG_ID = randomUUID();
+export const UUID = randomUUID();
 
 export const validations = (nullOrUndefined?: null): Validations => [
   [
-    "Should return validation errors for empty whitespace inputs and tag ids less than 1",
+    "Should return validation errors for empty input strings",
     {
       title: "",
       description: "",
       excerpt: "",
       content: "",
-      tagIds: [0],
+      tagIds: ["", ""],
       imageBanner: "",
     },
     {
@@ -30,18 +33,18 @@ export const validations = (nullOrUndefined?: null): Validations => [
       descriptionError: "Provide post description",
       excerptError: "Provide post excerpt",
       contentError: "Provide post content",
-      tagIdsError: "Only positive post tag id numbers are allowed",
+      tagIdsError: "Input post tag ids cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
     },
   ],
   [
-    "Should return validation errors for empty whitespace inputs and negative tag ids",
+    "Should return validation errors for empty whitespace input strings",
     {
       title: "  ",
       description: " ",
       excerpt: " ",
       content: "    ",
-      tagIds: [-2, -100],
+      tagIds: ["   ", "     "],
       imageBanner: "  ",
     },
     {
@@ -49,7 +52,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       descriptionError: "Provide post description",
       excerptError: "Provide post excerpt",
       contentError: "Provide post content",
-      tagIdsError: "Only positive post tag id numbers are allowed",
+      tagIdsError: "Input post tag ids cannot be empty values",
       imageBannerError: "Post image banner url cannot be empty",
     },
   ],
@@ -79,7 +82,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       description: "description",
       excerpt: "excerpt",
       content: "content",
-      tagIds: [50, 50],
+      tagIds: [TAG_ID, TAG_ID],
     },
     {
       titleError: nullOrUndefined,
@@ -87,6 +90,25 @@ export const validations = (nullOrUndefined?: null): Validations => [
       excerptError: nullOrUndefined,
       contentError: nullOrUndefined,
       tagIdsError: "The provided input post tag ids should be unique ids",
+      imageBannerError: nullOrUndefined,
+    },
+  ],
+  [
+    "Should return a post tags input validation error if an invalid post tag id was provided",
+    {
+      title: "title",
+      description: "description",
+      excerpt: "excerpt",
+      content: "content",
+      tagIds: [TAG_ID, "tagId"],
+      imageBanner: null,
+    },
+    {
+      titleError: nullOrUndefined,
+      descriptionError: nullOrUndefined,
+      excerptError: nullOrUndefined,
+      contentError: nullOrUndefined,
+      tagIdsError: "Invalid post tag id provided",
       imageBannerError: nullOrUndefined,
     },
   ],
@@ -149,7 +171,7 @@ export const dbPost = {
   isDeleted: false,
 };
 
-export const tagIds = [ID, 1000, 8465];
+export const tagIds = [TAG_ID, UUID, randomUUID()];
 export const imageBanner = "post/image/banner";
 const mockData = { description: "post description", excerpt: "mock excerpt" };
 

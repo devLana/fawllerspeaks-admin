@@ -126,7 +126,6 @@ describe("Create post tags - E2E", () => {
           {
             __typename: "PostTag",
             id: expect.stringMatching(UUID_REGEX),
-            tagId: expect.any(Number),
             name: "tag1",
             dateCreated: expect.stringMatching(DATE_REGEX),
             lastModified: null,
@@ -134,7 +133,6 @@ describe("Create post tags - E2E", () => {
           {
             __typename: "PostTag",
             id: expect.stringMatching(UUID_REGEX),
-            tagId: expect.any(Number),
             name: "tag2",
             dateCreated: expect.stringMatching(DATE_REGEX),
             lastModified: null,
@@ -142,7 +140,6 @@ describe("Create post tags - E2E", () => {
           {
             __typename: "PostTag",
             id: expect.stringMatching(UUID_REGEX),
-            tagId: expect.any(Number),
             name: "Test_Post TAG-3",
             dateCreated: expect.stringMatching(DATE_REGEX),
             lastModified: null,
@@ -166,7 +163,6 @@ describe("Create post tags - E2E", () => {
           {
             __typename: "PostTag",
             id: expect.stringMatching(UUID_REGEX),
-            tagId: expect.any(Number),
             name: created[0],
             dateCreated: expect.stringMatching(DATE_REGEX),
             lastModified: null,
@@ -174,7 +170,6 @@ describe("Create post tags - E2E", () => {
           {
             __typename: "PostTag",
             id: expect.stringMatching(UUID_REGEX),
-            tagId: expect.any(Number),
             name: created[1],
             dateCreated: expect.stringMatching(DATE_REGEX),
             lastModified: null,

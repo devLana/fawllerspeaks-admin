@@ -64,9 +64,9 @@ export const postTagsErrorMsg =
   "You can't add post tags to this post at the moment. Please try again later";
 
 const tags = [
-  testPostTag("Tag 1", "1", 1),
-  testPostTag("Tag 2", "2", 2),
-  testPostTag("Tag 3", "3", 3),
+  testPostTag("Tag 1", "1"),
+  testPostTag("Tag 2", "2"),
+  testPostTag("Tag 3", "3"),
 ];
 
 const resolver = (field: "draftPost" | "createPost", title: string) => {

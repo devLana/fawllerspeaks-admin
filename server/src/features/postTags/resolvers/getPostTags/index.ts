@@ -38,7 +38,6 @@ const getPostTags: GetPostTags = async (_, __, { db, user, req, res }) => {
       `SELECT
         name,
         tag_id id,
-        id "tagId",
         date_created "dateCreated",
         last_Modified "lastModified"
       FROM post_tags`

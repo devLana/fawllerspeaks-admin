@@ -89,22 +89,6 @@ describe("Test createPost resolver", () => {
     });
   });
 
-  describe.skip("Verify post tag ids", () => {
-    it("Should return an error object if at least one of the provided post tag ids is unknown", async () => {
-      const post = { ...mocks.argsWithNoImage, tagIds: mocks.tagIds };
-      const spy = spyDb({ rows: [{ isRegistered: true }] });
-      spy.mockReturnValueOnce({ rows: [] });
-
-      const data = await createPost({}, { post }, mockContext, info);
-
-      expect(spy).toHaveBeenCalledTimes(2);
-      expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-      expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-      expect(data).toHaveProperty("message", "Unknown post tag id provided");
-      expect(data).toHaveProperty("status", "ERROR");
-    });
-  });
-
   describe("Create post", () => {
     const author = "Author Name /author/image/path";
     const mockRows = [{ isRegistered: true, author }];
