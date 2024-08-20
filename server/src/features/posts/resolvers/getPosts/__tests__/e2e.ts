@@ -174,7 +174,7 @@ describe("Get posts - E2E", () => {
 
     it("Should return an empty posts array if the passed filters could not be used to retrieve any post from the database", async () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
-      const variables = { page: mocks.page, filters: mocks.filters };
+      const variables = { page: mocks.page, filters: mocks.e2eFilters };
       const payload = { query: GET_POSTS, variables };
 
       const { data } = await post<GetPosts>(url, payload, options);

@@ -56,6 +56,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
     let orderBy = "p.date_created DESC, p.id DESC";
     let where = "";
     let count = 0;
+    let postTagIntId = 0;
 
     if (filters?.sort) {
       const [column, order] = filters.sort.split("_");
@@ -111,11 +112,19 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
     }
 
     if (filters?.postTag) {
+      const { rows: findPostTag } = await db.query<{ id: number }>(
+        `SELECT id FROM post_tags WHERE name = $1`,
+        [filters.postTag]
+      );
+
+      const [tag] = findPostTag;
+      postTagIntId = tag?.id;
+
       where = where
         ? `${where} AND $${++count} = ANY (p.tags)`
         : ` WHERE $${++count} = ANY (p.tags)`;
 
-      sqlArgs.push(filters.postTag);
+      sqlArgs.push(postTagIntId);
     }
 
     if (filters?.status) {
@@ -146,11 +155,10 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         p.is_deleted "isDeleted",
         json_agg(json_build_object(
           'id', pt.tag_id,
-          'tagId', pt.id,
           'name', pt.name,
           'dateCreated', pt.date_created,
           'lastModified', pt.last_modified
-        )) FILTER (WHERE pt.id IS NOT NULL) tags
+        )) FILTER (WHERE pt.tag_id IS NOT NULL) tags
       FROM posts p JOIN users u ON p.author = u.user_id
       LEFT JOIN post_tags pt ON pt.id = ANY (p.tags)${where}
       GROUP BY p.id, p.post_id, u.first_name, u.last_name, u.image
@@ -218,7 +226,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
 
         if (filters?.postTag) {
           sqlStr = `${sqlStr} AND $${++paramsCount} = ANY (p.tags)`;
-          sqlParams.push(filters.postTag);
+          sqlParams.push(postTagIntId);
         }
 
         if (filters?.status) {

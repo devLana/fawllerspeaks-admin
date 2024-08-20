@@ -23,9 +23,8 @@ export const getPostsSchema = Joi.object<QueryGetPostsArgs>({
       "string.empty": "No posts search filter was provided",
     }),
 
-    postTag: Joi.number().allow(null).integer().positive().messages({
-      "number.integer": "The provided post tag id must be an integer",
-      "number.positive": "Only positive post tag id numbers are allowed",
+    postTag: Joi.string().allow(null).trim().messages({
+      "string.empty": "No post tag filter was provided",
     }),
 
     status: Joi.string()

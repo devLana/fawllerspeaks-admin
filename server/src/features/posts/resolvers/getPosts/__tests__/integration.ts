@@ -6,6 +6,8 @@ import deleteSession from "@utils/deleteSession";
 import { mockContext, info } from "@tests/resolverArguments";
 import spyDb from "@tests/spyDb";
 
+import type { QueryGetPostsArgs as Args } from "@resolverTypes";
+
 jest.mock("@utils/deleteSession", () => {
   return jest.fn().mockName("deleteSession");
 });
@@ -44,8 +46,9 @@ describe("Test get posts resolver", () => {
   describe("Verify user", () => {
     it("Should return an error object if the user could not be verified", async () => {
       const spy = spyDb({ rows: [] });
+      const inputs: Args = { filters: mocks.intFilters };
 
-      const result = await getPosts({}, {}, mockContext, info);
+      const result = await getPosts({}, inputs, mockContext, info);
 
       expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -56,8 +59,9 @@ describe("Test get posts resolver", () => {
 
     it("Should return an error object if the user is unregistered", async () => {
       const spy = spyDb({ rows: [{ isRegistered: false }] });
+      const inputs: Args = { filters: mocks.intFilters };
 
-      const result = await getPosts({}, {}, mockContext, info);
+      const result = await getPosts({}, inputs, mockContext, info);
 
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: false }] });
@@ -68,9 +72,10 @@ describe("Test get posts resolver", () => {
 
   describe("Verify pagination cursor", () => {
     it("An invalid base64 page cursor string was provided, Expect an error object", async () => {
+      const inputs: Args = { filters: mocks.intFilters, page: mocks.page };
       const spy = spyDb({ rows: [{ isRegistered: true }] });
 
-      const data = await getPosts({}, { page: mocks.page }, mockContext, info);
+      const data = await getPosts({}, inputs, mockContext, info);
 
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
@@ -81,32 +86,38 @@ describe("Test get posts resolver", () => {
 
   describe("Query for posts", () => {
     it("No posts found, Should return an empty posts array", async () => {
+      const inputs: Args = { filters: mocks.intFilters };
       const spy = spyDb({ rows: [{ isRegistered: true }] });
       spy.mockReturnValueOnce({ rows: [] });
+      spy.mockReturnValueOnce({ rows: [] });
 
-      const result = await getPosts({}, {}, mockContext, info);
+      const result = await getPosts({}, inputs, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy).toHaveBeenCalledTimes(3);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
       expect(spy).toHaveNthReturnedWith(2, { rows: [] });
+      expect(spy).toHaveNthReturnedWith(3, { rows: [] });
       expect(result).toHaveProperty("posts", []);
       expect(result).toHaveProperty("pageData", {});
       expect(result).toHaveProperty("status", "SUCCESS");
     });
 
     it("Post(s) found, Should return a posts array and a pagination page data object", async () => {
+      const inputs: Args = { filters: mocks.intFilters };
       const spy = spyDb({ rows: [{ isRegistered: true }] });
+      spy.mockReturnValueOnce({ rows: [{ id: 123 }] });
       spy.mockReturnValueOnce({ rows: mocks.dbPosts });
       spy.mockReturnValueOnce({ rows: [{}] });
       spy.mockReturnValueOnce({ rows: [{}] });
 
-      const result = await getPosts({}, {}, mockContext, info);
+      const result = await getPosts({}, inputs, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(4);
+      expect(spy).toHaveBeenCalledTimes(5);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-      expect(spy).toHaveNthReturnedWith(2, { rows: mocks.dbPosts });
-      expect(spy).toHaveNthReturnedWith(3, { rows: [{}] });
+      expect(spy).toHaveNthReturnedWith(2, { rows: [{ id: 123 }] });
+      expect(spy).toHaveNthReturnedWith(3, { rows: mocks.dbPosts });
       expect(spy).toHaveNthReturnedWith(4, { rows: [{}] });
+      expect(spy).toHaveNthReturnedWith(5, { rows: [{}] });
       expect(result).toHaveProperty("posts", mocks.dbPosts);
       expect(result).toHaveProperty("status", "SUCCESS");
 

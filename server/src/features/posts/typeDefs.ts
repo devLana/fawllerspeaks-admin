@@ -184,7 +184,7 @@ export const postsTypeDefs = `#graphql
 
   input GetPostsFiltersInput {
     q: String
-    postTag: Int
+    postTag: String
     status: PostStatus
     sort: SortPostsBy
   }

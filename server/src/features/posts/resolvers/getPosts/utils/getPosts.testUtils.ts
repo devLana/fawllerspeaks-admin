@@ -5,46 +5,46 @@ type IntErrors = InputErrors<NonNullable<Args["filters"] & Args["page"]>>;
 
 export const intValidations: [string, object, IntErrors][] = [
   [
-    "Expect a validation error when empty strings and an invalid post tag id is passed",
+    "Expect a validation error when empty input strings are passed",
     {
       page: { cursor: "", type: "" },
-      filters: { q: "", postTag: 1.5, sort: "", status: "" },
+      filters: { q: "", postTag: "", sort: "", status: "" },
     },
     {
       cursorError: "Posts pagination cursor is required",
       typeError: "Invalid posts pagination type provided",
       qError: "No posts search filter was provided",
-      postTagError: "The provided post tag id must be an integer",
+      postTagError: "No post tag filter was provided",
       statusError: "Invalid post status filter provided",
       sortError: "Invalid post sort filter provided",
     },
   ],
   [
-    "Expect a validation error when empty whitespace strings and an invalid post tag id is passed",
+    "Expect a validation error when empty whitespace input strings are passed",
     {
       page: { cursor: "  ", type: "    " },
-      filters: { q: "    ", postTag: 0, sort: "   ", status: "    " },
+      filters: { q: "    ", postTag: "   ", sort: "   ", status: "    " },
     },
     {
       cursorError: "Posts pagination cursor is required",
       typeError: "Invalid posts pagination type provided",
       qError: "No posts search filter was provided",
-      postTagError: "Only positive post tag id numbers are allowed",
+      postTagError: "No post tag filter was provided",
       statusError: "Invalid post status filter provided",
       sortError: "Invalid post sort filter provided",
     },
   ],
   [
-    "Expect a validation error message when the cursor is not a base64 string, postTag id is zero, and the type, status and sort filters are invalid",
+    "Expect a validation error message when the cursor is not a base64 string, and the type, status and sort filters are invalid",
     {
       page: { cursor: "12cursor34", type: "not-after" },
-      filters: { postTag: -484, status: "invalidStatus", sort: "invalid-sort" },
+      filters: { postTag: null, status: "invalidStatus", sort: "invalid-sort" },
     },
     {
       cursorError: "Invalid posts pagination cursor provided",
       typeError: "Invalid posts pagination type provided",
       qError: undefined,
-      postTagError: "Only positive post tag id numbers are allowed",
+      postTagError: undefined,
       statusError: "Invalid post status filter provided",
       sortError: "Invalid post sort filter provided",
     },
@@ -62,54 +62,54 @@ export const gqlValidations: [string, object][] = [
   [
     "When invalid input types are provided to enum input fields, Expect the API to throw a GraphQL validation error",
     {
-      page: { type: "", cursor: "   " },
-      filters: { sort: "", postTag: "d", status: "" },
+      page: { type: "", cursor: "cursor" },
+      filters: { sort: "", postTag: "postTag", status: "" },
     },
   ],
 ];
 
 export const e2eValidations: [string, Args, object][] = [
   [
-    "Expect a validation error when an invalid postTag id, and an empty string is passed to the cursor and q filter",
+    "Expect a validation error when an empty string is passed to the cursor, postTag and q filters",
     {
       page: { cursor: "", type: "before" },
-      filters: { q: "", sort: "title_asc", status: "Published" },
+      filters: { q: "", postTag: "", sort: "title_asc", status: "Published" },
     },
     {
       cursorError: "Posts pagination cursor is required",
       typeError: null,
       qError: "No posts search filter was provided",
-      postTagError: null,
+      postTagError: "No post tag filter was provided",
       statusError: null,
       sortError: null,
     },
   ],
   [
-    "Expect a validation error when an invalid postTag id, and an empty whitespace string is passed to the cursor and q filter",
+    "Expect a validation error when an empty whitespace string is passed to the cursor, postTag and q filters",
     {
       page: { cursor: "    ", type: "before" },
-      filters: { q: "    ", postTag: 0, sort: "title_asc", status: "Draft" },
+      filters: { q: "   ", postTag: "   ", sort: "title_asc", status: "Draft" },
     },
     {
       cursorError: "Posts pagination cursor is required",
       typeError: null,
       qError: "No posts search filter was provided",
-      postTagError: "Only positive post tag id numbers are allowed",
+      postTagError: "No post tag filter was provided",
       statusError: null,
       sortError: null,
     },
   ],
   [
-    "Expect a validation error when a non-base64 string is passed as the cursor string and a negative id number is passed as the postTag filter",
+    "Expect a validation error when a non-base64 string is passed to the cursor string filter",
     {
       page: { cursor: "5757hjbfjh%", type: "after" },
-      filters: { q: "q", postTag: -5, sort: "date_asc", status: "Unpublished" },
+      filters: { q: "q", postTag: null, status: "Unpublished" },
     },
     {
       cursorError: "Invalid posts pagination cursor provided",
       typeError: null,
       qError: null,
-      postTagError: "Only positive post tag id numbers are allowed",
+      postTagError: null,
       statusError: null,
       sortError: null,
     },
@@ -123,9 +123,9 @@ const datePublished = "2021-06-11 09:44:02.213+01";
 const lastModified = "2023-02-14 20:18:59.953+01";
 
 export const tags = [
-  { id: 1, tagId: "id-1", name: "tag1", dateCreated, lastModified: null },
-  { id: 2, tagId: "id-2", name: "tag2", dateCreated, lastModified },
-  { id: 3, tagId: "id-3", name: "tag3", dateCreated, lastModified: null },
+  { id: "id-1", name: "tag1", dateCreated, lastModified: null },
+  { id: "id-2", name: "tag2", dateCreated, lastModified },
+  { id: "id-3", name: "tag3", dateCreated, lastModified: null },
 ];
 
 export const dbPosts = [
@@ -169,9 +169,11 @@ export const dbPosts = [
   },
 ];
 
-export const filters: Args["filters"] = {
+const filters: Args["filters"] = {
   q: "jkghdjkgh",
   status: "Unpublished",
-  postTag: 100,
-  sort: "title_asc",
+  postTag: "post tag filter string",
 };
+
+export const intFilters: Args["filters"] = { ...filters, sort: "date_asc" };
+export const e2eFilters: Args["filters"] = { ...filters, sort: "title_asc" };
