@@ -135,7 +135,7 @@ describe("Get posts - E2E", () => {
   });
 
   describe("Verify pagination cursor", () => {
-    it("Should return an error response if an invalid base64 pagination cursor was provided", async () => {
+    it("Should return an error response if an invalid pagination cursor string was provided", async () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload = { query: GET_POSTS, variables: { page: mocks.page } };
 

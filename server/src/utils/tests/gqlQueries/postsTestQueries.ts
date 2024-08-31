@@ -188,8 +188,6 @@ export const GET_POSTS = `#graphql
         __typename
         cursorError
         typeError
-        qError
-        postTagError
         statusError
         sortError
         status

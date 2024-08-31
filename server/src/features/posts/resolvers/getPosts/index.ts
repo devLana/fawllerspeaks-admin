@@ -56,7 +56,6 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
     let orderBy = "p.date_created DESC, p.id DESC";
     let where = "";
     let count = 0;
-    let postTagIntId = 0;
 
     if (filters?.sort) {
       const [column, order] = filters.sort.split("_");
@@ -97,34 +96,6 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         where = ` WHERE p.title ${operator} $${++count}`;
         sqlArgs.push(cursor);
       }
-    }
-
-    if (filters?.q) {
-      const { q } = filters;
-
-      ++count;
-
-      where = where
-        ? `${where} AND (p.title ILIKE $${count} OR p.excerpt ILIKE $${count} OR p.content ~ $${++count})`
-        : ` WHERE (p.title ILIKE $${count} OR p.excerpt ILIKE $${count} OR p.content ~ $${++count})`;
-
-      sqlArgs.push(`%${q}%`, `(?:<[^>]+>)?(?:.*?${q}.*?)(?:</[^>]+>)?`);
-    }
-
-    if (filters?.postTag) {
-      const { rows: findPostTag } = await db.query<{ id: number }>(
-        `SELECT id FROM post_tags WHERE name = $1`,
-        [filters.postTag]
-      );
-
-      const [tag] = findPostTag;
-      postTagIntId = tag?.id;
-
-      where = where
-        ? `${where} AND $${++count} = ANY (p.tags)`
-        : ` WHERE $${++count} = ANY (p.tags)`;
-
-      sqlArgs.push(postTagIntId);
     }
 
     if (filters?.status) {
@@ -214,19 +185,6 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
           sqlStr = `SELECT p.id FROM posts AS p WHERE p.date_created ${operator}= $${++paramsCount} AND p.id ${operator} $${++paramsCount}`;
           sqlParams.push(dateString, postId);
           bufStr = Buffer.from(bufferString).toString("base64url");
-        }
-
-        if (filters?.q) {
-          const { q } = filters;
-
-          ++paramsCount;
-          sqlStr = `${sqlStr} AND (p.title ILIKE $${paramsCount} OR p.excerpt ILIKE $${paramsCount} OR p.content ~ $${++paramsCount})`;
-          sqlParams.push(`%${q}%`, `(?:<[^>]+>)?(?:.*?${q}.*?)(?:</[^>]+>)?`);
-        }
-
-        if (filters?.postTag) {
-          sqlStr = `${sqlStr} AND $${++paramsCount} = ANY (p.tags)`;
-          sqlParams.push(postTagIntId);
         }
 
         if (filters?.status) {

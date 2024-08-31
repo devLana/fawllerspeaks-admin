@@ -7,9 +7,8 @@ import type {
 
 export const getPostsSchema = Joi.object<QueryGetPostsArgs>({
   page: Joi.object<GetPostsPageInput>({
-    cursor: Joi.string().required().trim().base64().messages({
+    cursor: Joi.string().required().trim().messages({
       "string.empty": "Posts pagination cursor is required",
-      "string.base64": "Invalid posts pagination cursor provided",
     }),
 
     type: Joi.string().required().trim().valid("after", "before").messages({
@@ -19,14 +18,6 @@ export const getPostsSchema = Joi.object<QueryGetPostsArgs>({
   }).allow(null),
 
   filters: Joi.object<GetPostsFiltersInput>({
-    q: Joi.string().allow(null).trim().messages({
-      "string.empty": "No posts search filter was provided",
-    }),
-
-    postTag: Joi.string().allow(null).trim().messages({
-      "string.empty": "No post tag filter was provided",
-    }),
-
     status: Joi.string()
       .allow(null)
       .trim()

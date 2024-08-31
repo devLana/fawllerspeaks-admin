@@ -10,8 +10,6 @@ type ValidationErrors = RemoveNull<Omit<Errors, "status">>;
 export class GetPostsValidationError implements Errors {
   readonly cursorError?: string;
   readonly typeError?: string;
-  readonly qError?: string;
-  readonly postTagError?: string;
   readonly statusError?: string;
   readonly sortError?: string;
   readonly status: Status;
@@ -19,8 +17,6 @@ export class GetPostsValidationError implements Errors {
   constructor(errors: ValidationErrors) {
     this.cursorError = errors.cursorError;
     this.typeError = errors.typeError;
-    this.qError = errors.qError;
-    this.postTagError = errors.postTagError;
     this.statusError = errors.statusError;
     this.sortError = errors.sortError;
     this.status = "ERROR";

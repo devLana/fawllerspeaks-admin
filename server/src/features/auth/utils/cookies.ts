@@ -1,6 +1,6 @@
 import type { CookieOptions, Response } from "express";
 
-// import { nodeEnv } from "@utils";
+// import { nodeEnv } from "@utils/nodeEnv";
 import type { Cookies } from "@types";
 
 const baseCookieOptions: CookieOptions = {

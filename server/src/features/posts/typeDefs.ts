@@ -120,8 +120,6 @@ export const postsTypeDefs = `#graphql
   type GetPostsValidationError {
     cursorError: String
     typeError: String
-    qError: String
-    postTagError: String
     statusError: String
     sortError: String
     status: Status! 
@@ -183,8 +181,6 @@ export const postsTypeDefs = `#graphql
   }
 
   input GetPostsFiltersInput {
-    q: String
-    postTag: String
     status: PostStatus
     sort: SortPostsBy
   }
