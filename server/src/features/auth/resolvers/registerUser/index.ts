@@ -92,8 +92,6 @@ const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
       return new RegisterUserValidationError(errors);
     }
 
-    console.log(err);
-
     throw new GraphQLError("Unable to register. Please try again later");
   }
 };

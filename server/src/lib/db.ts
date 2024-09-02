@@ -13,5 +13,5 @@ export const db = new Pool({
 
 db.on("error", (err, client) => {
   console.error("PG Client Error - ", err);
-  console.error("PG client Upon Which Error Occurred- ", client);
+  console.error("PG client Instance That Threw The Error - ", client);
 });
