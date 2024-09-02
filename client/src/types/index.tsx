@@ -12,7 +12,6 @@ import type {
   CreatePostInput,
   Mutation,
   Post,
-  PostStatus,
   PostTag,
   PostValidationError,
   Query,
@@ -183,7 +182,7 @@ export interface PostImageBanner {
 }
 
 export type CreatePostData = Omit<CreatePostInput, "imageBanner" | "tagIds"> & {
-  tagIds?: number[];
+  tagIds?: string[];
   imageBanner?: PostImageBanner;
 };
 
@@ -197,7 +196,7 @@ export type RequiredPostMetadata = Pick<CreatePostData, RequiredMetadataKeys>;
 
 export type CreatePostAction =
   | { type: "CHANGE_VIEW"; payload: { view: PostView } }
-  | { type: "SELECT_POST_TAGS"; payload: { tagIds: number[] } }
+  | { type: "SELECT_POST_TAGS"; payload: { tagIds: string[] } }
   | { type: "UNKNOWN_POST_TAGS" }
   | { type: "ADD_POST_BANNER_IMAGE"; payload: { imageFile: File } }
   | { type: "REMOVE_POST_BANNER_IMAGE" }
@@ -211,7 +210,7 @@ export type CreatePostAction =
       payload: { key: RequiredMetadataKeys; value: string };
     };
 
-type ModifiedPost = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
+export type ModifiedPost = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
 
 type PostDataHelper<T extends object> = T extends { posts: Post[] }
   ? Omit<T, "posts"> & { posts: ModifiedPost[] }
@@ -225,7 +224,6 @@ type PostDataMapper<T extends Record<string, object>> = {
 
 export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
-export type GetPostsData = PostDataMapper<Pick<Query, "getPosts">>;
 
 type MetadataErrorKeys = "titleError" | "descriptionError" | "excerptError";
 type CreateErrorParam = Pick<PostValidationError, MetadataErrorKeys>;
@@ -241,17 +239,3 @@ export interface CKEditorComponentProps {
   onFocus: VoidFunction;
   onBlur: (value: boolean) => void;
 }
-
-export interface PostsQueryParams {
-  q?: string;
-  "post-tag"?: string;
-  status?: Lowercase<PostStatus>;
-  sort?: string;
-}
-
-export type PostsQueryParamsHandler = <T extends keyof PostsQueryParams>(
-  key: T,
-  value: NonNullable<PostsQueryParams[T]>
-) => void;
-
-export type PostsView = "list" | "grid";

@@ -2,7 +2,7 @@ import Typography from "@mui/material/Typography";
 
 import { postStatusBgColors } from "../utils/postStatusBgColors";
 import type { PostStatus as Status } from "@apiTypes";
-import type { PostsView } from "@types";
+import type { PostsView } from "@features/posts/GetPosts/types";
 
 interface PostStatusProps {
   status: Status;

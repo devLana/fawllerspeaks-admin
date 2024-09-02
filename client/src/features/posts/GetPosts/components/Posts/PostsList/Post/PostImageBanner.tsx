@@ -1,19 +1,30 @@
+import Image from "next/image";
+
 import Box from "@mui/material/Box";
 
-const PostImageBanner = ({ imageLink }: { imageLink: string }) => (
+interface PostImageBannerProps {
+  imageLink: string;
+  title: string;
+}
+
+const PostImageBanner = ({ imageLink, title }: PostImageBannerProps) => (
   <Box
     sx={{
-      // mb: 2,
-      border: "1px solid",
+      position: "relative",
+      height: { height: 150, sm: 160 },
+      borderTop: "1px solid",
+      borderBottom: "1px solid",
       borderColor: "divider",
-      height: { height: 200, sm: 280 },
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
       bgcolor: "action.disabledBackground",
     }}
   >
-    Image Banner {imageLink}
+    <Image
+      src={imageLink}
+      alt={`Image banner for ${title}`}
+      fill
+      style={{ objectFit: "cover" }}
+      priority
+    />
   </Box>
 );
 

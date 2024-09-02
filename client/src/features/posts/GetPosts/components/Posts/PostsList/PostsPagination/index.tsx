@@ -4,8 +4,8 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PaginationLink from "./PaginationLink";
 
 interface PostsPaginationLinksProps {
-  after: { cursor: string; hasNextPage: boolean } | null;
-  before: { cursor: string; hasPreviousPage: boolean } | null;
+  after?: string | null;
+  before?: string | null;
 }
 
 const PostsPagination = ({ after, before }: PostsPaginationLinksProps) => {
@@ -20,16 +20,11 @@ const PostsPagination = ({ after, before }: PostsPaginationLinksProps) => {
       columnGap={5}
       flexWrap="wrap"
     >
-      <PaginationLink
-        href={before?.hasPreviousPage ? `before/${before.cursor}` : undefined}
-      >
+      <PaginationLink href={before ? `before/${before}` : undefined}>
         <ArrowBackIcon fontSize="small" />
         Previous Page
       </PaginationLink>
-      <PaginationLink
-        ml="auto"
-        href={after?.hasNextPage ? `after/${after.cursor}` : undefined}
-      >
+      <PaginationLink ml="auto" href={after ? `after/${after}` : undefined}>
         Next Page <ArrowForwardIcon fontSize="small" />
       </PaginationLink>
     </Box>

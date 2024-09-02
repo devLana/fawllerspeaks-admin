@@ -16,7 +16,8 @@ const PostsToolbar = ({ onChangeCheckbox, viewButtons }: PostsToolbarProps) => {
       disableGutters
       variant="dense"
       sx={{
-        mb: 4,
+        mt: 5,
+        mb: 1.5,
         borderBottom: "1px solid",
         borderBottomColor: "divider",
         columnGap: 2,

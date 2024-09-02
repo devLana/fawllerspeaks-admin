@@ -1,22 +1,40 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
-import type { GetPostsData } from "@types";
 
-export const GET_POSTS: TypedDocumentNode<GetPostsData> = gql`
-  query GetPosts {
-    getPosts {
+import type { QueryGetPostsArgs } from "@apiTypes";
+import type { GetPostsPageData } from "../types";
+
+type GetPostsData = TypedDocumentNode<GetPostsPageData, QueryGetPostsArgs>;
+
+export const GET_POSTS: GetPostsData = gql`
+  fragment PostsPageData on Post {
+    id
+    title
+    imageBanner
+    status
+    dateCreated
+    url {
+      slug
+    }
+  }
+
+  query GetPosts($page: GetPostsPageInput, $filters: GetPostsFiltersInput) {
+    getPosts(page: $page, filters: $filters) {
       ... on BaseResponse {
         __typename
       }
-      ... on Posts {
+      ... on ForbiddenError {
+        message
+      }
+      ... on GetPostsValidationError {
+        cursorError
+      }
+      ... on GetPostsData {
         posts {
-          id
-          title
-          imageBanner
-          status
-          dateCreated
-          url {
-            slug
-          }
+          ...PostsPageData
+        }
+        pageData {
+          after
+          before
         }
       }
     }

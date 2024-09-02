@@ -1,26 +1,44 @@
 import * as React from "react";
 
-import PostsWrapper from "../PostsWrapper";
-import PostsMenu from "./PostsMenu";
-import PostsToolbar from "./PostsList/PostsToolbar";
-import PostsList from "./PostsList";
-import ToolbarViewButtons from "./PostsList/PostsToolbar/ToolbarViewButtons";
-import type { PostsView } from "@types";
+import Box from "@mui/material/Box";
 
-const Posts = ({ id }: { id: string }) => {
+import PostsWrapper from "../PostsWrapper";
+import PostsList from "./PostsList";
+import PostsToolbar from "./PostsList/PostsToolbar";
+import ToolbarViewButtons from "./PostsList/PostsToolbar/ToolbarViewButtons";
+import PostStatusInput from "./PostsMenuInputs/PostStatusInput";
+import SortByInput from "./PostsMenuInputs/SortByInput";
+import Searchbox from "./PostsMenuInputs/Searchbox";
+import PostCover from "./PostCover";
+import type { PostsData, PostsView } from "../../types";
+
+interface PostsProps {
+  postsData: PostsData;
+  id: string;
+  isFetchingMore: boolean;
+}
+
+const Posts = ({ id, isFetchingMore, postsData }: PostsProps) => {
   const [postsView, setPostsView] = React.useState<PostsView>("grid");
 
   const handleViewXs = () => {
-    setPostsView(view => {
-      return view === "grid" ? "list" : "grid";
-    });
+    setPostsView(postsView === "grid" ? "list" : "grid");
   };
 
   return (
     <PostsWrapper id={id} ariaBusy={false}>
-      <PostsMenu />
+      <Box
+        display="grid"
+        gridTemplateColumns="repeat(auto-fit, minmax(200px, 1fr))"
+        gap={4}
+      >
+        <PostStatusInput />
+        <SortByInput />
+        <Searchbox />
+      </Box>
       <PostsList
         postsView={postsView}
+        postsData={postsData}
         toolbar={
           <PostsToolbar
             onChangeCheckbox={() => {}}
@@ -32,6 +50,9 @@ const Posts = ({ id }: { id: string }) => {
               />
             }
           />
+        }
+        postCover={
+          <PostCover isFetchingMore={isFetchingMore} postsView={postsView} />
         }
       />
     </PostsWrapper>

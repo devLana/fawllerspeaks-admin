@@ -1,27 +1,32 @@
-import Box from "@mui/material/Box";
-
 import ListItem from "@mui/material/ListItem";
-import Typography from "@mui/material/Typography";
 
 import NextLink from "@components/NextLink";
 import PostImageBanner from "./PostImageBanner";
 import PostStatus from "./PostStatus";
 import PostMenu from "./PostMenu";
-import { formatPostDate } from "../utils/formatPostDate";
+import PostInfo from "./PostInfo";
 import type { PostStatus as Status } from "@apiTypes";
-import type { PostsView } from "@types";
+import type { PostItemSlug, PostsView } from "@features/posts/GetPosts/types";
 
 interface PostProps {
+  postCover: React.ReactElement;
+  postsView: PostsView;
   title: string;
-  imageBanner: string | null;
+  imageBanner?: string | null;
   status: Status;
   dateCreated: string;
-  postsView: PostsView;
-  slug: string;
+  url: PostItemSlug;
 }
 
-const Post = (props: PostProps) => {
-  const { title, imageBanner, status, dateCreated, postsView, slug } = props;
+const Post = ({
+  postCover,
+  postsView,
+  title,
+  imageBanner,
+  status,
+  dateCreated,
+  url,
+}: PostProps) => {
   const idName = title.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
 
   return (
@@ -30,7 +35,7 @@ const Post = (props: PostProps) => {
       sx={{
         flexDirection: "column",
         alignItems: "stretch",
-        rowGap: 2.5,
+        rowGap: 3,
         position: "relative",
         border: "1px solid",
         borderColor: "divider",
@@ -44,20 +49,13 @@ const Post = (props: PostProps) => {
           : { pt: 8, "&:not(:last-child)": { borderBottom: "none" } }),
       }}
     >
+      {postCover}
       <PostMenu idName={idName} name={title} status={status} />
       <PostStatus status={status} postsView={postsView} />
-      {imageBanner && <PostImageBanner imageLink={imageBanner} />}
-      <Box sx={{ px: 2 }}>
-        <Typography variant="h2" gutterBottom textAlign="center">
-          {title}
-        </Typography>
-        <Typography variant="body2" textAlign="center">
-          Created on{" "}
-          <time dateTime={dateCreated}>{formatPostDate(dateCreated)}</time>
-        </Typography>
-      </Box>
+      {imageBanner && <PostImageBanner imageLink={imageBanner} title={title} />}
+      <PostInfo title={title} dateCreated={dateCreated} />
       <NextLink
-        href={`view/${slug}`}
+        href={`view/${url.slug}`}
         mt="auto"
         mx="auto"
         width="90%"

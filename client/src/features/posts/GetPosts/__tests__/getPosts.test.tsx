@@ -4,7 +4,7 @@ import { screen } from "@testing-library/react";
 
 import GetPosts from "@pages/posts/[[...postsPage]]";
 import { renderUI } from "@utils/tests/renderUI";
-import * as mocks from "../utils/getPosts.mocks";
+import * as mocks from "./getPosts.mocks";
 
 describe("Get Posts Page", () => {
   describe("Get status param url query on redirect from other pages", () => {

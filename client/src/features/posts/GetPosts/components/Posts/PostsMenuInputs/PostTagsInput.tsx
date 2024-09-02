@@ -5,14 +5,14 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 
 import { useGetCachePostTags } from "@hooks/useGetCachePostTags";
-import type { PostsQueryParamsHandler } from "@types";
+// import type { FiltersHandler } from "@types";
 
 interface PostTagsInputProps {
   postTag: string | undefined;
-  onChange: PostsQueryParamsHandler;
+  // onChange: FiltersHandler;
 }
 
-const PostTagsInput = ({ postTag, onChange }: PostTagsInputProps) => {
+const PostTagsInput = ({ postTag }: PostTagsInputProps) => {
   const postTags = useGetCachePostTags();
 
   const postTagsOptions = React.useMemo(() => {
@@ -52,7 +52,7 @@ const PostTagsInput = ({ postTag, onChange }: PostTagsInputProps) => {
         htmlFor: "post-tags-input",
       }}
       InputProps={{ id: "post-tags-input" }}
-      onChange={e => onChange("post-tag", e.target.value)}
+      // onChange={e => onChange("postTag", e.target.value)}
     >
       {postTagsOptions}
     </TextField>

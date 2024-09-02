@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useRouter } from "next/router";
 
 import Box from "@mui/material/Box";
@@ -5,26 +6,21 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
 
-import type { PostsQueryParams, PostsQueryParamsHandler } from "@types";
+import { usePostsFilters } from "@features/posts/GetPosts/hooks/usePostsFilters";
 
-interface SearchboxProps {
-  onChangeSearchQuery: PostsQueryParamsHandler;
-  queryParams: PostsQueryParams;
-}
-
-const Searchbox = ({ queryParams, onChangeSearchQuery }: SearchboxProps) => {
-  const { "post-tag": postTag, q, sort, status } = queryParams;
-  const { query, push } = useRouter();
+const Searchbox = () => {
+  const { queryParams } = usePostsFilters();
+  const [q, setQ] = React.useState("");
+  const { push } = useRouter();
 
   const handleSearch = () => {
-    if (q && q !== query.q) {
+    if (q) {
       void push({
-        pathname: "/posts",
+        pathname: "/posts/search",
         query: {
           q,
-          ...(postTag && { "post-tag": postTag }),
-          ...(status && { status }),
-          ...(sort && { sort }),
+          ...(queryParams.status && { status: queryParams.status }),
+          ...(queryParams.sort && { sort: queryParams.sort }),
         },
       });
     }
@@ -35,7 +31,7 @@ const Searchbox = ({ queryParams, onChangeSearchQuery }: SearchboxProps) => {
   };
 
   return (
-    <Box display="flex" flexGrow={1} maxWidth={700}>
+    <Box display="flex">
       <TextField
         id="posts-search"
         type="search"
@@ -44,8 +40,8 @@ const Searchbox = ({ queryParams, onChangeSearchQuery }: SearchboxProps) => {
         size="small"
         fullWidth
         onKeyUp={handleKeyUp}
-        onChange={({ target: { value } }) => onChangeSearchQuery("q", value)}
-        value={q || ""}
+        onChange={e => setQ(e.target.value)}
+        value={q}
         sx={{
           "& .MuiOutlinedInput-notchedOutline": {
             borderTopRightRadius: 0,

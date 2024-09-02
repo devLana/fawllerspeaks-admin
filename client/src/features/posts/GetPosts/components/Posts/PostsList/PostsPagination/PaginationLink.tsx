@@ -1,5 +1,4 @@
-import { useRouter } from "next/router";
-
+import { usePostsFilters } from "@features/posts/GetPosts/hooks/usePostsFilters";
 import Button from "@mui/material/Button";
 import NextLink from "@components/NextLink";
 
@@ -10,16 +9,9 @@ interface PaginationLinkProps {
 }
 
 const PaginationLink = ({ children, href, ml }: PaginationLinkProps) => {
-  const { query: queryParams } = useRouter();
-  const { q, "post-tag": postTag, status, sort } = queryParams;
-
-  const query = {
-    ...(typeof q === "string" && { q }),
-    ...(typeof postTag === "string" && { "post-tag": postTag }),
-    ...(typeof status === "string" && { status }),
-    ...(typeof sort === "string" && { sort }),
-  };
-
+  const { queryParams } = usePostsFilters();
+  const { status, sort } = queryParams;
+  const query = { ...(status && { status }), ...(sort && { sort }) };
   const styles = { display: "inline-flex", alignItems: "center", columnGap: 1 };
 
   if (href) {
