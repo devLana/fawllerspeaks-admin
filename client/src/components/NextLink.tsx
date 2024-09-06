@@ -2,7 +2,7 @@ import * as React from "react";
 import NextJsLink, { type LinkProps as NextJsLinkProps } from "next/link";
 import MuiLink, { type LinkProps as MuiLinkProps } from "@mui/material/Link";
 
-type NextLinkProps = NextJsLinkProps & Omit<MuiLinkProps, "href">;
+export type NextLinkProps = NextJsLinkProps & Omit<MuiLinkProps, "href">;
 
 interface NextLinkRefProps extends Omit<NextJsLinkProps, "href"> {
   to: NextJsLinkProps["href"];

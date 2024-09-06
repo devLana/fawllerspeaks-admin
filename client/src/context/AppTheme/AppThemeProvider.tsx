@@ -10,7 +10,7 @@ import { shape } from "./utils/shape";
 import { shadows } from "./utils/shadows";
 import { components } from "./utils/components";
 import { getStorageTheme, saveStorageTheme } from "./utils/storage";
-import type { AppTheme, ThemeColor } from "@types";
+import type { AppTheme, ThemeColor } from "./types";
 
 type ThemeKeys = keyof AppTheme;
 

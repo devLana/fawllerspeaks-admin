@@ -4,8 +4,8 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 
-import SettingsMenuItem from "@components/Settings/SettingsMenuItem";
-import { settingsLinks } from "@utils/settings/settingsLinks";
+import SettingsMenuItem from "./SettingsMenuItem";
+import { settingsLinks } from "../utils/settingsLinks";
 
 const SettingsMenu = () => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);

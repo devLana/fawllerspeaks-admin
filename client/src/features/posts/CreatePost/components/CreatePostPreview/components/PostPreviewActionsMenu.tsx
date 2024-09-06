@@ -4,7 +4,11 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import type { DraftErrorCb, FunctionLike, CreateStatus } from "@types";
+import type { FunctionLike } from "@types";
+import type {
+  CreateStatus,
+  DraftErrorCb,
+} from "@features/posts/CreatePost/types";
 
 interface PostPreviewActionsMenuProps {
   draftStatus: CreateStatus;

@@ -3,7 +3,7 @@ import Skeleton from "@mui/material/Skeleton";
 import PersonIcon from "@mui/icons-material/Person";
 import type { Theme } from "@mui/material/styles";
 
-import useGetUserInfo from "@hooks/useGetUserInfo";
+import useGetUserInfo from "@features/auth/hooks/useGetUserInfo";
 import NextLink from "./NextLink";
 import type { SxPropsArray } from "@types";
 

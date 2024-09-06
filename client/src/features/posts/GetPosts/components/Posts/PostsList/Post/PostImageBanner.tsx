@@ -1,5 +1,4 @@
 import Image from "next/image";
-
 import Box from "@mui/material/Box";
 
 interface PostImageBannerProps {

@@ -7,14 +7,13 @@ interface NavbarContainerProps {
   isOpen: boolean;
   belowSm: boolean;
   children: React.ReactNode;
+  minWidth: string;
+  maxWidth: string;
   onClick: () => void;
 }
 
 const NavbarContainer = (props: NavbarContainerProps) => {
-  const { children, isOpen, belowSm, onClick } = props;
-
-  const minWidth = "calc(51px + 1.5em)";
-  const maxWidth = "calc(67px + 6.85em)";
+  const { children, isOpen, belowSm, minWidth, maxWidth, onClick } = props;
 
   return (
     <Box
@@ -24,7 +23,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
         [breakpoints.down("sm")]: {
           position: "fixed",
           zIndex: zIndex.drawer,
-          ...(isOpen ? { inset: 0 } : {}),
+          ...(isOpen && { inset: 0 }),
         },
         [breakpoints.up("sm")]: {
           width: isOpen ? maxWidth : minWidth,
@@ -48,10 +47,10 @@ const NavbarContainer = (props: NavbarContainerProps) => {
       <Box
         sx={theme => ({
           overflowY: "auto",
+          position: "fixed",
           [theme.breakpoints.down("sm")]: {
             p: 3,
             transition: transition(theme.transitions, isOpen, "transform"),
-            position: "fixed",
             top: 0,
             bottom: 0,
             left: 0,
@@ -60,26 +59,19 @@ const NavbarContainer = (props: NavbarContainerProps) => {
             boxShadow: 16,
             borderTopRightRadius: `${theme.shape.borderRadius}px`,
             borderBottomRightRadius: `${theme.shape.borderRadius}px`,
-            ...(theme.appTheme.themeMode !== "sunny"
-              ? {
-                  backgroundImage:
-                    "linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15))",
-                }
-              : {}),
+            ...(theme.appTheme.themeMode !== "sunny" && {
+              backgroundImage:
+                "linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15))",
+            }),
             transform: isOpen ? "translateX(0)" : "translateX(-150%)",
           },
           [theme.breakpoints.up("sm")]: {
             borderRight: 1,
             borderColor: "divider",
-            pt: 2,
-            pr: 3,
-            position: "fixed",
+            py: 2,
             top: theme.spacing(8),
             bottom: 0,
-            width: isOpen ? maxWidth : minWidth,
-            transition: transition(theme.transitions, isOpen, "width"),
           },
-          [theme.breakpoints.up("md")]: { width: isOpen ? minWidth : maxWidth },
         })}
       >
         {children}

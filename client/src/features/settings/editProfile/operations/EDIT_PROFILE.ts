@@ -1,6 +1,6 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
-import { USER_FIELDS } from "@fragments/User";
+import { USER_FIELDS } from "@features/auth/fragments/User";
 import type { Mutation, MutationEditProfileArgs } from "@apiTypes";
 
 type EditProfileData = Pick<Mutation, "editProfile">;

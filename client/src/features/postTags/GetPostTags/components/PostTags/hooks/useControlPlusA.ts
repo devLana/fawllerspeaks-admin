@@ -1,5 +1,6 @@
 import * as React from "react";
-import type { PostTagData, PostTagsListAction } from "@types";
+import type { PostTagData } from "@features/postTags/types";
+import type { PostTagsListAction } from "@features/postTags/GetPostTags/types";
 
 interface ControlPlusAOptions {
   cachePostTags: PostTagData[];

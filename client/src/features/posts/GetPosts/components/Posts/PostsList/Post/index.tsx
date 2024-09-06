@@ -51,7 +51,7 @@ const Post = ({
     >
       {postCover}
       <PostMenu idName={idName} name={title} status={status} />
-      <PostStatus status={status} postsView={postsView} />
+      <PostStatus status={status} />
       {imageBanner && <PostImageBanner imageLink={imageBanner} title={title} />}
       <PostInfo title={title} dateCreated={dateCreated} />
       <NextLink

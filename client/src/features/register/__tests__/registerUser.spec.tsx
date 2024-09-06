@@ -4,7 +4,7 @@ import { screen, waitFor } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event/dist/types/setup/setup";
 
 import RegisterUser from "@pages/register";
-import * as mocks from "../utils/registerUser.mocks";
+import * as mocks from "./registerUser.mocks";
 import { renderUI } from "@utils/tests/renderUI";
 
 describe("Register User Page", () => {

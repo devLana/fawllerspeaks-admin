@@ -7,8 +7,14 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import { useAppTheme } from "@context/AppTheme";
-import { normalizedThemes, themes } from "@utils/appThemes";
-import type { ThemeMode } from "@types";
+import { appThemes as themes } from "@context/AppTheme/utils/appThemes";
+import type { AppThemeItem, ThemeMode } from "@context/AppTheme/types";
+
+export const normalizedThemes: Record<ThemeMode, AppThemeItem> = {
+  sunny: themes[0],
+  sunset: themes[1],
+  "pitch black": themes[2],
+};
 
 const AuthLayoutThemeButton = () => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);

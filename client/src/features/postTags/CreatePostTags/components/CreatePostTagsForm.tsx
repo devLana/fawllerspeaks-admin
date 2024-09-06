@@ -11,11 +11,11 @@ import Snackbar from "@mui/material/Snackbar";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTagsPage } from "../../context/PostTagsPageContext";
+import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
 import CreatePostTagsInput from "./CreatePostTagsInput";
 import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
-import { createPostTagsValidator } from "../utils/createPostTagsValidator";
-import { refetchQueries } from "../utils/refetchQueries";
+import { createPostTagsSchema } from "../validatorSchema";
+import { refetchQueries } from "../cache/refetchQueries";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { SESSION_ID } from "@utils/constants";
 
@@ -39,7 +39,7 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
     formState: { errors },
     unregister,
   } = useForm<Record<string, string>>({
-    resolver: yupResolver(createPostTagsValidator(inputs)),
+    resolver: yupResolver(createPostTagsSchema(inputs)),
   });
 
   const { handleOpenAlert } = usePostTagsPage();
@@ -114,7 +114,7 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
     alertMessage = data.createPostTags.tagsError;
   } else if (data?.createPostTags.__typename === "DuplicatePostTagError") {
     alertMessage = data.createPostTags.message;
-  } else if (error?.graphQLErrors[0]) {
+  } else if (error?.graphQLErrors?.[0]) {
     alertMessage = error.graphQLErrors[0].message;
   }
 

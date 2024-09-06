@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography";
 
 import { useAppTheme } from "@context/AppTheme";
 import DefaultColor from "./DefaultColor";
-import type { ThemeColors } from "@types";
+import type { ThemeColors } from "@context/AppTheme/types";
 
 const colors = [
   { themeColor: "#7dd1f3", light: "#7dd1f3", dark: "#149cd2", label: "Blue" },

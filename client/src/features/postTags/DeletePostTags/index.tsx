@@ -13,10 +13,10 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
 import DeletePostTagsTextFormatter from "./components/DeletePostTagsTextFormatter";
 import { DELETE_POST_TAGS } from "./operations/DELETE_POST_TAGS";
-import { update } from "./utils/update";
-import { refetchQueries } from "./utils/refetchQueries";
+import { update } from "./cache/update";
+import { refetchQueries } from "./cache/refetchQueries";
 import { SESSION_ID } from "@utils/constants";
-import type { PostTagsListAction } from "@types";
+import type { PostTagsListAction } from "../GetPostTags/types";
 
 export interface DeletePostTagsProps {
   open: boolean;
@@ -51,7 +51,7 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
       variables: { tagIds: ids },
       update,
       refetchQueries,
-      onError: err => handleResponse(err.graphQLErrors[0]?.message ?? msg),
+      onError: err => handleResponse(err.graphQLErrors?.[0]?.message ?? msg),
       onCompleted(data) {
         switch (data.deletePostTags.__typename) {
           case "AuthenticationError":

@@ -1,5 +1,5 @@
 import { postStatusBgColors } from ".";
-import type { ThemeMode } from "@types";
+import type { ThemeMode } from "@context/AppTheme/types";
 
 type ColorVariant = "light" | "main" | "dark";
 

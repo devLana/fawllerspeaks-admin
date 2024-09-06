@@ -9,7 +9,7 @@ import {
 import { http } from "msw";
 
 import CreatePostPage from "@pages/posts/new";
-import * as mocks from "../utils/createPost.mocks";
+import * as mocks from "./createPost.mocks";
 import { renderUI } from "@utils/tests/renderUI";
 import type { UserEvent } from "@testing-library/user-event/dist/types/setup/setup";
 

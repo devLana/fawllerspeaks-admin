@@ -2,7 +2,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import type { Theme } from "@mui/material/styles";
 
-import SettingsMenuList from "@components/Settings/SettingsMenuList";
+import SettingsMenuList from "./SettingsMenuList";
 import SettingsMenu from "./SettingsMenu";
 
 const SettingsLayoutMenu = () => {

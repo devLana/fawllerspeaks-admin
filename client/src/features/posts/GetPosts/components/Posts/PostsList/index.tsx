@@ -32,7 +32,7 @@ const PostsList = (props: PostsListProps) => {
           ...(postsView === "grid" && {
             display: "grid",
             gridTemplateColumns: {
-              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
             },
             columnGap: 2.5,
             rowGap: 7,

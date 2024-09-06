@@ -5,7 +5,7 @@ import { graphql } from "msw";
 
 import PostTagsPage from "@pages/post-tags";
 import { renderUI } from "@utils/tests/renderUI";
-import * as mocks from "../utils/createPostTags.mocks";
+import * as mocks from "./createPostTags.mocks";
 
 describe("Create post tags", () => {
   beforeAll(() => {

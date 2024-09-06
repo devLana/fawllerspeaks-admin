@@ -5,7 +5,7 @@ import { http } from "msw";
 
 import EditMe from "@pages/settings/me/edit";
 import { renderUI } from "@utils/tests/renderUI";
-import * as mocks from "../utils/editProfile.mocks";
+import * as mocks from "./editProfile.mocks";
 
 describe("Edit Profile", () => {
   const fName = { name: /^first name$/i };

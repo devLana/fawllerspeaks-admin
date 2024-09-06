@@ -3,11 +3,11 @@ import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import useGetUserInfo from "@hooks/useGetUserInfo";
+import useGetUserInfo from "@features/auth/hooks/useGetUserInfo";
 import useStatusAlert from "@features/settings/Profile/useStatusAlert";
 import UserAvatar from "@components/UserAvatar";
 import NextLink from "@components/NextLink";
-import settingsLayout from "@utils/settings/settingsLayout";
+import settingsLayout from "@layouts/SettingsLayout/utils/settingsLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { type NextPageWithLayout } from "@types";
 

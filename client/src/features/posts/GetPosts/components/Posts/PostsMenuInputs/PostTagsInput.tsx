@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 
-import { useGetCachePostTags } from "@hooks/useGetCachePostTags";
+import { useGetCachePostTags } from "@features/postTags/GetPostTags/hooks/useGetCachePostTags";
 // import type { FiltersHandler } from "@types";
 
 interface PostTagsInputProps {

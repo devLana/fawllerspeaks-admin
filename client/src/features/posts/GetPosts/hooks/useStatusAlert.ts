@@ -5,10 +5,10 @@ import { handleCloseAlert } from "@utils/handleCloseAlert";
 
 const useStatusAlert = () => {
   const [alert, setAlert] = React.useState({ open: false, message: "" });
-  const { isReady, query } = useRouter();
+  const { query } = useRouter();
 
   React.useEffect(() => {
-    if (isReady && typeof query.image === "string") {
+    if (query.image && typeof query.image === "string") {
       switch (query.image) {
         case "draft-upload-error":
           setAlert({
@@ -29,7 +29,7 @@ const useStatusAlert = () => {
         default:
       }
     }
-  }, [isReady, query.image]);
+  }, [query.image]);
 
   const onClose = handleCloseAlert({ ...alert, open: false }, setAlert);
 

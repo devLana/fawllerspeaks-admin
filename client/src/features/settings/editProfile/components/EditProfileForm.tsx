@@ -10,15 +10,16 @@ import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import useGetUserInfo from "@hooks/useGetUserInfo";
+import useGetUserInfo from "@features/auth/hooks/useGetUserInfo";
 import useUploadImage from "@hooks/useUploadImage";
 import EditProfileFileInput from "./EditProfileFileInput";
 import { EDIT_PROFILE } from "@features/settings/editProfile/operations/EDIT_PROFILE";
-import { editProfileValidator } from "@features/settings/editProfile/utils/editProfileValidator";
+import { editProfileSchema } from "@features/settings/editProfile/validatorSchema";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { SESSION_ID } from "@utils/constants";
+import type { EditProfileImage } from "../types";
+import type { Status } from "@types";
 import type { MutationEditProfileArgs } from "@apiTypes";
-import type { EditProfileImage, Status } from "@types";
 
 type EditProfile = Omit<MutationEditProfileArgs, "image">;
 
@@ -56,7 +57,7 @@ const EditProfileForm = () => {
     formState: { errors, defaultValues },
     setError,
   } = useForm<EditProfile>({
-    resolver: yupResolver(editProfileValidator),
+    resolver: yupResolver(editProfileSchema),
     defaultValues: { firstName, lastName },
   });
 
@@ -163,7 +164,7 @@ const EditProfileForm = () => {
 
   if (image.error) {
     msg = image.error;
-  } else if (error?.graphQLErrors[0]) {
+  } else if (error?.graphQLErrors?.[0]) {
     msg = error.graphQLErrors[0].message;
   }
 

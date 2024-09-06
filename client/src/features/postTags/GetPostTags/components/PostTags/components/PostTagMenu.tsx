@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
-import type { PostTagsListAction } from "@types";
+import type { PostTagsListAction } from "@features/postTags/GetPostTags/types";
 
 type ActionType = "OPEN_MENU_EDIT" | "OPEN_MENU_DELETE";
 
@@ -39,7 +39,7 @@ const PostTagMenu = ({ id, name, idName, dispatch }: PostTagMenuProps) => {
         onClick={e => setAnchor(e.currentTarget)}
         sx={{
           opacity: 0,
-          transition: ({ transitions: { create, easing } }) => {
+          transition({ transitions: { create, easing } }) {
             return create("opacity", { easing: easing.easeInOut });
           },
           "&:focus": { opacity: 1 },

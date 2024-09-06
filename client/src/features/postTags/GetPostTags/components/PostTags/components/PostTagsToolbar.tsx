@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Toolbar from "@mui/material/Toolbar";
-import type { PostTagsListAction } from "@types";
+import type { PostTagsListAction } from "@features/postTags/GetPostTags/types";
 
 interface PostTagsToolbarProps {
   totalNumberOfPostTags: number;
@@ -23,7 +23,7 @@ const PostTagsToolbar = ({
   if (numSelected === numTags) {
     buttonText = "Delete All Post Tags";
   } else if (numSelected === 1) {
-    buttonText = "Delete 1 Post Tag";
+    buttonText = "Delete Post Tag";
   } else {
     buttonText = `Delete ${numSelected} Post Tags`;
   }

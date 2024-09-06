@@ -9,7 +9,10 @@ import { useHandleFile } from "@hooks/useHandleFile";
 import { FileInput } from "@components/FileInput";
 import PostImagePreview from "./PostImagePreview";
 import TooltipHint from "../TooltipHint";
-import type { CreatePostAction, PostImageBanner } from "@types";
+import type {
+  CreatePostAction,
+  PostImageBanner,
+} from "@features/posts/CreatePost/types";
 
 interface PostFileInputProps {
   imageBannerError: string | undefined;
@@ -101,7 +104,6 @@ const PostFileInput = (props: PostFileInputProps) => {
           </Button>
         )}
         <FileInput
-          type="file"
           name="image"
           id={id}
           accept="image/*"

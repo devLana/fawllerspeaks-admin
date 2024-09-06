@@ -1,8 +1,8 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
-import { POST_FIELDS } from "@fragments/Post";
+import { POST_FIELDS } from "@features/posts/gqlFragments/Post";
 import type { MutationCreatePostArgs } from "@apiTypes";
-import type { CreatePostGQLData } from "@types";
+import type { CreatePostGQLData } from "@features/posts/types";
 
 type CreatePost = TypedDocumentNode<CreatePostGQLData, MutationCreatePostArgs>;
 

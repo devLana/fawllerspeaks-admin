@@ -9,7 +9,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import LogoutModal from "./LogoutModal";
 import transition from "../utils/transition";
-import type { NavbarButtonItem } from "@types";
+import type { NavbarButtonItem } from "../types";
 
 interface NavbarItemButtonProps extends NavbarButtonItem {
   isOpen: boolean;
@@ -22,7 +22,7 @@ const NavbarItemButton = (props: NavbarItemButtonProps) => {
 
   return (
     <>
-      <ListItem sx={{ py: 2, px: 0 }}>
+      <ListItem disablePadding>
         <Tooltip title={showTooltip ? label : null} placement="right">
           <ListItemButton
             sx={{
@@ -32,11 +32,8 @@ const NavbarItemButton = (props: NavbarItemButtonProps) => {
               flexGrow: { sm: 0 },
               whiteSpace: { sm: "nowrap" },
               overflow: { sm: "hidden" },
-              transition: theme => {
-                return transition(theme.transitions, isOpen, [
-                  "background-color",
-                  "padding",
-                ]);
+              transition({ transitions: t }) {
+                return transition(t, isOpen, ["background-color", "padding"]);
               },
               "&:hover": { color: "primary.main" },
             }}
@@ -54,11 +51,8 @@ const NavbarItemButton = (props: NavbarItemButtonProps) => {
                 marginLeft: 2,
                 ml: { sm: isOpen ? 2 : 0, md: isOpen ? 0 : 2 },
                 opacity: { sm: isOpen ? 1 : 0, md: isOpen ? 0 : 1 },
-                transition: ({ transitions: transit }) => {
-                  return transition(transit, isOpen, [
-                    "margin-left",
-                    "opacity",
-                  ]);
+                transition({ transitions: tran }) {
+                  return transition(tran, isOpen, ["margin-left", "opacity"]);
                 },
                 "&>.MuiTypography-root": { lineHeight: 1 },
               }}

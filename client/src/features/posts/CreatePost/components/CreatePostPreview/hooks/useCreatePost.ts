@@ -7,7 +7,11 @@ import useUploadImage from "@hooks/useUploadImage";
 import { CREATE_POST } from "@features/posts/CreatePost/components/CreatePostPreview/operations/CREATE_POST";
 import { SESSION_ID } from "@utils/constants";
 import type { CreatePostInput } from "@apiTypes";
-import type { CreateInputErrors, CreatePostData, CreateStatus } from "@types";
+import type {
+  CreateInputErrors,
+  CreatePostData,
+  CreateStatus,
+} from "@features/posts/CreatePost/types";
 
 export const useCreatePost = (
   post: CreatePostData,

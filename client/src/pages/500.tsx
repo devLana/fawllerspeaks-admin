@@ -3,8 +3,8 @@ import Typography from "@mui/material/Typography";
 
 import useErrorPageData from "@hooks/useErrorPageData";
 import NextLink from "@components/NextLink";
-import ErrorPageLayout from "@layouts/ErrorPageLayout";
-import uiLayout from "@utils/uiLayout";
+import ErrorPageLayout from "@layouts/components/ErrorPageLayout";
+import uiLayout from "@layouts/utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const ServerError: NextPageWithLayout = () => {

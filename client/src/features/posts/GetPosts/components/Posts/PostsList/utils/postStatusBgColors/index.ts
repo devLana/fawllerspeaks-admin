@@ -1,5 +1,5 @@
 import type { PostStatus } from "@apiTypes";
-import type { ThemeMode } from "@types";
+import type { ThemeMode } from "@context/AppTheme/types";
 
 export const postStatusBgColors = (
   status: PostStatus,

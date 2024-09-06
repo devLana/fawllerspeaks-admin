@@ -3,13 +3,13 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
-import Metadata from "@components/Metadata";
+import Metadata from "@layouts/components/Metadata";
 import Loader from "@components/Loader";
 import ErrorAlert from "@components/ErrorAlert";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import PageBreadcrumbs from "./components/PageBreadcrumbs";
-import { type RootLayoutProps } from "@types";
+import type { RootLayoutProps } from "@layouts/types";
 
 const RootLayout = (props: RootLayoutProps) => {
   const { children, clientHasRendered, errorMessage, ...metaProps } = props;
@@ -37,7 +37,7 @@ const RootLayout = (props: RootLayoutProps) => {
         paddingTop: 7,
         pt: { sm: 8 },
         display: { sm: "flex" },
-        columnGap: { sm: 3 },
+        columnGap: { sm: 3.75 },
       }}
     >
       <Metadata {...metaProps} />

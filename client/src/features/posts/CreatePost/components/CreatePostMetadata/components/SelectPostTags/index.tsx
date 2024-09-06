@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useApolloClient } from "@apollo/client";
 import Alert from "@mui/material/Alert";
 
-import useGetPostTags from "@hooks/useGetPostTags";
+import useGetPostTags from "@features/postTags/GetPostTags/hooks/useGetPostTags";
 import SelectPostTagsSkeleton from "./SelectPostTagsSkeleton";
 import { SESSION_ID } from "@utils/constants";
 

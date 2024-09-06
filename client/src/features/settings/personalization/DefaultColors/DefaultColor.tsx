@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CheckIcon from "@mui/icons-material/Check";
 
-import type { ThemeColors } from "@types";
+import type { ThemeColors } from "@context/AppTheme/types";
 
 interface DefaultColorProps {
   onClick: (key: "color", value: ThemeColors) => void;

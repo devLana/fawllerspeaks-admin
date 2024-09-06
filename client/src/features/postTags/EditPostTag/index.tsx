@@ -2,7 +2,10 @@ import * as React from "react";
 
 import PostTagsDialog from "../components/PostTagsDialog";
 import EditPostTagForm from "./components/EditPostTagForm";
-import type { PostTagsListAction, PostTagsListState } from "@types";
+import type {
+  PostTagsListAction,
+  PostTagsListState,
+} from "../GetPostTags/types";
 
 type Status = "idle" | "submitting";
 

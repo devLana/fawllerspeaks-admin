@@ -1,5 +1,5 @@
 import EditProfileForm from "@features/settings/editProfile/components/EditProfileForm";
-import settingsLayout from "@utils/settings/settingsLayout";
+import settingsLayout from "@layouts/SettingsLayout/utils/settingsLayout";
 import type { NextPageWithLayout } from "@types";
 
 const EditMe: NextPageWithLayout = () => <EditProfileForm />;

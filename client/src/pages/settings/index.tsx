@@ -1,8 +1,8 @@
 import Typography from "@mui/material/Typography";
 
 import RootLayout from "@layouts/RootLayout";
-import SettingsMenuList from "@components/Settings/SettingsMenuList";
-import uiLayout from "@utils/uiLayout";
+import SettingsMenuList from "@layouts/SettingsLayout/components/SettingsMenuList";
+import uiLayout from "@layouts/utils/uiLayout";
 import { type NextPageWithLayout } from "@types";
 
 const Settings: NextPageWithLayout = () => (

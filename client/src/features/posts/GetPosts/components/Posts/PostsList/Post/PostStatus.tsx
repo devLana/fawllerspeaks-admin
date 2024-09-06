@@ -1,37 +1,23 @@
-import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
 
 import { postStatusBgColors } from "../utils/postStatusBgColors";
 import type { PostStatus as Status } from "@apiTypes";
-import type { PostsView } from "@features/posts/GetPosts/types";
 
-interface PostStatusProps {
-  status: Status;
-  postsView: PostsView;
-}
-
-const PostStatus = ({ status, postsView }: PostStatusProps) => (
-  <Typography
-    variant="caption"
-    sx={({ shape }) => ({
+const PostStatus = ({ status }: { status: Status }) => (
+  <Chip
+    label={status}
+    size="small"
+    sx={{
       position: "absolute",
-      top: 0,
-      right: 0,
-      px: 2.5,
-      py: 0.7,
-      color: "background.default",
+      top: "5px",
+      right: "5px",
       fontWeight: "bold",
-      letterSpacing: 1,
-      bgcolor: ({ appTheme: { themeMode } }) => {
+      letterSpacing: 0.5,
+      color({ appTheme: { themeMode } }) {
         return postStatusBgColors(status, themeMode);
       },
-      borderBottomLeftRadius: `${shape.borderRadius}px`,
-      ...(postsView === "grid"
-        ? { borderTopRightRadius: `${shape.borderRadius}px` }
-        : { borderBottomRightRadius: `${shape.borderRadius}px` }),
-    })}
-  >
-    {status}
-  </Typography>
+    }}
+  />
 );
 
 export default PostStatus;

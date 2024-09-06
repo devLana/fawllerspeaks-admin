@@ -4,7 +4,7 @@ import { screen, waitFor } from "@testing-library/react";
 
 import ForgotPassword from "@pages/forgot-password";
 import { renderUI } from "@utils/tests/renderUI";
-import * as mocks from "../utils/forgotPassword.mocks";
+import * as mocks from "./forgotPassword.mocks";
 
 describe("Forgot Password Page", () => {
   const textBox = { name: /e-?mail/i };

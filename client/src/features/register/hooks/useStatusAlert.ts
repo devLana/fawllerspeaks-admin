@@ -3,10 +3,10 @@ import { useRouter } from "next/router";
 
 const useStatusAlert = () => {
   const [alert, setAlert] = React.useState({ open: false, message: "" });
-  const { isReady, query } = useRouter();
+  const { query } = useRouter();
 
   React.useEffect(() => {
-    if (isReady && typeof query.status === "string") {
+    if (query.status && typeof query.status === "string") {
       switch (query.status) {
         case "unregistered":
           setAlert({
@@ -19,7 +19,7 @@ const useStatusAlert = () => {
         default:
       }
     }
-  }, [isReady, query.status]);
+  }, [query.status]);
 
   const handleCloseAlert = () => setAlert({ ...alert, open: false });
 

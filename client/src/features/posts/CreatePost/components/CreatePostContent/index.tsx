@@ -12,7 +12,7 @@ import type {
   CreateStatus,
   DraftErrorCb,
   PostView,
-} from "@types";
+} from "../../types";
 
 interface CreatePostContentProps {
   content: string;

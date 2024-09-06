@@ -7,6 +7,7 @@ import NavbarItemLink from "./components/NavbarItemLink";
 import NavbarItemButton from "./components/NavbarItemButton";
 import NavbarToggleButton from "./components/NavbarToggleButton";
 import { navbarItems } from "./utils/navbarItems";
+import transition from "./utils/transition";
 
 interface NavbarProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
   const sm_Above = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
   const md_Above = useMediaQuery((theme: Theme) => theme.breakpoints.up("md"));
 
+  const minWidth = "calc(51px + 1.5em)";
+  const maxWidth = "calc(67px + 6.85em)";
   const onClickNavLink = belowSm ? onCloseNav : undefined;
   let showTooltip: boolean;
 
@@ -58,8 +61,27 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
   });
 
   return (
-    <NavbarContainer isOpen={isOpen} belowSm={belowSm} onClick={onCloseNav}>
-      <List>
+    <NavbarContainer
+      isOpen={isOpen}
+      belowSm={belowSm}
+      onClick={onCloseNav}
+      minWidth={minWidth}
+      maxWidth={maxWidth}
+    >
+      <List
+        sx={({ breakpoints, transitions }) => ({
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          rowGap: 3.5,
+          [breakpoints.up("sm")]: {
+            pr: 3,
+            width: isOpen ? maxWidth : minWidth,
+            transition: transition(transitions, isOpen, "width"),
+          },
+          [breakpoints.up("md")]: { width: isOpen ? minWidth : maxWidth },
+        })}
+      >
         <NavbarToggleButton
           isOpen={isOpen}
           sm_Above={sm_Above}

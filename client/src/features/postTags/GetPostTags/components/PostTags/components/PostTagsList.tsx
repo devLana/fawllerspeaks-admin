@@ -1,14 +1,16 @@
 import * as React from "react";
 
 import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 
-import { useGetCachePostTags } from "@hooks/useGetCachePostTags";
+import { useGetCachePostTags } from "@features/postTags/GetPostTags/hooks/useGetCachePostTags";
 import useControlPlusA from "../hooks/useControlPlusA";
 import PostTagsToolbar from "./PostTagsToolbar";
 import PostTag from "./PostTag";
-import type { PostTagsListAction, PostTagsListState } from "@types";
+import type {
+  PostTagsListAction,
+  PostTagsListState,
+} from "@features/postTags/GetPostTags/types";
 
 interface PostTagsListProps {
   tagIdsLength: number;
@@ -79,14 +81,16 @@ const PostTagsList = (props: PostTagsListProps) => {
         dispatch={dispatch}
       />
       <Divider sx={{ mt: 1, mb: 3.5 }} />
-      <Grid
-        component={List}
-        container
-        rowSpacing={2.5}
-        columnSpacing={{ xs: 2, sm: 4 }}
+      <List
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          rowGap: 2.5,
+          columnGap: { columnGap: 8, sm: 2.5 },
+        }}
       >
         {tagsList}
-      </Grid>
+      </List>
     </>
   );
 };

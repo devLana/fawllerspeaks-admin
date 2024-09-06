@@ -29,8 +29,6 @@
       "@types": ["types"],
       "@apiTypes": ["types/graphql"],
       "@utils/*": ["utils/*"],
-      "@lib/*": ["lib/*"],
-      "@fragments/*": ["fragments/*"],
       "@services/*": ["services/*"]
     },
     "types": ["vitest/globals"]

@@ -1,5 +1,5 @@
 import { DEFAULT_THEME } from "@utils/constants";
-import type { AppTheme } from "@types";
+import type { AppTheme } from "../types";
 
 export const getStorageTheme = (): AppTheme | null => {
   const storageTheme = localStorage.getItem(DEFAULT_THEME);

@@ -3,11 +3,10 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Grid from "@mui/material/Grid";
 import ListItem from "@mui/material/ListItem";
 
 import PostTagMenu from "./PostTagMenu";
-import type { PostTagsListAction } from "@types";
+import type { PostTagsListAction } from "@features/postTags/GetPostTags/types";
 
 interface PostTagProps {
   id: string;
@@ -26,7 +25,7 @@ const PostTag = (props: PostTagProps) => {
   };
 
   return (
-    <Grid component={ListItem} disableGutters item xs={6} md={4} lg={3}>
+    <ListItem disablePadding>
       <Box
         aria-label={`${name} post tag container`}
         display="flex"
@@ -47,12 +46,11 @@ const PostTag = (props: PostTagProps) => {
             />
           }
           label={name}
-          sx={theme => ({
+          sx={{
             mr: 0,
-            width: "75%",
-            columnGap: 0.25,
+            width: "calc(100% - 40px)",
+            columnGap: 1,
             flex: 0,
-            [theme.breakpoints.up("md")]: { width: "80%" },
             "&>.MuiFormControlLabel-label": {
               textOverflow: "ellipsis",
               lineHeight: 1,
@@ -66,11 +64,11 @@ const PostTag = (props: PostTagProps) => {
               bgcolor: "action.selected",
               userSelect: "none",
             },
-          })}
+          }}
         />
         <PostTagMenu id={id} name={name} idName={idName} dispatch={dispatch} />
       </Box>
-    </Grid>
+    </ListItem>
   );
 };
 

@@ -76,7 +76,7 @@ const LogoutModal = ({ isOpen, onCloseModal }: LogoutModalProps) => {
   let alertMessage =
     "You are unable to logout at the moment. Please try again later";
 
-  if (error?.graphQLErrors[0]) {
+  if (error?.graphQLErrors?.[0]) {
     alertMessage = error.graphQLErrors[0].message;
   } else if (data?.logout.__typename === "NotAllowedError") {
     alertMessage = "You cannot perform that action right now";

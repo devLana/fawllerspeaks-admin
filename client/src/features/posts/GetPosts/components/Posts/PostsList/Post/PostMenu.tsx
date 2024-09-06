@@ -33,7 +33,7 @@ const PostMenu = ({ idName, name, status }: PostMenuProps) => {
         aria-expanded={isOpen || undefined}
         onClick={e => setAnchor(e.currentTarget)}
         color="secondary"
-        sx={{ position: "absolute", top: "3px", left: "3px" }}
+        sx={{ position: "absolute", top: "5px", left: "5px" }}
       >
         <MoreVertIcon fontSize="small" />
       </IconButton>

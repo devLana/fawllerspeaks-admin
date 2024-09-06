@@ -14,7 +14,7 @@ import AlertToast from "@components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
 import PasswordInput from "@components/PasswordInput";
 import { REGISTER_USER } from "../operations/REGISTER_USER";
-import { registerUserValidator } from "../utils/registerUserValidator";
+import { registerUserSchema } from "../validatorSchema";
 import { SESSION_ID } from "@utils/constants";
 import type { MutationRegisterUserArgs } from "@apiTypes";
 import type { Status } from "@types";
@@ -33,7 +33,7 @@ const RegisterUserForm = () => {
     formState: { errors },
     setError,
   } = useForm<RegisterUserArgs>({
-    resolver: yupResolver(registerUserValidator),
+    resolver: yupResolver(registerUserSchema),
   });
 
   const submitHandler = (values: RegisterUserArgs) => {
@@ -115,7 +115,7 @@ const RegisterUserForm = () => {
   let alertMessage =
     "You are unable to register your account. Please try again later";
 
-  if (error?.graphQLErrors[0]) {
+  if (error?.graphQLErrors?.[0]) {
     alertMessage = error.graphQLErrors[0].message;
   }
 

@@ -1,6 +1,6 @@
 import { gql, type TypedDocumentNode as Node } from "@apollo/client";
 
-import { USER_FIELDS } from "@fragments/User";
+import { USER_FIELDS } from "@features/auth/fragments/User";
 import type { Mutation, MutationRegisterUserArgs } from "@apiTypes";
 
 type RegisterUserData = Pick<Mutation, "registerUser">;

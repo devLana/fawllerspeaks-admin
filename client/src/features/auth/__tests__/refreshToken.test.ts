@@ -2,8 +2,8 @@ import { useRouter } from "next/router";
 
 import { screen, waitFor } from "@testing-library/react";
 
-import * as mocks from "../utils/refreshToken.mocks";
-import { sessionTestRenderer } from "../utils/sessionTestRenderer";
+import * as mocks from "./mocks/refreshToken.mocks";
+import { sessionTestRenderer } from "./utils/sessionTestRenderer";
 import { SESSION_ID } from "@utils/constants";
 
 describe("Refresh expired user access token", () => {

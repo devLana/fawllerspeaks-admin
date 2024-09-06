@@ -1,7 +1,7 @@
 import { getServerSideProps } from "@pages/reset-password";
 import type { GetServerSidePropsContext as GssPContext } from "next";
 
-import * as mocks from "../utils/resetPasswordGSSP.mocks";
+import * as mocks from "./mocks/resetPasswordGSSP.mocks";
 
 describe("getServerSideProps(ResetPassword)", () => {
   describe("Validate password reset token", () => {

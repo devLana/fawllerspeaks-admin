@@ -108,7 +108,7 @@ const useVerifySession = (handleRefreshToken: HandleRefreshToken) => {
         .catch(err => {
           if (err instanceof ApolloError) {
             const message =
-              err.graphQLErrors[0]?.message ??
+              err.graphQLErrors?.[0]?.message ??
               "Server is currently unreachable. Please try again later";
 
             setErrorMessage(message);

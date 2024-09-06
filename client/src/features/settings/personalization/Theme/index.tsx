@@ -4,8 +4,8 @@ import Typography from "@mui/material/Typography";
 
 import { useAppTheme } from "@context/AppTheme";
 import ThemeItem from "./ThemeItem";
-import { themes } from "@utils/appThemes";
-import type { ThemeMode } from "@types";
+import { appThemes as themes } from "@context/AppTheme/utils/appThemes";
+import type { ThemeMode } from "@context/AppTheme/types";
 
 const Theme = ({ themeMode }: { themeMode: ThemeMode }) => {
   const handleAppTheme = useAppTheme();

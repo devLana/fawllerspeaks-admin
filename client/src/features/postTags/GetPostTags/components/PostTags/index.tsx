@@ -7,7 +7,7 @@ import DeletePostTags from "@features/postTags/DeletePostTags";
 import PostTagsWrapper from "../PostTagsWrapper";
 import PostTagsList from "./components/PostTagsList";
 import ErrorBoundary from "@components/ErrorBoundary";
-import { initialState, reducer } from "./utils/postTagsList.reducer";
+import { initialState, reducer } from "./state/postTagsList.reducer";
 
 const PostTags = ({ id }: { id: string }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);

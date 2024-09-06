@@ -9,7 +9,7 @@ import {
   renderUI,
 } from "@utils/tests/renderUI";
 import { SESSION_ID } from "@utils/constants";
-import * as mocks from "../utils/login.mocks";
+import * as mocks from "./login.mocks";
 
 describe("Login Page", () => {
   const emailLabel = { name: /^e-?mail$/i };

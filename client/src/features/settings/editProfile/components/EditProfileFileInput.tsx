@@ -4,7 +4,8 @@ import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternate
 import { useHandleFile } from "@hooks/useHandleFile";
 import EditProfileImagePreview from "./EditProfileImagePreview";
 import { FileInput } from "@components/FileInput";
-import type { EditProfileImage, Status, StateSetterFn } from "@types";
+import type { EditProfileImage } from "../types";
+import type { Status, StateSetterFn } from "@types";
 
 interface EditProfileFileInputProps {
   image: EditProfileImage;
@@ -64,7 +65,6 @@ const EditProfileFileInput = ({
   return (
     <>
       <FileInput
-        type="file"
         name="image"
         id={id}
         accept="image/*"

@@ -9,10 +9,10 @@ import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import useGetUserInfo from "@hooks/useGetUserInfo";
+import useGetUserInfo from "@features/auth/hooks/useGetUserInfo";
 import PasswordInput from "@components/PasswordInput";
 import { CHANGE_PASSWORD } from "../operations/CHANGE_PASSWORD";
-import { changePasswordValidator } from "../utils/changePasswordValidator";
+import { changePasswordSchema } from "../validatorSchema";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { SESSION_ID } from "@utils/constants";
 import type { MutationChangePasswordArgs } from "@apiTypes";
@@ -33,7 +33,7 @@ const ChangePasswordForm = () => {
     setError,
     reset,
   } = useForm<MutationChangePasswordArgs>({
-    resolver: yupResolver(changePasswordValidator),
+    resolver: yupResolver(changePasswordSchema),
   });
 
   const userEmail = useGetUserInfo()?.email ?? "";
@@ -114,7 +114,7 @@ const ChangePasswordForm = () => {
     data?.changePassword.__typename === "ServerError"
   ) {
     msg = data.changePassword.message;
-  } else if (error?.graphQLErrors[0]) {
+  } else if (error?.graphQLErrors?.[0]) {
     msg = error.graphQLErrors[0].message;
   }
 

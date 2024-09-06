@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { middlewareService } from ".";
-import type { MiddlewareAuthCookies } from "@types";
+import { middlewareService, type MiddlewareAuthCookies } from ".";
 
 describe("Middleware Service", () => {
   const url = "https://example-site.com";

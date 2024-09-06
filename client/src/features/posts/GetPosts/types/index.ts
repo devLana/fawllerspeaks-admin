@@ -1,5 +1,5 @@
-import type { ModifiedPost } from "@types";
 import type { GetPosts, GetPostsData, Post } from "@apiTypes";
+import type { ModifiedPost } from "@features/posts/types";
 
 type PostsPageDataKeys =
   | "id"

@@ -7,7 +7,7 @@ import type { Theme } from "@mui/material/styles";
 
 import { useAuthHeader } from "@context/AuthHeader";
 import CustomEditor from "ckeditor5-custom-build";
-import type { CKEditorComponentProps } from "@types";
+import type { CKEditorComponentProps } from "@features/posts/CreatePost/types";
 
 const CKEditorComponent = (props: CKEditorComponentProps) => {
   const { id, data, contentHasError, dispatch, onBlur, onFocus } = props;

@@ -8,7 +8,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/NextLink";
 import transition from "../utils/transition";
-import type { NavbarLinkItem } from "@types";
+import type { NavbarLinkItem } from "../types";
 
 interface NavbarItemLinkProps extends NavbarLinkItem {
   isOpen: boolean;
@@ -21,20 +21,30 @@ const NavbarItemLink = ({
   href,
   label,
   Icon,
-  hasDivider,
   isOpen,
   showTooltip,
   onClick,
 }: NavbarItemLinkProps) => {
   const { pathname } = useRouter();
+  let isCurrent: boolean;
+
+  switch (href) {
+    case "/":
+      isCurrent = pathname === href;
+      break;
+
+    case "/posts":
+      isCurrent = pathname.startsWith(href) && pathname !== "/posts/new";
+      break;
+
+    default:
+      isCurrent = pathname.startsWith(href);
+  }
 
   return (
     <ListItem
-      sx={{
-        py: 2,
-        px: 0,
-        ...(hasDivider ? { borderBottom: 1, borderColor: "divider" } : {}),
-      }}
+      disablePadding
+      sx={{ ...(label === "Settings" && { mt: "auto", pt: 4 }) }}
     >
       <Tooltip title={showTooltip ? label : null} placement="right">
         <ListItemButton
@@ -46,20 +56,16 @@ const NavbarItemLink = ({
             color: "primary.main",
             whiteSpace: { sm: "nowrap" },
             overflow: { sm: "hidden" },
-            transition: ({ transitions: transit }) => {
+            transition({ transitions: transit }) {
               return transition(transit, isOpen, ["background-color"]);
             },
             "&:hover": { color: "primary.main" },
-            "&[aria-current=page]": {
-              bgcolor: "primary.main",
-              color: "background.default",
-              boxShadow: 3,
-            },
+            "&[aria-current=page]": { bgcolor: "action.selected" },
           }}
           component={NextLink}
           href={href}
           onClick={onClick}
-          aria-current={pathname === href ? "page" : undefined}
+          aria-current={isCurrent ? "page" : undefined}
         >
           <ListItemIcon sx={{ color: "inherit", minWidth: 0 }}>
             <Icon />
@@ -71,7 +77,7 @@ const NavbarItemLink = ({
               marginLeft: 2,
               ml: { sm: isOpen ? 2 : 0, md: isOpen ? 0 : 2 },
               opacity: { sm: isOpen ? 1 : 0, md: isOpen ? 0 : 1 },
-              transition: ({ transitions: transit }) => {
+              transition({ transitions: transit }) {
                 return transition(transit, isOpen, ["margin-left", "opacity"]);
               },
               "&>.MuiTypography-root": { lineHeight: 1 },

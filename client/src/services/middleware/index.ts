@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import type { MiddlewareAuthCookies } from "@types";
+
+export interface MiddlewareAuthCookies {
+  authCookie: string | undefined;
+  sigCookie: string | undefined;
+  tokenCookie: string | undefined;
+}
 
 export const middlewareService = (
   { authCookie, sigCookie, tokenCookie }: MiddlewareAuthCookies,

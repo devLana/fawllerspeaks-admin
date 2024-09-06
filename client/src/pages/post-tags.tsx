@@ -8,7 +8,7 @@ import RootLayout from "@layouts/RootLayout";
 import { PostTagsPageContext } from "@features/postTags/context/PostTagsPageContext";
 import CreatePostTags from "@features/postTags/CreatePostTags";
 import GetPostTags from "@features/postTags/GetPostTags";
-import uiLayout from "@utils/uiLayout";
+import uiLayout from "@layouts/utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 
@@ -18,6 +18,8 @@ const PostTagsPage: NextPageWithLayout = () => {
   const handleOpenAlert = (message: string) => {
     setAlert({ open: true, message });
   };
+
+  const id = "post-tags";
 
   return (
     <PostTagsPageContext.Provider value={{ handleOpenAlert }}>
@@ -29,12 +31,12 @@ const PostTagsPage: NextPageWithLayout = () => {
         justifyContent="space-between"
         mb={5}
       >
-        <Typography variant="h1">
-          Use post tags to categorize blog posts
+        <Typography variant="h1" id={id}>
+          Post Tags: Categorize blog posts
         </Typography>
         <CreatePostTags />
       </Box>
-      <GetPostTags />
+      <GetPostTags id={id} />
       <Snackbar
         message={alert.message}
         open={alert.open}

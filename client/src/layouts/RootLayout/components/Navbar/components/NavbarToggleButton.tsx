@@ -22,13 +22,16 @@ const NavbarToggleButton = (props: NavbarToggleButtonProps) => {
   }
 
   return (
-    <ListItem sx={{ pb: 2, px: 0, borderBottom: 1, borderColor: "divider" }}>
+    <ListItem
+      disablePadding
+      sx={{ pb: 2, borderBottom: 1, borderColor: "divider" }}
+    >
       <Tooltip title={title} placement="bottom-start">
         <IconButton
           onClick={onClick}
           sx={{
             m: "auto",
-            color: ({ appTheme: { themeMode } }) => {
+            color({ appTheme: { themeMode } }) {
               return themeMode === "sunny" ? "primary.dark" : "primary.main";
             },
             transform: {

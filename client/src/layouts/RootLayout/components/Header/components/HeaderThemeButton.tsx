@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 
 import { useAppTheme } from "@context/AppTheme";
-import { themes } from "@utils/appThemes";
+import { appThemes as themes } from "@context/AppTheme/utils/appThemes";
 
 const HeaderThemeButton = () => {
   const { appTheme } = useTheme();

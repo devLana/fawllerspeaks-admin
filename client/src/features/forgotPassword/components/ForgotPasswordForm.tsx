@@ -9,7 +9,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import AlertToast from "@components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
 import { FORGOT_PASSWORD } from "../operations/FORGOT_PASSWORD";
-import { forgotPasswordValidator } from "../utils/forgotPasswordValidator";
+import { forgotPasswordSchema } from "../validatorSchema";
 import type { AuthPageView, Status, StateSetterFn } from "@types";
 import type { MutationForgotPasswordArgs } from "@apiTypes";
 
@@ -28,7 +28,7 @@ const ForgotPasswordForm = ({ setView }: ForgotPasswordFormProps) => {
     formState: { errors },
     setError,
   } = useForm<MutationForgotPasswordArgs>({
-    resolver: yupResolver(forgotPasswordValidator),
+    resolver: yupResolver(forgotPasswordSchema),
   });
 
   const submitHandler = (values: MutationForgotPasswordArgs) => {
@@ -75,7 +75,7 @@ const ForgotPasswordForm = ({ setView }: ForgotPasswordFormProps) => {
     data?.forgotPassword.__typename === "ServerError"
   ) {
     alertMessage = data.forgotPassword.message;
-  } else if (error?.graphQLErrors[0]) {
+  } else if (error?.graphQLErrors?.[0]) {
     alertMessage = error.graphQLErrors[0].message;
   }
 

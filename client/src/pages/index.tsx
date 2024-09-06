@@ -5,16 +5,16 @@ import Typography from "@mui/material/Typography";
 import Snackbar from "@mui/material/Snackbar";
 
 import RootLayout from "@layouts/RootLayout";
-import uiLayout from "@utils/uiLayout";
+import uiLayout from "@layouts/utils/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 
 const Home: NextPageWithLayout = () => {
   const [alert, setAlert] = React.useState({ open: false, message: "" });
-  const { isReady, query } = useRouter();
+  const { query } = useRouter();
 
   React.useEffect(() => {
-    if (isReady && typeof query.status === "string") {
+    if (query.status && typeof query.status === "string") {
       switch (query.status) {
         case "registered":
           setAlert({
@@ -26,7 +26,7 @@ const Home: NextPageWithLayout = () => {
         default:
       }
     }
-  }, [isReady, query.status]);
+  }, [query.status]);
 
   return (
     <>

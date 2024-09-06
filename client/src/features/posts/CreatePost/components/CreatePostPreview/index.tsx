@@ -20,7 +20,7 @@ import type {
   CreatePostData,
   CreateStatus,
   DraftErrorCb,
-} from "@types";
+} from "../../types";
 
 interface CreatePostPreviewProps {
   post: CreatePostData;

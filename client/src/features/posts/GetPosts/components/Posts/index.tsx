@@ -29,7 +29,10 @@ const Posts = ({ id, isFetchingMore, postsData }: PostsProps) => {
     <PostsWrapper id={id} ariaBusy={false}>
       <Box
         display="grid"
-        gridTemplateColumns="repeat(auto-fit, minmax(200px, 1fr))"
+        gridTemplateColumns={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          lg: "repeat(auto-fit, minmax(140px, auto))",
+        }}
         gap={4}
       >
         <PostStatusInput />

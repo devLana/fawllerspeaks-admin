@@ -4,7 +4,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import { graphql } from "msw";
 
 import PostTagsPage from "@pages/post-tags";
-import * as mocks from "../utils/editPostTag.mocks";
+import * as mocks from "./editPostTag.mocks";
 import { renderUI } from "@utils/tests/renderUI";
 
 describe("Edit a post tag", () => {

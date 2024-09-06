@@ -2,8 +2,8 @@ import { useRouter } from "next/router";
 
 import { screen, waitFor } from "@testing-library/react";
 
-import * as mocks from "../utils/verifySession.mocks";
-import { sessionTestRenderer } from "../utils/sessionTestRenderer";
+import * as mocks from "./mocks/verifySession.mocks";
+import { sessionTestRenderer } from "./utils/sessionTestRenderer";
 import { SESSION_ID } from "@utils/constants";
 
 describe("Verify user session", () => {

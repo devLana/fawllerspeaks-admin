@@ -9,7 +9,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import type { MutationTuple } from "@apollo/client";
 
 import PasswordInput from "@components/PasswordInput";
-import { resetPasswordValidator } from "../utils/resetPasswordValidator";
+import { resetPasswordSchema } from "../validatorSchema";
 import type { ResetPasswordData } from "../operations/RESET_PASSWORD";
 import type { MutationResetPasswordArgs } from "@apiTypes";
 import type { AuthPageView, Status, StateSetterFn } from "@types";
@@ -34,7 +34,7 @@ const ResetPasswordForm = (props: ResetPasswordFormProps) => {
     formState: { errors },
     setError,
   } = useForm<OmitToken>({
-    resolver: yupResolver(resetPasswordValidator),
+    resolver: yupResolver(resetPasswordSchema),
   });
 
   const submitHandler = (values: OmitToken) => {
@@ -43,7 +43,7 @@ const ResetPasswordForm = (props: ResetPasswordFormProps) => {
     void resetPassword({
       variables: { ...values, token: resetToken },
       onError(err) {
-        const status = err.graphQLErrors.length > 0 ? "api" : "network";
+        const status = err.graphQLErrors?.length > 0 ? "api" : "network";
         void push(`/forgot-password?status=${status}`);
       },
       onCompleted(resetData) {

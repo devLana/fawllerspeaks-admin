@@ -1,5 +1,4 @@
 import * as React from "react";
-import dynamic from "next/dynamic";
 
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
@@ -9,47 +8,29 @@ import RootLayout from "@layouts/RootLayout";
 import CreatePostMetadata from "@features/posts/CreatePost/components/CreatePostMetadata";
 import PostFileInput from "@features/posts/CreatePost/components/CreatePostMetadata/components/PostFileInput";
 import SelectPostTagsInput from "@features/posts/CreatePost/components/CreatePostMetadata/components/SelectPostTags/SelectPostTagsInput";
-import CreatePostContentSkeleton from "@features/posts/CreatePost/components/CreatePostContent/components/CreatePostContentSkeleton";
-import PostPreviewSkeleton from "@features/posts/CreatePost/components/CreatePostPreview/components/PostPreviewSkeleton";
-import * as post from "@features/posts/CreatePost/utils/createPostReducer";
-import uiLayout from "@utils/uiLayout";
+import { LazyCreatePostContent } from "@features/posts/CreatePost/components/CreatePostContent/LazyCreatePostContent";
+import { LazyCreatePostPreview } from "@features/posts/CreatePost/components/CreatePostPreview/LazyCreatePostPreview";
+import * as post from "@features/posts/CreatePost/state/createPostReducer";
+import uiLayout from "@layouts/utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
-
-const CreatePostContent = dynamic(
-  () => {
-    return import(
-      /* webpackChunkName: "CreatePostContent" */ "@features/posts/CreatePost/components/CreatePostContent"
-    );
-  },
-  { loading: () => <CreatePostContentSkeleton />, ssr: false }
-);
-
-const CreatePostPreview = dynamic(
-  () => {
-    return import(
-      /* webpackChunkName: "CreatePostPreview" */ "@features/posts/CreatePost/components/CreatePostPreview"
-    );
-  },
-  { loading: () => <PostPreviewSkeleton />, ssr: false }
-);
 
 const CreatePostPage: NextPageWithLayout = () => {
   const [state, dispatch] = React.useReducer(post.reducer, post.initialState);
 
   React.useEffect(() => {
     return () => {
-      if (state.postData.imageBanner) {
+      if (state.postData.imageBanner?.blobUrl) {
         window.URL.revokeObjectURL(state.postData.imageBanner.blobUrl);
       }
     };
-  }, [state.postData.imageBanner]);
+  }, [state.postData.imageBanner?.blobUrl]);
 
   const draft = useDraftPost(state.postData);
 
   return (
     <>
       <Typography variant="h1" gutterBottom>
-        Create A New Blog Post
+        Create a new blog post
       </Typography>
       {state.view === "metadata" ? (
         <CreatePostMetadata
@@ -76,7 +57,7 @@ const CreatePostPage: NextPageWithLayout = () => {
           }
         />
       ) : state.view === "content" ? (
-        <CreatePostContent
+        <LazyCreatePostContent
           content={state.postData.content}
           draftStatus={draft.draftStatus}
           draftErrors={draft.errors}
@@ -85,7 +66,7 @@ const CreatePostPage: NextPageWithLayout = () => {
           dispatch={dispatch}
         />
       ) : (
-        <CreatePostPreview
+        <LazyCreatePostPreview
           post={state.postData}
           draftStatus={draft.draftStatus}
           draftErrors={draft.errors}

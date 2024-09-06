@@ -8,10 +8,10 @@ import MenuItem from "@mui/material/MenuItem";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Select, { type SelectChangeEvent } from "@mui/material/Select";
 
-import { useGetCachePostTags } from "@hooks/useGetCachePostTags";
+import { useGetCachePostTags } from "@features/postTags/GetPostTags/hooks/useGetCachePostTags";
 import TooltipHint from "../TooltipHint";
 import RenderSelectedPostTags from "./RenderSelectedPostTags";
-import type { CreatePostAction } from "@types";
+import type { CreatePostAction } from "@features/posts/CreatePost/types";
 
 interface SelectPostTagsInputProps {
   tagIdsError: string | undefined;

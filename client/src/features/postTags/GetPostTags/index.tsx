@@ -1,17 +1,14 @@
 import { useRouter } from "next/router";
 
-import useGetPostTags from "@hooks/useGetPostTags";
+import useGetPostTags from "@features/postTags/GetPostTags/hooks/useGetPostTags";
 import PostTags from "./components/PostTags";
 import PostTagsLoading from "./components/PostTagsLoading";
 import PostTagsTextContent from "./components/PostTagsTextContent";
 import { SESSION_ID } from "@utils/constants";
 
-const GetPostTags = () => {
+const GetPostTags = ({ id }: { id: string }) => {
   const { replace, pathname } = useRouter();
-
   const { data, loading, error, client } = useGetPostTags();
-
-  const id = "post-tags";
 
   const msg =
     "You are unable to get post tags at the moment. Please try again later";
@@ -19,8 +16,8 @@ const GetPostTags = () => {
   if (loading) return <PostTagsLoading id={id} />;
 
   if (error) {
-    const message = error.graphQLErrors[0]?.message ?? msg;
-    return <PostTagsTextContent severity="error" id={id} text={message} />;
+    const message = error.graphQLErrors?.[0]?.message ?? msg;
+    return <PostTagsTextContent id={id} severity="error" text={message} />;
   }
 
   if (!data) {

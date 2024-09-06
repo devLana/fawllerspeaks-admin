@@ -4,7 +4,7 @@ import { screen, waitFor } from "@testing-library/react";
 
 import ResetPassword from "@pages/reset-password";
 import { renderUI } from "@utils/tests/renderUI";
-import * as mocks from "../utils/resetPassword.mocks";
+import * as mocks from "./mocks/resetPassword.mocks";
 
 describe("Reset Password", () => {
   describe("Pre-render reset password page with server side data", () => {

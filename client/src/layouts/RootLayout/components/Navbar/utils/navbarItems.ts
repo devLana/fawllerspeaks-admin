@@ -5,7 +5,7 @@ import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded";
-import type { NavbarButtonItem, NavbarLinkItem } from "@types";
+import type { NavbarButtonItem, NavbarLinkItem } from "../types";
 
 interface LinkItem extends NavbarLinkItem {
   type: "link";
@@ -29,34 +29,19 @@ export const navbarItems: (LinkItem | ButtonItem)[] = [
     label: "Dashboard",
     Icon: SpaceDashboardOutlinedIcon,
   },
-  {
-    type: "link",
-    href: "/posts",
-    label: "Posts",
-    Icon: ListAltIcon,
-  },
+  { type: "link", href: "/posts", label: "Posts", Icon: ListAltIcon },
   {
     type: "link",
     href: "/post-tags",
     label: "Post Tags",
     Icon: StyleOutlinedIcon,
   },
-  {
-    type: "link",
-    href: "/posts/bin",
-    label: "Bin",
-    Icon: DeleteOutlinedIcon,
-  },
+  { type: "link", href: "/posts/bin", label: "Bin", Icon: DeleteOutlinedIcon },
   {
     type: "link",
     href: "/settings",
     label: "Settings",
     Icon: SettingsOutlinedIcon,
-    hasDivider: true,
   },
-  {
-    type: "button",
-    label: "Logout",
-    Icon: ExitToAppRoundedIcon,
-  },
+  { type: "button", label: "Logout", Icon: ExitToAppRoundedIcon },
 ];

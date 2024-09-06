@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import TooltipHint from "./components/TooltipHint";
 import SelectPostTags from "./components/SelectPostTags";
 import ActionButtons from "../ActionButtons";
-import { postMetadataValidator } from "./utils/postMetadataValidator";
+import { postMetadataValidator } from "./validatorSchema";
 import { metadataTextBoxes } from "./utils/metadataTextBoxes";
 import type {
   DraftErrorCb,
@@ -17,7 +17,7 @@ import type {
   CreateStatus,
   RequiredPostMetadata,
   RequiredMetadataKeys,
-} from "@types";
+} from "../../types";
 
 type BlurEvent = React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>;
 

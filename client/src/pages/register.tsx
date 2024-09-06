@@ -6,7 +6,7 @@ import AlertToast from "@components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
 import Card from "@components/Card";
 import RegisterUserForm from "@features/register/components/RegisterUserForm";
-import uiLayout from "@utils/uiLayout";
+import uiLayout from "@layouts/utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const RegisterUser: NextPageWithLayout = () => {

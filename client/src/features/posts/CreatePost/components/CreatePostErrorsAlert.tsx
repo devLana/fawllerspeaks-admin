@@ -7,7 +7,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Tooltip from "@mui/material/Tooltip";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 
-import type { CreateInputErrors } from "@types";
+import type { CreateInputErrors } from "../types";
 
 interface CreatePostErrorsAlertProps extends CreateInputErrors {
   ariaLabel: string;

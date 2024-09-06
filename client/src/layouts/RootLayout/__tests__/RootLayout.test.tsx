@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { screen, waitFor, within } from "@testing-library/react";
 
 import RootLayout from "..";
-import * as mocks from "../utils/Layout.mocks";
+import * as mocks from "./Layout.mocks";
 import { renderUI, stopRefreshTokenTimer } from "@utils/tests/renderUI";
 import { DEFAULT_THEME, SESSION_ID } from "@utils/constants";
 

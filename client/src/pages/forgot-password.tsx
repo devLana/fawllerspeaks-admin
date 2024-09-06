@@ -12,7 +12,7 @@ import Card from "@components/Card";
 import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
 import ForgotPasswordForm from "@features/forgotPassword/components/ForgotPasswordForm";
 import ForgotPasswordSuccess from "@features/forgotPassword/components/ForgotPasswordSuccess";
-import uiLayout from "@utils/uiLayout";
+import uiLayout from "@layouts/utils/uiLayout";
 import type { AuthPageView, NextPageWithLayout } from "@types";
 
 const ForgotPassword: NextPageWithLayout = () => {

@@ -1,8 +1,7 @@
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 
-import type { AppThemeItem } from "@utils/appThemes";
-import type { ThemeMode } from "@types";
+import type { AppThemeItem, ThemeMode } from "@context/AppTheme/types";
 
 interface ThemeItemProps extends AppThemeItem {
   isCurrentTheme: boolean;

@@ -4,7 +4,7 @@ import { screen, waitFor } from "@testing-library/react";
 
 import ChangePassword from "@pages/settings/password";
 import { renderUI } from "@utils/tests/renderUI";
-import * as mocks from "../utils/changePassword.mocks";
+import * as mocks from "./changePassword.mocks";
 
 describe("Change Password", () => {
   const btnName = { name: /^change password$/i };

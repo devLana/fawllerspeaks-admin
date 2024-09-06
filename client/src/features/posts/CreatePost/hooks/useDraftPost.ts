@@ -11,7 +11,7 @@ import type {
   CreatePostData,
   CreateStatus,
   DraftErrorCb,
-} from "@types";
+} from "../types";
 import type { DraftPostInput } from "@apiTypes";
 
 export const useDraftPost = (postData: CreatePostData) => {

@@ -4,7 +4,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import { graphql } from "msw";
 
 import PostTagsPage from "@pages/post-tags";
-import * as mocks from "../utils/deletePostTags.mocks";
+import * as mocks from "./deletePostTags.mocks";
 import { renderUI } from "@utils/tests/renderUI";
 
 describe("Delete post tags", () => {
@@ -200,7 +200,7 @@ describe("Delete post tags", () => {
     });
 
     // Attempt the delete operation by selecting each post tag checkbox individually
-    it("Should delete some post tags post tags from the list of post tags", async () => {
+    it("Should delete some post tags from the list of post tags", async () => {
       const { msg, tagNames: tags, resolver } = mocks.allDel2;
       mocks.server.use(graphql.query("GetPostTags", resolver));
       const label = tagLabel;

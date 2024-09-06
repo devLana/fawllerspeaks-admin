@@ -1,9 +1,10 @@
 import * as React from "react";
 
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { InMemoryCache, ApolloProvider } from "@apollo/client";
 
 import { AuthHeaderContext } from ".";
 import { BaseResponse, UserData } from "./cachePossibleTypes";
+import apolloClient from "./apolloClient";
 
 const AuthHeaderProvider = ({ children }: { children: React.ReactNode }) => {
   const [jwt, setJwt] = React.useState("");
@@ -13,15 +14,8 @@ const AuthHeaderProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const client = React.useMemo(() => {
-    return new ApolloClient({
-      uri: process.env.NEXT_PUBLIC_API_URL,
-      cache,
-      credentials: "include",
-      ssrMode: typeof window === "undefined",
-      connectToDevTools: true,
-      ...(jwt ? { headers: { authorization: `Bearer ${jwt}` } } : {}),
-    });
-  }, [jwt, cache]);
+    return apolloClient(jwt, cache);
+  }, [cache, jwt]);
 
   return (
     <AuthHeaderContext.Provider

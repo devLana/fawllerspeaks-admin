@@ -8,9 +8,9 @@ import { usePostsFilters } from "@features/posts/GetPosts/hooks/usePostsFilters"
 import type { SortPostsBy } from "@apiTypes";
 
 const options: { label: string; value: SortPostsBy }[] = [
-  { label: "Date Created", value: "date_asc" },
-  { label: "Date Created (Desc)", value: "date_desc" },
+  { label: "Date", value: "date_asc" },
   { label: "Title", value: "title_asc" },
+  { label: "Date (Desc)", value: "date_desc" },
   { label: "Title (Desc)", value: "title_desc" },
 ];
 

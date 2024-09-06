@@ -8,21 +8,19 @@ import NextLink from "@components/NextLink";
 
 const PageBreadcrumbs = () => {
   const { pathname } = useRouter();
+
+  if (/\[{1,2}(?:\.\.\.)?[\w-]+\]{1,2}/.test(pathname)) return null;
+
   const pathnames = pathname.split("/").filter(Boolean);
 
   if (pathnames.length < 2) return null;
 
   const crumbs = pathnames.map((path, index, pathnamesArr) => {
     const href = `/${pathnamesArr.slice(0, index + 1).join("/")}`;
+
     const label = path
       .split(/[\s_-]/)
-      .map(str => {
-        const checkFirstCharacter = /[a-z]/i.test(str.charAt(0));
-
-        if (!checkFirstCharacter) return str;
-
-        return `${str.charAt(0).toUpperCase()}${str.substring(1)}`;
-      })
+      .map(str => `${str.charAt(0).toUpperCase()}${str.substring(1)}`)
       .join(" ");
 
     return index === pathnamesArr.length - 1 ? (

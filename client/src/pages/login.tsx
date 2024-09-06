@@ -8,7 +8,7 @@ import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
 import Card from "@components/Card";
 import LoginForm from "@features/login/components/LoginForm";
-import uiLayout from "@utils/uiLayout";
+import uiLayout from "@layouts/utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const Login: NextPageWithLayout = () => {

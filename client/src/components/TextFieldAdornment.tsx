@@ -22,22 +22,20 @@ const TextFieldAdornment = ({
   iconEdge = false,
   Icon,
   onClick,
-}: TextFieldAdornmentProps) => {
-  return (
-    <InputAdornment position={position}>
-      <Tooltip title={title}>
-        <IconButton
-          edge={iconEdge}
-          color={color}
-          size="small"
-          onClick={onClick}
-          onMouseDown={e => e.preventDefault()}
-        >
-          <Icon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-    </InputAdornment>
-  );
-};
+}: TextFieldAdornmentProps) => (
+  <InputAdornment position={position}>
+    <Tooltip title={title}>
+      <IconButton
+        edge={iconEdge}
+        color={color}
+        size="small"
+        onClick={onClick}
+        onMouseDown={e => e.preventDefault()}
+      >
+        <Icon fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  </InputAdornment>
+);
 
 export default TextFieldAdornment;

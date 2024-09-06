@@ -12,12 +12,12 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
 import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
-import { editPostTagValidator } from "../utils/editPostTagValidator";
-import { refetchQueries } from "../utils/refetchQueries";
+import { editPostTagSchema } from "../validatorSchema";
+import { refetchQueries } from "../cache/refetchQueries";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { SESSION_ID } from "@utils/constants";
 import type { MutationEditPostTagArgs } from "@apiTypes";
-import type { PostTagsListAction } from "@types";
+import type { PostTagsListAction } from "@features/postTags/GetPostTags/types";
 
 type OmitTagId = Omit<MutationEditPostTagArgs, "tagId">;
 
@@ -43,7 +43,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
     formState: { errors, defaultValues },
     setError,
   } = useForm<OmitTagId>({
-    resolver: yupResolver(editPostTagValidator),
+    resolver: yupResolver(editPostTagSchema),
     defaultValues: { name },
   });
 
@@ -134,7 +134,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
     data?.editPostTag.__typename === "EditedPostTagWarning"
   ) {
     alertMessage = data.editPostTag.message;
-  } else if (error?.graphQLErrors[0]) {
+  } else if (error?.graphQLErrors?.[0]) {
     alertMessage = error.graphQLErrors[0].message;
   }
 

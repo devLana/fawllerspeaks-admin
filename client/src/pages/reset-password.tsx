@@ -12,8 +12,8 @@ import ResetPasswordSuccess from "@features/resetPassword/components/ResetPasswo
 import { RESET_PASSWORD } from "@features/resetPassword/operations/RESET_PASSWORD";
 import verifyPasswordResetToken, {
   type ResetPasswordPageData,
-} from "@features/resetPassword/utils/verifyPasswordResetToken";
-import uiLayout from "@utils/uiLayout";
+} from "@features/resetPassword/api/verifyPasswordResetToken";
+import uiLayout from "@layouts/utils/uiLayout";
 import type { AuthPageView, NextPageWithLayout } from "@types";
 
 type GssP = GetServerSideProps<ResetPasswordPageData>;

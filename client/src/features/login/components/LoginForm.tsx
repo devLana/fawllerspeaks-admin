@@ -13,7 +13,7 @@ import AlertToast from "@components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
 import PasswordInput from "@components/PasswordInput";
 import { LOGIN_USER } from "../operations/LOGIN_USER";
-import { loginValidator } from "../utils/loginValidator";
+import { loginSchema } from "../validatorSchema";
 import { SESSION_ID } from "@utils/constants";
 import type { MutationLoginArgs } from "@apiTypes";
 import type { Status } from "@types";
@@ -29,7 +29,7 @@ const LoginForm = () => {
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<MutationLoginArgs>({ resolver: yupResolver(loginValidator) });
+  } = useForm<MutationLoginArgs>({ resolver: yupResolver(loginSchema) });
 
   const { handleUserId, handleRefreshToken } = useSession();
   const { handleAuthHeader } = useAuthHeader();
@@ -96,7 +96,7 @@ const LoginForm = () => {
 
   if (data?.login.__typename === "NotAllowedError") {
     alertMessage = data.login.message;
-  } else if (error?.graphQLErrors[0]) {
+  } else if (error?.graphQLErrors?.[0]) {
     alertMessage = error.graphQLErrors[0].message;
   }
 

@@ -6,7 +6,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import type { CreateStatus } from "@types";
+import type { CreateStatus } from "@features/posts/CreatePost/types";
 
 interface PostPreviewDialogProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import { gql, type TypedDocumentNode as DocNode } from "@apollo/client";
 
-import { USER_FIELDS } from "@fragments/User";
+import { USER_FIELDS } from "@features/auth/fragments/User";
 import type { Mutation, MutationVerifySessionArgs } from "@apiTypes";
 
 type VerifySessionData = Pick<Mutation, "verifySession">;

@@ -4,14 +4,14 @@ import { useRouter } from "next/router";
 import { NetworkStatus } from "@apollo/client";
 
 import { useGetPosts } from "@features/posts/GetPosts/hooks/useGetPosts";
-import useGetPostTags from "@hooks/useGetPostTags";
+import useGetPostTags from "@features/postTags/GetPostTags/hooks/useGetPostTags";
 import RootLayout from "@layouts/RootLayout";
 import Posts from "@features/posts/GetPosts/components/Posts";
 import PostsLoading from "@features/posts/GetPosts/components/PostsLoading";
 import PostsTextContent from "@features/posts/GetPosts/components/PostsTextContent";
 import NoPostsData from "@features/posts/GetPosts/components/NoPostsData";
 import { SESSION_ID } from "@utils/constants";
-import uiLayout from "@utils/uiLayout";
+import uiLayout from "@layouts/utils/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const GetPosts: NextPageWithLayout = () => {
