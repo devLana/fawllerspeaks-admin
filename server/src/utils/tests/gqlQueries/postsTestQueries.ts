@@ -142,8 +142,8 @@ export const DRAFT_POST = `#graphql
 
 export const GET_POST = `#graphql
   ${POST_FIELDS}
-  query GetPost($postId: ID!) {
-    getPost(postId: $postId) {
+  query GetPost($slug: String!) {
+    getPost(slug: $slug) {
       ... on  BaseResponse {
         __typename
         message
@@ -158,9 +158,9 @@ export const GET_POST = `#graphql
         status
       }
 
-      ... on PostIdValidationError {
+      ... on GetPostValidationError {
         __typename
-        postIdError
+        slugError
         status
       }
     }

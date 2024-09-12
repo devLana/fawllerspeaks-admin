@@ -60,6 +60,11 @@ export const postsTypeDefs = `#graphql
     status: Status!
   }
 
+  type GetPostWarning implements BaseResponse {
+    message: String!
+    status: Status!
+  }
+
   type PostsWarning implements BaseResponse {
     posts: [Post!]!
     message: String!
@@ -125,6 +130,11 @@ export const postsTypeDefs = `#graphql
     status: Status! 
   }
 
+  type GetPostValidationError {
+    slugError: String
+    status: Status!
+  }
+
   union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
 
   union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError
@@ -133,7 +143,7 @@ export const postsTypeDefs = `#graphql
 
   union EmptyBin = Posts | EmptyBinWarning | NotAllowedError
 
-  union GetPost = SinglePost | PostIdValidationError | NotAllowedError | UnknownError
+  union GetPost = SinglePost | GetPostWarning | GetPostValidationError | AuthenticationError | NotAllowedError | RegistrationError
 
   union GetPosts = GetPostsData | GetPostsValidationError | AuthenticationError | NotAllowedError | RegistrationError | ForbiddenError
 

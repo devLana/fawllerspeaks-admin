@@ -12,8 +12,8 @@ const types = `#graphql
     ####POSTS####
     "Get posts"
     getPosts(page: GetPostsPageInput, filters: GetPostsFiltersInput): GetPosts!
-    "Get one post"
-    getPost(postId: ID!): GetPost!
+    "Get post by slug"
+    getPost(slug: String!): GetPost!
   }
 
   type Mutation {

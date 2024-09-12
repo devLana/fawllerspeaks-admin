@@ -16,6 +16,7 @@ import { PostAuthorResolvers } from "./types/PostAuthor";
 import { PostUrlResolvers } from "./types/PostUrl";
 import { SinglePostResolver } from "./types/SinglePost";
 import { PostsResolver } from "./types/Posts";
+import { GetPostWarningResolvers } from "./getPost/types/GetPostWarning";
 import { PostsWarningResolver } from "./types/PostsWarning";
 import { DuplicatePostTitleErrorResolver } from "./types/DuplicatePostTitleError";
 import { NotAllowedPostActionErrorResolver } from "./types/NotAllowedPostActionError";
@@ -28,6 +29,7 @@ import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
 import { EditPostValidationErrorResolver } from "./editPost/types/EditPostValidationError";
 import { GetPostsDataResolvers } from "./getPosts/types/GetPostsData";
 import { GetPostsValidationErrorResolvers } from "./getPosts/types/GetPostsValidationError";
+import { GetPostValidationErrorResolvers } from "./getPost/types/GetPostValidationError";
 
 import type {
   MutationResolvers,
@@ -54,6 +56,7 @@ type TypeKeys =
   | "SinglePost"
   | "Posts"
   | "GetPostsData"
+  | "GetPostWarning"
   | "PostsWarning"
   | "EmptyBinWarning"
   | "DuplicatePostTitleError"
@@ -63,7 +66,8 @@ type TypeKeys =
   | "PostIdValidationError"
   | "PostIdsValidationError"
   | "EditPostValidationError"
-  | "GetPostsValidationError";
+  | "GetPostsValidationError"
+  | "GetPostValidationError";
 
 interface PostsResolvers {
   Queries: ResolversMapper<Pick<QueryResolvers, "getPosts" | "getPost">>;
@@ -96,6 +100,7 @@ export const postsResolvers: PostsResolvers = {
     SinglePost: SinglePostResolver,
     Posts: PostsResolver,
     GetPostsData: GetPostsDataResolvers,
+    GetPostWarning: GetPostWarningResolvers,
     PostsWarning: PostsWarningResolver,
     EmptyBinWarning: EmptyBinWarningResolver,
     DuplicatePostTitleError: DuplicatePostTitleErrorResolver,
@@ -106,5 +111,6 @@ export const postsResolvers: PostsResolvers = {
     PostIdsValidationError: PostIdsValidationErrorResolver,
     EditPostValidationError: EditPostValidationErrorResolver,
     GetPostsValidationError: GetPostsValidationErrorResolvers,
+    GetPostValidationError: GetPostValidationErrorResolvers,
   },
 };
