@@ -10,8 +10,8 @@ import ActionButtons from "../ActionButtons";
 import CreatePostErrorsAlert from "../CreatePostErrorsAlert";
 import PostInfoPreview from "./components/PostInfo/PostInfoPreview";
 import PostTagsPreview from "./components/PostInfo/PostTagsPreview";
-import PostImageBannerPreview from "./components/PostContent/PostImageBannerPreview";
-import PostContentPreview from "./components/PostContent/PostContentPreview";
+import PostImageBanner from "@features/posts/components/PostImageBanner";
+import PostContentView from "@features/posts/components/PostContentView";
 import PostPreviewActionsMenu from "./components/PostPreviewActionsMenu";
 import PostPreviewDialog from "./components/PostPreviewDialog";
 import type {
@@ -119,11 +119,21 @@ const CreatePostPreview = ({
           >
             {post.title}
           </Typography>
-          <PostImageBannerPreview
-            imageBanner={post.imageBanner?.blobUrl}
-            title={post.title}
-          />
-          <PostContentPreview content={post.content} />
+          {post.imageBanner?.blobUrl && (
+            <PostImageBanner
+              src={post.imageBanner.blobUrl}
+              title={post.title}
+              sx={{
+                height: { height: 200, sm: 250, md: 300 },
+                maxWidth: 700,
+                borderRadius: 1,
+                overflow: "hidden",
+                mb: 3,
+                mx: "auto",
+              }}
+            />
+          )}
+          <PostContentView content={post.content} />
         </Box>
         <ActionButtons
           label="Create post"

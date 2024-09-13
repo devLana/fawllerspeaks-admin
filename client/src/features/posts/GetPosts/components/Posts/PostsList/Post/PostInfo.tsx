@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { formatPostDate } from "../utils/formatPostDate";
+import PostDate from "@features/posts/components/PostDate";
 
 interface PostInfoProps {
   title: string;
@@ -13,8 +13,7 @@ const PostInfo = ({ title, dateCreated }: PostInfoProps) => (
       {title}
     </Typography>
     <Typography variant="body2" textAlign="center">
-      Created on&nbsp;
-      <time dateTime={dateCreated}>{formatPostDate(dateCreated)}</time>
+      Created on <PostDate dateString={dateCreated} />
     </Typography>
   </Box>
 );

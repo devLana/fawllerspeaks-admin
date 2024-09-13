@@ -1,10 +1,7 @@
 import type { PostStatus } from "@apiTypes";
 import type { ThemeMode } from "@context/AppTheme/types";
 
-export const postStatusBgColors = (
-  status: PostStatus,
-  themeMode: ThemeMode
-) => {
+export const postStatusColors = (status: PostStatus, themeMode: ThemeMode) => {
   const modes: Record<ThemeMode, string> = {
     sunny: "dark",
     sunset: "main",

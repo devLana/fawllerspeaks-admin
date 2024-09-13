@@ -1,9 +1,9 @@
 import ListItem from "@mui/material/ListItem";
 
 import NextLink from "@components/NextLink";
-import PostImageBanner from "./PostImageBanner";
+import PostImageBanner from "@features/posts/components/PostImageBanner";
 import PostStatus from "./PostStatus";
-import PostMenu from "./PostMenu";
+import PostMenu from "@features/posts/components/PostMenu";
 import PostInfo from "./PostInfo";
 import type { PostStatus as Status } from "@apiTypes";
 import type { PostItemSlug, PostsView } from "@features/posts/GetPosts/types";
@@ -27,8 +27,6 @@ const Post = ({
   dateCreated,
   url,
 }: PostProps) => {
-  const idName = title.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
-
   return (
     <ListItem
       disablePadding
@@ -50,9 +48,26 @@ const Post = ({
       }}
     >
       {postCover}
-      <PostMenu idName={idName} name={title} status={status} />
+      <PostMenu
+        title={title}
+        status={status}
+        slug={url.slug}
+        sx={{ position: "absolute", top: "5px", left: "5px" }}
+      />
       <PostStatus status={status} />
-      {imageBanner && <PostImageBanner imageLink={imageBanner} title={title} />}
+      {imageBanner && (
+        <PostImageBanner
+          src={imageBanner}
+          title={title}
+          sx={{
+            height: { height: 150, sm: 160 },
+            borderTop: "1px solid",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            bgcolor: "action.disabledBackground",
+          }}
+        />
+      )}
       <PostInfo title={title} dateCreated={dateCreated} />
       <NextLink
         href={`view/${url.slug}`}

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import IconButton from "@mui/material/IconButton";
+import IconButton, { type IconButtonProps } from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -10,38 +10,40 @@ import PublishIcon from "@mui/icons-material/Publish";
 import UnpublishedIcon from "@mui/icons-material/Unpublished";
 
 import type { PostStatus } from "@apiTypes";
+import type { SxPropsArray } from "@types";
 
 interface PostMenuProps {
-  name: string;
-  idName: string;
+  title: string;
   status: PostStatus;
+  slug: string;
+  sx?: IconButtonProps["sx"];
 }
 
-const PostMenu = ({ idName, name, status }: PostMenuProps) => {
+const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
-
   const isOpen = !!anchor;
+  const sxProps: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
   return (
     <>
       <IconButton
-        id={`${idName}-post-action-btn`}
+        id={`${slug}-post-action-btn`}
         size="small"
-        aria-label={`${name} blog post`}
-        aria-controls={isOpen ? `${idName}-post-menu` : undefined}
+        aria-label={`${title} blog post`}
+        aria-controls={isOpen ? `${slug}-post-menu` : undefined}
         aria-haspopup="true"
         aria-expanded={isOpen || undefined}
         onClick={e => setAnchor(e.currentTarget)}
         color="secondary"
-        sx={{ position: "absolute", top: "5px", left: "5px" }}
+        sx={[...sxProps]}
       >
         <MoreVertIcon fontSize="small" />
       </IconButton>
       <Menu
-        id={`${idName}-post-menu`}
+        id={`${slug}-post-menu`}
         open={isOpen}
         anchorEl={anchor}
-        MenuListProps={{ "aria-labelledby": `${idName}-post-action-btn` }}
+        MenuListProps={{ "aria-labelledby": `${slug}-post-action-btn` }}
         onClose={() => setAnchor(null)}
       >
         {status === "Published" && (

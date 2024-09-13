@@ -1,6 +1,6 @@
 import Chip from "@mui/material/Chip";
 
-import { postStatusBgColors } from "../utils/postStatusBgColors";
+import { postStatusColors } from "@features/posts/utils/postStatusColors";
 import type { PostStatus as Status } from "@apiTypes";
 
 const PostStatus = ({ status }: { status: Status }) => (
@@ -13,9 +13,7 @@ const PostStatus = ({ status }: { status: Status }) => (
       right: "5px",
       fontWeight: "bold",
       letterSpacing: 0.5,
-      color({ appTheme: { themeMode } }) {
-        return postStatusBgColors(status, themeMode);
-      },
+      color: ({ appTheme }) => postStatusColors(status, appTheme.themeMode),
     }}
   />
 );

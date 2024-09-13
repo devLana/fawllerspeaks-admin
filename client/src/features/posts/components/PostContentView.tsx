@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 
-const PostContentPreview = ({ content }: { content: string }) => (
+const PostContentView = ({ content }: { content: string }) => (
   <Box
     component="article"
     dangerouslySetInnerHTML={{ __html: content }}
@@ -234,4 +234,4 @@ const PostContentPreview = ({ content }: { content: string }) => (
   />
 );
 
-export default PostContentPreview;
+export default PostContentView;
