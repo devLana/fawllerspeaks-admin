@@ -15,7 +15,9 @@ const SectionHeader = (props: SectionHeaderProps) => {
   const { onClick, heading, buttonLabel, id, actionsMenu } = props;
 
   return (
-    <Box mb={3} display="flex" alignItems="flex-start" columnGap={3}>
+    <Box
+      sx={{ mb: 3, display: "flex", alignItems: "flex-start", columnGap: 3 }}
+    >
       <PostsPageBackButton buttonLabel={buttonLabel} onClick={onClick} />
       <Typography variant="h2" id={id}>
         {heading}

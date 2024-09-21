@@ -1,14 +1,14 @@
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 
-import useStatusAlert from "@features/login/hooks/useStatusAlert";
-import AlertToast from "@components/AlertToast";
+import useStatusAlert from "@hooks/login/useStatusAlert";
+import AlertToast from "@features/auth/components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
-import Card from "@components/Card";
-import LoginForm from "@features/login/components/LoginForm";
-import uiLayout from "@layouts/utils/uiLayout";
+import Card from "@features/auth/components/Card";
+import LoginForm from "@features/auth/login/LoginForm";
+import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const Login: NextPageWithLayout = () => {

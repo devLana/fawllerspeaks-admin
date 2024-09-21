@@ -1,5 +1,5 @@
-import { GET_POST_TAGS } from "@features/postTags/GetPostTags/operations/GET_POST_TAGS";
-import type { CreatePostTagsData } from "@features/postTags/types";
+import { GET_POST_TAGS } from "@queries/getPostTags/GET_POST_TAGS";
+import type { CreatePostTagsData } from "types/postTags";
 import type { RefetchQueriesFn } from "@types";
 
 type CreatePostTagsRefetchQueriesFn = RefetchQueriesFn<CreatePostTagsData>;

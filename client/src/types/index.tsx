@@ -1,6 +1,7 @@
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 
+import type { BaseMutationOptions as MutationOptions } from "@apollo/client";
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 import type { EmotionCache } from "@emotion/react";
 import type { OverridableComponent } from "@mui/material/OverridableComponent";
@@ -39,3 +40,5 @@ export type RefetchQueriesFn<T extends object> = Extract<
   MutationBaseOptions<T>["refetchQueries"],
   FunctionLike
 >;
+
+export type OnCompleted<T extends object> = MutationOptions<T>["onCompleted"];

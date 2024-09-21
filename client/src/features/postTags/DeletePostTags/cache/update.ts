@@ -1,7 +1,7 @@
 import type { Reference } from "@apollo/client";
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
-import type { DeletePostTagsData } from "@features/postTags/types";
+import type { DeletePostTagsData } from "types/postTags";
 
 type Update = MutationBaseOptions<DeletePostTagsData>["update"];
 

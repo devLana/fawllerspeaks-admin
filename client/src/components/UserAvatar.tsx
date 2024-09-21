@@ -3,7 +3,7 @@ import Skeleton from "@mui/material/Skeleton";
 import PersonIcon from "@mui/icons-material/Person";
 import type { Theme } from "@mui/material/styles";
 
-import useGetUserInfo from "@features/auth/hooks/useGetUserInfo";
+import useGetUserInfo from "@hooks/auth/useGetUserInfo";
 import NextLink from "./NextLink";
 import type { SxPropsArray } from "@types";
 
@@ -59,9 +59,9 @@ const UserAvatar = ({ renderWithLink = false, sx = [] }: UserAvatarProps) => {
 
   return renderWithLink ? (
     <NextLink
-      fontStyle="normal"
       href="/settings/me"
       aria-label={`${firstName} ${lastName} profile page`}
+      sx={{ fontStyle: "normal" }}
     >
       <Avatar
         sx={[{ bgcolor, color: "primary.main", fontSize: 17 }, ...sxProp]}

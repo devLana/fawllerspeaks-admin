@@ -7,8 +7,8 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import { useAppTheme } from "@context/AppTheme";
-import { appThemes as themes } from "@context/AppTheme/utils/appThemes";
-import type { AppThemeItem, ThemeMode } from "@context/AppTheme/types";
+import { appThemes as themes } from "@context/AppTheme/themeHelpers/appThemes";
+import type { AppThemeItem, ThemeMode } from "types/appTheme";
 
 export const normalizedThemes: Record<ThemeMode, AppThemeItem> = {
   sunny: themes[0],

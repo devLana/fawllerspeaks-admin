@@ -4,7 +4,7 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
 import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded";
-import type { PostsView } from "@features/posts/GetPosts/types";
+import type { PostsView } from "types/posts/getPosts";
 
 interface ToolbarViewButtonsProps {
   postsView: PostsView;

@@ -2,8 +2,8 @@ import { GraphQLError } from "graphql";
 import { graphql, delay } from "msw";
 import { setupServer } from "msw/node";
 
-import { LOGOUT } from "../components/Navbar/components/LogoutModal/LOGOUT";
-import { mswData, mswErrors } from "@utils/tests/msw";
+import { LOGOUT } from "@mutations/logout/LOGOUT";
+import { mswData, mswErrors } from "@testUtils/msw";
 
 export const storageTheme = (theme: string) => {
   return JSON.stringify({

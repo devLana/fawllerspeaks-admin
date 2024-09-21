@@ -1,5 +1,5 @@
-import ChangePasswordForm from "@features/settings/changePassword/components/ChangePasswordForm";
-import settingsLayout from "@layouts/SettingsLayout/utils/settingsLayout";
+import ChangePasswordForm from "@features/settings/changePassword/ChangePasswordForm";
+import settingsLayout from "@utils/layouts/settingsLayout";
 import type { NextPageWithLayout } from "@types";
 
 const ChangePassword: NextPageWithLayout = () => <ChangePasswordForm />;

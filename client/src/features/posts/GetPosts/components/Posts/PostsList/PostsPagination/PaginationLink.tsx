@@ -1,4 +1,4 @@
-import { usePostsFilters } from "@features/posts/GetPosts/hooks/usePostsFilters";
+import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import Button from "@mui/material/Button";
 import NextLink from "@components/NextLink";
 
@@ -16,7 +16,7 @@ const PaginationLink = ({ children, href, ml }: PaginationLinkProps) => {
 
   if (href) {
     return (
-      <NextLink ml={ml} href={{ pathname: href, query }} {...styles}>
+      <NextLink href={{ pathname: href, query }} sx={{ ml, ...styles }}>
         {children}
       </NextLink>
     );

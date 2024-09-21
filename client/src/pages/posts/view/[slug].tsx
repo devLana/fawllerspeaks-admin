@@ -3,11 +3,11 @@ import { useRouter } from "next/router";
 import { useQuery } from "@apollo/client";
 
 import RootLayout from "@layouts/RootLayout";
-import PostLoading from "@features/posts/ViewPost/components/PostLoading";
-import PostTextContent from "@features/posts/ViewPost/components/PostTextContent";
-import Post from "@features/posts/ViewPost/components/Post";
-import uiLayout from "@layouts/utils/uiLayout";
-import { GET_POST } from "@features/posts/ViewPost/operations/GET_POST";
+import PostLoading from "@features/posts/ViewPost/PostLoading";
+import PostTextContent from "@features/posts/ViewPost/PostTextContent";
+import Post from "@features/posts/ViewPost/Post";
+import uiLayout from "@utils/layouts/uiLayout";
+import { GET_POST } from "@queries/viewPost/GET_POST";
 import { SESSION_ID } from "@utils/constants";
 import type { NextPageWithLayout } from "@types";
 

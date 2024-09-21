@@ -1,7 +1,7 @@
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
-import useStatusAlert from "../hooks/useStatusAlert";
+import useStatusAlert from "@hooks/getPosts/useStatusAlert";
 
 interface PostsWrapperProps {
   children: React.ReactNode;

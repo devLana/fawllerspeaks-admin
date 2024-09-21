@@ -4,7 +4,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 
 import RootLayout from "..";
 import * as mocks from "./Layout.mocks";
-import { renderUI, stopRefreshTokenTimer } from "@utils/tests/renderUI";
+import { renderUI, stopRefreshTokenTimer } from "@testUtils/renderUI";
 import { DEFAULT_THEME, SESSION_ID } from "@utils/constants";
 
 describe("Protected Pages Root Layout", () => {

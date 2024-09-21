@@ -2,8 +2,8 @@ import { GraphQLError } from "graphql";
 import { delay, graphql, type StrictResponse } from "msw";
 import { setupServer } from "msw/node";
 
-import { testPostTag } from "@utils/tests/testPostTag";
-import { mswData, mswErrors, type TypeNames } from "@utils/tests/msw";
+import { testPostTag } from "@testUtils/testPostTag";
+import { mswData, mswErrors, type TypeNames } from "@testUtils/msw";
 
 type Typename = TypeNames<"getPostTags">;
 

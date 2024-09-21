@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 
 import Personalize from "@pages/settings/personalization";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 import { DEFAULT_THEME } from "@utils/constants";
-import type { AppTheme } from "@context/AppTheme/types";
+import type { AppTheme } from "types/appTheme";
 
 describe("Personalization Settings", () => {
   beforeAll(() => {

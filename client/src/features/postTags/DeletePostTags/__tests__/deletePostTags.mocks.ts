@@ -2,10 +2,10 @@ import { GraphQLError } from "graphql";
 import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
-import { DELETE_POST_TAGS } from "../operations/DELETE_POST_TAGS";
-import { testPostTag } from "@utils/tests/testPostTag";
-import { mswData, mswErrors } from "@utils/tests/msw";
-import type { PostTagData } from "@features/postTags/types";
+import { DELETE_POST_TAGS } from "@mutations/deletePostTags/DELETE_POST_TAGS";
+import { testPostTag } from "@testUtils/testPostTag";
+import { mswData, mswErrors } from "@testUtils/msw";
+import type { PostTagData } from "types/postTags";
 
 interface Redirects {
   pathname: string;

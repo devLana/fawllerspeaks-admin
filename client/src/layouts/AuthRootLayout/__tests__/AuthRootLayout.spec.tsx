@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 
 import AuthRootLayout from "..";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 
 describe("Authentication Pages Root Layout", () => {
   const page = <div>Page Element UI</div>;

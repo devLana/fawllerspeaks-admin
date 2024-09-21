@@ -9,10 +9,14 @@ interface PostInfoProps {
 
 const PostInfo = ({ title, dateCreated }: PostInfoProps) => (
   <Box sx={{ px: 2 }}>
-    <Typography variant="h2" gutterBottom textAlign="center" fontSize="1.25em">
+    <Typography
+      variant="h2"
+      gutterBottom
+      sx={{ textAlign: "center", fontSize: "1.25em" }}
+    >
       {title}
     </Typography>
-    <Typography variant="body2" textAlign="center">
+    <Typography variant="body2" sx={{ textAlign: "center" }}>
       Created on <PostDate dateString={dateCreated} />
     </Typography>
   </Box>

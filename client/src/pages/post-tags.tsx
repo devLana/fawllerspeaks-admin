@@ -5,10 +5,10 @@ import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
 import RootLayout from "@layouts/RootLayout";
-import { PostTagsPageContext } from "@features/postTags/context/PostTagsPageContext";
+import { PostTagsPageContext } from "@context/PostTags";
 import CreatePostTags from "@features/postTags/CreatePostTags";
 import GetPostTags from "@features/postTags/GetPostTags";
-import uiLayout from "@layouts/utils/uiLayout";
+import uiLayout from "@utils/layouts/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 
@@ -24,12 +24,14 @@ const PostTagsPage: NextPageWithLayout = () => {
   return (
     <PostTagsPageContext.Provider value={{ handleOpenAlert }}>
       <Box
-        display="flex"
-        flexWrap="wrap"
-        rowGap={2}
-        columnGap={5}
-        justifyContent="space-between"
-        mb={5}
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          rowGap: 2,
+          columnGap: 5,
+          justifyContent: "space-between",
+          mb: 5,
+        }}
       >
         <Typography variant="h1" id={id}>
           Post Tags: Categorize blog posts

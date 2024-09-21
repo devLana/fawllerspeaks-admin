@@ -2,12 +2,12 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import List from "@mui/material/List";
 import type { Theme } from "@mui/material/styles";
 
-import NavbarContainer from "./components/NavbarContainer";
-import NavbarItemLink from "./components/NavbarItemLink";
-import NavbarItemButton from "./components/NavbarItemButton";
-import NavbarToggleButton from "./components/NavbarToggleButton";
-import { navbarItems } from "./utils/navbarItems";
-import transition from "./utils/transition";
+import NavbarContainer from "./NavbarContainer";
+import NavbarItemLink from "./NavbarItemLink";
+import NavbarItemButton from "./NavbarItemButton";
+import NavbarToggleButton from "./NavbarToggleButton";
+import { navbarItems } from "@uiHelpers/navbarItems";
+import transition from "@utils/layouts/transition";
 
 interface NavbarProps {
   isOpen: boolean;

@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 
 import AuthLayoutThemeButton from "../components/AuthLayoutThemeButton";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 import { DEFAULT_THEME } from "@utils/constants";
 
 const storageTheme = (theme: string) => {

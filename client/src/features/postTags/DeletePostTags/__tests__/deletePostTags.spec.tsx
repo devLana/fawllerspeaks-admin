@@ -5,7 +5,7 @@ import { graphql } from "msw";
 
 import PostTagsPage from "@pages/post-tags";
 import * as mocks from "./deletePostTags.mocks";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 
 describe("Delete post tags", () => {
   beforeAll(() => {

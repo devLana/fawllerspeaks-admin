@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 
-import useGetPostTags from "@features/postTags/GetPostTags/hooks/useGetPostTags";
+import useGetPostTags from "@hooks/getPostTags/useGetPostTags";
 import PostTags from "./components/PostTags";
 import PostTagsLoading from "./components/PostTagsLoading";
 import PostTagsTextContent from "./components/PostTagsTextContent";

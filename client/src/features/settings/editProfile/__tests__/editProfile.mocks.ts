@@ -2,8 +2,8 @@ import { GraphQLError } from "graphql";
 import { delay, graphql, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
-import { EDIT_PROFILE } from "../operations/EDIT_PROFILE";
-import { mswData, mswErrors } from "@utils/tests/msw";
+import { EDIT_PROFILE } from "@mutations/editProfile/EDIT_PROFILE";
+import { mswData, mswErrors } from "@testUtils/msw";
 
 interface Redirects {
   url: string;

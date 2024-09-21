@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { screen, waitFor } from "@testing-library/react";
 
 import ChangePassword from "@pages/settings/password";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 import * as mocks from "./changePassword.mocks";
 
 describe("Change Password", () => {

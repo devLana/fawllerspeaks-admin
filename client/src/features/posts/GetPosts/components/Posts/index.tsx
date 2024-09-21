@@ -10,7 +10,7 @@ import PostStatusInput from "./PostsMenuInputs/PostStatusInput";
 import SortByInput from "./PostsMenuInputs/SortByInput";
 import Searchbox from "./PostsMenuInputs/Searchbox";
 import PostCover from "./PostCover";
-import type { PostsData, PostsView } from "../../types";
+import type { PostsData, PostsView } from "types/posts/getPosts";
 
 interface PostsProps {
   postsData: PostsData;
@@ -28,12 +28,14 @@ const Posts = ({ id, isFetchingMore, postsData }: PostsProps) => {
   return (
     <PostsWrapper id={id} ariaBusy={false}>
       <Box
-        display="grid"
-        gridTemplateColumns={{
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          lg: "repeat(auto-fit, minmax(140px, auto))",
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            lg: "repeat(auto-fit, minmax(140px, auto))",
+          },
+          gap: 4,
         }}
-        gap={4}
       >
         <PostStatusInput />
         <SortByInput />

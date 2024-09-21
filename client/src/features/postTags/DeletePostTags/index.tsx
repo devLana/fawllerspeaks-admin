@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useRouter } from "next/router";
 
 import { useMutation } from "@apollo/client";
 import Button from "@mui/material/Button";
@@ -10,15 +9,15 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
-import DeletePostTagsTextFormatter from "./components/DeletePostTagsTextFormatter";
-import { DELETE_POST_TAGS } from "./operations/DELETE_POST_TAGS";
+import { usePostTagsPage } from "@context/PostTags";
+import DeletePostTagsMessage from "./DeletePostTagsMessage";
+import { DELETE_POST_TAGS } from "@mutations/deletePostTags/DELETE_POST_TAGS";
 import { update } from "./cache/update";
 import { refetchQueries } from "./cache/refetchQueries";
-import { SESSION_ID } from "@utils/constants";
-import type { PostTagsListAction } from "../GetPostTags/types";
+import type { PostTagsListAction } from "types/postTags/getPostTags";
+import useDeletePostTags from "@hooks/deletePostTags/useDeletePostTags";
 
-export interface DeletePostTagsProps {
+interface DeletePostTagsProps {
   open: boolean;
   name: string;
   ids: string[];
@@ -29,20 +28,14 @@ export interface DeletePostTagsProps {
 const DeletePostTags = (props: DeletePostTagsProps) => {
   const { open, name, ids, onClose, dispatch } = props;
   const [isLoading, setIsLoading] = React.useState(false);
-  const { replace, pathname } = useRouter();
 
-  const [deleteTags, { client }] = useMutation(DELETE_POST_TAGS);
-
-  const { handleOpenAlert } = usePostTagsPage();
+  const [deleteTags] = useMutation(DELETE_POST_TAGS);
 
   const msg =
     "You are unable to delete post tags at the moment. Please try again later";
 
-  const handleResponse = (message: string) => {
-    onClose();
-    handleOpenAlert(message);
-    setIsLoading(false);
-  };
+  const { handleOpenAlert } = usePostTagsPage();
+  const onCompleted = useDeletePostTags(msg, dispatch, handleResponse);
 
   const handleDelete = () => {
     setIsLoading(true);
@@ -52,54 +45,15 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
       update,
       refetchQueries,
       onError: err => handleResponse(err.graphQLErrors?.[0]?.message ?? msg),
-      onCompleted(data) {
-        switch (data.deletePostTags.__typename) {
-          case "AuthenticationError":
-            localStorage.removeItem(SESSION_ID);
-            void client.clearStore();
-            void replace(
-              `/login?status=unauthenticated&redirectTo=${pathname}`
-            );
-            break;
-
-          case "NotAllowedError":
-            localStorage.removeItem(SESSION_ID);
-            void client.clearStore();
-            void replace("/login?status=unauthorized");
-            break;
-
-          case "RegistrationError":
-            void replace(
-              `/register?status=unregistered&redirectTo=${pathname}`
-            );
-            break;
-
-          case "DeletePostTagsValidationError":
-            handleResponse(data.deletePostTags.tagIdsError);
-            dispatch({ type: "CLEAR_SELECTION" });
-            break;
-
-          case "UnknownError":
-          case "DeletedPostTagsWarning":
-            handleResponse(data.deletePostTags.message);
-            dispatch({ type: "CLEAR_SELECTION" });
-            break;
-
-          case "DeletedPostTags": {
-            const { tagIds: deletedTags } = data.deletePostTags;
-            const word = deletedTags.length > 1 ? "tags" : "tag";
-
-            handleResponse(`Post ${word} deleted`);
-            dispatch({ type: "CLEAR_SELECTION", payload: { deletedTags } });
-            break;
-          }
-
-          default:
-            handleResponse(msg);
-        }
-      },
+      onCompleted,
     });
   };
+
+  function handleResponse(message: string) {
+    onClose();
+    handleOpenAlert(message);
+    setIsLoading(false);
+  }
 
   const tagOrTags = ids.length > 1 ? "Tags" : "Tag";
 
@@ -115,7 +69,7 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
       <DialogContent sx={{ textAlign: "center" }}>
         <DialogContentText gutterBottom>
           Are you sure you want to delete&nbsp;
-          <DeletePostTagsTextFormatter name={name} idsLength={ids.length} />?
+          <DeletePostTagsMessage name={name} idsLength={ids.length} />?
         </DialogContentText>
         <DialogContentText sx={{ textAlign: "center" }}>
           Any post tag you delete will also be deleted from posts it was

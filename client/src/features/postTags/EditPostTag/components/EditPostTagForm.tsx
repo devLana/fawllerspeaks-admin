@@ -1,6 +1,3 @@
-import * as React from "react";
-import { useRouter } from "next/router";
-
 import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -10,14 +7,14 @@ import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
-import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
-import { editPostTagSchema } from "../validatorSchema";
+import { usePostTagsPage } from "@context/PostTags";
+import { EDIT_POST_TAG } from "@mutations/editPostTag/EDIT_POST_TAG";
+import { editPostTagSchema } from "@validators/editPostTagSchema";
 import { refetchQueries } from "../cache/refetchQueries";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
-import { SESSION_ID } from "@utils/constants";
 import type { MutationEditPostTagArgs } from "@apiTypes";
-import type { PostTagsListAction } from "@features/postTags/GetPostTags/types";
+import type { PostTagsListAction } from "types/postTags/getPostTags";
+import useEditPostTag from "@hooks/editPostTag/useEditPostTag";
 
 type OmitTagId = Omit<MutationEditPostTagArgs, "tagId">;
 
@@ -32,22 +29,21 @@ interface EditPostTagFormProps {
 
 const EditPostTagForm = (props: EditPostTagFormProps) => {
   const { name, id, status, onClick, onStatusChange, dispatch } = props;
-  const [alertIsOpen, setAlertIsOpen] = React.useState(false);
-  const router = useRouter();
+  const [edit, { data, error }] = useMutation(EDIT_POST_TAG);
 
-  const [edit, { client, data, error }] = useMutation(EDIT_POST_TAG);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, defaultValues },
-    setError,
-  } = useForm<OmitTagId>({
+  const { register, handleSubmit, formState, setError } = useForm<OmitTagId>({
     resolver: yupResolver(editPostTagSchema),
     defaultValues: { name },
   });
 
   const { handleOpenAlert } = usePostTagsPage();
+
+  const { setAlertIsOpen, alertIsOpen, onCompleted } = useEditPostTag({
+    dispatch,
+    handleOpenAlert,
+    onStatusChange,
+    setError,
+  });
 
   const submitHandler = (values: OmitTagId) => {
     onStatusChange("submitting");
@@ -59,67 +55,11 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
         onStatusChange("idle");
         setAlertIsOpen(true);
       },
-      onCompleted(editData) {
-        switch (editData.editPostTag.__typename) {
-          case "AuthenticationError":
-            localStorage.removeItem(SESSION_ID);
-            void client.clearStore();
-            void router.replace(
-              `/login?status=unauthenticated&redirectTo=${router.pathname}`
-            );
-            break;
-
-          case "NotAllowedError":
-            localStorage.removeItem(SESSION_ID);
-            void client.clearStore();
-            void router.replace("/login?status=unauthorized");
-            break;
-
-          case "RegistrationError":
-            void router.replace(
-              `/register?status=unregistered&redirectTo=${router.pathname}`
-            );
-            break;
-
-          case "EditPostTagValidationError": {
-            const { nameError, tagIdError } = editData.editPostTag;
-            const focus = { shouldFocus: true };
-
-            if (tagIdError) setAlertIsOpen(true);
-
-            if (nameError) setError("name", { message: nameError }, focus);
-
-            onStatusChange("idle");
-            break;
-          }
-
-          case "DuplicatePostTagError": {
-            const { message } = editData.editPostTag;
-
-            if (message) setError("name", { message }, { shouldFocus: true });
-
-            onStatusChange("idle");
-            break;
-          }
-
-          case "UnknownError":
-          case "EditedPostTagWarning":
-          default:
-            onStatusChange("idle");
-            setAlertIsOpen(true);
-            break;
-
-          case "EditedPostTag": {
-            const { __typename, ...rest } = editData.editPostTag.tag;
-
-            handleOpenAlert("Post tag edited");
-            onStatusChange("idle");
-            dispatch({ type: "POST_TAG_EDITED", payload: rest });
-          }
-        }
-      },
+      onCompleted,
     });
   };
+
+  const { errors, defaultValues } = formState;
 
   let alertMessage =
     "You are unable to edit the post tag at the moment. Please try again later";
@@ -140,7 +80,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(submitHandler)}>
+      <form onSubmit={handleSubmit(submitHandler)} noValidate>
         <TextField
           id="post-tag-name"
           autoComplete="on"
@@ -157,7 +97,15 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
               : undefined,
           }}
         />
-        <Box display="flex" justifyContent="center" mt={3} columnGap={2}>
+        <Box
+          sx={{
+            mt: 3,
+            display: "flex",
+            justifyContent: "center",
+            columnGap: 2,
+          }}
+        >
+          ,
           <Button onClick={onClick} disabled={status === "submitting"}>
             Cancel
           </Button>

@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
 
-import { usePostsFilters } from "@features/posts/GetPosts/hooks/usePostsFilters";
+import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 
 const Searchbox = () => {
   const { queryParams } = usePostsFilters();
@@ -31,7 +31,7 @@ const Searchbox = () => {
   };
 
   return (
-    <Box display="flex">
+    <Box sx={{ display: "flex" }}>
       <TextField
         id="posts-search"
         type="search"

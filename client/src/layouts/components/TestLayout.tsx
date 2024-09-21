@@ -1,5 +1,5 @@
-import Loader from "@components/Loader";
-import ErrorAlert from "@components/ErrorAlert";
+import ErrorAlert from "./ErrorAlert";
+import Loader from "./Loader";
 
 interface TestLayoutProps {
   children: React.ReactElement;

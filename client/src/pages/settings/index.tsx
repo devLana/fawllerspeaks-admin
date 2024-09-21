@@ -2,7 +2,7 @@ import Typography from "@mui/material/Typography";
 
 import RootLayout from "@layouts/RootLayout";
 import SettingsMenuList from "@layouts/SettingsLayout/components/SettingsMenuList";
-import uiLayout from "@layouts/utils/uiLayout";
+import uiLayout from "@utils/layouts/uiLayout";
 import { type NextPageWithLayout } from "@types";
 
 const Settings: NextPageWithLayout = () => (

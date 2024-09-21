@@ -4,7 +4,7 @@ import { screen, waitFor } from "@testing-library/react";
 import { http } from "msw";
 
 import EditMe from "@pages/settings/me/edit";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 import * as mocks from "./editProfile.mocks";
 
 describe("Edit Profile", () => {

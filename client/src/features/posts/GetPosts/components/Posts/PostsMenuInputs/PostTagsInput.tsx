@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 
-import { useGetCachePostTags } from "@features/postTags/GetPostTags/hooks/useGetCachePostTags";
+import { useGetCachedPostTags } from "@hooks/getPostTags/useGetCachedPostTags";
 // import type { FiltersHandler } from "@types";
 
 interface PostTagsInputProps {
@@ -13,7 +13,7 @@ interface PostTagsInputProps {
 }
 
 const PostTagsInput = ({ postTag }: PostTagsInputProps) => {
-  const postTags = useGetCachePostTags();
+  const postTags = useGetCachedPostTags();
 
   const postTagsOptions = React.useMemo(() => {
     const options: React.ReactElement[] = [];

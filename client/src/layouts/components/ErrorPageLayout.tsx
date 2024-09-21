@@ -1,7 +1,7 @@
 import { useSession } from "@context/Session";
 import RootLayout from "../RootLayout";
 import AuthRootLayout from "../AuthRootLayout";
-import type { RootLayoutProps } from "@layouts/types";
+import type { RootLayoutProps } from "types/layouts";
 
 const ErrorPageLayout = ({ children, ...props }: RootLayoutProps) => {
   const { userId } = useSession();

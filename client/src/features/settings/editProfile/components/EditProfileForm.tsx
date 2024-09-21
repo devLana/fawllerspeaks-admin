@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useRouter } from "next/router";
 
 import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
@@ -10,82 +9,42 @@ import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import useGetUserInfo from "@features/auth/hooks/useGetUserInfo";
-import useUploadImage from "@hooks/useUploadImage";
+import useEditProfile from "@hooks/editProfile/useEditProfile";
+import useGetUserInfo from "@hooks/auth/useGetUserInfo";
 import EditProfileFileInput from "./EditProfileFileInput";
-import { EDIT_PROFILE } from "@features/settings/editProfile/operations/EDIT_PROFILE";
-import { editProfileSchema } from "@features/settings/editProfile/validatorSchema";
+import { EDIT_PROFILE } from "@mutations/editProfile/EDIT_PROFILE";
+import { editProfileSchema } from "@validators/editProfileSchema";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
-import { SESSION_ID } from "@utils/constants";
-import type { EditProfileImage } from "../types";
 import type { Status } from "@types";
 import type { MutationEditProfileArgs } from "@apiTypes";
 
 type EditProfile = Omit<MutationEditProfileArgs, "image">;
 
 const EditProfileForm = () => {
-  const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const [removeCurrentImage, setRemoveCurrentImage] = React.useState(false);
-  const router = useRouter();
-
-  const [image, setImage] = React.useState<EditProfileImage>({
-    error: "",
-    file: null,
-    blobUrl: "",
-  });
-
-  React.useEffect(() => {
-    return () => {
-      if (image.blobUrl) {
-        window.URL.revokeObjectURL(image.blobUrl);
-      }
-    };
-  }, [image.blobUrl]);
-
-  const [editProfile, { error, client }] = useMutation(EDIT_PROFILE);
-
-  const upload = useUploadImage();
+  const [editProfile, { error }] = useMutation(EDIT_PROFILE);
   const user = useGetUserInfo();
 
-  const firstName = user?.firstName ?? "";
-  const lastName = user?.lastName ?? "";
-  const userImage = user?.image ?? "";
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, defaultValues },
-    setError,
-  } = useForm<EditProfile>({
+  const { register, handleSubmit, formState, setError } = useForm<EditProfile>({
     resolver: yupResolver(editProfileSchema),
-    defaultValues: { firstName, lastName },
+    defaultValues: {
+      firstName: user?.firstName ?? "",
+      lastName: user?.lastName ?? "",
+    },
   });
+
+  const { formStatus, image, onCompleted, setFormStatus, setImage, handleImg } =
+    useEditProfile(setError);
 
   const submitHandler = async (values: EditProfile) => {
     setFormStatus("loading");
 
-    let variables: MutationEditProfileArgs = values;
-    let uploadHasError = false;
+    const { imageUrl, uploadHasError } = await handleImg(removeCurrentImage);
 
-    if (image.file) {
-      /*
-       * If the user has selected a new image to be uploaded:
-       * - attempt to upload the image to storage
-       * - if the upload was successful, append the image link response to variables
-       */
-      const data = await upload(image.file, "avatar");
-      ({ uploadHasError } = data);
-
-      if (data.imageLink) {
-        variables = { ...variables, image: data.imageLink };
-      }
-    } else if (removeCurrentImage) {
-      /*
-       * The user is attempting to remove their current uploaded image:
-       * send "image: null" back to the api server
-       */
-      variables = { ...variables, image: null };
-    }
+    const variables: MutationEditProfileArgs = {
+      ...values,
+      ...((imageUrl || imageUrl === null) && { image: imageUrl }),
+    };
 
     void editProfile({
       variables,
@@ -97,67 +56,11 @@ const EditProfileForm = () => {
         setFormStatus("error");
         setImage({ ...image, error: "" });
       },
-      onCompleted(editData) {
-        switch (editData.editProfile.__typename) {
-          case "EditProfileValidationError": {
-            const focus = { shouldFocus: true };
-            const { firstNameError, imageError, lastNameError } =
-              editData.editProfile;
-
-            if (imageError) {
-              setImage({ ...image, error: imageError });
-            }
-
-            if (lastNameError) {
-              setError("lastName", { message: lastNameError }, focus);
-            }
-
-            if (firstNameError) {
-              setError("firstName", { message: firstNameError }, focus);
-            }
-
-            setFormStatus(imageError ? "error" : "idle");
-            break;
-          }
-
-          case "AuthenticationError":
-            localStorage.removeItem(SESSION_ID);
-            void client.clearStore();
-            void router.replace(
-              `/login?status=unauthenticated&redirectTo=${router.pathname}`
-            );
-            break;
-
-          case "UnknownError":
-            localStorage.removeItem(SESSION_ID);
-            void client.clearStore();
-            void router.replace("/login?status=unauthorized");
-            break;
-
-          case "RegistrationError":
-            void router.replace(
-              `/register?status=unregistered&redirectTo=${router.pathname}`
-            );
-            break;
-
-          case "EditedProfile": {
-            const redirectStatus = uploadHasError ? "upload-error" : "upload";
-            void router.push(`/settings/me?status=${redirectStatus}`);
-            break;
-          }
-
-          default:
-            /*
-             * The api responds with an unsupported object type:
-             * Set error status and reset the image error state
-             */
-            setFormStatus("error");
-            setImage({ ...image, error: "" });
-            break;
-        }
-      },
+      onCompleted: data => onCompleted(data, uploadHasError),
     });
   };
+
+  const { errors, defaultValues } = formState;
 
   let msg =
     "You are unable to update your profile at the moment. Please try again later";
@@ -175,8 +78,13 @@ const EditProfileForm = () => {
         open={formStatus === "error"}
         onClose={handleCloseAlert<Status>("idle", setFormStatus)}
       />
-      <form onSubmit={handleSubmit(submitHandler)}>
-        <Grid container rowSpacing={2} columnSpacing={2} mb={3.3} mt={0}>
+      <form onSubmit={handleSubmit(submitHandler)} noValidate>
+        <Grid
+          container
+          rowSpacing={2}
+          columnSpacing={2}
+          sx={{ mb: 3.3, mt: 0 }}
+        >
           <Grid item xs={12} sm={6}>
             <TextField
               id="first-name"
@@ -214,12 +122,10 @@ const EditProfileForm = () => {
             />
           </Grid>
         </Grid>
-        <Box mb={3.3}>
+        <Box sx={{ mb: 3.3 }}>
           <EditProfileFileInput
             image={image}
-            userImage={userImage}
-            firstName={firstName}
-            lastName={lastName}
+            userImage={user?.image ?? ""}
             removeCurrentImage={removeCurrentImage}
             setImage={setImage}
             setRemoveCurrentImage={setRemoveCurrentImage}

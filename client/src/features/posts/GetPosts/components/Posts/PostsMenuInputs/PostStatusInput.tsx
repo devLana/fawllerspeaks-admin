@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 
-import { usePostsFilters } from "@features/posts/GetPosts/hooks/usePostsFilters";
+import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import type { PostStatus } from "@apiTypes";
 
 type Statuses = "All" | PostStatus;

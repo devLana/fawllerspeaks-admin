@@ -1,4 +1,7 @@
-import type { CreatePostAction as A, CreatePostState as S } from "../types";
+import type {
+  CreatePostAction as A,
+  CreatePostState as S,
+} from "types/posts/createPost";
 
 type Reducer = (state: S, action: A) => S;
 

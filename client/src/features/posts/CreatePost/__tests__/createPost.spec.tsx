@@ -10,10 +10,10 @@ import { http } from "msw";
 
 import CreatePostPage from "@pages/posts/new";
 import * as mocks from "./createPost.mocks";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 import type { UserEvent } from "@testing-library/user-event/dist/types/setup/setup";
 
-vi.mock("../components/CreatePostContent/components/CKEditorComponent");
+vi.mock("../components/Content/CKEditorComponent");
 
 describe("Create Post", () => {
   beforeAll(() => {

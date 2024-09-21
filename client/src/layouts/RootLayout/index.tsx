@@ -4,12 +4,12 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
 import Metadata from "@layouts/components/Metadata";
-import Loader from "@components/Loader";
-import ErrorAlert from "@components/ErrorAlert";
+import Loader from "@layouts/components/Loader";
+import ErrorAlert from "@layouts/components/ErrorAlert";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import PageBreadcrumbs from "./components/PageBreadcrumbs";
-import type { RootLayoutProps } from "@layouts/types";
+import type { RootLayoutProps } from "types/layouts";
 
 const RootLayout = (props: RootLayoutProps) => {
   const { children, clientHasRendered, errorMessage, ...metaProps } = props;
@@ -47,7 +47,10 @@ const RootLayout = (props: RootLayoutProps) => {
         onToggleNav={() => setNavBarIsOpen(!navBarIsOpen)}
         onCloseNav={() => setNavBarIsOpen(false)}
       />
-      <Box component="main" py={4} flexGrow={{ sm: 1 }} minWidth={{ sm: 0 }}>
+      <Box
+        component="main"
+        sx={{ py: 4, flexGrow: { sm: 1 }, minWidth: { sm: 0 } }}
+      >
         {content}
       </Box>
     </Container>

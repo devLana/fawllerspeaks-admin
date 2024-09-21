@@ -1,6 +1,6 @@
 import Chip from "@mui/material/Chip";
 
-import { postStatusColors } from "@features/posts/utils/postStatusColors";
+import { postStatusColors } from "@utils/posts/postStatusColors";
 import type { PostStatus as Status } from "@apiTypes";
 
 const PostStatus = ({ status }: { status: Status }) => (

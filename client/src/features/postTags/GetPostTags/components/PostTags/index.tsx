@@ -5,7 +5,7 @@ import Alert from "@mui/material/Alert";
 import EditPostTag from "@features/postTags/EditPostTag";
 import DeletePostTags from "@features/postTags/DeletePostTags";
 import PostTagsWrapper from "../PostTagsWrapper";
-import PostTagsList from "./components/PostTagsList";
+import PostTagsList from "./PostTagsList";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { initialState, reducer } from "./state/postTagsList.reducer";
 

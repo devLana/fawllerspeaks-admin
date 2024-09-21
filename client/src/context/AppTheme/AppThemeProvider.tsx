@@ -4,13 +4,13 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 import { AppThemeContext } from ".";
-import { palette } from "./utils/palette";
-import { typography } from "./utils/typography";
-import { shape } from "./utils/shape";
-import { shadows } from "./utils/shadows";
-import { components } from "./utils/components";
-import { getStorageTheme, saveStorageTheme } from "./utils/storage";
-import type { AppTheme, ThemeColor } from "./types";
+import { palette } from "./themeHelpers/palette";
+import { typography } from "./themeHelpers/typography";
+import { shape } from "./themeHelpers/shape";
+import { shadows } from "./themeHelpers/shadows";
+import { components } from "./themeHelpers/components";
+import { getStorageTheme, saveStorageTheme } from "./themeHelpers/storage";
+import type { AppTheme, ThemeColor } from "types/appTheme";
 
 type ThemeKeys = keyof AppTheme;
 

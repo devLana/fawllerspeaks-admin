@@ -1,5 +1,5 @@
 import Head from "next/head";
-import type { MetaDataProps } from "@layouts/types";
+import type { MetaDataProps } from "types/layouts";
 
 const Metadata = ({ title, description }: MetaDataProps) => (
   <Head>

@@ -2,11 +2,11 @@ import ListItem from "@mui/material/ListItem";
 
 import NextLink from "@components/NextLink";
 import PostImageBanner from "@features/posts/components/PostImageBanner";
-import PostStatus from "./PostStatus";
 import PostMenu from "@features/posts/components/PostMenu";
+import PostStatus from "./PostStatus";
 import PostInfo from "./PostInfo";
 import type { PostStatus as Status } from "@apiTypes";
-import type { PostItemSlug, PostsView } from "@features/posts/GetPosts/types";
+import type { PostItemSlug, PostsView } from "types/posts/getPosts";
 
 interface PostProps {
   postCover: React.ReactElement;
@@ -58,7 +58,7 @@ const Post = ({
       {imageBanner && (
         <PostImageBanner
           src={imageBanner}
-          title={title}
+          alt={`${title} image banner`}
           sx={{
             height: { height: 150, sm: 160 },
             borderTop: "1px solid",
@@ -71,16 +71,18 @@ const Post = ({
       <PostInfo title={title} dateCreated={dateCreated} />
       <NextLink
         href={`view/${url.slug}`}
-        mt="auto"
-        mx="auto"
-        width="90%"
-        maxWidth={400}
-        py={0.4}
-        borderRadius={1}
-        textAlign="center"
-        color="background.default"
-        bgcolor="secondary.main"
-        sx={{ ":hover": { color: "background.default" } }}
+        sx={{
+          mt: "auto",
+          mx: "auto",
+          py: 0.4,
+          width: "90%",
+          maxWidth: 400,
+          borderRadius: 1,
+          textAlign: "center",
+          color: "background.default",
+          bgcolor: "secondary.main",
+          ":hover": { color: "background.default" },
+        }}
       >
         View Post
       </NextLink>

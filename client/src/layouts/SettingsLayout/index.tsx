@@ -10,7 +10,7 @@ export interface SettingsLayoutProps {
 }
 
 const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => (
-  <Box columnGap={{ md: 2 }} display={{ md: "flex" }}>
+  <Box sx={{ display: { md: "flex" }, columnGap: { md: 2 } }}>
     <SettingsLayoutMenu />
     <Divider
       orientation="vertical"
@@ -18,7 +18,7 @@ const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => (
       light
       sx={theme => ({ [theme.breakpoints.down("md")]: { display: "none" } })}
     />
-    <Box flexGrow={{ md: 1 }}>
+    <Box sx={{ flexGrow: { md: 1 } }}>
       <Typography variant="h1" gutterBottom>
         {pageHeading}
       </Typography>

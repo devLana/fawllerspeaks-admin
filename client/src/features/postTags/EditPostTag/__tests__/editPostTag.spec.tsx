@@ -5,7 +5,7 @@ import { graphql } from "msw";
 
 import PostTagsPage from "@pages/post-tags";
 import * as mocks from "./editPostTag.mocks";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 
 describe("Edit a post tag", () => {
   const cancelBtn = { name: /^cancel$/i };

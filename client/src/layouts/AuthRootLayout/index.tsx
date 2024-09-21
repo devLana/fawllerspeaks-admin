@@ -1,10 +1,10 @@
 import Container from "@mui/material/Container";
 
-import Loader from "@components/Loader";
+import Loader from "@layouts/components/Loader";
 import Metadata from "@layouts/components/Metadata";
-import ErrorAlert from "@components/ErrorAlert";
+import ErrorAlert from "@layouts/components/ErrorAlert";
 import AuthLayoutThemeButton from "./components/AuthLayoutThemeButton";
-import type { RootLayoutProps } from "@layouts/types";
+import type { RootLayoutProps } from "types/layouts";
 
 const AuthRootLayout = (props: RootLayoutProps) => {
   const { children, clientHasRendered, errorMessage, ...metaProps } = props;

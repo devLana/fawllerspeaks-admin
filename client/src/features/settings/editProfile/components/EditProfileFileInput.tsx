@@ -4,14 +4,12 @@ import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternate
 import { useHandleFile } from "@hooks/useHandleFile";
 import EditProfileImagePreview from "./EditProfileImagePreview";
 import { FileInput } from "@components/FileInput";
-import type { EditProfileImage } from "../types";
+import type { EditProfileImage } from "types/editProfile";
 import type { Status, StateSetterFn } from "@types";
 
 interface EditProfileFileInputProps {
   image: EditProfileImage;
   userImage: string;
-  firstName: string;
-  lastName: string;
   removeCurrentImage: boolean;
   setImage: StateSetterFn<EditProfileImage>;
   setRemoveCurrentImage: StateSetterFn<boolean>;
@@ -21,8 +19,6 @@ interface EditProfileFileInputProps {
 const EditProfileFileInput = ({
   image,
   userImage,
-  firstName,
-  lastName,
   removeCurrentImage,
   setImage,
   setRemoveCurrentImage,
@@ -88,7 +84,7 @@ const EditProfileFileInput = ({
           src={userImage}
           onClick={() => setRemoveCurrentImage(true)}
           onKeyDown={handleKeydown}
-          alt={`${firstName} ${lastName} profile image`}
+          alt="Current profile image"
         />
       ) : (
         <Button

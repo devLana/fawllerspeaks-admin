@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import type { PostsView } from "../../types";
+import type { PostsView } from "types/posts/getPosts";
 
 interface PostCoverProps {
   isFetchingMore: boolean;
@@ -8,17 +8,17 @@ interface PostCoverProps {
 
 const PostCover = ({ isFetchingMore, postsView }: PostCoverProps) => (
   <Box
-    position="absolute"
-    {...(isFetchingMore && {
-      bgcolor: "action.active",
-      zIndex: "mobileStepper",
-      ...(postsView === "grid" && { borderRadius: 1 }),
-    })}
     sx={{
+      position: "absolute",
+      ...(isFetchingMore && {
+        inset: 0,
+        zIndex: "mobileStepper",
+        bgcolor: "action.active",
+        ...(postsView === "grid" && { borderRadius: 1 }),
+      }),
       transition({ transitions }) {
         return transitions.create(["background-color"]);
       },
-      ...(isFetchingMore && { inset: 0 }),
     }}
   />
 );

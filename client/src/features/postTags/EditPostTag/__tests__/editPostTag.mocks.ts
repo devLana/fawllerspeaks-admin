@@ -2,9 +2,9 @@ import { GraphQLError } from "graphql";
 import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
-import { EDIT_POST_TAG } from "../operations/EDIT_POST_TAG";
-import { testPostTag } from "@utils/tests/testPostTag";
-import { mswData, mswErrors } from "@utils/tests/msw";
+import { EDIT_POST_TAG } from "@mutations/editPostTag/EDIT_POST_TAG";
+import { testPostTag } from "@testUtils/testPostTag";
+import { mswData, mswErrors } from "@testUtils/msw";
 
 interface Redirects {
   pathname: string;

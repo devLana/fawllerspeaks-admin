@@ -9,7 +9,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 import NextLink from "@components/NextLink";
 import UserAvatar from "@components/UserAvatar";
-import HeaderThemeButton from "./components/HeaderThemeButton";
+import HeaderThemeButton from "./HeaderThemeButton";
 
 const Header = ({ onClick }: { onClick: () => void }) => (
   <AppBar
@@ -23,13 +23,13 @@ const Header = ({ onClick }: { onClick: () => void }) => (
         edge="start"
         color="primary"
         aria-label="Show main sidebar navigation"
-        sx={{ mr: 2, display: { sm: "none" } }}
         onClick={onClick}
+        sx={{ mr: 2, display: { sm: "none" } }}
       >
         <MenuIcon />
       </IconButton>
-      <Box maxWidth="10rem" width="40%" mr="auto">
-        <NextLink href="/" aria-label="Dashboard page" display="flex">
+      <Box sx={{ maxWidth: "10rem", width: "40%", mr: "auto" }}>
+        <NextLink href="/" aria-label="Dashboard page" sx={{ display: "flex" }}>
           <Image
             src="/logo.png"
             alt="FawllerSpeaks brand logo"
@@ -40,7 +40,13 @@ const Header = ({ onClick }: { onClick: () => void }) => (
           />
         </NextLink>
       </Box>
-      <Box display="flex" alignItems="center" columnGap={{ xs: 1, sm: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          columnGap: { xs: 1, sm: 2 },
+        }}
+      >
         <HeaderThemeButton />
         <UserAvatar renderWithLink />
       </Box>

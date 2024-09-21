@@ -2,9 +2,9 @@ import { GraphQLError } from "graphql";
 import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
-import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
-import { testPostTag } from "@utils/tests/testPostTag";
-import { mswData, mswErrors } from "@utils/tests/msw";
+import { CREATE_POST_TAGS } from "@mutations/createPostTags/CREATE_POST_TAGS";
+import { testPostTag } from "@testUtils/testPostTag";
+import { mswData, mswErrors } from "@testUtils/msw";
 
 export const cancel = { name: /^cancel$/i };
 export const createDialogBtn = { name: /^create post tags$/i };

@@ -5,7 +5,7 @@ import Menu from "@mui/material/Menu";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 
 import SettingsMenuItem from "./SettingsMenuItem";
-import { settingsLinks } from "../utils/settingsLinks";
+import { settingsLinks } from "@uiHelpers/settingsLinks";
 
 const SettingsMenu = () => {
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);

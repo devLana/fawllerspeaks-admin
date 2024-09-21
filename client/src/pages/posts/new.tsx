@@ -3,15 +3,15 @@ import * as React from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
-import { useDraftPost } from "@features/posts/CreatePost/hooks/useDraftPost";
+import { useDraftPost } from "@hooks/createPost/useDraftPost";
 import RootLayout from "@layouts/RootLayout";
-import CreatePostMetadata from "@features/posts/CreatePost/components/CreatePostMetadata";
-import PostFileInput from "@features/posts/CreatePost/components/CreatePostMetadata/components/PostFileInput";
-import SelectPostTagsInput from "@features/posts/CreatePost/components/CreatePostMetadata/components/SelectPostTags/SelectPostTagsInput";
-import { LazyCreatePostContent } from "@features/posts/CreatePost/components/CreatePostContent/LazyCreatePostContent";
-import { LazyCreatePostPreview } from "@features/posts/CreatePost/components/CreatePostPreview/LazyCreatePostPreview";
+import CreatePostMetadata from "@features/posts/CreatePost/components/Metadata";
+import PostFileInput from "@features/posts/CreatePost/components/Metadata/PostFileInput";
+import SelectPostTagsInput from "@features/posts/CreatePost/components/Metadata/SelectPostTags/SelectPostTagsInput";
+import { LazyContent } from "@features/posts/CreatePost/components/Content/LazyContent";
+import { LazyPreview } from "@features/posts/CreatePost/components/Preview/LazyPreview";
 import * as post from "@features/posts/CreatePost/state/createPostReducer";
-import uiLayout from "@layouts/utils/uiLayout";
+import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const CreatePostPage: NextPageWithLayout = () => {
@@ -57,7 +57,7 @@ const CreatePostPage: NextPageWithLayout = () => {
           }
         />
       ) : state.view === "content" ? (
-        <LazyCreatePostContent
+        <LazyContent
           content={state.postData.content}
           draftStatus={draft.draftStatus}
           draftErrors={draft.errors}
@@ -66,7 +66,7 @@ const CreatePostPage: NextPageWithLayout = () => {
           dispatch={dispatch}
         />
       ) : (
-        <LazyCreatePostPreview
+        <LazyPreview
           post={state.postData}
           draftStatus={draft.draftStatus}
           draftErrors={draft.errors}

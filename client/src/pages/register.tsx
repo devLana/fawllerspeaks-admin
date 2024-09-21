@@ -1,12 +1,12 @@
 import Typography from "@mui/material/Typography";
 
-import useStatusAlert from "@features/register/hooks/useStatusAlert";
+import useStatusAlert from "@hooks/register/useStatusAlert";
 import AuthRootLayout from "@layouts/AuthRootLayout";
-import AlertToast from "@components/AlertToast";
+import AlertToast from "@features/auth/components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
-import Card from "@components/Card";
-import RegisterUserForm from "@features/register/components/RegisterUserForm";
-import uiLayout from "@layouts/utils/uiLayout";
+import Card from "@features/auth/components/Card";
+import RegisterUserForm from "@features/auth/register/RegisterUserForm";
+import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const RegisterUser: NextPageWithLayout = () => {

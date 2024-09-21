@@ -1,9 +1,9 @@
 import Box, { type BoxProps } from "@mui/material/Box";
-import Button, { type ButtonProps } from "@mui/material/Button";
+import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import type { SxPropsArray } from "@types";
-import type { CreateStatus } from "../types";
+import type { CreateStatus } from "types/posts/createPost";
 
 interface ActionButtonsProps {
   status: CreateStatus;
@@ -15,23 +15,20 @@ interface ActionButtonsProps {
 
 const ActionButtons = (props: ActionButtonsProps) => {
   const { onDraft, onNext, status, label, sx = [] } = props;
-
-  const buttonProps: ButtonProps = {
-    variant: "contained",
-    disabled: status === "loading",
-    ...(onNext ? { onClick: onNext } : { type: "submit" }),
-  };
-
   const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      flexWrap="wrap"
-      rowGap={1.5}
-      columnGap={2}
-      sx={[...sxProp]}
+      sx={[
+        {
+          display: "flex",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          rowGap: 1.5,
+          columnGap: 2,
+        },
+        ...sxProp,
+      ]}
     >
       <LoadingButton
         variant="outlined"
@@ -40,7 +37,14 @@ const ActionButtons = (props: ActionButtonsProps) => {
       >
         <span>Save as draft</span>
       </LoadingButton>
-      <Button {...buttonProps}>{label}</Button>
+      <Button
+        variant="contained"
+        disabled={status === "loading"}
+        onClick={onNext || undefined}
+        type={onNext ? undefined : "submit"}
+      >
+        {label}
+      </Button>
     </Box>
   );
 };

@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import Snackbar from "@mui/material/Snackbar";
 
 import RootLayout from "@layouts/RootLayout";
-import uiLayout from "@layouts/utils/uiLayout";
+import uiLayout from "@utils/layouts/uiLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { NextPageWithLayout } from "@types";
 

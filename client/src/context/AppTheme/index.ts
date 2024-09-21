@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { AppTheme } from "./types";
+import type { AppTheme } from "types/appTheme";
 
 type AppThemeHandler = <T extends keyof AppTheme>(
   key: T,

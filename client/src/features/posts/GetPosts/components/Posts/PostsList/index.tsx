@@ -3,7 +3,7 @@ import List from "@mui/material/List";
 
 import Post from "./Post";
 import PostsPagination from "./PostsPagination";
-import type { PostsData, PostsView } from "@features/posts/GetPosts/types";
+import type { PostsData, PostsView } from "types/posts/getPosts";
 
 interface PostsListProps {
   postsData: PostsData;

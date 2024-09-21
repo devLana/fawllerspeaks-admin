@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useRouter } from "next/router";
 
 import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
@@ -11,13 +10,13 @@ import Snackbar from "@mui/material/Snackbar";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTagsPage } from "@features/postTags/context/PostTagsPageContext";
+import { usePostTagsPage } from "@context/PostTags";
+import useCreatePostTags from "@hooks/createPostTags/useCreatePostTags";
 import CreatePostTagsInput from "./CreatePostTagsInput";
-import { CREATE_POST_TAGS } from "../operations/CREATE_POST_TAGS";
-import { createPostTagsSchema } from "../validatorSchema";
+import { CREATE_POST_TAGS } from "@mutations/createPostTags/CREATE_POST_TAGS";
+import { createPostTagsSchema } from "@validators/createPostTagsSchema";
 import { refetchQueries } from "../cache/refetchQueries";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
-import { SESSION_ID } from "@utils/constants";
 
 interface CreatePostTagsFormProps {
   onCloseDialog: () => void;
@@ -29,20 +28,15 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
   const { status, onStatusChange, onCloseDialog } = props;
   const [inputs, setInputs] = React.useState([1]);
   const [alertIsOpen, setAlertIsOpen] = React.useState(false);
-  const router = useRouter();
 
-  const [create, { client, data, error }] = useMutation(CREATE_POST_TAGS);
+  const [create, { data, error }] = useMutation(CREATE_POST_TAGS);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    unregister,
-  } = useForm<Record<string, string>>({
-    resolver: yupResolver(createPostTagsSchema(inputs)),
-  });
+  const { register, handleSubmit, formState, unregister } = useForm<
+    Record<string, string>
+  >({ resolver: yupResolver(createPostTagsSchema(inputs)) });
 
   const { handleOpenAlert } = usePostTagsPage();
+  const onCompleted = useCreatePostTags(handleDialog, handleFormAlert);
 
   const handleAddMore = () => {
     const lastInputValue = inputs.at(-1) ?? 0;
@@ -60,52 +54,22 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
     void create({
       refetchQueries,
       variables: { tags: Object.values(values) },
-      onError() {
-        onStatusChange("idle");
-        setAlertIsOpen(true);
-      },
-      onCompleted(createData) {
-        switch (createData.createPostTags.__typename) {
-          case "AuthenticationError":
-            localStorage.removeItem(SESSION_ID);
-            void client.clearStore();
-            void router.replace(
-              `/login?status=unauthenticated&redirectTo=${router.pathname}`
-            );
-            break;
-
-          case "UnknownError":
-            localStorage.removeItem(SESSION_ID);
-            void client.clearStore();
-            void router.replace("/login?status=unauthorized");
-            break;
-
-          case "RegistrationError":
-            void router.replace(
-              `/register?status=unregistered&redirectTo=${router.pathname}`
-            );
-            break;
-
-          case "CreatePostTagsValidationError":
-          case "DuplicatePostTagError":
-          default:
-            onStatusChange("idle");
-            setAlertIsOpen(true);
-            break;
-
-          case "CreatedPostTagsWarning":
-            onCloseDialog();
-            handleOpenAlert(createData.createPostTags.message);
-            break;
-
-          case "PostTags":
-            onCloseDialog();
-            handleOpenAlert("Post tags created");
-            break;
-        }
-      },
+      onError: () => handleFormAlert(),
+      onCompleted,
     });
   };
+
+  function handleFormAlert() {
+    onStatusChange("idle");
+    setAlertIsOpen(true);
+  }
+
+  function handleDialog(message: string) {
+    onCloseDialog();
+    handleOpenAlert(message);
+  }
+
+  const { errors } = formState;
 
   let alertMessage =
     "You are unable to create post tags at the moment. Please try again later";
@@ -120,8 +84,8 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(submitHandler)}>
-        <Grid container rowSpacing={3} columnSpacing={2} mb={2}>
+      <form onSubmit={handleSubmit(submitHandler)} noValidate>
+        <Grid container rowSpacing={3} columnSpacing={2} sx={{ mb: 2 }}>
           {inputs.map(value => (
             <CreatePostTagsInput
               key={value}
@@ -140,7 +104,14 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
         >
           Add More
         </Button>
-        <Box display="flex" justifyContent="center" mt={3} columnGap={2}>
+        <Box
+          sx={{
+            mt: 3,
+            display: "flex",
+            justifyContent: "center",
+            columnGap: 2,
+          }}
+        >
           <Button onClick={onCloseDialog} disabled={status === "submitting"}>
             Cancel
           </Button>

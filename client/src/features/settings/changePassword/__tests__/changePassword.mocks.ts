@@ -2,8 +2,8 @@ import { GraphQLError } from "graphql";
 import { delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
-import { CHANGE_PASSWORD } from "../operations/CHANGE_PASSWORD";
-import { mswData, mswErrors } from "@utils/tests/msw";
+import { CHANGE_PASSWORD } from "@mutations/changePassword/CHANGE_PASSWORD";
+import { mswData, mswErrors } from "@testUtils/msw";
 
 interface Redirects {
   url: string;

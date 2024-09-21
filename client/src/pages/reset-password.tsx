@@ -5,15 +5,15 @@ import { useMutation } from "@apollo/client";
 import Typography from "@mui/material/Typography";
 
 import AuthRootLayout from "@layouts/AuthRootLayout";
-import Card from "@components/Card";
-import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
-import ResetPasswordForm from "@features/resetPassword/components/ResetPasswordForm";
-import ResetPasswordSuccess from "@features/resetPassword/components/ResetPasswordSuccess";
-import { RESET_PASSWORD } from "@features/resetPassword/operations/RESET_PASSWORD";
+import Card from "@features/auth/components/Card";
+import UnregisteredUserAlert from "@features/auth/components/UnregisteredUserAlert";
+import ResetPasswordForm from "@features/auth/resetPassword/components/ResetPasswordForm";
+import ResetPasswordSuccess from "@features/auth/resetPassword/components/ResetPasswordSuccess";
+import { RESET_PASSWORD } from "@mutations/resetPassword/RESET_PASSWORD";
 import verifyPasswordResetToken, {
   type ResetPasswordPageData,
-} from "@features/resetPassword/api/verifyPasswordResetToken";
-import uiLayout from "@layouts/utils/uiLayout";
+} from "@features/auth/resetPassword/api/verifyPasswordResetToken";
+import uiLayout from "@utils/layouts/uiLayout";
 import type { AuthPageView, NextPageWithLayout } from "@types";
 
 type GssP = GetServerSideProps<ResetPasswordPageData>;
@@ -52,12 +52,12 @@ const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
   );
 };
 
-export const getServerSideProps: GssP = async ({ query }) => {
-  return verifyPasswordResetToken(query);
-};
-
 ResetPassword.layout = uiLayout(AuthRootLayout, {
   title: "Reset Password - Reset Your FawllerSpeaks Admin Password",
 });
+
+export const getServerSideProps: GssP = async ({ query }) => {
+  return verifyPasswordResetToken(query);
+};
 
 export default ResetPassword;

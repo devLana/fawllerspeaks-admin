@@ -3,11 +3,11 @@ import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import useGetUserInfo from "@features/auth/hooks/useGetUserInfo";
-import useStatusAlert from "@features/settings/Profile/useStatusAlert";
+import useGetUserInfo from "@hooks/auth/useGetUserInfo";
+import useStatusAlert from "@hooks/profile/useStatusAlert";
 import UserAvatar from "@components/UserAvatar";
 import NextLink from "@components/NextLink";
-import settingsLayout from "@layouts/SettingsLayout/utils/settingsLayout";
+import settingsLayout from "@utils/layouts/settingsLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { type NextPageWithLayout } from "@types";
 
@@ -17,7 +17,7 @@ const Me: NextPageWithLayout = () => {
 
   return (
     <>
-      <Box display="flex" alignItems="center" pt={2} columnGap={4}>
+      <Box sx={{ display: "flex", alignItems: "center", pt: 2, columnGap: 4 }}>
         <UserAvatar
           sx={{
             width: { width: 100, md: 115 },

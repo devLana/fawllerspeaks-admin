@@ -4,22 +4,19 @@ import type { SxPropsArray } from "@types";
 
 interface PostImageBannerProps {
   src: string;
-  title: string;
+  alt: string;
   sx?: BoxProps["sx"];
+  children?: React.ReactElement;
 }
 
-const PostImageBanner = ({ src, sx = [], title }: PostImageBannerProps) => {
+const PostImageBanner = (props: PostImageBannerProps) => {
+  const { src, sx = [], alt, children } = props;
   const sxProps: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
   return (
     <Box sx={[{ position: "relative" }, ...sxProps]}>
-      <Image
-        src={src}
-        alt={`Image banner for ${title}`}
-        fill
-        style={{ objectFit: "cover" }}
-        priority
-      />
+      <Image src={src} alt={alt} fill style={{ objectFit: "cover" }} priority />
+      {children}
     </Box>
   );
 };

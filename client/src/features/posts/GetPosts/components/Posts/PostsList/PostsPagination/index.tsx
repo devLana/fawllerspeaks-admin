@@ -13,12 +13,14 @@ const PostsPagination = ({ after, before }: PostsPaginationLinksProps) => {
 
   return (
     <Box
-      px={1}
-      mt={6}
-      display="flex"
-      rowGap={0.25}
-      columnGap={5}
-      flexWrap="wrap"
+      sx={{
+        px: 1,
+        mt: 6,
+        display: "flex",
+        rowGap: 0.25,
+        columnGap: 5,
+        flexWrap: "wrap",
+      }}
     >
       <PaginationLink href={before ? `before/${before}` : undefined}>
         <ArrowBackIcon fontSize="small" />

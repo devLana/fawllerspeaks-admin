@@ -20,16 +20,22 @@
     "incremental": true,
     "baseUrl": "src",
     "paths": {
-      "@pages/*": ["pages/*"],
       "@components/*": ["components/*"],
       "@context/*": ["context/*"],
       "@features/*": ["features/*"],
-      "@layouts/*": ["layouts/*"],
+      "@uiHelpers/*": ["uiHelpers/*"],
       "@hooks/*": ["hooks/*"],
-      "@types": ["types"],
-      "@apiTypes": ["types/graphql"],
+      "@layouts/*": ["layouts/*"],
+      "@pages/*": ["pages/*"],
+      "@services/*": ["services/*"],
+      "@testUtils/*": ["testUtils/*"],
+      "@types": ["types/index"],
       "@utils/*": ["utils/*"],
-      "@services/*": ["services/*"]
+      "@validators/*": ["validators/*"],
+      "@apiTypes": ["types/graphql"],
+      "@fragments/*": ["operations/fragments/*"],
+      "@mutations/*": ["operations/mutations/*"],
+      "@queries/*": ["operations/queries/*"]
     },
     "types": ["vitest/globals"]
   },

@@ -1,9 +1,9 @@
 import { useTheme } from "@mui/material/styles";
 
-import Theme from "@features/settings/personalization/Theme";
-import FontSize from "@features/settings/personalization/FontSize";
-import DefaultColors from "@features/settings/personalization/DefaultColors";
-import settingsLayout from "@layouts/SettingsLayout/utils/settingsLayout";
+import Theme from "@features/settings/personalization/components/Theme";
+import FontSize from "@features/settings/personalization/components/FontSize";
+import DefaultColors from "@features/settings/personalization/components/DefaultColors";
+import settingsLayout from "@utils/layouts/settingsLayout";
 import { type NextPageWithLayout } from "@types";
 
 const Personalize: NextPageWithLayout = () => {

@@ -5,7 +5,7 @@ import EditPostTagForm from "./components/EditPostTagForm";
 import type {
   PostTagsListAction,
   PostTagsListState,
-} from "../GetPostTags/types";
+} from "types/postTags/getPostTags";
 
 type Status = "idle" | "submitting";
 

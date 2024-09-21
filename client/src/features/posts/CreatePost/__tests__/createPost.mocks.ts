@@ -2,10 +2,10 @@ import { GraphQLError } from "graphql";
 import { delay, graphql, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
-import { DRAFT_POST } from "../operations/DRAFT_POST";
-import { CREATE_POST } from "../components/CreatePostPreview/operations/CREATE_POST";
-import { mswData, mswErrors } from "@utils/tests/msw";
-import { testPostTag } from "@utils/tests/testPostTag";
+import { DRAFT_POST } from "@mutations/createPost/DRAFT_POST";
+import { CREATE_POST } from "@mutations/createPost/CREATE_POST";
+import { mswData, mswErrors } from "@testUtils/msw";
+import { testPostTag } from "@testUtils/testPostTag";
 
 interface Redirects {
   pathname: string;

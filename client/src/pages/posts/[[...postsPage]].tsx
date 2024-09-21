@@ -3,15 +3,15 @@ import { useRouter } from "next/router";
 
 import { NetworkStatus } from "@apollo/client";
 
-import { useGetPosts } from "@features/posts/GetPosts/hooks/useGetPosts";
-import useGetPostTags from "@features/postTags/GetPostTags/hooks/useGetPostTags";
+import { useGetPosts } from "@hooks/getPosts/useGetPosts";
+import useGetPostTags from "@hooks/getPostTags/useGetPostTags";
 import RootLayout from "@layouts/RootLayout";
 import Posts from "@features/posts/GetPosts/components/Posts";
 import PostsLoading from "@features/posts/GetPosts/components/PostsLoading";
 import PostsTextContent from "@features/posts/GetPosts/components/PostsTextContent";
 import NoPostsData from "@features/posts/GetPosts/components/NoPostsData";
 import { SESSION_ID } from "@utils/constants";
-import uiLayout from "@layouts/utils/uiLayout";
+import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const GetPosts: NextPageWithLayout = () => {

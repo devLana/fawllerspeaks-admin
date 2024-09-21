@@ -5,7 +5,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 
 import PostTagsPage from "@pages/post-tags";
 import * as mocks from "./getPostTags.mocks";
-import { renderUI } from "@utils/tests/renderUI";
+import { renderUI } from "@testUtils/renderUI";
 
 describe("View/Get post tags", () => {
   beforeAll(() => {

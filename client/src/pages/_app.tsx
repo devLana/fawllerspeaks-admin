@@ -3,8 +3,8 @@ import { CacheProvider } from "@emotion/react";
 
 import AuthHeaderProvider from "@context/AuthHeader/AuthHeaderProvider";
 import AppThemeProvider from "@context/AppTheme/AppThemeProvider";
-import SessionProvider from "@features/auth/components/SessionProvider";
-import createEmotionCache from "../configs/createEmotionCache";
+import SessionProvider from "@context/Session/SessionProvider";
+import createEmotionCache from "configs/createEmotionCache";
 import type { NextAppProps } from "@types";
 
 const clientSideEmotionCache = createEmotionCache();

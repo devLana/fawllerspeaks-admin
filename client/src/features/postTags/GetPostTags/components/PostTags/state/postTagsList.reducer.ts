@@ -1,7 +1,7 @@
 import type {
   PostTagsListAction as A,
   PostTagsListState as S,
-} from "@features/postTags/GetPostTags/types";
+} from "types/postTags/getPostTags";
 
 type Reducer = (state: S, action: A) => S;
 

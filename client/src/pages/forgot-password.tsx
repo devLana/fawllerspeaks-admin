@@ -3,16 +3,16 @@ import * as React from "react";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 
-import useStatusAlert from "@features/forgotPassword/hooks/useStatusAlert";
+import useStatusAlert from "@hooks/forgotPassword/useStatusAlert";
 import AuthRootLayout from "@layouts/AuthRootLayout";
 import NextLink from "@components/NextLink";
-import AlertToast from "@components/AlertToast";
+import AlertToast from "@features/auth/components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
-import Card from "@components/Card";
-import UnregisteredUserAlert from "@components/UnregisteredUserAlert";
-import ForgotPasswordForm from "@features/forgotPassword/components/ForgotPasswordForm";
-import ForgotPasswordSuccess from "@features/forgotPassword/components/ForgotPasswordSuccess";
-import uiLayout from "@layouts/utils/uiLayout";
+import Card from "@features/auth/components/Card";
+import UnregisteredUserAlert from "@features/auth/components/UnregisteredUserAlert";
+import ForgotPasswordForm from "@features/auth/forgotPassword/components/ForgotPasswordForm";
+import ForgotPasswordSuccess from "@features/auth/forgotPassword/components/ForgotPasswordSuccess";
+import uiLayout from "@utils/layouts/uiLayout";
 import type { AuthPageView, NextPageWithLayout } from "@types";
 
 const ForgotPassword: NextPageWithLayout = () => {
@@ -45,7 +45,7 @@ const ForgotPassword: NextPageWithLayout = () => {
         Forgot Password
       </Typography>
       <Card>
-        <Typography align="center" mb="1.5rem">
+        <Typography align="center" sx={{ mb: "1.5rem" }}>
           Can&apos;t remember your password? Enter your e-mail below to have a
           password reset link sent to you
         </Typography>

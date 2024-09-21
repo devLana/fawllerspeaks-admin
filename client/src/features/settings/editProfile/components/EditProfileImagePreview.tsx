@@ -23,11 +23,13 @@ const EditProfileImagePreview = (props: EditProfileImagePreviewProps) => {
         sx={{ width: 200, height: 200, mb: 2, mx: "auto" }}
       />
       <Box
-        display="flex"
-        justifyContent="center"
-        flexWrap="wrap"
-        rowGap={1}
-        columnGap={2}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          rowGap: 1,
+          columnGap: 2,
+        }}
       >
         <Button
           size="small"

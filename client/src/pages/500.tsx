@@ -4,18 +4,18 @@ import Typography from "@mui/material/Typography";
 import useErrorPageData from "@hooks/useErrorPageData";
 import NextLink from "@components/NextLink";
 import ErrorPageLayout from "@layouts/components/ErrorPageLayout";
-import uiLayout from "@layouts/utils/uiLayout";
+import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const ServerError: NextPageWithLayout = () => {
   const { href, label } = useErrorPageData();
 
   return (
-    <Box textAlign="center" maxWidth={700} mx="auto">
+    <Box sx={{ textAlign: "center", maxWidth: 700, mx: "auto" }}>
       <Typography variant="h1" gutterBottom>
         500 - Internal server error
       </Typography>
-      <Typography mb={3}>
+      <Typography sx={{ mb: 3 }}>
         Something has gone wrong! An error has occurred and you cant perform
         that action. Please try again later.
       </Typography>

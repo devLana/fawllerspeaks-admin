@@ -5,7 +5,9 @@ import PostTagsWrapper from "./PostTagsWrapper";
 
 const PostTagsLoading = ({ id }: { id: string }) => (
   <PostTagsWrapper id={id} ariaBusy={true}>
-    <Box display="flex" alignItems="center" justifyContent="center">
+    <Box
+      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+    >
       <CircularProgress size="1.9em" aria-describedby={id} />
     </Box>
   </PostTagsWrapper>
