@@ -7,8 +7,8 @@ import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import useChangePassword from "@hooks/changePassword/useChangePassword";
-import useGetUserInfo from "@hooks/auth/useGetUserInfo";
-import PasswordInput from "@components/PasswordInput";
+import useGetUserInfo from "@hooks/session/useGetUserInfo";
+import PasswordInput from "@components/ui/PasswordInput";
 import { CHANGE_PASSWORD } from "@mutations/changePassword/CHANGE_PASSWORD";
 import { changePasswordSchema } from "@validators/changePasswordSchema";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
@@ -69,6 +69,7 @@ const ChangePasswordForm = () => {
         component="form"
         onSubmit={handleSubmit(submitHandler)}
         noValidate
+        aria-labelledby="page-title"
         sx={{ width: "100%", maxWidth: 570 }}
       >
         <TextField

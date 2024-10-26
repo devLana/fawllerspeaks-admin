@@ -25,6 +25,8 @@ const AuthRootLayout = (props: RootLayoutProps) => {
 
   return (
     <Container
+      aria-live="polite"
+      aria-busy={!clientHasRendered}
       sx={{
         minHeight: "100vh",
         pt: "7rem",

@@ -1,4 +1,4 @@
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";

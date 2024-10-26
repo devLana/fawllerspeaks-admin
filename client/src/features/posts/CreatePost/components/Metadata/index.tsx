@@ -21,7 +21,7 @@ import type {
 
 type BlurEvent = React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>;
 
-interface CreatePostMetadataProps {
+interface MetadataProps {
   title: string;
   description: string;
   excerpt: string;
@@ -33,7 +33,7 @@ interface CreatePostMetadataProps {
   handleDraftPost: (errorCb?: DraftErrorCb) => Promise<void>;
 }
 
-const CreatePostMetadata = ({
+const Metadata = ({
   title,
   description,
   excerpt,
@@ -43,7 +43,7 @@ const CreatePostMetadata = ({
   selectPostTagsInput,
   dispatch,
   handleDraftPost,
-}: CreatePostMetadataProps) => {
+}: MetadataProps) => {
   const { register, handleSubmit, setError, formState } =
     useForm<RequiredPostMetadata>({
       resolver: yupResolver(metadataValidator),
@@ -166,4 +166,4 @@ const CreatePostMetadata = ({
   );
 };
 
-export default CreatePostMetadata;
+export default Metadata;

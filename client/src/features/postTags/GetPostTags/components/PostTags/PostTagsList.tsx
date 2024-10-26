@@ -13,39 +13,41 @@ import type {
 } from "types/postTags/getPostTags";
 
 interface PostTagsListProps {
-  tagIdsLength: number;
+  id: string;
   selectedTags: PostTagsListState["selectedTags"];
-  deleteTag: PostTagsListState["deleteTag"];
-  deleteTags: PostTagsListState["deleteTags"];
+  isNotDeleting: PostTagsListState["delete"]["open"];
   dispatch: React.Dispatch<PostTagsListAction>;
 }
 
 const PostTagsList = (props: PostTagsListProps) => {
-  const { deleteTag, deleteTags, selectedTags, tagIdsLength, dispatch } = props;
-  const anchorTag = React.useRef<string | null>(null);
-
+  const { id, isNotDeleting, selectedTags, dispatch } = props;
+  const anchorTag = React.useRef<{ id: string; index: number } | null>(null);
   const cachedPostTags = useGetCachedPostTags();
 
   if (!cachedPostTags) throw new Error();
 
+  const selectedTagsIds = Object.keys(selectedTags);
+
   useControlPlusA({
     cachedPostTags,
-    isDeleting: deleteTag.open || deleteTags,
-    tagIdsLength,
+    isNotDeleting,
+    tagIdsLength: selectedTagsIds.length,
     dispatch,
   });
 
   const handleShiftClick = React.useCallback(
-    (shiftKey: boolean, id: string) => {
+    (shiftKey: boolean, index: number, tagId: string) => {
       if (!shiftKey) {
-        anchorTag.current = id;
-        return;
-      }
-
-      if (anchorTag.current && anchorTag.current !== id) {
+        anchorTag.current = { index, id: tagId };
+      } else if (anchorTag.current && anchorTag.current.index !== index) {
         dispatch({
           type: "SHIFT_PLUS_CLICK",
-          payload: { anchorTagId: anchorTag.current, id, tags: cachedPostTags },
+          payload: {
+            anchorTagId: anchorTag.current.id,
+            anchorTagIndex: anchorTag.current.index,
+            targetIndex: index,
+            tags: cachedPostTags,
+          },
         });
       }
     },
@@ -53,35 +55,43 @@ const PostTagsList = (props: PostTagsListProps) => {
   );
 
   const tagsList = React.useMemo(() => {
-    return cachedPostTags.map(({ id, name }) => (
+    return cachedPostTags.map((tag, index) => (
       <PostTag
-        key={id}
-        id={id}
-        name={name}
-        isChecked={!!selectedTags[id]}
+        key={tag.id}
+        {...tag}
+        index={index}
+        isChecked={!!selectedTags[tag.id]}
         onClickLabel={handleShiftClick}
         dispatch={dispatch}
       />
     ));
   }, [cachedPostTags, selectedTags, handleShiftClick, dispatch]);
 
-  const handleAllCheckboxChange = (checked: boolean) => {
+  const handleAllCheckboxChange = (isChecked: boolean) => {
     dispatch({
-      type: "SELECT_UNSELECT_ALL_CHECKBOX",
-      payload: { checked, tags: cachedPostTags },
+      type: "SELECT_ALL_POST_TAGS",
+      payload: { shouldSelectAll: isChecked, tags: cachedPostTags },
+    });
+  };
+
+  const handleDelete = () => {
+    dispatch({
+      type: "OPEN_DELETE",
+      payload: { ids: selectedTagsIds, name: selectedTags[selectedTagsIds[0]] },
     });
   };
 
   return (
     <>
       <PostTagsToolbar
-        numberOfSelectedPostTags={tagIdsLength}
         totalNumberOfPostTags={cachedPostTags.length}
-        onAllCheckboxChange={value => handleAllCheckboxChange(value)}
-        dispatch={dispatch}
+        numberOfSelectedPostTags={selectedTagsIds.length}
+        handleAllCheckboxChange={handleAllCheckboxChange}
+        handleDelete={handleDelete}
       />
       <Divider sx={{ mt: 1, mb: 3.5 }} />
       <List
+        aria-labelledby={id}
         sx={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",

@@ -4,22 +4,22 @@ import type { PostTagsListAction } from "types/postTags/getPostTags";
 
 interface ControlPlusAOptions {
   cachedPostTags: PostTagData[];
-  isDeleting: boolean;
+  isNotDeleting: boolean;
   tagIdsLength: number;
   dispatch: React.Dispatch<PostTagsListAction>;
 }
 
 const useControlPlusA = (options: ControlPlusAOptions) => {
-  const { cachedPostTags, isDeleting, tagIdsLength, dispatch } = options;
+  const { cachedPostTags, isNotDeleting, tagIdsLength, dispatch } = options;
 
   React.useEffect(() => {
     const handleControlPlusA = (e: KeyboardEvent) => {
-      if (!isDeleting && e.ctrlKey && (e.key === "A" || e.key === "a")) {
+      if (isNotDeleting && e.ctrlKey && (e.key === "A" || e.key === "a")) {
         dispatch({
-          type: "CTRL_A_SELECT_ALL",
+          type: "SELECT_ALL_POST_TAGS",
           payload: {
+            shouldSelectAll: tagIdsLength !== cachedPostTags.length,
             tags: cachedPostTags,
-            isNotAllSelected: tagIdsLength !== cachedPostTags.length,
           },
         });
       }
@@ -36,7 +36,7 @@ const useControlPlusA = (options: ControlPlusAOptions) => {
       window.removeEventListener("keyup", handleControlPlusA);
       window.removeEventListener("keydown", handleKeydown);
     };
-  }, [cachedPostTags, isDeleting, tagIdsLength, dispatch]);
+  }, [cachedPostTags, isNotDeleting, tagIdsLength, dispatch]);
 };
 
 export default useControlPlusA;

@@ -11,34 +11,37 @@ import type { PostTagsListAction } from "types/postTags/getPostTags";
 interface PostTagProps {
   id: string;
   name: string;
+  index: number;
   isChecked: boolean;
   dispatch: React.Dispatch<PostTagsListAction>;
-  onClickLabel: (shiftKey: boolean, id: string) => void;
+  onClickLabel: (shiftKey: boolean, index: number, id: string) => void;
 }
 
 const PostTag = (props: PostTagProps) => {
-  const { id, name, isChecked, onClickLabel, dispatch } = props;
+  const { id, name, index, isChecked, onClickLabel, dispatch } = props;
   const idName = name.replace(/[\s_.]/g, "-");
 
   const handleChange = (checked: boolean) => {
-    dispatch({ type: "CLICK_POST_TAG", payload: { checked, id, name } });
+    dispatch({ type: "SELECT_POST_TAG", payload: { checked, id, name } });
   };
 
   return (
-    <ListItem disablePadding>
+    <ListItem
+      aria-label={`${name} post tag`}
+      disablePadding
+      sx={{ "&:hover>div>.MuiIconButton-root": { opacity: 1 } }}
+    >
       <Box
-        aria-label={`${name} post tag container`}
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           columnGap: 1,
           width: "100%",
-          "&:hover>.MuiIconButton-root": { opacity: 1 },
         }}
       >
         <FormControlLabel
-          onClick={e => onClickLabel(e.shiftKey, id)}
+          onClick={e => onClickLabel(e.shiftKey, index, id)}
           control={
             <Checkbox
               id={`${idName}-checkbox`}

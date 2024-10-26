@@ -24,11 +24,11 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
   const postTags = useGetCachedPostTags();
 
   const postTagsMap = React.useMemo(() => {
-    const map = new Map<string, string>();
+    const map: Record<string, string> = {};
     const options: React.ReactElement[] = [];
 
     postTags?.forEach(({ id, name }) => {
-      map.set(id, name);
+      map[id] = name;
 
       options.push(
         <MenuItem key={id} value={id}>
@@ -51,7 +51,7 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
     const { value } = e.target;
     const selectedTags = typeof value === "string" ? value.split(",") : value;
 
-    dispatch?.({ type: "SELECT_POST_TAGS", payload: { tagIds: selectedTags } });
+    dispatch({ type: "MANAGE_POST_TAGS", payload: { tagIds: selectedTags } });
   };
 
   const ariaId = tagIdsError ? "post-tags-error-message" : undefined;

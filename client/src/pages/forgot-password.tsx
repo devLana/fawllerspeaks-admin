@@ -5,7 +5,7 @@ import Divider from "@mui/material/Divider";
 
 import useStatusAlert from "@hooks/forgotPassword/useStatusAlert";
 import AuthRootLayout from "@layouts/AuthRootLayout";
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 import AlertToast from "@features/auth/components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
 import Card from "@features/auth/components/Card";
@@ -41,7 +41,7 @@ const ForgotPassword: NextPageWithLayout = () => {
         severity="info"
         content={message}
       />
-      <Typography variant="h1" align="center">
+      <Typography variant="h1" align="center" id="page-title">
         Forgot Password
       </Typography>
       <Card>
@@ -49,7 +49,7 @@ const ForgotPassword: NextPageWithLayout = () => {
           Can&apos;t remember your password? Enter your e-mail below to have a
           password reset link sent to you
         </Typography>
-        <ForgotPasswordForm setView={setView} />
+        <ForgotPasswordForm handleView={nextView => setView(nextView)} />
         <Divider light sx={{ mt: 3.5, mb: 3 }} />
         <Typography align="center">
           Still Remember Your Password?&nbsp;

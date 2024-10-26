@@ -7,11 +7,17 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
-import NextLink from "@components/NextLink";
-import UserAvatar from "@components/UserAvatar";
+import NextLink from "@components/ui/NextLink";
+import UserAvatar from "@components/ui/UserAvatar";
 import HeaderThemeButton from "./HeaderThemeButton";
+import Skeleton from "@mui/material/Skeleton";
 
-const Header = ({ onClick }: { onClick: () => void }) => (
+interface HeaderProps {
+  onClick: () => void;
+  isLoading: boolean;
+}
+
+const Header = ({ onClick, isLoading }: HeaderProps) => (
   <AppBar
     sx={({ appTheme: { themeMode } }) => ({
       ...(themeMode === "sunny" && { backgroundColor: "background.default" }),
@@ -22,7 +28,7 @@ const Header = ({ onClick }: { onClick: () => void }) => (
         size="large"
         edge="start"
         color="primary"
-        aria-label="Show main sidebar navigation"
+        aria-label="Show main app navigation"
         onClick={onClick}
         sx={{ mr: 2, display: { sm: "none" } }}
       >
@@ -48,7 +54,18 @@ const Header = ({ onClick }: { onClick: () => void }) => (
         }}
       >
         <HeaderThemeButton />
-        <UserAvatar renderWithLink />
+        <div aria-label="polite" aria-busy={isLoading}>
+          {isLoading ? (
+            <Skeleton
+              variant="circular"
+              aria-label="Loading user avatar"
+              width={45}
+              height={45}
+            />
+          ) : (
+            <UserAvatar renderWithLink />
+          )}
+        </div>
       </Box>
     </Toolbar>
   </AppBar>

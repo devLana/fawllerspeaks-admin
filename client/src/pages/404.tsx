@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 import useErrorPageData from "@hooks/useErrorPageData";
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 import ErrorPageLayout from "@layouts/components/ErrorPageLayout";
 import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";

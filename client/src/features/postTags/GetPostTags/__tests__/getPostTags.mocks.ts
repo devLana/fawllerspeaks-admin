@@ -1,15 +1,15 @@
 import { GraphQLError } from "graphql";
-import { delay, graphql, type StrictResponse } from "msw";
+import { delay, type StrictResponse } from "msw";
 import { setupServer } from "msw/node";
 
-import { testPostTag } from "@testUtils/testPostTag";
-import { mswData, mswErrors, type TypeNames } from "@testUtils/msw";
+import { testPostTag } from "@utils/tests/testPostTag";
+import { mswData, mswErrors, type TypeNames } from "@utils/tests/msw";
 
 type Typename = TypeNames<"getPostTags">;
 
 interface Redirects {
-  url: string;
   pathname: string;
+  params: { pathname: string; query: Record<string, string> };
 }
 
 interface Res {
@@ -17,7 +17,8 @@ interface Res {
   errors?: object[];
 }
 
-export const getTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5"];
+export const label = { name: /^loading post tags$/i };
+const tags = [testPostTag("Tag 1", "1")];
 const gqlMsg = "Unable to get post tags. Please try again later";
 
 const message =
@@ -26,65 +27,76 @@ const message =
 const noTagsMsg =
   "No post tags have been created yet. Click on 'Create Post Tags' above to get started";
 
-const tags = [
-  testPostTag(getTags[0], "1"),
-  testPostTag(getTags[1], "2"),
-  testPostTag(getTags[2], "3"),
-  testPostTag(getTags[3], "4"),
-  testPostTag(getTags[4], "5"),
-];
-
-export const server = setupServer(
-  graphql.query("GetPostTags", async () => {
-    await delay();
-    return mswData("getPostTags", "PostTags", { tags });
-  })
-);
+export const server = setupServer();
 
 const dataCb = (typename: Typename, data: object = {}) => {
-  return () => mswData("getPostTags", typename, data);
+  return async () => {
+    await delay(50);
+    return mswData("getPostTags", typename, data);
+  };
 };
 
 type MswData = ReturnType<typeof mswData<"getPostTags">>;
-export const redirects: [string, Redirects, () => MswData][] = [
+export const redirects: [string, Redirects, () => Promise<MswData>][] = [
   [
-    "Should redirect to the login page if the user is not logged in",
+    "Expect the user to be redirected to the login page if the user is not logged in",
     {
-      url: "/login?status=unauthenticated&redirectTo=/posts/new",
+      params: {
+        pathname: "/login",
+        query: { status: "unauthenticated", redirectTo: "/posts/new" },
+      },
       pathname: "/posts/new",
     },
     dataCb("AuthenticationError"),
   ],
   [
-    "Should redirect to the login page if the user could not be verified",
-    { url: "/login?status=unauthorized", pathname: "/posts" },
+    "Expect the user to be redirected to the login page if the user could not be verified",
+    {
+      params: { pathname: "/login", query: { status: "unauthorized" } },
+      pathname: "/posts",
+    },
     dataCb("UnknownError"),
   ],
   [
-    "Should redirect to the registration page if the user is not registered",
+    "Expect the user to be redirected to the registration page if the user is not registered",
     {
-      url: "/register?status=unregistered&redirectTo=/post-tags",
+      params: {
+        pathname: "/register",
+        query: { status: "unregistered", redirectTo: "/post-tags" },
+      },
       pathname: "/post-tags",
     },
     dataCb("RegistrationError"),
   ],
 ];
 
-const network = () => mswErrors(new Error(), { status: 503 });
-const gql = () => mswErrors(new GraphQLError(gqlMsg));
+const network = async () => {
+  await delay(50);
+  return mswErrors(new Error(), { status: 503 });
+};
 
-const text = "Should display a notification status message if the api";
-export const alerts: [string, string, () => StrictResponse<Res>][] = [
+const gql = async () => {
+  await delay(50);
+  return mswErrors(new GraphQLError(gqlMsg));
+};
+
+const text = "Expect a notification status message if the API";
+export const alerts: [string, string, () => Promise<StrictResponse<Res>>][] = [
   [`${text} throws a graphql error`, gqlMsg, gql],
   [`${text} request fails with a network error`, message, network],
   [
-    `${text} responded with an unsupported object type`,
+    `${text} responds with an unsupported object type`,
     message,
     dataCb("UnsupportedType"),
   ],
   [
-    `${text} responds with an empty tags array`,
+    `${text} responds with an empty post tags array`,
     noTagsMsg,
     dataCb("PostTags", { tags: [] }),
   ],
 ];
+
+export const all = async () => {
+  await delay(50);
+  return mswData("getPostTags", "PostTags", { tags });
+};

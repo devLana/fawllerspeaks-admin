@@ -24,12 +24,15 @@ const useLogout = (onCloseModal: () => void) => {
         setStatus("error");
         break;
 
-      case "AuthenticationError":
+      case "AuthenticationError": {
+        const query = { status: "unauthenticated" };
+
         localStorage.removeItem(SESSION_ID);
         handleClearRefreshTokenTimer();
         void client.clearStore();
-        void replace("/login?status=unauthenticated");
+        void replace({ pathname: "/login", query });
         break;
+      }
 
       case "Response":
         localStorage.removeItem(SESSION_ID);

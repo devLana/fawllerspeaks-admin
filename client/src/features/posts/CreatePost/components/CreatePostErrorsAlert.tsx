@@ -10,9 +10,9 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import type { CreateInputErrors } from "types/posts/createPost";
 
 interface CreatePostErrorsAlertProps extends CreateInputErrors {
-  ariaLabel: string;
+  ariaLabel: string | undefined;
   shouldOpen: boolean;
-  onClick: () => void;
+  onClick: (() => void) | undefined;
 }
 
 const CreatePostErrorsAlert = ({
@@ -31,7 +31,7 @@ const CreatePostErrorsAlert = ({
       severity="error"
       sx={{ width: "100%", "&>.MuiAlert-icon,&>.MuiAlert-action": { mt: 1 } }}
       action={
-        <Tooltip title={`Close ${ariaLabel} list`}>
+        <Tooltip title={`Close${ariaLabel ? ` ${ariaLabel} ` : " "}list`}>
           <IconButton size="small" color="inherit" onClick={onClick}>
             <CancelOutlinedIcon fontSize="small" />
           </IconButton>

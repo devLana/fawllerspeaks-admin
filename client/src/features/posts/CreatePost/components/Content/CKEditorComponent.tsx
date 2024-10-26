@@ -1,50 +1,17 @@
 import * as React from "react";
 
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Box from "@mui/material/Box";
-import type { Theme } from "@mui/material/styles";
 
-import { useAuthHeader } from "@context/AuthHeader";
+import { useAuth } from "@context/Auth";
+import useCKEditor from "@hooks/createPost/useCKEditor";
 import CustomEditor from "ckeditor5-custom-build";
 import type { CKEditorComponentProps } from "types/posts/createPost";
 
 const CKEditorComponent = (props: CKEditorComponentProps) => {
   const { id, data, contentHasError, dispatch, onBlur, onFocus } = props;
-  const ckEditorRef = React.useRef<CustomEditor | null>(null);
-
-  const mq = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
-  const { jwt } = useAuthHeader();
-
-  const topOffset = mq ? 64 : 56;
-
-  React.useEffect(() => {
-    if (ckEditorRef.current) {
-      ckEditorRef.current.ui.viewportOffset = { top: topOffset };
-    }
-  }, [topOffset]);
-
-  React.useEffect(() => {
-    if (ckEditorRef.current) {
-      const { view } = ckEditorRef.current.editing;
-
-      view.change(writer => {
-        const editableRoot = view.document.getRoot();
-
-        if (editableRoot) {
-          writer.setAttribute("aria-invalid", contentHasError, editableRoot);
-
-          if (contentHasError) {
-            writer.setAttribute("aria-errormessage", id, editableRoot);
-            writer.setAttribute("aria-describedby", id, editableRoot);
-          } else {
-            writer.removeAttribute("aria-errormessage", editableRoot);
-            writer.removeAttribute("aria-describedby", editableRoot);
-          }
-        }
-      });
-    }
-  }, [contentHasError, id]);
+  const { ckEditorRef, topOffset } = useCKEditor(id, contentHasError);
+  const { jwt } = useAuth();
 
   const handleContent = (content: string) => {
     dispatch({ type: "ADD_POST_CONTENT", payload: { content } });

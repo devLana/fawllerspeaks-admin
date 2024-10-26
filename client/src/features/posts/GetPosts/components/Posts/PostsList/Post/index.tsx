@@ -1,6 +1,6 @@
 import ListItem from "@mui/material/ListItem";
 
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 import PostImageBanner from "@features/posts/components/PostImageBanner";
 import PostMenu from "@features/posts/components/PostMenu";
 import PostStatus from "./PostStatus";

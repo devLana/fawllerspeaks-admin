@@ -1,24 +1,29 @@
 import { useRouter } from "next/router";
 
-import { screen, waitFor, within } from "@testing-library/react";
-import { graphql } from "msw";
+import {
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+  within,
+} from "@testing-library/react";
 
-import PostTagsPage from "@pages/post-tags";
-import { renderUI } from "@testUtils/renderUI";
+import CreatePostTags from "..";
+import { PostTagsPageContext } from "@context/PostTags";
+import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./createPostTags.mocks";
 
 describe("Create post tags", () => {
-  beforeAll(() => {
-    mocks.server.listen({ onUnhandledRequest: "error" });
-  });
+  const mockFn = vi.fn().mockName("handleOpenAlert");
 
-  afterAll(() => {
-    mocks.server.close();
-  });
+  const UI = (
+    <PostTagsPageContext.Provider value={{ handleOpenAlert: mockFn }}>
+      <CreatePostTags />
+    </PostTagsPageContext.Provider>
+  );
 
   describe("Client side form validation", () => {
     it("Input fields should have an error message if their values are empty", async () => {
-      const { user } = renderUI(<PostTagsPage />);
+      const { user } = renderUI(UI);
 
       await user.click(screen.getByRole("button", mocks.createDialogBtn));
 
@@ -28,6 +33,7 @@ describe("Create post tags", () => {
       await user.click(within(modal).getByRole("button", mocks.addMoreBtn));
 
       const inputBoxes = within(modal).getAllByRole("textbox", mocks.textBox);
+
       expect(inputBoxes).toHaveLength(3);
 
       await user.click(within(modal).getByRole("button", mocks.saveBtn));
@@ -38,14 +44,22 @@ describe("Create post tags", () => {
     });
   });
 
-  describe("Create post tags api request", () => {
-    describe("On user verification, Redirect the user to an authentication page", () => {
-      it.each(mocks.redirects)("%s", async (_, { pathname, url }, mock) => {
-        const router = useRouter();
-        router.pathname = pathname;
+  describe("Create post tags API request", () => {
+    beforeAll(() => {
+      mocks.server.listen({ onUnhandledRequest: "error" });
+    });
 
+    afterAll(() => {
+      mocks.server.close();
+    });
+
+    describe("API response is a user authentication error", () => {
+      it.each(mocks.redirects)("%s", async (_, { pathname, params }, mock) => {
         const saveButton = { name: /^Create tag$/i };
-        const { user } = renderUI(<PostTagsPage />);
+        const router = useRouter();
+        const { user } = renderUI(UI);
+
+        router.pathname = pathname;
 
         await user.click(screen.getByRole("button", mocks.createDialogBtn));
 
@@ -57,16 +71,18 @@ describe("Create post tags", () => {
 
         expect(within(modal).getByRole("button", saveButton)).toBeDisabled();
         expect(within(modal).getByRole("button", mocks.cancel)).toBeDisabled();
-        await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
-        expect(router.replace).toHaveBeenCalledWith(url);
+
+        await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
+
+        expect(router.replace).toHaveBeenCalledWith(params);
         expect(within(modal).getByRole("button", saveButton)).toBeDisabled();
         expect(within(modal).getByRole("button", mocks.cancel)).toBeDisabled();
       });
     });
 
-    describe("Api response is an error or an unsupported object type", () => {
+    describe("API response is an error or an unsupported object type", () => {
       it.each(mocks.alerts)("%s", async (_, mock) => {
-        const { user } = renderUI(<PostTagsPage />);
+        const { user } = renderUI(UI);
 
         await user.click(screen.getByRole("button", mocks.createDialogBtn));
 
@@ -75,6 +91,7 @@ describe("Create post tags", () => {
         await user.click(within(modal).getByRole("button", mocks.addMoreBtn));
 
         const inputBoxes = within(modal).getAllByRole("textbox", mocks.textBox);
+
         expect(inputBoxes).toHaveLength(2);
 
         await user.type(inputBoxes[0], mock.tags[0]);
@@ -91,12 +108,8 @@ describe("Create post tags", () => {
     });
 
     describe("New post tags are created", () => {
-      afterEach(() => {
-        mocks.server.resetHandlers();
-      });
-
-      it.each(mocks.creates)("%s", async (_, mock, resolver) => {
-        const { user } = renderUI(<PostTagsPage />);
+      it.each(mocks.creates)("%s", async (_, mock) => {
+        const { user } = renderUI(UI);
 
         await user.click(screen.getByRole("button", mocks.createDialogBtn));
 
@@ -106,6 +119,7 @@ describe("Create post tags", () => {
         await user.click(within(modal).getByRole("button", mocks.addMoreBtn));
 
         const inputBoxes = within(modal).getAllByRole("textbox", mocks.textBox);
+
         expect(inputBoxes).toHaveLength(3);
 
         await user.type(inputBoxes[0], mock.tags[0]);
@@ -116,13 +130,10 @@ describe("Create post tags", () => {
         expect(within(modal).getByRole("button", mocks.saveBtn)).toBeDisabled();
         expect(within(modal).getByRole("button", mocks.cancel)).toBeDisabled();
 
-        mocks.server.use(graphql.query("GetPostTags", resolver));
+        await waitForElementToBeRemoved(modal);
 
-        expect(await screen.findByRole("alert")).toHaveTextContent(mock.msg);
-        expect(modal).not.toBeInTheDocument();
-        expect(screen.getByText(mock.tags[0])).toBeInTheDocument();
-        expect(screen.getByText(mock.tags[1])).toBeInTheDocument();
-        expect(screen.getByText(mock.tags[2])).toBeInTheDocument();
+        expect(mockFn).toHaveBeenCalledOnce();
+        expect(mockFn).toHaveBeenCalledWith(mock.msg);
       });
     });
   });

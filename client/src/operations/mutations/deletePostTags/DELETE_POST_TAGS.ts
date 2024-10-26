@@ -1,7 +1,7 @@
 import { gql, type TypedDocumentNode as Node } from "@apollo/client";
 
 import type { MutationDeletePostTagsArgs } from "@apiTypes";
-import type { DeletePostTagsData } from "types/postTags";
+import type { DeletePostTagsData } from "types/postTags/deletePostTags";
 
 type DeletePostTags = Node<DeletePostTagsData, MutationDeletePostTagsArgs>;
 

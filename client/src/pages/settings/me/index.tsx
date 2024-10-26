@@ -3,10 +3,10 @@ import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import useGetUserInfo from "@hooks/auth/useGetUserInfo";
+import useGetUserInfo from "@hooks/session/useGetUserInfo";
 import useStatusAlert from "@hooks/profile/useStatusAlert";
-import UserAvatar from "@components/UserAvatar";
-import NextLink from "@components/NextLink";
+import UserAvatar from "@components/ui/UserAvatar";
+import NextLink from "@components/ui/NextLink";
 import settingsLayout from "@utils/layouts/settingsLayout";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import { type NextPageWithLayout } from "@types";

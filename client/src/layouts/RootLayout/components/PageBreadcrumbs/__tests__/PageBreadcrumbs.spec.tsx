@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { screen, within } from "@testing-library/react";
 
 import PageBreadcrumbs from "..";
-import { renderUI } from "@testUtils/renderUI";
+import { renderUI } from "@utils/tests/renderUI";
 
 describe("Page Breadcrumbs", () => {
   const name = { name: /^breadcrumb$/i };
@@ -13,16 +13,19 @@ describe("Page Breadcrumbs", () => {
     router.pathname = "/posts/[dynamicRoute]";
 
     const { rerender } = renderUI(<PageBreadcrumbs />);
+
     expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
 
     router.pathname = "/posts/[...dynamicRoute]";
 
     rerender(<PageBreadcrumbs />);
+
     expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
 
     router.pathname = "/posts/[[...dynamicRoute]]";
 
     rerender(<PageBreadcrumbs />);
+
     expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
   });
 
@@ -33,7 +36,6 @@ describe("Page Breadcrumbs", () => {
 
   it("Should not render breadcrumbs if the current pathname is only one directory deep", () => {
     const router = useRouter();
-
     router.pathname = "/posts";
 
     renderUI(<PageBreadcrumbs />);

@@ -1,4 +1,4 @@
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 
 const NoPostsData = () => (
   <>

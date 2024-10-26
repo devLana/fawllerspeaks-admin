@@ -10,7 +10,7 @@ const DeletePostTagsMessage = ({ name, idsLength }: FormatTextProps) => {
   const cachedPostTags = useGetCachedPostTags();
   const numberOfTags = cachedPostTags?.length ?? -1;
 
-  if (numberOfTags === 1 || idsLength === 1) {
+  if (idsLength === 1) {
     return (
       <Typography
         variant="caption"
@@ -34,7 +34,7 @@ const DeletePostTagsMessage = ({ name, idsLength }: FormatTextProps) => {
 
   return (
     <>
-      these&nbsp;
+      these{" "}
       <Typography
         variant="caption"
         sx={{ fontSize: "1em", fontWeight: "bold" }}

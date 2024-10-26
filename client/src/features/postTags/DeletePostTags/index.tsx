@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { useMutation } from "@apollo/client";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -9,33 +7,20 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTagsPage } from "@context/PostTags";
+import useDeletePostTags from "@hooks/deletePostTags/useDeletePostTags";
 import DeletePostTagsMessage from "./DeletePostTagsMessage";
 import { DELETE_POST_TAGS } from "@mutations/deletePostTags/DELETE_POST_TAGS";
-import { update } from "./cache/update";
-import { refetchQueries } from "./cache/refetchQueries";
-import type { PostTagsListAction } from "types/postTags/getPostTags";
-import useDeletePostTags from "@hooks/deletePostTags/useDeletePostTags";
+import { update } from "@cache/update/postTags/deletePostTags";
+import { refetchQueries } from "@cache/refetchQueries/postTags/deletePostTags";
+import type { DeletePostTagsProps } from "types/postTags/deletePostTags";
 
-interface DeletePostTagsProps {
-  open: boolean;
-  name: string;
-  ids: string[];
-  onClose: () => void;
-  dispatch: React.Dispatch<PostTagsListAction>;
-}
-
-const DeletePostTags = (props: DeletePostTagsProps) => {
-  const { open, name, ids, onClose, dispatch } = props;
-  const [isLoading, setIsLoading] = React.useState(false);
-
+const DeletePostTags = ({ open, name, ids, dispatch }: DeletePostTagsProps) => {
   const [deleteTags] = useMutation(DELETE_POST_TAGS);
 
-  const msg =
-    "You are unable to delete post tags at the moment. Please try again later";
-
-  const { handleOpenAlert } = usePostTagsPage();
-  const onCompleted = useDeletePostTags(msg, dispatch, handleResponse);
+  const { onCompleted, onError, isLoading, setIsLoading } = useDeletePostTags(
+    handleRemoveTags,
+    handleClose
+  );
 
   const handleDelete = () => {
     setIsLoading(true);
@@ -44,15 +29,20 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
       variables: { tagIds: ids },
       update,
       refetchQueries,
-      onError: err => handleResponse(err.graphQLErrors?.[0]?.message ?? msg),
+      onError,
       onCompleted,
     });
   };
 
-  function handleResponse(message: string) {
-    onClose();
-    handleOpenAlert(message);
-    setIsLoading(false);
+  function handleClose() {
+    dispatch({ type: "CLOSE_DELETE" });
+  }
+
+  function handleRemoveTags() {
+    dispatch({
+      type: "REMOVE_POST_TAG_ON_DELETE",
+      payload: { tagIds: ids },
+    });
   }
 
   const tagOrTags = ids.length > 1 ? "Tags" : "Tag";
@@ -60,7 +50,7 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
   return (
     <Dialog
       open={open}
-      onClose={isLoading ? undefined : onClose}
+      onClose={isLoading ? undefined : handleClose}
       aria-labelledby="delete-post-tags-dialog"
     >
       <DialogTitle id="delete-post-tags-dialog" sx={{ textAlign: "center" }}>
@@ -68,7 +58,7 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
       </DialogTitle>
       <DialogContent sx={{ textAlign: "center" }}>
         <DialogContentText gutterBottom>
-          Are you sure you want to delete&nbsp;
+          Are you sure you want to delete{" "}
           <DeletePostTagsMessage name={name} idsLength={ids.length} />?
         </DialogContentText>
         <DialogContentText sx={{ textAlign: "center" }}>
@@ -77,7 +67,7 @@ const DeletePostTags = (props: DeletePostTagsProps) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-        <Button disabled={isLoading} onClick={onClose}>
+        <Button disabled={isLoading} onClick={handleClose}>
           Cancel
         </Button>
         <LoadingButton

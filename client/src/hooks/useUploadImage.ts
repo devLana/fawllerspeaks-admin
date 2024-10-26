@@ -1,4 +1,4 @@
-import { useAuthHeader } from "@context/AuthHeader";
+import { useAuth } from "@context/Auth";
 
 interface UploadImage {
   image: string;
@@ -6,7 +6,7 @@ interface UploadImage {
 }
 
 const useUploadImage = () => {
-  const { jwt } = useAuthHeader();
+  const { jwt } = useAuth();
 
   const upload = async (file: File, fileType: "avatar" | "postBanner") => {
     const url = process.env.NEXT_PUBLIC_API_URL ?? "";

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import type { UseFormSetError } from "react-hook-form";
 
 import { useSession } from "@context/Session";
-import { useAuthHeader } from "@context/AuthHeader";
+import { useAuth } from "@context/Auth";
 import { SESSION_ID } from "@utils/constants";
 import type { Mutation, MutationLoginArgs } from "@apiTypes";
 import type { OnCompleted, Status } from "@types";
@@ -14,7 +14,7 @@ const useLogin = (setError: UseFormSetError<MutationLoginArgs>) => {
   const { push, query, replace } = useRouter();
 
   const { handleUserId, handleRefreshToken } = useSession();
-  const { handleAuthHeader } = useAuthHeader();
+  const { handleAuthHeader } = useAuth();
 
   const onCompleted: OnCompleted<Pick<Mutation, "login">> = loginData => {
     switch (loginData.login.__typename) {

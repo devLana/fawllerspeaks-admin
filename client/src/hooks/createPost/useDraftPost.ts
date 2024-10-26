@@ -16,7 +16,7 @@ import type { DraftPostInput } from "@apiTypes";
 
 export const useDraftPost = (postData: CreatePostData) => {
   const [draftStatus, setDraftStatus] = React.useState<CreateStatus>("idle");
-  const router = useRouter();
+  const { pathname, replace, push } = useRouter();
 
   const [draftPost, { client, data, error }] = useMutation(DRAFT_POST);
 
@@ -49,25 +49,29 @@ export const useDraftPost = (postData: CreatePostData) => {
       onError: () => setDraftStatus("error"),
       onCompleted(draftData) {
         switch (draftData.draftPost.__typename) {
-          case "AuthenticationError":
+          case "AuthenticationError": {
+            const query = { status: "unauthenticated", redirectTo: pathname };
+
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void router.replace(
-              `/login?status=unauthenticated&redirectTo=${router.pathname}`
-            );
+            void replace({ pathname: "/login", query });
             break;
+          }
 
-          case "RegistrationError":
-            void router.replace(
-              `/register?status=unregistered&redirectTo=${router.pathname}`
-            );
+          case "RegistrationError": {
+            const query = { status: "unregistered", redirectTo: pathname };
+            void replace({ pathname: "/register", query });
             break;
+          }
 
-          case "NotAllowedError":
+          case "NotAllowedError": {
+            const query = { status: "unauthorized" };
+
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void router.replace("/login?status=unauthorized");
+            void replace({ pathname: "/login", query });
             break;
+          }
 
           case "PostValidationError": {
             const { titleError, descriptionError, excerptError } =
@@ -87,8 +91,10 @@ export const useDraftPost = (postData: CreatePostData) => {
           }
 
           case "SinglePost": {
-            const status = uploadHasError ? "?image=draft-upload-error" : "";
-            void router.push(`/posts${status}`);
+            const { slug } = draftData.draftPost.post.url;
+            const query = { slug, draft: uploadHasError };
+
+            void push({ pathname: "/posts/view/[slug]", query });
             break;
           }
 

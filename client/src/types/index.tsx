@@ -42,3 +42,4 @@ export type RefetchQueriesFn<T extends object> = Extract<
 >;
 
 export type OnCompleted<T extends object> = MutationOptions<T>["onCompleted"];
+export type OnError = MutationOptions["onError"];

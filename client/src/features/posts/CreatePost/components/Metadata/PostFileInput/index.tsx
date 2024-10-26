@@ -6,7 +6,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 
 import { useHandleFile } from "@hooks/useHandleFile";
-import { FileInput } from "@components/FileInput";
+import { FileInput } from "@components/ui/FileInput";
 import PostImagePreview from "./PostImagePreview";
 import TooltipHint from "../TooltipHint";
 import type { CreatePostAction, PostImageBanner } from "types/posts/createPost";
@@ -49,7 +49,6 @@ const PostFileInput = (props: PostFileInputProps) => {
   };
 
   const id = "post-image-banner";
-
   const hasError = !!(imageError || imageBannerError);
   const errorMsg = imageError || imageBannerError;
 

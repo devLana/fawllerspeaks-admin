@@ -4,33 +4,15 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 import { AppThemeContext } from ".";
-import { palette } from "./themeHelpers/palette";
-import { typography } from "./themeHelpers/typography";
-import { shape } from "./themeHelpers/shape";
-import { shadows } from "./themeHelpers/shadows";
-import { components } from "./themeHelpers/components";
-import { getStorageTheme, saveStorageTheme } from "./themeHelpers/storage";
-import type { AppTheme, ThemeColor } from "types/appTheme";
+import { palette } from "./helpers/palette";
+import { typography } from "./helpers/typography";
+import { shape } from "./helpers/shape";
+import { shadows } from "./helpers/shadows";
+import { components } from "./helpers/components";
+import { getStorageTheme, saveStorageTheme } from "./helpers/storage";
+import type { AppTheme } from "types/appTheme";
 
 type ThemeKeys = keyof AppTheme;
-
-declare module "@mui/material/styles" {
-  interface Theme {
-    appTheme: AppTheme;
-  }
-
-  interface ThemeOptions {
-    appTheme: AppTheme;
-  }
-
-  interface Palette {
-    themeColor: ThemeColor;
-  }
-
-  interface PaletteOptions {
-    themeColor: ThemeColor;
-  }
-}
 
 const AppThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [appTheme, setAppTheme] = React.useState<AppTheme>({

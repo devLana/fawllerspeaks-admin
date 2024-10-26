@@ -3,11 +3,11 @@ import * as React from "react";
 import type { UseFormSetError } from "react-hook-form";
 
 import type { Mutation, MutationForgotPasswordArgs } from "@apiTypes";
-import type { AuthPageView, OnCompleted, StateSetterFn, Status } from "@types";
+import type { AuthPageView, OnCompleted, Status } from "@types";
 
 const useForgotPassword = (
   setError: UseFormSetError<MutationForgotPasswordArgs>,
-  setView: StateSetterFn<AuthPageView>
+  handleView: (view: Exclude<AuthPageView, "form">) => void
 ) => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
 
@@ -28,11 +28,11 @@ const useForgotPassword = (
         break;
 
       case "RegistrationError":
-        setView("unregistered error");
+        handleView("unregistered error");
         break;
 
       case "Response":
-        setView("success");
+        handleView("success");
         break;
     }
   };

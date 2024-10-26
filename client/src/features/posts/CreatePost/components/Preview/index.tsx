@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import Box from "@mui/material/Box";
 import Snackbar from "@mui/material/Snackbar";
 
@@ -36,20 +34,28 @@ const Preview = ({
   handleCloseDraftError,
   dispatch,
 }: PreviewProps) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const create = useCreatePost(post, () => setIsOpen(false));
+  const { isOpen, setIsOpen, ...create } = useCreatePost(post);
 
   const handleGoBack = () => {
     dispatch({ type: "CHANGE_VIEW", payload: { view: "content" } });
   };
 
-  const apiErrors: CreateInputErrors = { ...draftErrors, ...create.errors };
+  let shouldOpen = false;
+  let apiErrors: CreateInputErrors = {};
+  let ariaLabel: string | undefined = undefined;
+  let handleCloseErrorsList: VoidFunction | undefined = undefined;
 
-  const handleCloseErrorsList =
-    create.createStatus === "inputError"
-      ? create.handleCloseError
-      : handleCloseDraftError;
+  if (draftStatus === "inputError") {
+    shouldOpen = true;
+    apiErrors = draftErrors;
+    ariaLabel = "Draft post errors";
+    handleCloseErrorsList = handleCloseDraftError;
+  } else if (create.status === "inputError") {
+    shouldOpen = true;
+    apiErrors = create.errors;
+    ariaLabel = "Publish post errors";
+    handleCloseErrorsList = create.handleCloseError;
+  }
 
   return (
     <section
@@ -91,7 +97,7 @@ const Preview = ({
           content={post.content}
         />
         <ActionButtons
-          label="Create post"
+          label="Publish post"
           status={draftStatus}
           onDraft={() => void handleDraftPost()}
           onNext={() => setIsOpen(true)}
@@ -99,22 +105,20 @@ const Preview = ({
         />
       </Box>
       <CreatePostErrorsAlert
-        ariaLabel="Create post errors"
-        shouldOpen={
-          create.createStatus === "inputError" || draftStatus === "inputError"
-        }
+        ariaLabel={ariaLabel}
+        shouldOpen={shouldOpen}
         onClick={handleCloseErrorsList}
         {...apiErrors}
       />
       <PreviewDialog
         isOpen={isOpen}
-        createStatus={create.createStatus}
+        createStatus={create.status}
         onCloseDialog={() => setIsOpen(false)}
         handleCreatePost={create.handleCreatePost}
       />
       <Snackbar
         message={create.msg}
-        open={create.createStatus === "error"}
+        open={create.status === "error"}
         onClose={create.handleCloseError}
       />
     </section>

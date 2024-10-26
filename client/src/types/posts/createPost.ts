@@ -24,8 +24,7 @@ export type RequiredPostMetadata = Pick<CreatePostData, RequiredMetadataKeys>;
 
 export type CreatePostAction =
   | { type: "CHANGE_VIEW"; payload: { view: PostView } }
-  | { type: "SELECT_POST_TAGS"; payload: { tagIds: string[] } }
-  | { type: "UNKNOWN_POST_TAGS" }
+  | { type: "MANAGE_POST_TAGS"; payload: { tagIds: string[] } }
   | { type: "ADD_POST_BANNER_IMAGE"; payload: { imageFile: File } }
   | { type: "REMOVE_POST_BANNER_IMAGE" }
   | {

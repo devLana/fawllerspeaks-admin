@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { CacheProvider } from "@emotion/react";
 
-import AuthHeaderProvider from "@context/AuthHeader/AuthHeaderProvider";
+import AuthProvider from "@context/Auth/AuthProvider";
 import AppThemeProvider from "@context/AppTheme/AppThemeProvider";
 import SessionProvider from "@context/Session/SessionProvider";
 import createEmotionCache from "configs/createEmotionCache";
@@ -15,7 +15,7 @@ export default function App(props: NextAppProps) {
   const { layout = uiLayout } = Component;
 
   return (
-    <AuthHeaderProvider>
+    <AuthProvider>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex, nofollow" />
@@ -28,6 +28,6 @@ export default function App(props: NextAppProps) {
           />
         </AppThemeProvider>
       </CacheProvider>
-    </AuthHeaderProvider>
+    </AuthProvider>
   );
 }

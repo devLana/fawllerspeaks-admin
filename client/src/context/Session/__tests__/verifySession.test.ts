@@ -13,31 +13,37 @@ describe("Verify user session", () => {
       router.pathname = "/";
     });
 
-    it("Redirect to the login page", () => {
+    it("Should redirect to the login page", () => {
       const router = useRouter();
 
       router.pathname = "/posts";
       sessionTestRenderer();
 
+      expect(
+        screen.queryByLabelText(/^loading session$/i)
+      ).not.toBeInTheDocument();
+
       expect(screen.getByText(mocks.TEXT_NODE)).toBeInTheDocument();
-      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-      expect(router.replace).toHaveBeenCalledTimes(1);
+      expect(router.replace).toHaveBeenCalledOnce();
       expect(router.replace).toHaveBeenCalledWith("/login");
     });
 
-    it("Render the authentication page for the current route", () => {
+    it("Should render the authentication page for the current route", () => {
       const router = useRouter();
 
       router.pathname = "/reset-password";
       sessionTestRenderer();
 
+      expect(
+        screen.queryByLabelText(/^loading session$/i)
+      ).not.toBeInTheDocument();
+
       expect(screen.getByText(mocks.TEXT_NODE)).toBeInTheDocument();
-      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
       expect(router.replace).not.toHaveBeenCalled();
     });
   });
 
-  describe("User is logged in, Send a session verification request to the api", () => {
+  describe("User is logged in and a session verification request is sent to the API", () => {
     beforeAll(() => {
       mocks.server.listen({ onUnhandledRequest: "error" });
     });
@@ -50,25 +56,30 @@ describe("Verify user session", () => {
       mocks.server.close();
     });
 
-    describe("Api response is either an error or an unsupported object type", () => {
+    describe("API response is either an error or an unsupported object type", () => {
       it.each(mocks.alerts)("%s", async (_, expected) => {
         localStorage.setItem(SESSION_ID, expected.sessionId);
 
         const { reload, replace } = useRouter();
         const { user } = sessionTestRenderer();
 
-        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+        expect(screen.getByLabelText(/^loading session$/i)).toBeInTheDocument();
         expect(screen.queryByText(mocks.TEXT_NODE)).not.toBeInTheDocument();
 
         const alert = await screen.findByRole("alert");
 
         expect(alert).toHaveTextContent(expected.message);
-        expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByLabelText(/^loading session$/i)
+        ).not.toBeInTheDocument();
+
         expect(screen.queryByText(mocks.TEXT_NODE)).not.toBeInTheDocument();
         expect(replace).not.toHaveBeenCalled();
 
         await user.click(screen.getByRole("button", { name: /reload page/i }));
-        expect(reload).toHaveBeenCalledTimes(1);
+
+        expect(reload).toHaveBeenCalledOnce();
       });
 
       it("Should render an error alert message box if there was an error decoding the access token response", async () => {
@@ -77,39 +88,44 @@ describe("Verify user session", () => {
         const { reload } = useRouter();
         const { user } = sessionTestRenderer();
 
-        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+        expect(screen.getByLabelText(/^loading session$/i)).toBeInTheDocument();
         expect(screen.queryByText(mocks.TEXT_NODE)).not.toBeInTheDocument();
 
-        const alert = await screen.findByRole("alert");
-
-        expect(alert).toHaveTextContent(mocks.msg1);
+        expect(await screen.findByRole("alert")).toHaveTextContent(mocks.msg1);
         expect(screen.queryByText(mocks.TEXT_NODE)).not.toBeInTheDocument();
-        expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByLabelText(/^loading session$/i)
+        ).not.toBeInTheDocument();
 
         await user.click(screen.getByRole("button", { name: /reload page/i }));
-        expect(reload).toHaveBeenCalledTimes(1);
+
+        expect(reload).toHaveBeenCalledOnce();
       });
     });
 
-    describe("Redirect the user to the login page if the current route is a protected route and the user's session could not be verified", () => {
+    describe("The user's session could not be verified on a protected route", () => {
       it.each(mocks.redirects1)("%s", async (_, mock) => {
         const { replace } = useRouter();
 
         localStorage.setItem(SESSION_ID, mock.sessionId);
         sessionTestRenderer();
 
-        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+        expect(screen.getByLabelText(/^loading session$/i)).toBeInTheDocument();
         expect(screen.queryByText(mocks.TEXT_NODE)).not.toBeInTheDocument();
 
-        await waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+        await waitFor(() => expect(replace).toHaveBeenCalledOnce());
 
         expect(replace).toHaveBeenCalledWith("/login");
         expect(screen.getByText(mocks.TEXT_NODE)).toBeInTheDocument();
-        expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByLabelText(/^loading session$/i)
+        ).not.toBeInTheDocument();
       });
     });
 
-    describe("Render the authentication page at the current route if there was an error verifying the user's session", () => {
+    describe("An error occurred while trying to verify the user's session", () => {
       it.each(mocks.renders1)("%s", async (_, pathname, mock) => {
         const router = useRouter();
 
@@ -117,13 +133,14 @@ describe("Verify user session", () => {
         localStorage.setItem(SESSION_ID, mock.sessionId);
         sessionTestRenderer();
 
-        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+        expect(screen.getByLabelText(/^loading session$/i)).toBeInTheDocument();
         expect(screen.queryByText(mocks.TEXT_NODE)).not.toBeInTheDocument();
-
         expect(await screen.findByText(mocks.TEXT_NODE)).toBeInTheDocument();
-
         expect(router.replace).not.toHaveBeenCalled();
-        expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByLabelText(/^loading session$/i)
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -136,16 +153,20 @@ describe("Verify user session", () => {
           router.pathname = expected.from;
           sessionTestRenderer();
 
-          expect(screen.getByRole("progressbar")).toBeInTheDocument();
           expect(screen.queryByText(mocks.TEXT_NODE)).not.toBeInTheDocument();
 
-          await waitFor(() => {
-            expect(router.replace).toHaveBeenCalledTimes(1);
-          });
+          expect(
+            screen.getByLabelText(/^loading session$/i)
+          ).toBeInTheDocument();
+
+          await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
 
           expect(router.replace).toHaveBeenCalledWith(expected.to);
           expect(screen.getByText(mocks.TEXT_NODE)).toBeInTheDocument();
-          expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+
+          expect(
+            screen.queryByLabelText(/^loading session$/i)
+          ).not.toBeInTheDocument();
         });
       });
 
@@ -157,13 +178,17 @@ describe("Verify user session", () => {
           router.pathname = pathname;
           sessionTestRenderer();
 
-          expect(screen.getByRole("progressbar")).toBeInTheDocument();
+          expect(
+            screen.getByLabelText(/^loading session$/i)
+          ).toBeInTheDocument();
+
           expect(screen.queryByText(mocks.TEXT_NODE)).not.toBeInTheDocument();
-
           expect(await screen.findByText(mocks.TEXT_NODE)).toBeInTheDocument();
-
           expect(router.replace).not.toHaveBeenCalled();
-          expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+
+          expect(
+            screen.queryByLabelText(/^loading session$/i)
+          ).not.toBeInTheDocument();
         });
       });
     });

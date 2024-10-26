@@ -3,17 +3,18 @@ import type { GetServerSidePropsContext as GssPContext } from "next";
 
 import * as mocks from "./mocks/resetPasswordGSSP.mocks";
 
-describe("getServerSideProps(ResetPassword)", () => {
+describe("ResetPassword - getServerSideProps", () => {
   describe("Validate password reset token", () => {
-    it.each(mocks.verifyValidate)("%s", async (_, tId, status) => {
+    it.each(mocks.verifyValidate)("%s", async (_, tId) => {
       const context = { query: { tId } } as unknown as GssPContext;
 
       const result = await getServerSideProps(context);
 
       expect(result).not.toHaveProperty("props");
+
       expect(result).toHaveProperty(
         "redirect.destination",
-        `/forgot-password?status=${status}`
+        "/forgot-password?status=invalid"
       );
     });
   });
@@ -45,6 +46,7 @@ describe("getServerSideProps(ResetPassword)", () => {
         const result = await getServerSideProps(context);
 
         expect(result).not.toHaveProperty("props");
+
         expect(result).toHaveProperty(
           "redirect.destination",
           `/forgot-password?status=${status}`

@@ -29,7 +29,7 @@ const Aside = ({ description, excerpt, tagIds }: AsideProps) => (
       alignSelf: { md: "start" },
     })}
   >
-    <List disablePadding>
+    <List disablePadding aria-label="post information">
       <ListItem disablePadding sx={{ mb: 4 }}>
         <ListItemText
           primary="Post Description"

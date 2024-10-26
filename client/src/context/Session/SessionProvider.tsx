@@ -5,8 +5,8 @@ import Snackbar from "@mui/material/Snackbar";
 import Tooltip from "@mui/material/Tooltip";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
-import useRefreshToken from "@hooks/auth/useRefreshToken";
-import useVerifySession from "@hooks/auth/useVerifySession";
+import useRefreshToken from "@hooks/session/useRefreshToken";
+import useVerifySession from "@hooks/session/useVerifySession";
 import { SessionContext } from "@context/Session";
 import type { PageLayoutFn } from "@types";
 

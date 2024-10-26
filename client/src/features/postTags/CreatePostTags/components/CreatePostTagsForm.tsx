@@ -10,18 +10,18 @@ import Snackbar from "@mui/material/Snackbar";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTagsPage } from "@context/PostTags";
 import useCreatePostTags from "@hooks/createPostTags/useCreatePostTags";
 import CreatePostTagsInput from "./CreatePostTagsInput";
 import { CREATE_POST_TAGS } from "@mutations/createPostTags/CREATE_POST_TAGS";
 import { createPostTagsSchema } from "@validators/createPostTagsSchema";
-import { refetchQueries } from "../cache/refetchQueries";
+import { refetchQueries } from "@cache/refetchQueries/postTags/createPostTags";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
+import type { Status } from "@types";
 
 interface CreatePostTagsFormProps {
   onCloseDialog: () => void;
-  onStatusChange: (newStatus: "idle" | "submitting") => void;
-  status: "idle" | "submitting";
+  onStatusChange: (newStatus: Exclude<Status, "error">) => void;
+  status: Exclude<Status, "error">;
 }
 
 const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
@@ -35,8 +35,7 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
     Record<string, string>
   >({ resolver: yupResolver(createPostTagsSchema(inputs)) });
 
-  const { handleOpenAlert } = usePostTagsPage();
-  const onCompleted = useCreatePostTags(handleDialog, handleFormAlert);
+  const onCompleted = useCreatePostTags(onCloseDialog, handleFormAlert);
 
   const handleAddMore = () => {
     const lastInputValue = inputs.at(-1) ?? 0;
@@ -49,7 +48,7 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
   };
 
   const submitHandler = (values: Record<string, string>) => {
-    onStatusChange("submitting");
+    onStatusChange("loading");
 
     void create({
       refetchQueries,
@@ -62,11 +61,6 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
   function handleFormAlert() {
     onStatusChange("idle");
     setAlertIsOpen(true);
-  }
-
-  function handleDialog(message: string) {
-    onCloseDialog();
-    handleOpenAlert(message);
   }
 
   const { errors } = formState;
@@ -84,7 +78,11 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(submitHandler)} noValidate>
+      <form
+        onSubmit={handleSubmit(submitHandler)}
+        noValidate
+        aria-label="create post tags"
+      >
         <Grid container rowSpacing={3} columnSpacing={2} sx={{ mb: 2 }}>
           {inputs.map(value => (
             <CreatePostTagsInput
@@ -112,13 +110,13 @@ const CreatePostTagsForm = (props: CreatePostTagsFormProps) => {
             columnGap: 2,
           }}
         >
-          <Button onClick={onCloseDialog} disabled={status === "submitting"}>
+          <Button onClick={onCloseDialog} disabled={status === "loading"}>
             Cancel
           </Button>
           <LoadingButton
             variant="contained"
             type="submit"
-            loading={status === "submitting"}
+            loading={status === "loading"}
           >
             <span>Create {inputs.length > 1 ? "Tags" : "Tag"}</span>
           </LoadingButton>

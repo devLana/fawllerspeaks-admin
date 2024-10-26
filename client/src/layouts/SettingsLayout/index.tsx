@@ -19,7 +19,7 @@ const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => (
       sx={theme => ({ [theme.breakpoints.down("md")]: { display: "none" } })}
     />
     <Box sx={{ flexGrow: { md: 1 } }}>
-      <Typography variant="h1" gutterBottom>
+      <Typography variant="h1" gutterBottom id="page-title">
         {pageHeading}
       </Typography>
       {children}

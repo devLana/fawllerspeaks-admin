@@ -4,7 +4,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 
 const PageBreadcrumbs = () => {
   const { pathname } = useRouter();

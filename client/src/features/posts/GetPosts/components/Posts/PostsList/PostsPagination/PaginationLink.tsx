@@ -1,6 +1,6 @@
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import Button from "@mui/material/Button";
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 
 interface PaginationLinkProps {
   href: string | undefined;

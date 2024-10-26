@@ -1,4 +1,4 @@
-import EditProfileForm from "@features/settings/editProfile/components/EditProfileForm";
+import EditProfileForm from "@features/settings/editProfile/EditProfileForm";
 import settingsLayout from "@utils/layouts/settingsLayout";
 import type { NextPageWithLayout } from "@types";
 

@@ -7,17 +7,7 @@ const useStatusAlert = () => {
 
   React.useEffect(() => {
     if (query.status && typeof query.status === "string") {
-      const message = "Unable to verify password reset token";
-
       switch (query.status) {
-        case "empty":
-          setAlert({
-            open: true,
-            message:
-              "A password reset token is needed to reset an account password",
-          });
-          break;
-
         case "invalid":
         case "validation":
           setAlert({ open: true, message: "Invalid password reset token" });
@@ -26,14 +16,25 @@ const useStatusAlert = () => {
         case "fail":
         case "unsupported":
         case "api":
-          setAlert({ open: true, message });
+          setAlert({
+            open: true,
+            message: "Unable to verify password reset token",
+          });
           break;
 
         case "network":
+          setAlert({
+            open: true,
+            message:
+              "Unable to verify password reset token. Please try again later",
+          });
+          break;
+
         case "error":
           setAlert({
             open: true,
-            message: `${message}. Please try again later`,
+            message:
+              "There was an error trying to reset your password. Please try again later",
           });
           break;
 

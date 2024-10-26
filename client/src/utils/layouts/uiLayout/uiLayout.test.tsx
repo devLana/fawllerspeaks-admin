@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 
 import uiLayout from ".";
 import TestLayout from "@layouts/components/TestLayout";
-import { renderUI } from "@testUtils/renderUI";
+import { renderUI } from "@utils/tests/renderUI";
 
 const page = <div>Testing Page</div>;
 
@@ -15,7 +15,7 @@ describe("Page Layout Utility Function", () => {
 
     expect(screen.queryByText("Testing Page")).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByLabelText(/^loading session$/i)).toBeInTheDocument();
   });
 
   it("Layout function should render an alert if there is an error message", () => {
@@ -25,8 +25,11 @@ describe("Page Layout Utility Function", () => {
     renderUI(ui);
 
     expect(screen.queryByText("Testing Page")).not.toBeInTheDocument();
-    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-    expect(screen.getByRole("alert")).toBeInTheDocument();
+
+    expect(
+      screen.queryByLabelText(/^loading session$/i)
+    ).not.toBeInTheDocument();
+
     expect(screen.getByRole("alert")).toHaveTextContent(
       "An error has occurred"
     );
@@ -38,7 +41,10 @@ describe("Page Layout Utility Function", () => {
 
     renderUI(ui);
 
-    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/^loading session$/i)
+    ).not.toBeInTheDocument();
+
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(screen.getByText("Testing Page")).toBeInTheDocument();
   });

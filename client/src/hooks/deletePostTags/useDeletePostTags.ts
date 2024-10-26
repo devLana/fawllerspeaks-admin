@@ -1,64 +1,87 @@
+import * as React from "react";
 import { useRouter } from "next/router";
 
 import { useApolloClient } from "@apollo/client";
 
+import { usePostTagsPage } from "@context/PostTags";
 import { SESSION_ID } from "@utils/constants";
-import type { OnCompleted } from "@types";
-import type { DeletePostTagsData } from "types/postTags";
-import type { PostTagsListAction } from "types/postTags/getPostTags";
+import type { OnCompleted, OnError } from "@types";
+import type { DeletePostTagsData } from "types/postTags/deletePostTags";
 
 const useDeletePostTags = (
-  msg: string,
-  dispatch: React.Dispatch<PostTagsListAction>,
-  handleResponse: (msg: string) => void
+  handleRemoveTags: () => void,
+  handleClose: () => void
 ) => {
+  const [isLoading, setIsLoading] = React.useState(false);
   const { replace, pathname } = useRouter();
+
   const client = useApolloClient();
+  const { handleOpenAlert } = usePostTagsPage();
+
+  const msg =
+    "You are unable to delete post tags at the moment. Please try again later";
+
+  function handleError(message: string) {
+    handleClose();
+    handleOpenAlert(message);
+    setIsLoading(false);
+  }
+
+  const handleResponse = (message: string) => {
+    handleRemoveTags();
+    handleOpenAlert(message);
+    setIsLoading(false);
+  };
 
   const onCompleted: OnCompleted<DeletePostTagsData> = data => {
     switch (data.deletePostTags.__typename) {
-      case "AuthenticationError":
+      case "AuthenticationError": {
+        const query = { status: "unauthenticated", redirectTo: pathname };
+
         localStorage.removeItem(SESSION_ID);
         void client.clearStore();
-        void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
+        void replace({ pathname: "/login", query });
         break;
+      }
 
       case "NotAllowedError":
         localStorage.removeItem(SESSION_ID);
         void client.clearStore();
-        void replace("/login?status=unauthorized");
+        void replace({ pathname: "/login", query: { status: "unauthorized" } });
         break;
 
-      case "RegistrationError":
-        void replace(`/register?status=unregistered&redirectTo=${pathname}`);
+      case "RegistrationError": {
+        const query = { status: "unregistered", redirectTo: pathname };
+        void replace({ pathname: "/register", query });
         break;
+      }
 
       case "DeletePostTagsValidationError":
         handleResponse(data.deletePostTags.tagIdsError);
-        dispatch({ type: "CLEAR_SELECTION" });
         break;
 
       case "UnknownError":
       case "DeletedPostTagsWarning":
         handleResponse(data.deletePostTags.message);
-        dispatch({ type: "CLEAR_SELECTION" });
         break;
 
       case "DeletedPostTags": {
-        const { tagIds: deletedTags } = data.deletePostTags;
-        const word = deletedTags.length > 1 ? "tags" : "tag";
+        const { tagIds } = data.deletePostTags;
 
-        handleResponse(`Post ${word} deleted`);
-        dispatch({ type: "CLEAR_SELECTION", payload: { deletedTags } });
+        handleResponse(`Post ${tagIds.length > 1 ? "tags" : "tag"} deleted`);
         break;
       }
 
       default:
-        handleResponse(msg);
+        handleError(msg);
     }
   };
 
-  return onCompleted;
+  const onError: OnError = err => {
+    handleError(err.graphQLErrors?.[0]?.message ?? msg);
+  };
+
+  return { onCompleted, onError, isLoading, setIsLoading };
 };
 
 export default useDeletePostTags;

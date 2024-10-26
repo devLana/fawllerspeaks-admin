@@ -58,7 +58,7 @@ const PreviewActionsMenu = (props: PreviewActionsMenuProps) => {
           dense
           aria-haspopup="dialog"
         >
-          Create Post
+          Publish Post
         </MenuItem>
         <MenuItem onClick={() => handler(onDraft)} dense>
           Save Post As Draft

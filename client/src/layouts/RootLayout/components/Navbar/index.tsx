@@ -3,8 +3,8 @@ import List from "@mui/material/List";
 import type { Theme } from "@mui/material/styles";
 
 import NavbarContainer from "./NavbarContainer";
-import NavbarItemLink from "./NavbarItemLink";
-import NavbarItemButton from "./NavbarItemButton";
+import NavbarLink from "./NavbarLink";
+import NavbarLogoutButton from "./NavbarLogoutButton";
 import NavbarToggleButton from "./NavbarToggleButton";
 import { navbarItems } from "@uiHelpers/navbarItems";
 import transition from "@utils/layouts/transition";
@@ -38,7 +38,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
       const { type: _, ...items } = item;
 
       return (
-        <NavbarItemLink
+        <NavbarLink
           key={item.label}
           {...items}
           isOpen={isOpen}
@@ -51,7 +51,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
     const { type: _, ...items } = item;
 
     return (
-      <NavbarItemButton
+      <NavbarLogoutButton
         key={item.label}
         {...items}
         isOpen={isOpen}
@@ -69,6 +69,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
       maxWidth={maxWidth}
     >
       <List
+        aria-label="Main app navigation"
         sx={({ breakpoints, transitions }) => ({
           height: "100%",
           display: "flex",
@@ -85,6 +86,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
         <NavbarToggleButton
           isOpen={isOpen}
           sm_Above={sm_Above}
+          md_Above={md_Above}
           onClick={onToggleNav}
         />
         {navItems}

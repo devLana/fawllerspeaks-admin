@@ -5,7 +5,7 @@ import useStatusAlert from "@hooks/login/useStatusAlert";
 import AlertToast from "@features/auth/components/AlertToast";
 import Down from "@components/SlideTransitions/Down";
 import AuthRootLayout from "@layouts/AuthRootLayout";
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 import Card from "@features/auth/components/Card";
 import LoginForm from "@features/auth/login/LoginForm";
 import uiLayout from "@utils/layouts/uiLayout";
@@ -25,7 +25,9 @@ const Login: NextPageWithLayout = () => {
         severity="info"
         content={message}
       />
-      <Typography variant="h1">Sign In</Typography>
+      <Typography variant="h1" id="page-title">
+        Sign In
+      </Typography>
       <Card>
         <LoginForm />
         <Divider light sx={{ mt: 3.5, mb: 3 }} />

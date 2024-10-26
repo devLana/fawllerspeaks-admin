@@ -20,3 +20,21 @@ export interface AppThemeItem {
   name: CapitalizeThemeMode;
   Icon: MuiIconType;
 }
+
+declare module "@mui/material/styles" {
+  interface Theme {
+    appTheme: AppTheme;
+  }
+
+  interface ThemeOptions {
+    appTheme: AppTheme;
+  }
+
+  interface Palette {
+    themeColor: ThemeColor;
+  }
+
+  interface PaletteOptions {
+    themeColor: ThemeColor;
+  }
+}

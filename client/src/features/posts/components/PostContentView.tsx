@@ -2,7 +2,8 @@ import Box from "@mui/material/Box";
 
 const PostContentView = ({ content }: { content: string }) => (
   <Box
-    component="article"
+    aria-label="post content"
+    component="section"
     dangerouslySetInnerHTML={{ __html: content }}
     sx={({ appTheme, shape, typography, spacing, transitions }) => ({
       "--ck-image-style-spacing": spacing(3),

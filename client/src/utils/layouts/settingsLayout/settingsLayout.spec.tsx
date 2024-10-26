@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 
 import settingsLayout from ".";
-import { renderUI } from "@testUtils/renderUI";
+import { renderUI } from "@utils/tests/renderUI";
 
 const heading = "Settings Page";
 const headingName = { name: new RegExp(heading, "i") };
@@ -18,7 +18,7 @@ describe("Settings Layout Utility Function", () => {
     expect(screen.queryByText(textNode)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", headingName)).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByLabelText(/^loading session$/i)).toBeInTheDocument();
   });
 
   it("Layout function should render an alert if there is an error message", () => {
@@ -29,8 +29,11 @@ describe("Settings Layout Utility Function", () => {
 
     expect(screen.queryByText(textNode)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", headingName)).not.toBeInTheDocument();
-    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-    expect(screen.getByRole("alert")).toBeInTheDocument();
+
+    expect(
+      screen.queryByLabelText(/^loading session$/i)
+    ).not.toBeInTheDocument();
+
     expect(screen.getByRole("alert")).toHaveTextContent(
       "An error has occurred"
     );
@@ -42,7 +45,10 @@ describe("Settings Layout Utility Function", () => {
 
     renderUI(ui);
 
-    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/^loading session$/i)
+    ).not.toBeInTheDocument();
+
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", headingName)).toBeInTheDocument();
     expect(screen.getByText(textNode)).toBeInTheDocument();

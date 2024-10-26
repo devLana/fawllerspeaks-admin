@@ -41,7 +41,10 @@ const RootLayout = (props: RootLayoutProps) => {
       }}
     >
       <Metadata {...metaProps} />
-      <Header onClick={() => setNavBarIsOpen(true)} />
+      <Header
+        onClick={() => setNavBarIsOpen(true)}
+        isLoading={!clientHasRendered}
+      />
       <Navbar
         isOpen={navBarIsOpen}
         onToggleNav={() => setNavBarIsOpen(!navBarIsOpen)}
@@ -49,6 +52,8 @@ const RootLayout = (props: RootLayoutProps) => {
       />
       <Box
         component="main"
+        aria-live="polite"
+        aria-busy={!clientHasRendered}
         sx={{ py: 4, flexGrow: { sm: 1 }, minWidth: { sm: 0 } }}
       >
         {content}

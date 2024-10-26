@@ -4,12 +4,11 @@ import Button from "@mui/material/Button";
 
 import PostTagsDialog from "../components/PostTagsDialog";
 import CreatePostTagsForm from "./components/CreatePostTagsForm";
-
-type Status = "idle" | "submitting";
+import type { Status } from "@types";
 
 const CreatePostTags = () => {
   const [open, setOpen] = React.useState(false);
-  const [status, setStatus] = React.useState<Status>("idle");
+  const [status, setStatus] = React.useState<Exclude<Status, "error">>("idle");
 
   const handleCloseDialog = () => {
     setOpen(false);
@@ -27,7 +26,7 @@ const CreatePostTags = () => {
       </Button>
       <PostTagsDialog
         open={open}
-        onClose={status === "submitting" ? undefined : () => setOpen(false)}
+        onClose={status === "loading" ? undefined : () => setOpen(false)}
         modalTitle="Create new post tags"
         contentText="You can create up to 10 post tags at a time."
         fullWidth
@@ -35,7 +34,7 @@ const CreatePostTags = () => {
         <CreatePostTagsForm
           status={status}
           onCloseDialog={handleCloseDialog}
-          onStatusChange={(newStatus: Status) => setStatus(newStatus)}
+          onStatusChange={newStatus => setStatus(newStatus)}
         />
       </PostTagsDialog>
     </>

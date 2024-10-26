@@ -40,8 +40,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
       <Button
         variant="contained"
         disabled={status === "loading"}
-        onClick={onNext || undefined}
-        type={onNext ? undefined : "submit"}
+        {...(onNext ? { onClick: onNext } : { type: "submit" })}
       >
         {label}
       </Button>

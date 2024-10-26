@@ -5,6 +5,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 const SelectPostTagsSkeleton = () => (
   <Box
+    aria-label="Loading post tags"
     aria-busy="true"
     sx={{
       mb: 2.5,

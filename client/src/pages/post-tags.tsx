@@ -19,8 +19,6 @@ const PostTagsPage: NextPageWithLayout = () => {
     setAlert({ open: true, message });
   };
 
-  const id = "post-tags";
-
   return (
     <PostTagsPageContext.Provider value={{ handleOpenAlert }}>
       <Box
@@ -33,12 +31,12 @@ const PostTagsPage: NextPageWithLayout = () => {
           mb: 5,
         }}
       >
-        <Typography variant="h1" id={id}>
+        <Typography variant="h1" id="post-tags">
           Post Tags: Categorize blog posts
         </Typography>
         <CreatePostTags />
       </Box>
-      <GetPostTags id={id} />
+      <GetPostTags id="post-tags" />
       <Snackbar
         message={alert.message}
         open={alert.open}

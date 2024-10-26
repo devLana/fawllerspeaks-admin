@@ -44,21 +44,26 @@ const useChangePassword = (
         break;
       }
 
-      case "AuthenticationError":
+      case "AuthenticationError": {
+        const query = { status: "unauthenticated", redirectTo: pathname };
+
         localStorage.removeItem(SESSION_ID);
         void client.clearStore();
-        void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
+        void replace({ pathname: "/login", query });
         break;
+      }
 
       case "UnknownError":
         localStorage.removeItem(SESSION_ID);
         void client.clearStore();
-        void replace("/login?status=unauthorized");
+        void replace({ pathname: "/login", query: { status: "unauthorized" } });
         break;
 
-      case "RegistrationError":
-        void replace(`/register?status=unregistered&redirectTo=${pathname}`);
+      case "RegistrationError": {
+        const query = { status: "unregistered", redirectTo: pathname };
+        void replace({ pathname: "/register", query });
         break;
+      }
 
       case "NotAllowedError":
       case "ServerError":

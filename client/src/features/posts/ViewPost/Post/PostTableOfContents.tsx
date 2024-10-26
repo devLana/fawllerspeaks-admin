@@ -3,7 +3,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Typography from "@mui/material/Typography";
 
-import NextLink from "@components/NextLink";
+import NextLink from "@components/ui/NextLink";
 import { tableOfContentsMargin } from "@utils/posts/tableOfContentsMargin";
 import type { PostTableOfContents as TableOfContents } from "@apiTypes";
 

@@ -29,7 +29,8 @@ describe("Refresh expired user access token", () => {
       localStorage.setItem(SESSION_ID, sessionId);
       sessionTestRenderer();
 
-      await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
+
       expect(router.replace).toHaveBeenCalledWith(url);
     });
   });

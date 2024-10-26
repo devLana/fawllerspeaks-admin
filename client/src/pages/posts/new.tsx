@@ -5,12 +5,12 @@ import Typography from "@mui/material/Typography";
 
 import { useDraftPost } from "@hooks/createPost/useDraftPost";
 import RootLayout from "@layouts/RootLayout";
-import CreatePostMetadata from "@features/posts/CreatePost/components/Metadata";
+import Metadata from "@features/posts/CreatePost/components/Metadata";
 import PostFileInput from "@features/posts/CreatePost/components/Metadata/PostFileInput";
 import SelectPostTagsInput from "@features/posts/CreatePost/components/Metadata/SelectPostTags/SelectPostTagsInput";
 import { LazyContent } from "@features/posts/CreatePost/components/Content/LazyContent";
 import { LazyPreview } from "@features/posts/CreatePost/components/Preview/LazyPreview";
-import * as post from "@features/posts/CreatePost/state/createPostReducer";
+import * as post from "@reducers/createPost";
 import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
@@ -33,7 +33,7 @@ const CreatePostPage: NextPageWithLayout = () => {
         Create a new blog post
       </Typography>
       {state.view === "metadata" ? (
-        <CreatePostMetadata
+        <Metadata
           title={state.postData.title}
           description={state.postData.description}
           excerpt={state.postData.excerpt}

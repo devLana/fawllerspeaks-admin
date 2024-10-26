@@ -16,7 +16,7 @@ const useStatusAlert = () => {
           setAlert({
             open: true,
             message:
-              "Profile updated. But there was an error uploading your new profile image. Please try again later",
+              "Profile updated. But there was an error uploading your new profile image. Please try uploading an image later",
           });
           break;
 

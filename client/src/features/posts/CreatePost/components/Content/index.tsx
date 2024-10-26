@@ -45,10 +45,6 @@ const Content = ({
     }
   };
 
-  const id = "post-content-helper-text";
-  const contentHasError = contentIsEmpty || !!contentError;
-  const contentErrorMsg = contentIsEmpty ? "Enter post content" : contentError;
-
   return (
     <section
       aria-live="polite"
@@ -62,16 +58,16 @@ const Content = ({
         heading="Provide post content"
       />
       <CKEditorComponent
-        id={id}
+        id="post-content-helper-text"
         data={content}
-        contentHasError={contentHasError}
+        contentHasError={contentIsEmpty || !!contentError}
         dispatch={dispatch}
         onBlur={value => setContentIsEmpty(value)}
         onFocus={() => setContentIsEmpty(false)}
       />
-      {contentHasError && (
-        <FormHelperText id={id} error>
-          {contentErrorMsg}
+      {(contentIsEmpty || !!contentError) && (
+        <FormHelperText id="post-content-helper-text" error>
+          {contentIsEmpty ? "Enter post content" : contentError}
         </FormHelperText>
       )}
       <CreatePostErrorsAlert

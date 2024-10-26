@@ -3,7 +3,7 @@ import { graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { REFRESH_TOKEN } from "@mutations/auth/REFRESH_TOKEN";
-import { mswData, mswErrors } from "@testUtils/msw";
+import { mswData, mswErrors } from "@utils/tests/msw";
 
 interface Redirects {
   url: string;

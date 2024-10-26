@@ -13,11 +13,9 @@ import type {
   CreateStatus,
 } from "types/posts/createPost";
 
-export const useCreatePost = (
-  post: CreatePostData,
-  handleCloseDialog: VoidFunction
-) => {
-  const [createStatus, setCreateStatus] = React.useState<CreateStatus>("idle");
+export const useCreatePost = (postData: CreatePostData) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [status, setStatus] = React.useState<CreateStatus>("idle");
   const { push, replace, pathname } = useRouter();
 
   const [createPost, { client, data, error }] = useMutation(CREATE_POST);
@@ -25,10 +23,10 @@ export const useCreatePost = (
   const upload = useUploadImage();
 
   const handleCreatePost = async () => {
-    setCreateStatus("loading");
+    setStatus("loading");
 
-    const { imageBanner, tagIds, ...rest } = post;
-    const postInput: CreatePostInput = { ...rest, tagIds: tagIds || null };
+    const { imageBanner, tagIds, ...rest } = postData;
+    const post: CreatePostInput = { ...rest, ...(tagIds && { tagIds }) };
     let uploadHasError = false;
 
     if (imageBanner) {
@@ -36,54 +34,60 @@ export const useCreatePost = (
       ({ uploadHasError } = imageData);
 
       if (imageData.imageLink) {
-        postInput.imageBanner = imageData.imageLink;
+        post.imageBanner = imageData.imageLink;
       }
     }
 
     void createPost({
-      variables: { post: postInput },
+      variables: { post },
       onError: () => {
-        setCreateStatus("error");
-        handleCloseDialog();
+        setStatus("error");
+        setIsOpen(false);
       },
       onCompleted(createData) {
         switch (createData.createPost.__typename) {
-          case "AuthenticationError":
+          case "AuthenticationError": {
+            const query = { status: "unauthenticated", redirectTo: pathname };
+
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void replace(
-              `/login?status=unauthenticated&redirectTo=${pathname}`
-            );
+            void replace({ pathname: "/login", query });
             break;
+          }
 
-          case "RegistrationError":
-            void replace(
-              `/register?status=unregistered&redirectTo=${pathname}`
-            );
+          case "RegistrationError": {
+            const query = { status: "unregistered", redirectTo: pathname };
+            void replace({ pathname: "/register", query });
             break;
+          }
 
-          case "NotAllowedError":
+          case "NotAllowedError": {
+            const query = { status: "unauthorized" };
+
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
-            void replace("/login?status=unauthorized");
+            void replace({ pathname: "/login", query });
             break;
+          }
 
           case "PostValidationError":
           case "DuplicatePostTitleError":
           case "ForbiddenError":
-            setCreateStatus("inputError");
-            handleCloseDialog();
+            setStatus("inputError");
+            setIsOpen(false);
             break;
 
           case "SinglePost": {
-            const status = uploadHasError ? "?image=create-upload-error" : "";
-            void push(`/posts${status}`);
+            const { slug } = createData.createPost.post.url;
+            const query = { slug, create: uploadHasError };
+
+            void push({ pathname: "/posts/view/[slug]", query });
             break;
           }
 
           default:
-            setCreateStatus("error");
-            handleCloseDialog();
+            setStatus("error");
+            setIsOpen(false);
         }
       },
     });
@@ -116,7 +120,13 @@ export const useCreatePost = (
     errors.titleError = data.createPost.message;
   }
 
-  const handleCloseError = () => setCreateStatus("idle");
-
-  return { createStatus, msg, errors, handleCreatePost, handleCloseError };
+  return {
+    isOpen,
+    setIsOpen,
+    msg,
+    errors,
+    status,
+    handleCreatePost,
+    handleCloseError: () => setStatus("idle"),
+  };
 };

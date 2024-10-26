@@ -1,5 +1,6 @@
 import { useApolloClient } from "@apollo/client";
-import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
 import Chip from "@mui/material/Chip";
 
 import { GET_POST_TAG_NAME } from "@fragments/GET_POST_TAG_NAME";
@@ -13,15 +14,27 @@ const PreviewPostTags = ({ tagIds }: { tagIds: string[] }) => {
     const id = `PostTag:${tagId}`;
     const tag = client.readFragment({ fragment: GET_POST_TAG_NAME, id });
 
-    return <Chip key={tagId} label={tag?.name} sx={{ maxWidth: "15.5em" }} />;
+    return (
+      <ListItem
+        key={tagId}
+        disablePadding
+        aria-label={tag?.name}
+        sx={{ width: "auto" }}
+      >
+        <Chip label={tag?.name} sx={{ maxWidth: "15em" }} />
+      </ListItem>
+    );
   });
 
   return (
-    <Box
+    <List
+      aria-label="post tags"
+      disablePadding
       sx={{
         display: "flex",
         flexWrap: "wrap",
-        gap: 1.25,
+        columnGap: 0.5,
+        rowGap: 1,
         mt: 3,
         pt: { md: 3 },
         borderTop: { md: "1px solid" },
@@ -29,7 +42,7 @@ const PreviewPostTags = ({ tagIds }: { tagIds: string[] }) => {
       }}
     >
       {selectedTags}
-    </Box>
+    </List>
   );
 };
 

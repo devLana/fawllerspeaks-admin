@@ -7,7 +7,7 @@ import DeletePostTags from "@features/postTags/DeletePostTags";
 import PostTagsWrapper from "../PostTagsWrapper";
 import PostTagsList from "./PostTagsList";
 import ErrorBoundary from "@components/ErrorBoundary";
-import { initialState, reducer } from "./state/postTagsList.reducer";
+import { initialState, reducer } from "@reducers/postTagsList";
 
 const PostTags = ({ id }: { id: string }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
@@ -16,33 +16,18 @@ const PostTags = ({ id }: { id: string }) => {
     "There was an error trying to display the list of post tags. Please try again later";
 
   const alertProps = { severity: "error", role: "status" } as const;
-  const selectedTagsIds = Object.keys(state.selectedTags);
 
   return (
     <PostTagsWrapper id={id} ariaBusy={false}>
       <ErrorBoundary fallback={<Alert {...alertProps}>{msg}</Alert>}>
         <PostTagsList
-          deleteTag={state.deleteTag}
-          deleteTags={state.deleteTags}
+          id={id}
+          isNotDeleting={!state.delete.open}
           selectedTags={state.selectedTags}
-          tagIdsLength={selectedTagsIds.length}
           dispatch={dispatch}
         />
-        <EditPostTag edit={state.edit} dispatch={dispatch} />
-        {/* Delete one post tag by clicking delete on the post tag's menu */}
-        <DeletePostTags
-          {...state.deleteTag}
-          onClose={() => dispatch({ type: "CLOSE_MENU_DELETE" })}
-          dispatch={dispatch}
-        />
-        {/* Delete multiple post tag(s) by selecting the post tags from the list and clicking the toolbar delete button */}
-        <DeletePostTags
-          open={state.deleteTags}
-          name={state.selectedTags[selectedTagsIds[0]]}
-          ids={selectedTagsIds}
-          onClose={() => dispatch({ type: "CLOSE_MULTI_DELETE" })}
-          dispatch={dispatch}
-        />
+        <EditPostTag {...state.edit} dispatch={dispatch} />
+        <DeletePostTags {...state.delete} dispatch={dispatch} />
       </ErrorBoundary>
     </PostTagsWrapper>
   );

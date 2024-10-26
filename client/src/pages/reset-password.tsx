@@ -1,7 +1,6 @@
 import * as React from "react";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 
-import { useMutation } from "@apollo/client";
 import Typography from "@mui/material/Typography";
 
 import AuthRootLayout from "@layouts/AuthRootLayout";
@@ -9,19 +8,16 @@ import Card from "@features/auth/components/Card";
 import UnregisteredUserAlert from "@features/auth/components/UnregisteredUserAlert";
 import ResetPasswordForm from "@features/auth/resetPassword/components/ResetPasswordForm";
 import ResetPasswordSuccess from "@features/auth/resetPassword/components/ResetPasswordSuccess";
-import { RESET_PASSWORD } from "@mutations/resetPassword/RESET_PASSWORD";
-import verifyPasswordResetToken, {
-  type ResetPasswordPageData,
-} from "@features/auth/resetPassword/api/verifyPasswordResetToken";
+import verifyPasswordResetToken from "@features/auth/resetPassword/api/verifyPasswordResetToken";
 import uiLayout from "@utils/layouts/uiLayout";
-import type { AuthPageView, NextPageWithLayout } from "@types";
+import type { NextPageWithLayout } from "@types";
+import type { ResetPasswordPageData, View } from "types/resetPassword";
 
 type GssP = GetServerSideProps<ResetPasswordPageData>;
 type ResetPasswordPage = NextPageWithLayout<InferGetServerSidePropsType<GssP>>;
 
 const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
-  const [view, setView] = React.useState<AuthPageView>("form");
-  const [resetPassword, { data }] = useMutation(RESET_PASSWORD);
+  const [view, setView] = React.useState<View>("form");
 
   if (isUnregistered || view === "unregistered error") {
     return (
@@ -32,20 +28,19 @@ const ResetPassword: ResetPasswordPage = ({ isUnregistered, verified }) => {
     );
   }
 
-  const status = data?.resetPassword.status ?? null;
-
-  if (view === "success") return <ResetPasswordSuccess status={status} />;
+  if (view === "success" || view === "warn") {
+    return <ResetPasswordSuccess view={view} />;
+  }
 
   return (
     <>
-      <Typography align="center" variant="h1">
+      <Typography align="center" variant="h1" id="page-title">
         Reset Your Password
       </Typography>
       <Card>
         <ResetPasswordForm
           {...verified}
-          resetPassword={resetPassword}
-          setView={setView}
+          handleView={nextView => setView(nextView)}
         />
       </Card>
     </>

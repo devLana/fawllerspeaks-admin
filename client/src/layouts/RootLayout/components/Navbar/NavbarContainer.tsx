@@ -18,7 +18,7 @@ const NavbarContainer = (props: NavbarContainerProps) => {
   return (
     <Box
       component="nav"
-      aria-label="Main sidebar"
+      aria-label="Main app"
       sx={({ breakpoints, transitions, zIndex }) => ({
         [breakpoints.down("sm")]: {
           position: "fixed",

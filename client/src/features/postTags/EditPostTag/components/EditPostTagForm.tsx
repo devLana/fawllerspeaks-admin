@@ -7,28 +7,29 @@ import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { usePostTagsPage } from "@context/PostTags";
+import useEditPostTag from "@hooks/editPostTag/useEditPostTag";
 import { EDIT_POST_TAG } from "@mutations/editPostTag/EDIT_POST_TAG";
 import { editPostTagSchema } from "@validators/editPostTagSchema";
-import { refetchQueries } from "../cache/refetchQueries";
+import { refetchQueries } from "@cache/refetchQueries/postTags/editPostTag";
 import { handleCloseAlert } from "@utils/handleCloseAlert";
 import type { MutationEditPostTagArgs } from "@apiTypes";
-import type { PostTagsListAction } from "types/postTags/getPostTags";
-import useEditPostTag from "@hooks/editPostTag/useEditPostTag";
+import type { Status } from "@types";
 
 type OmitTagId = Omit<MutationEditPostTagArgs, "tagId">;
 
 interface EditPostTagFormProps {
-  name: string;
   id: string;
-  status: "idle" | "submitting";
-  onClick: () => void;
-  onStatusChange: (nextStatus: "idle" | "submitting") => void;
-  dispatch: React.Dispatch<PostTagsListAction>;
+  name: string;
+  status: Exclude<Status, "error">;
+  onClose: () => void;
+  onUnknownTag: () => void;
+  onEdit: ({ id, name }: { id: string; name: string }) => void;
+  onStatusChange: (nextStatus: Exclude<Status, "error">) => void;
 }
 
 const EditPostTagForm = (props: EditPostTagFormProps) => {
-  const { name, id, status, onClick, onStatusChange, dispatch } = props;
+  const { name, id, status, onClose, onStatusChange, ...rest } = props;
+
   const [edit, { data, error }] = useMutation(EDIT_POST_TAG);
 
   const { register, handleSubmit, formState, setError } = useForm<OmitTagId>({
@@ -36,17 +37,15 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
     defaultValues: { name },
   });
 
-  const { handleOpenAlert } = usePostTagsPage();
-
   const { setAlertIsOpen, alertIsOpen, onCompleted } = useEditPostTag({
-    dispatch,
-    handleOpenAlert,
-    onStatusChange,
+    onEdit: rest.onEdit,
     setError,
+    onUnknownTag: rest.onUnknownTag,
+    onStatusChange,
   });
 
   const submitHandler = (values: OmitTagId) => {
-    onStatusChange("submitting");
+    onStatusChange("loading");
 
     void edit({
       variables: { ...values, tagId: id },
@@ -69,10 +68,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
     data.editPostTag.tagIdError
   ) {
     alertMessage = data.editPostTag.tagIdError;
-  } else if (
-    data?.editPostTag.__typename === "UnknownError" ||
-    data?.editPostTag.__typename === "EditedPostTagWarning"
-  ) {
+  } else if (data?.editPostTag.__typename === "EditedPostTagWarning") {
     alertMessage = data.editPostTag.message;
   } else if (error?.graphQLErrors?.[0]) {
     alertMessage = error.graphQLErrors[0].message;
@@ -80,7 +76,11 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(submitHandler)} noValidate>
+      <form
+        onSubmit={handleSubmit(submitHandler)}
+        noValidate
+        aria-label="edit post tag"
+      >
         <TextField
           id="post-tag-name"
           autoComplete="on"
@@ -105,14 +105,13 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
             columnGap: 2,
           }}
         >
-          ,
-          <Button onClick={onClick} disabled={status === "submitting"}>
+          <Button onClick={onClose} disabled={status === "loading"}>
             Cancel
           </Button>
           <LoadingButton
             variant="contained"
             type="submit"
-            loading={status === "submitting"}
+            loading={status === "loading"}
           >
             <span>Edit Tag</span>
           </LoadingButton>

@@ -28,21 +28,26 @@ const GetPostTags = ({ id }: { id: string }) => {
   }
 
   switch (data.getPostTags.__typename) {
-    case "AuthenticationError":
+    case "AuthenticationError": {
+      const query = { status: "unauthenticated", redirectTo: pathname };
+
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
-      void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
+      void replace({ pathname: "/login", query });
       return <PostTagsLoading id={id} />;
+    }
 
     case "UnknownError":
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
-      void replace("/login?status=unauthorized");
+      void replace({ pathname: "/login", query: { status: "unauthorized" } });
       return <PostTagsLoading id={id} />;
 
-    case "RegistrationError":
-      void replace(`/register?status=unregistered&redirectTo=${pathname}`);
+    case "RegistrationError": {
+      const query = { status: "unregistered", redirectTo: pathname };
+      void replace({ pathname: "/register", query });
       return <PostTagsLoading id={id} />;
+    }
 
     case "PostTags":
       if (data.getPostTags.tags.length === 0) {

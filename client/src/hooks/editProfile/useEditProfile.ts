@@ -27,7 +27,7 @@ const useEditProfile = (setError: UseFormSetError<Omit<Args, "image">>) => {
     };
   }, [image.blobUrl]);
 
-  const router = useRouter();
+  const { pathname, replace, push } = useRouter();
   const client = useApolloClient();
   const upload = useUploadImage();
 
@@ -83,29 +83,30 @@ const useEditProfile = (setError: UseFormSetError<Omit<Args, "image">>) => {
         break;
       }
 
-      case "AuthenticationError":
+      case "AuthenticationError": {
+        const query = { status: "unauthenticated", redirectTo: pathname };
+
         localStorage.removeItem(SESSION_ID);
         void client.clearStore();
-        void router.replace(
-          `/login?status=unauthenticated&redirectTo=${router.pathname}`
-        );
+        void replace({ pathname: "/login", query });
         break;
+      }
 
       case "UnknownError":
         localStorage.removeItem(SESSION_ID);
         void client.clearStore();
-        void router.replace("/login?status=unauthorized");
+        void replace({ pathname: "/login", query: { status: "unauthorized" } });
         break;
 
-      case "RegistrationError":
-        void router.replace(
-          `/register?status=unregistered&redirectTo=${router.pathname}`
-        );
+      case "RegistrationError": {
+        const query = { status: "unregistered", redirectTo: pathname };
+        void replace({ pathname: "/register", query });
         break;
+      }
 
       case "EditedProfile": {
-        const redirectStatus = uploadHasError ? "upload-error" : "upload";
-        void router.push(`/settings/me?status=${redirectStatus}`);
+        const query = { status: uploadHasError ? "upload-error" : "upload" };
+        void push({ pathname: "/settings/me", query });
         break;
       }
 

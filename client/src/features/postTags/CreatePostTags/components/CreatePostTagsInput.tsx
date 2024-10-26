@@ -3,7 +3,7 @@ import TextField from "@mui/material/TextField";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 
-import TextFieldAdornment from "@components/TextFieldAdornment";
+import TextFieldAdornment from "@components/ui/TextFieldAdornment";
 
 interface CreatePostTagsInputProps {
   numberOfInputs: number;

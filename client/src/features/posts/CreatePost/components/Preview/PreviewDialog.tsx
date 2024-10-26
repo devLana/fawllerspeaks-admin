@@ -25,11 +25,11 @@ const PreviewDialog = (props: PreviewDialogProps) => {
       aria-labelledby="create-post-dialog-title"
     >
       <DialogTitle id="create-post-dialog-title" sx={{ textAlign: "center" }}>
-        Create blog post
+        Publish blog post
       </DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ textAlign: "center" }}>
-          Creating a post will also publish it making it ready for your readers
+          Create and publish your blog post, making it public for your readers
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
@@ -41,7 +41,7 @@ const PreviewDialog = (props: PreviewDialogProps) => {
           loading={createStatus === "loading"}
           variant="contained"
         >
-          <span>Create Post</span>
+          <span>Publish</span>
         </LoadingButton>
       </DialogActions>
     </Dialog>

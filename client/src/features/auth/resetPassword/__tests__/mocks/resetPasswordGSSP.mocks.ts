@@ -3,19 +3,12 @@ import { graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { VERIFY_PASSWORD_RESET_TOKEN } from "@mutations/resetPassword/VERIFY_PASSWORD_RESET_TOKEN";
-import { mswData, mswErrors } from "@testUtils/msw";
-
-interface UnRegisteredProps {
-  isUnregistered: true;
-}
-
-interface VerifiedProps {
-  verified: { email: string; resetToken: string };
-}
+import { mswData, mswErrors } from "@utils/tests/msw";
+import type { PageView, Verified } from "types/resetPassword";
 
 interface Dict {
   token: string;
-  props: UnRegisteredProps | VerifiedProps;
+  props: Pick<PageView, "isUnregistered"> | Pick<Verified, "verified">;
 }
 
 const VERIFIED_PASSWORD_RESET_TOKEN = "VERIFIED_PASSWORD_RESET_TOKEN";
@@ -64,22 +57,20 @@ export const server = setupServer(
   })
 );
 
-export const verifyValidate: [string, string | string[], string][] = [
+export const verifyValidate: [string, string | string[]][] = [
   [
     "Should return a redirect object if there is no password reset token in the query params object",
     "",
-    "empty",
   ],
   [
     "Should return a redirect object if there are multiple password reset tokens in the query params object",
     ["token_one", "token_two"],
-    "invalid",
   ],
 ];
 
 export const verifyErrorObjects: [string, string, string][] = [
   [
-    "Should return a redirect object if the password reset token is invalid",
+    "Should return a redirect object if the password reset token input validation failed",
     "/forgot-password?status=validation",
     INVALID_RESET_TOKEN,
   ],
@@ -116,12 +107,12 @@ export const verified = {
 export const verifyProps: [string, string, Dict][] = [
   [
     "Verification fails for an unregistered user",
-    "Return an 'isUnregistered' props",
+    "Should return an 'isUnregistered' props object",
     { token: UNREGISTERED_RESET_TOKEN, props: { isUnregistered: true } },
   ],
   [
     "Password reset token is verified",
-    "Return a 'verified' props",
+    "Should return a 'verified' props object",
     { token: VERIFIED_PASSWORD_RESET_TOKEN, props: { verified } },
   ],
 ];

@@ -6,23 +6,31 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 interface NavbarToggleButtonProps {
   isOpen: boolean;
   sm_Above: boolean;
+  md_Above: boolean;
   onClick: () => void;
 }
 
 const NavbarToggleButton = (props: NavbarToggleButtonProps) => {
-  const { isOpen, sm_Above, onClick } = props;
+  const { isOpen, sm_Above, md_Above, onClick } = props;
 
-  const text = "main sidebar navigation";
+  const text = "main app navigation";
   let title: string;
+  let label: string;
 
-  if (sm_Above) {
+  if (md_Above) {
+    title = isOpen ? `Maximize ${text}` : `Minimize ${text}`;
+    label = "Toggle main app navigation size";
+  } else if (sm_Above) {
     title = isOpen ? `Minimize ${text}` : `Maximize ${text}`;
+    label = "Toggle main app navigation size";
   } else {
     title = `Hide ${text}`;
+    label = title;
   }
 
   return (
     <ListItem
+      aria-label={label}
       disablePadding
       sx={{ pb: 2, borderBottom: 1, borderColor: "divider" }}
     >
