@@ -22,11 +22,11 @@ const PostsPagination = ({ after, before }: PostsPaginationLinksProps) => {
         flexWrap: "wrap",
       }}
     >
-      <PaginationLink href={before ? `before/${before}` : undefined}>
+      <PaginationLink cursor={before ? ["before", before] : undefined}>
         <ArrowBackIcon fontSize="small" />
         Previous Page
       </PaginationLink>
-      <PaginationLink ml="auto" href={after ? `after/${after}` : undefined}>
+      <PaginationLink cursor={after ? ["after", after] : undefined} ml="auto">
         Next Page <ArrowForwardIcon fontSize="small" />
       </PaginationLink>
     </Box>

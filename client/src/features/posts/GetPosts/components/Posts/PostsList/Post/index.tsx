@@ -9,7 +9,6 @@ import type { PostStatus as Status } from "@apiTypes";
 import type { PostItemSlug, PostsView } from "types/posts/getPosts";
 
 interface PostProps {
-  postCover: React.ReactElement;
   postsView: PostsView;
   title: string;
   imageBanner?: string | null;
@@ -19,7 +18,6 @@ interface PostProps {
 }
 
 const Post = ({
-  postCover,
   postsView,
   title,
   imageBanner,
@@ -34,7 +32,6 @@ const Post = ({
         flexDirection: "column",
         alignItems: "stretch",
         rowGap: 3,
-        position: "relative",
         border: "1px solid",
         borderColor: "divider",
         pb: 3,
@@ -47,7 +44,6 @@ const Post = ({
           : { pt: 8, "&:not(:last-child)": { borderBottom: "none" } }),
       }}
     >
-      {postCover}
       <PostMenu
         title={title}
         status={status}

@@ -1,22 +1,30 @@
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import Button from "@mui/material/Button";
 import NextLink from "@components/ui/NextLink";
+import type { GetPostsPageType } from "@apiTypes";
 
 interface PaginationLinkProps {
-  href: string | undefined;
+  cursor: [GetPostsPageType, string] | undefined;
   children: React.ReactNode;
   ml?: string;
 }
 
-const PaginationLink = ({ children, href, ml }: PaginationLinkProps) => {
+const PaginationLink = ({ children, cursor, ml }: PaginationLinkProps) => {
   const { queryParams } = usePostsFilters();
-  const { status, sort } = queryParams;
-  const query = { ...(status && { status }), ...(sort && { sort }) };
   const styles = { display: "inline-flex", alignItems: "center", columnGap: 1 };
 
-  if (href) {
+  if (cursor) {
+    const query = {
+      postsPage: cursor,
+      ...(queryParams.status && { status: queryParams.status }),
+      ...(queryParams.sort && { sort: queryParams.sort }),
+    };
+
     return (
-      <NextLink href={{ pathname: href, query }} sx={{ ml, ...styles }}>
+      <NextLink
+        href={{ pathname: "[[...postsPage]]", query }}
+        sx={{ ml, ...styles }}
+      >
         {children}
       </NextLink>
     );

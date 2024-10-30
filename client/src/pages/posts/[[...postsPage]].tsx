@@ -1,30 +1,34 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import { NetworkStatus } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
-import { useGetPosts } from "@hooks/getPosts/useGetPosts";
-import useGetPostTags from "@hooks/getPostTags/useGetPostTags";
+import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import RootLayout from "@layouts/RootLayout";
 import Posts from "@features/posts/GetPosts/components/Posts";
 import PostsLoading from "@features/posts/GetPosts/components/PostsLoading";
 import PostsTextContent from "@features/posts/GetPosts/components/PostsTextContent";
 import NoPostsData from "@features/posts/GetPosts/components/NoPostsData";
+import { GET_POSTS } from "@queries/getPosts/GET_POSTS";
 import { SESSION_ID } from "@utils/constants";
 import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const GetPosts: NextPageWithLayout = () => {
   const { replace, pathname } = useRouter();
-  const { loading: tagsIsLoading } = useGetPostTags();
-  const { data, error, client, loading, networkStatus } = useGetPosts();
+
+  const { gqlVariables } = usePostsFilters();
+
+  const { data, error, client, loading } = useQuery(GET_POSTS, {
+    variables: gqlVariables,
+  });
 
   const id = "blog-posts";
 
   const msg =
     "You are unable to get posts at the moment. Please try again later";
 
-  if (loading || tagsIsLoading) return <PostsLoading id={id} />;
+  if (loading) return <PostsLoading id={id} />;
 
   if (error) {
     const message = error.graphQLErrors?.[0]?.message ?? msg;
@@ -36,21 +40,27 @@ const GetPosts: NextPageWithLayout = () => {
   }
 
   switch (data.getPosts.__typename) {
-    case "AuthenticationError":
+    case "AuthenticationError": {
+      const query = { status: "unauthenticated", redirectTo: pathname };
+
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
-      void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
+      void replace({ pathname: "/login", query });
       return <PostsLoading id={id} />;
+    }
 
     case "NotAllowedError":
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
-      void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
+      void replace({ pathname: "/login", query: { status: "unauthorized" } });
       return <PostsLoading id={id} />;
 
-    case "RegistrationError":
-      void replace(`/register?status=unregistered&redirectTo=${pathname}`);
+    case "RegistrationError": {
+      const query = { status: "unregistered", redirectTo: pathname };
+
+      void replace({ pathname: "/register", query });
       return <PostsLoading id={id} />;
+    }
 
     case "ForbiddenError":
       return <PostsTextContent id={id} node={data.getPosts.message} />;
@@ -67,13 +77,7 @@ const GetPosts: NextPageWithLayout = () => {
       );
 
     case "GetPostsData":
-      return (
-        <Posts
-          id={id}
-          isFetchingMore={networkStatus === NetworkStatus.fetchMore}
-          postsData={data.getPosts}
-        />
-      );
+      return <Posts id={id} postsData={data.getPosts} />;
 
     default:
       return <PostsTextContent id={id} node={msg} />;

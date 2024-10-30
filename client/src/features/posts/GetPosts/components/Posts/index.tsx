@@ -9,16 +9,14 @@ import ToolbarViewButtons from "./PostsList/PostsToolbar/ToolbarViewButtons";
 import PostStatusInput from "./PostsMenuInputs/PostStatusInput";
 import SortByInput from "./PostsMenuInputs/SortByInput";
 import Searchbox from "./PostsMenuInputs/Searchbox";
-import PostCover from "./PostCover";
 import type { PostsData, PostsView } from "types/posts/getPosts";
 
 interface PostsProps {
   postsData: PostsData;
   id: string;
-  isFetchingMore: boolean;
 }
 
-const Posts = ({ id, isFetchingMore, postsData }: PostsProps) => {
+const Posts = ({ id, postsData }: PostsProps) => {
   const [postsView, setPostsView] = React.useState<PostsView>("grid");
 
   const handleViewXs = () => {
@@ -55,9 +53,6 @@ const Posts = ({ id, isFetchingMore, postsData }: PostsProps) => {
               />
             }
           />
-        }
-        postCover={
-          <PostCover isFetchingMore={isFetchingMore} postsView={postsView} />
         }
       />
     </PostsWrapper>

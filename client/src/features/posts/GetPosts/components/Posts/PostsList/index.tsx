@@ -9,11 +9,10 @@ interface PostsListProps {
   postsData: PostsData;
   postsView: PostsView;
   toolbar: React.ReactElement;
-  postCover: React.ReactElement;
 }
 
 const PostsList = (props: PostsListProps) => {
-  const { postsView, toolbar, postCover, postsData } = props;
+  const { postsView, toolbar, postsData } = props;
 
   if (postsData.posts.length === 0) {
     return (
@@ -40,12 +39,7 @@ const PostsList = (props: PostsListProps) => {
         }}
       >
         {postsData.posts.map(({ id, ...post }) => (
-          <Post
-            key={id}
-            {...post}
-            postCover={postCover}
-            postsView={postsView}
-          />
+          <Post key={id} {...post} postsView={postsView} />
         ))}
       </List>
       <PostsPagination {...postsData.pageData} />
