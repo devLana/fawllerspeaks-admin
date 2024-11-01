@@ -7,12 +7,9 @@ import SessionProvider from "@context/Session/SessionProvider";
 import createEmotionCache from "configs/createEmotionCache";
 import type { NextAppProps } from "@types";
 
-const clientSideEmotionCache = createEmotionCache();
-const uiLayout = (page: React.ReactElement) => page;
-
 export default function App(props: NextAppProps) {
-  const { Component, pageProps, emotionCache = clientSideEmotionCache } = props;
-  const { layout = uiLayout } = Component;
+  const { Component, pageProps, emotionCache = createEmotionCache() } = props;
+  const { layout = page => page } = Component;
 
   return (
     <AuthProvider>
