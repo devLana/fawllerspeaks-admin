@@ -15,11 +15,24 @@ const PostTableOfContents = ({ tableOfContents }: PostTableOfContentsProps) => {
   if (tableOfContents.length === 0) return null;
 
   return (
-    <Box sx={{ mt: 3, position: { md: "sticky" }, top: { md: "70px" } }}>
-      <Typography gutterBottom>Table of contents</Typography>
-      <List aria-label="Post table of contents" disablePadding>
+    <Box
+      sx={({ breakpoints: { down } }) => ({
+        mt: 3,
+        [down("md")]: {
+          pt: 3,
+          borderTop: "1px solid",
+          borderTopColor: "divider",
+        },
+        position: { md: "sticky" },
+        top: { md: "80px" },
+      })}
+    >
+      <Typography gutterBottom id="table-of-contents">
+        Table of contents
+      </Typography>
+      <List aria-labelledby="table-of-contents" disablePadding>
         {tableOfContents.map(({ heading, href, level }) => (
-          <ListItem disablePadding key={`${heading}-${level}`} sx={{ py: 0.1 }}>
+          <ListItem disablePadding key={`${heading}-${level}`} sx={{ py: 1 }}>
             <NextLink href={href} sx={{ ml: tableOfContentsMargin(level) }}>
               {heading}
             </NextLink>

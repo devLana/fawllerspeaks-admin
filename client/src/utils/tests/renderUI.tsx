@@ -1,6 +1,6 @@
 import { render, type RenderOptions } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { InMemoryCache as IMC } from "@apollo/client";
+import { InMemoryCache } from "@apollo/client";
 import type { Cache } from "@apollo/client/cache/core/types/Cache";
 
 import { SessionContext } from "@context/Session";
@@ -8,6 +8,7 @@ import AppThemeProvider from "@context/AppTheme/AppThemeProvider";
 import AuthProvider from "@context/Auth/AuthProvider";
 import apolloClient from "@context/Auth/helpers/apolloClient";
 import { BaseResponse, UserData } from "@cache/possibleTypes";
+import * as typePolicies from "@cache/typePolicies";
 
 interface Options extends RenderOptions {
   writeFragment?: Cache.WriteFragmentOptions<object, object>;
@@ -24,7 +25,12 @@ export const stopRefreshTokenTimer = vi
 
 export const renderUI = (ui: React.ReactElement, options: Options = {}) => {
   const { writeFragment, writeQuery, ...renderOptions } = options;
-  const cache = new IMC({ possibleTypes: { BaseResponse, UserData } });
+
+  const cache = new InMemoryCache({
+    possibleTypes: { BaseResponse, UserData },
+    typePolicies,
+  });
+
   const client = apolloClient(undefined, cache);
 
   const UI = ({ children }: { children: React.ReactElement }) => (

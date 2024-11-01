@@ -25,12 +25,7 @@ const PostMetadataList = (props: PostMetadataListProps) => {
       disablePadding
       aria-label="Post metadata"
       sx={{
-        pt: 1,
-        pb: 2,
-        paddingBottom: { md: 1 },
         px: { md: 2 },
-        borderBottom: "1px solid",
-        borderBottomColor: "divider",
         borderRadius: { md: 1 },
         border: { md: "1px solid" },
         borderColor: { md: "divider" },
@@ -71,18 +66,23 @@ const PostMetadataList = (props: PostMetadataListProps) => {
           <ListItemText
             primary="Post Tags"
             secondaryTypographyProps={{
-              component: "div",
+              component: List,
+              disablePadding: true,
+              "aria-label": "Post tags",
               sx: {
+                pt: 0.5,
                 display: "flex",
                 flexWrap: "wrap",
-                rowGap: 1.25,
-                columnGap: 1,
+                rowGap: 1,
+                columnGap: 0.5,
               },
             }}
             secondary={
               <>
                 {tags.map(({ id, name }) => (
-                  <Chip key={id} label={name} sx={{ maxWidth: "15.5em" }} />
+                  <ListItem key={id} disablePadding sx={{ width: "auto" }}>
+                    <Chip label={name} sx={{ maxWidth: "15em" }} />
+                  </ListItem>
                 ))}
               </>
             }

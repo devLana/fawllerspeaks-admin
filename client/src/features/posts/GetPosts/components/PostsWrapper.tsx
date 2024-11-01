@@ -1,7 +1,4 @@
-import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
-
-import useStatusAlert from "@hooks/getPosts/useStatusAlert";
 
 interface PostsWrapperProps {
   children: React.ReactNode;
@@ -9,18 +6,13 @@ interface PostsWrapperProps {
   ariaBusy: boolean;
 }
 
-const PostsWrapper = ({ children, id, ariaBusy }: PostsWrapperProps) => {
-  const { onClose, message, open } = useStatusAlert();
-
-  return (
-    <section aria-live="polite" aria-labelledby={id} aria-busy={ariaBusy}>
-      <Typography variant="h1" id={id} gutterBottom>
-        Blog Posts
-      </Typography>
-      {children}
-      <Snackbar open={open} onClose={onClose} message={message} />
-    </section>
-  );
-};
+const PostsWrapper = ({ children, id, ariaBusy }: PostsWrapperProps) => (
+  <section aria-live="polite" aria-labelledby={id} aria-busy={ariaBusy}>
+    <Typography variant="h1" id={id} gutterBottom>
+      Blog Posts
+    </Typography>
+    {children}
+  </section>
+);
 
 export default PostsWrapper;

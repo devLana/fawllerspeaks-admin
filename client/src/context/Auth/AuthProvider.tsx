@@ -3,8 +3,9 @@ import * as React from "react";
 import { InMemoryCache, ApolloProvider } from "@apollo/client";
 
 import { AuthContext } from ".";
-import { BaseResponse, UserData } from "@cache/possibleTypes";
 import apolloClient from "./helpers/apolloClient";
+import { BaseResponse, UserData } from "@cache/possibleTypes";
+import * as typePolicies from "@cache/typePolicies";
 
 interface AuthProviderProps {
   appClient?: ReturnType<typeof apolloClient>;
@@ -15,7 +16,10 @@ const AuthProvider = ({ children, appClient }: AuthProviderProps) => {
   const [jwt, setJwt] = React.useState("");
 
   const cache = React.useMemo(() => {
-    return new InMemoryCache({ possibleTypes: { BaseResponse, UserData } });
+    return new InMemoryCache({
+      possibleTypes: { BaseResponse, UserData },
+      typePolicies,
+    });
   }, []);
 
   const client = React.useMemo(() => {

@@ -16,8 +16,8 @@ const PostContentHeader = (props: PostContentHeaderProps) => {
 
   return (
     <Box sx={{ display: "flex", columnGap: 2.5, mb: 4, alignItems: "center" }}>
-      {src && <Avatar src={src} alt={name} />}
-      <Stack spacing={1}>
+      {src && <Avatar src={src} alt={name} sx={{ width: 50, height: 50 }} />}
+      <Stack spacing={0.2}>
         <Typography sx={{ fontWeight: "bold" }}>{name}</Typography>
         <Typography variant="caption">
           Created on <PostDate dateString={dateCreated} />

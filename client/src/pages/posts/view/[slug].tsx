@@ -12,11 +12,11 @@ import { SESSION_ID } from "@utils/constants";
 import type { NextPageWithLayout } from "@types";
 
 const ViewPost: NextPageWithLayout = () => {
-  const { pathname, query, replace } = useRouter();
-  const slug = query.slug as string;
+  const { pathname, query, isReady, replace } = useRouter();
 
   const { data, error, loading, client } = useQuery(GET_POST, {
-    variables: { slug },
+    variables: { slug: query.slug as string },
+    skip: !isReady,
   });
 
   const label = "View post page";
@@ -24,7 +24,7 @@ const ViewPost: NextPageWithLayout = () => {
   const msg =
     "You are unable to view this post at the moment. Please try again later";
 
-  if (loading) return <PostLoading label={label} />;
+  if (!isReady || loading) return <PostLoading label={label} />;
 
   if (error) {
     const message = error.graphQLErrors?.[0]?.message ?? msg;
@@ -36,21 +36,27 @@ const ViewPost: NextPageWithLayout = () => {
   }
 
   switch (data.getPost.__typename) {
-    case "AuthenticationError":
+    case "AuthenticationError": {
+      const q = { status: "unauthenticated", redirectTo: pathname };
+
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
-      void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
+      void replace({ pathname: "/login", query: q });
       return <PostLoading label={label} />;
+    }
 
     case "NotAllowedError":
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
-      void replace(`/login?status=unauthenticated&redirectTo=${pathname}`);
+      void replace({ pathname: "/login", query: { status: "unauthorized" } });
       return <PostLoading label={label} />;
 
-    case "RegistrationError":
-      void replace(`/register?status=unregistered&redirectTo=${pathname}`);
+    case "RegistrationError": {
+      const q = { status: "unregistered", redirectTo: pathname };
+
+      void replace({ pathname: "/register", query: q });
       return <PostLoading label={label} />;
+    }
 
     case "GetPostValidationError":
       return (
@@ -65,7 +71,7 @@ const ViewPost: NextPageWithLayout = () => {
       return <PostTextContent label={label} node={data.getPost.message} />;
 
     case "SinglePost":
-      return <Post label={label} slug={slug} />;
+      return <Post label={label} post={data.getPost.post} />;
 
     default:
       return <PostTextContent label={label} node={msg} />;

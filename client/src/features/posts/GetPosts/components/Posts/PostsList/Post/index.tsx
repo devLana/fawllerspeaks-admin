@@ -66,7 +66,7 @@ const Post = ({
       )}
       <PostInfo title={title} dateCreated={dateCreated} />
       <NextLink
-        href={`view/${url.slug}`}
+        href={{ pathname: "view/[slug]", query: { slug: url.slug } }}
         sx={{
           mt: "auto",
           mx: "auto",

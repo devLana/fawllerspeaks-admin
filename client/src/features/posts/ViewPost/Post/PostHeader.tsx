@@ -18,7 +18,7 @@ const PostHeader = ({ slug, status, title }: PostHeaderProps) => {
   const { back } = useRouter();
 
   return (
-    <Box sx={{ display: "flex", columnGap: 2, mb: 3 }}>
+    <Box sx={{ display: "flex", columnGap: 2, mb: 4.5 }}>
       <PostsPageBackButton
         buttonLabel=" Go back to posts page"
         onClick={() => back()}
@@ -29,7 +29,7 @@ const PostHeader = ({ slug, status, title }: PostHeaderProps) => {
           pl: 1,
           display: "flex",
           alignItems: "center",
-          columnGap: 1.5,
+          columnGap: 2,
           bgcolor: "action.selected",
           borderRadius: "16px",
         }}
@@ -38,7 +38,6 @@ const PostHeader = ({ slug, status, title }: PostHeaderProps) => {
           variant="body2"
           component="span"
           sx={{
-            minWidth: "5.3em",
             color: ({ appTheme }) => colors(status, appTheme.themeMode),
             fontWeight: "bold",
             letterSpacing: 0.5,
