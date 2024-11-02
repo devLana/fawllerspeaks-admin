@@ -65,13 +65,14 @@ const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
             }),
           }}
         >
-          <ModeEditIcon fontSize="small" /> Edit
+          <ModeEditIcon fontSize="small" />{" "}
+          {status === "Draft" ? "Continue writing post" : "Edit"}
         </MenuItem>
         <MenuItem
           sx={{ columnGap: 3, color: "error.main" }}
           aria-haspopup="dialog"
         >
-          <DeleteIcon color="error" fontSize="small" /> Delete
+          <DeleteIcon color="error" fontSize="small" /> Send to bin
         </MenuItem>
       </Menu>
     </>
