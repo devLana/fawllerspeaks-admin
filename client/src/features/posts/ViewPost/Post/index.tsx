@@ -13,6 +13,9 @@ import type { ModifiedPost } from "types/posts";
 const Post = ({ label, post }: { label: string; post: ModifiedPost }) => (
   <PostWrapper label={label}>
     <PostHeader slug={post.url.slug} status={post.status} title={post.title} />
+    <Typography variant="h1" align="center" gutterBottom>
+      {post.title}
+    </Typography>
     <Box
       sx={{
         display: { md: "grid" },
@@ -49,9 +52,6 @@ const Post = ({ label, post }: { label: string; post: ModifiedPost }) => (
         component="article"
         sx={{ gridRow: { md: 1 }, gridColumn: { md: 2 } }}
       >
-        <Typography variant="h1" gutterBottom>
-          {post.title}
-        </Typography>
         {post.imageBanner && (
           <PostImageBanner
             src={post.imageBanner}

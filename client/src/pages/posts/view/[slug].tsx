@@ -12,7 +12,7 @@ import { SESSION_ID } from "@utils/constants";
 import type { NextPageWithLayout } from "@types";
 
 const ViewPost: NextPageWithLayout = () => {
-  const { pathname, query, isReady, replace } = useRouter();
+  const { query, isReady, asPath, replace } = useRouter();
 
   const { data, error, loading, client } = useQuery(GET_POST, {
     variables: { slug: query.slug as string },
@@ -37,7 +37,7 @@ const ViewPost: NextPageWithLayout = () => {
 
   switch (data.getPost.__typename) {
     case "AuthenticationError": {
-      const q = { status: "unauthenticated", redirectTo: pathname };
+      const q = { status: "unauthenticated", redirectTo: asPath };
 
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
@@ -52,7 +52,7 @@ const ViewPost: NextPageWithLayout = () => {
       return <PostLoading label={label} />;
 
     case "RegistrationError": {
-      const q = { status: "unregistered", redirectTo: pathname };
+      const q = { status: "unregistered", redirectTo: asPath };
 
       void replace({ pathname: "/register", query: q });
       return <PostLoading label={label} />;
