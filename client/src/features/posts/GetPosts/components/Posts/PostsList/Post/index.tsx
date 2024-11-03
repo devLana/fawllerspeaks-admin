@@ -55,6 +55,7 @@ const Post = ({
         <PostImageBanner
           src={imageBanner}
           alt={`${title} image banner`}
+          sizes="(max-width: 900px) 520px, 385px"
           sx={{
             height: { height: 150, sm: 160 },
             borderTop: "1px solid",

@@ -56,6 +56,7 @@ const Post = ({ label, post }: { label: string; post: ModifiedPost }) => (
           <PostImageBanner
             src={post.imageBanner}
             alt={`${post.title} image banner`}
+            sizes="(max-width: 600px) 570px, (max-width: 900px) 750px, 680px"
             sx={{
               height: { height: 200, sm: 250, md: 300 },
               borderRadius: 1,
