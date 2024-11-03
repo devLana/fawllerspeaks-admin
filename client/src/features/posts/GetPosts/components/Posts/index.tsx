@@ -6,22 +6,14 @@ import PostsWrapper from "../PostsWrapper";
 import PostsList from "./PostsList";
 import PostsToolbar from "./PostsList/PostsToolbar";
 import ToolbarViewButtons from "./PostsList/PostsToolbar/ToolbarViewButtons";
+import PostsPagination from "./PostsList/PostsPagination";
 import PostStatusInput from "./PostsMenuInputs/PostStatusInput";
 import SortByInput from "./PostsMenuInputs/SortByInput";
 import Searchbox from "./PostsMenuInputs/Searchbox";
-import type { PostsData, PostsView } from "types/posts/getPosts";
+import type { PostsPageData, PostsView } from "types/posts/getPosts";
 
-interface PostsProps {
-  postsData: PostsData;
-  id: string;
-}
-
-const Posts = ({ id, postsData }: PostsProps) => {
+const Posts = ({ id, postsData }: { id: string; postsData: PostsPageData }) => {
   const [postsView, setPostsView] = React.useState<PostsView>("grid");
-
-  const handleViewXs = () => {
-    setPostsView(postsView === "grid" ? "list" : "grid");
-  };
 
   return (
     <PostsWrapper id={id} ariaBusy={false}>
@@ -39,22 +31,20 @@ const Posts = ({ id, postsData }: PostsProps) => {
         <SortByInput />
         <Searchbox />
       </Box>
-      <PostsList
-        postsView={postsView}
-        postsData={postsData}
-        toolbar={
-          <PostsToolbar
-            onChangeCheckbox={() => {}}
-            viewButtons={
-              <ToolbarViewButtons
-                onChangePostsViewXs={handleViewXs}
-                onChangePostsViewSm={view => setPostsView(view)}
-                postsView={postsView}
-              />
+      <PostsToolbar
+        onChangeCheckbox={() => {}}
+        viewButtons={
+          <ToolbarViewButtons
+            postsView={postsView}
+            onChangePostsViewSm={view => setPostsView(view)}
+            onChangePostsViewXs={() =>
+              setPostsView(postsView === "grid" ? "list" : "grid")
             }
           />
         }
       />
+      <PostsList postsView={postsView} posts={postsData.posts} />
+      <PostsPagination {...postsData.pageData} />
     </PostsWrapper>
   );
 };

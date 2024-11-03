@@ -1,14 +1,15 @@
 import ListItem from "@mui/material/ListItem";
 
-import NextLink from "@components/ui/NextLink";
-import PostImageBanner from "@features/posts/components/PostImageBanner";
-import PostMenu from "@features/posts/components/PostMenu";
+import PostItemMenu from "./PostItemMenu";
 import PostStatus from "./PostStatus";
+import PostItemImageBanner from "./PostItemImageBanner";
 import PostInfo from "./PostInfo";
+import PostItemLink from "./PostItemLink";
 import type { PostStatus as Status } from "@apiTypes";
 import type { PostItemSlug, PostsView } from "types/posts/getPosts";
 
 interface PostProps {
+  isLoadingMore: boolean;
   postsView: PostsView;
   title: string;
   imageBanner?: string | null;
@@ -18,6 +19,7 @@ interface PostProps {
 }
 
 const Post = ({
+  isLoadingMore,
   postsView,
   title,
   imageBanner,
@@ -44,45 +46,26 @@ const Post = ({
           : { pt: 8, "&:not(:last-child)": { borderBottom: "none" } }),
       }}
     >
-      <PostMenu
+      <PostItemMenu
+        isLoadingMore={isLoadingMore}
         title={title}
         status={status}
         slug={url.slug}
-        sx={{ position: "absolute", top: "5px", left: "5px" }}
       />
-      <PostStatus status={status} />
+      <PostStatus status={status} isLoadingMore={isLoadingMore} />
       {imageBanner && (
-        <PostImageBanner
+        <PostItemImageBanner
+          isLoadingMore={isLoadingMore}
           src={imageBanner}
           alt={`${title} image banner`}
-          sizes="(max-width: 900px) 520px, 385px"
-          sx={{
-            height: { height: 150, sm: 160 },
-            borderTop: "1px solid",
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "action.disabledBackground",
-          }}
         />
       )}
-      <PostInfo title={title} dateCreated={dateCreated} />
-      <NextLink
-        href={{ pathname: "view/[slug]", query: { slug: url.slug } }}
-        sx={{
-          mt: "auto",
-          mx: "auto",
-          py: 0.4,
-          width: "90%",
-          maxWidth: 400,
-          borderRadius: 1,
-          textAlign: "center",
-          color: "background.default",
-          bgcolor: "secondary.main",
-          ":hover": { color: "background.default" },
-        }}
-      >
-        View Post
-      </NextLink>
+      <PostInfo
+        isLoadingMore={isLoadingMore}
+        title={title}
+        dateCreated={dateCreated}
+      />
+      <PostItemLink isLoadingMore={isLoadingMore} slug={url.slug} />
     </ListItem>
   );
 };

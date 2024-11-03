@@ -19,12 +19,12 @@ export type PostsView = "list" | "grid";
 
 export type PostItemSlug = Pick<ModifiedPost["url"], "slug">;
 
-type PostsPageData = Pick<ModifiedPost, PostsPageDataKeys> & {
+export type PostsPagePostData = Pick<ModifiedPost, PostsPageDataKeys> & {
   url: PostItemSlug;
 };
 
 type PostsPageDataMapper<T extends object> = T extends { posts: Post[] }
-  ? Omit<T, "posts" | "status"> & { posts: PostsPageData[] }
+  ? Omit<T, "posts" | "status"> & { posts: PostsPagePostData[] }
   : T extends { __typename?: "GetPostsValidationError" }
   ? Omit<T, ValidationErrorKeys>
   : T;
@@ -33,4 +33,4 @@ export interface GetPostsPageData {
   getPosts: PostsPageDataMapper<GetPosts>;
 }
 
-export type PostsData = PostsPageDataMapper<GetPostsData>;
+export type PostsPageData = PostsPageDataMapper<GetPostsData>;

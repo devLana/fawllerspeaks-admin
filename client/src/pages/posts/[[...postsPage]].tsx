@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useRouter } from "next/router";
 
 import { useQuery } from "@apollo/client";
@@ -15,33 +14,32 @@ import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
 
 const GetPosts: NextPageWithLayout = () => {
-  const { replace, pathname } = useRouter();
-
+  const { replace, asPath, isReady } = useRouter();
   const { gqlVariables } = usePostsFilters();
 
-  const { data, error, client, loading } = useQuery(GET_POSTS, {
+  const { data, error, client, loading, previousData } = useQuery(GET_POSTS, {
     variables: gqlVariables,
+    skip: !isReady,
   });
 
   const id = "blog-posts";
+  const msg1 = "Invalid posts search filters provided";
 
-  const msg =
+  const msg2 =
     "You are unable to get posts at the moment. Please try again later";
 
-  if (loading) return <PostsLoading id={id} />;
+  if ((!isReady || loading) && !previousData) return <PostsLoading id={id} />;
 
   if (error) {
-    const message = error.graphQLErrors?.[0]?.message ?? msg;
+    const message = error.graphQLErrors?.[0]?.message ?? msg2;
     return <PostsTextContent severity="error" id={id} node={message} />;
   }
 
-  if (!data) {
-    return <PostsTextContent id={id} node={<NoPostsData />} />;
-  }
+  if (!data) return <PostsTextContent id={id} node={<NoPostsData />} />;
 
   switch (data.getPosts.__typename) {
     case "AuthenticationError": {
-      const query = { status: "unauthenticated", redirectTo: pathname };
+      const query = { status: "unauthenticated", redirectTo: asPath };
 
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
@@ -56,7 +54,7 @@ const GetPosts: NextPageWithLayout = () => {
       return <PostsLoading id={id} />;
 
     case "RegistrationError": {
-      const query = { status: "unregistered", redirectTo: pathname };
+      const query = { status: "unregistered", redirectTo: asPath };
 
       void replace({ pathname: "/register", query });
       return <PostsLoading id={id} />;
@@ -70,9 +68,7 @@ const GetPosts: NextPageWithLayout = () => {
         <PostsTextContent
           severity="error"
           id={id}
-          node={
-            data.getPosts.cursorError || "Invalid posts search filters provided"
-          }
+          node={data.getPosts.cursorError || msg1}
         />
       );
 
@@ -80,7 +76,7 @@ const GetPosts: NextPageWithLayout = () => {
       return <Posts id={id} postsData={data.getPosts} />;
 
     default:
-      return <PostsTextContent id={id} node={msg} />;
+      return <PostsTextContent id={id} node={msg2} />;
   }
 };
 
