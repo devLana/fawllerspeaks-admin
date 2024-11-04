@@ -22,7 +22,6 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
 
   const minWidth = "calc(51px + 1.5em)";
   const maxWidth = "calc(67px + 6.85em)";
-  const onClickNavLink = belowSm ? onCloseNav : undefined;
   let showTooltip: boolean;
 
   if (md_Above) {
@@ -43,7 +42,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
           {...items}
           isOpen={isOpen}
           showTooltip={showTooltip}
-          onClick={onClickNavLink}
+          onClick={belowSm ? onCloseNav : undefined}
         />
       );
     }
