@@ -1,6 +1,6 @@
 import * as React from "react";
 
-const useCheckbox = (totalSelected: number, totalItems: number) => {
+const useSelectAllCheckbox = (totalSelected: number, totalItems: number) => {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   React.useEffect(() => {
@@ -14,4 +14,4 @@ const useCheckbox = (totalSelected: number, totalItems: number) => {
   return inputRef;
 };
 
-export default useCheckbox;
+export default useSelectAllCheckbox;

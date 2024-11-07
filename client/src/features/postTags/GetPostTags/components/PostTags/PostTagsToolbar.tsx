@@ -1,4 +1,4 @@
-import useCheckbox from "@hooks/getPostTags/useCheckbox";
+import useSelectAllCheckbox from "@hooks/useSelectAllCheckbox";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Toolbar from "@mui/material/Toolbar";
@@ -16,7 +16,7 @@ const PostTagsToolbar = ({
   handleAllCheckboxChange,
   handleDelete,
 }: PostTagsToolbarProps) => {
-  const checkboxRef = useCheckbox(numberSelected, numberTags);
+  const checkboxRef = useSelectAllCheckbox(numberSelected, numberTags);
 
   const label = numberSelected === numberTags ? "Unselect" : "Select";
   let buttonText: string;
