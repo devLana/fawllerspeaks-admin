@@ -4,7 +4,8 @@ import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 
 import { useGetCachedPostTags } from "@hooks/getPostTags/useGetCachedPostTags";
-import useControlPlusA from "@hooks/getPostTags/useControlPlusA";
+import useControlPlusA from "@hooks/useControlPlusA";
+import useShiftPlusClickPostTags from "@hooks/getPostTags/useShiftPlusClickPostTags";
 import PostTagsToolbar from "./PostTagsToolbar";
 import PostTag from "./PostTag";
 import type {
@@ -21,38 +22,22 @@ interface PostTagsListProps {
 
 const PostTagsList = (props: PostTagsListProps) => {
   const { id, isNotDeleting, selectedTags, dispatch } = props;
-  const anchorTag = React.useRef<{ id: string; index: number } | null>(null);
   const cachedPostTags = useGetCachedPostTags();
 
   if (!cachedPostTags) throw new Error();
 
   const selectedTagsIds = Object.keys(selectedTags);
+  const handleShiftClick = useShiftPlusClickPostTags(cachedPostTags, dispatch);
 
-  useControlPlusA({
-    cachedPostTags,
-    isNotDeleting,
-    tagIdsLength: selectedTagsIds.length,
-    dispatch,
+  useControlPlusA(isNotDeleting, () => {
+    dispatch({
+      type: "SELECT_ALL_POST_TAGS",
+      payload: {
+        shouldSelectAll: selectedTagsIds.length !== cachedPostTags.length,
+        tags: cachedPostTags,
+      },
+    });
   });
-
-  const handleShiftClick = React.useCallback(
-    (shiftKey: boolean, index: number, tagId: string) => {
-      if (!shiftKey) {
-        anchorTag.current = { index, id: tagId };
-      } else if (anchorTag.current && anchorTag.current.index !== index) {
-        dispatch({
-          type: "SHIFT_PLUS_CLICK",
-          payload: {
-            anchorTagId: anchorTag.current.id,
-            anchorTagIndex: anchorTag.current.index,
-            targetIndex: index,
-            tags: cachedPostTags,
-          },
-        });
-      }
-    },
-    [cachedPostTags, dispatch]
-  );
 
   const tagsList = React.useMemo(() => {
     return cachedPostTags.map((tag, index) => (
