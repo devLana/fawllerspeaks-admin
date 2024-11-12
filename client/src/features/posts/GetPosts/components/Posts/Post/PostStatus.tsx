@@ -15,7 +15,7 @@ const PostStatus = ({ status, isLoadingMore }: PostStatusProps) => (
       <Skeleton
         sx={{
           position: "absolute",
-          top: 0,
+          top: "7px",
           right: "5px",
           transform: "scale(1, 0.75)",
         }}
@@ -28,7 +28,7 @@ const PostStatus = ({ status, isLoadingMore }: PostStatusProps) => (
         size="small"
         sx={{
           position: "absolute",
-          top: "5px",
+          top: "13px",
           right: "5px",
           fontWeight: "bold",
           letterSpacing: 0.5,

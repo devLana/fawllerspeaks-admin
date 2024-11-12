@@ -16,7 +16,6 @@ type ValidationErrorKeys =
   | "postTagError";
 
 export type PostsView = "list" | "grid";
-
 export type PostItemSlug = Pick<ModifiedPost["url"], "slug">;
 
 export type PostsPagePostData = Pick<ModifiedPost, PostsPageDataKeys> & {
@@ -34,3 +33,34 @@ export interface GetPostsPageData {
 }
 
 export type PostsPageData = PostsPageDataMapper<GetPostsData>;
+
+export interface GetPostsListState {
+  postsView: PostsView;
+  delete: { open: boolean; title: string; ids: string[] };
+  selectedPosts: Record<string, string>;
+}
+
+export type GetPostsListAction =
+  | {
+      type: "CHANGE_POST_LIST_VIEW";
+      payload: { view: PostsView };
+    }
+  | { type: "OPEN_DELETE"; payload: { title: string; ids: string[] } }
+  | { type: "CLOSE_DELETE" }
+  | {
+      type: "SELECT_ALL_POSTS";
+      payload: { shouldSelectAll: boolean; posts: PostsPagePostData[] };
+    }
+  | {
+      type: "SELECT_POST";
+      payload: { checked: boolean; title: string; id: string };
+    }
+  | {
+      type: "SHIFT_PLUS_CLICK";
+      payload: {
+        anchorPost: { id: string; index: number };
+        targetIndex: number;
+        prevTargetIndex: number | null;
+        posts: PostsPagePostData[];
+      };
+    };

@@ -15,7 +15,6 @@ const PostsPagination = ({ after, before }: PostsPaginationLinksProps) => {
     <Box
       sx={{
         px: 1,
-        mt: 6,
         display: "flex",
         rowGap: 0.25,
         columnGap: 5,

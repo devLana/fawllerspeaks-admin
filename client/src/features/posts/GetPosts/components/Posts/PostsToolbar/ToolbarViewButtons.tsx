@@ -4,16 +4,26 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
 import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded";
-import type { PostsView } from "types/posts/getPosts";
+import type { GetPostsListAction, PostsView } from "types/posts/getPosts";
 
 interface ToolbarViewButtonsProps {
   postsView: PostsView;
-  onChangePostsViewXs: VoidFunction;
-  onChangePostsViewSm: (view: PostsView) => void;
+  dispatch: React.Dispatch<GetPostsListAction>;
 }
 
 const ToolbarViewButtons = (props: ToolbarViewButtonsProps) => {
-  const { postsView, onChangePostsViewXs, onChangePostsViewSm } = props;
+  const { postsView, dispatch } = props;
+
+  const handleXsView = () => {
+    dispatch({
+      type: "CHANGE_POST_LIST_VIEW",
+      payload: { view: postsView === "grid" ? "list" : "grid" },
+    });
+  };
+
+  const handleSmView = (view: PostsView) => {
+    dispatch({ type: "CHANGE_POST_LIST_VIEW", payload: { view } });
+  };
 
   const view = postsView === "grid" ? "list" : "grid";
 
@@ -21,8 +31,8 @@ const ToolbarViewButtons = (props: ToolbarViewButtonsProps) => {
     <Box sx={{ ml: "auto" }}>
       <Tooltip title={`Switch to ${view} view`} placement="bottom">
         <Button
-          onClick={onChangePostsViewXs}
           size="small"
+          onClick={handleXsView}
           variant={postsView === "list" ? "contained" : "outlined"}
           sx={({ breakpoints }) => ({
             minWidth: "auto",
@@ -35,14 +45,14 @@ const ToolbarViewButtons = (props: ToolbarViewButtonsProps) => {
       <ButtonGroup
         size="small"
         aria-label="Posts view button"
-        sx={({ breakpoints }) => ({
-          [breakpoints.down("sm")]: { display: "none" },
+        sx={({ breakpoints: { down } }) => ({
+          [down("sm")]: { display: "none" },
         })}
       >
         <Tooltip title="Switch to list view" placement="bottom">
           <Button
             variant={postsView === "list" ? "contained" : "outlined"}
-            onClick={() => onChangePostsViewSm("list")}
+            onClick={() => handleSmView("list")}
           >
             <ViewListRoundedIcon fontSize="small" />
           </Button>
@@ -50,7 +60,7 @@ const ToolbarViewButtons = (props: ToolbarViewButtonsProps) => {
         <Tooltip title="Switch to grid view" placement="bottom">
           <Button
             variant={postsView === "grid" ? "contained" : "outlined"}
-            onClick={() => onChangePostsViewSm("grid")}
+            onClick={() => handleSmView("grid")}
           >
             <GridViewRoundedIcon fontSize="small" />
           </Button>

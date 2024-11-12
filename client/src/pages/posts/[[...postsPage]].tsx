@@ -35,6 +35,10 @@ const GetPosts: NextPageWithLayout = () => {
     return <PostsTextContent severity="error" id={id} node={message} />;
   }
 
+  if (loading && previousData?.getPosts.__typename === "GetPostsData") {
+    return <Posts id={id} postsData={previousData.getPosts} />;
+  }
+
   if (!data) return <PostsTextContent id={id} node={<NoPostsData />} />;
 
   switch (data.getPosts.__typename) {
