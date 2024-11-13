@@ -2,6 +2,7 @@ let handler: (() => void) | null = null;
 
 const routerObject = {
   pathname: "/",
+  asPath: "/",
   query: {},
   isReady: true,
   events: {
