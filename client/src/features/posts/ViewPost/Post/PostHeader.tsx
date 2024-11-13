@@ -37,6 +37,7 @@ const PostHeader = ({ slug, status, title }: PostHeaderProps) => {
         <Typography
           variant="body2"
           component="span"
+          aria-label={`${title} blog post status`}
           sx={{
             color: ({ appTheme }) => colors(status, appTheme.themeMode),
             fontWeight: "bold",

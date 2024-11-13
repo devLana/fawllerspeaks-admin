@@ -29,7 +29,7 @@ const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
       <IconButton
         id={`${slug}-post-action-btn`}
         size="small"
-        aria-label={`${title} blog post`}
+        aria-label={`${title} blog post actions`}
         aria-controls={isOpen ? `${slug}-post-menu` : undefined}
         aria-haspopup="true"
         aria-expanded={isOpen || undefined}

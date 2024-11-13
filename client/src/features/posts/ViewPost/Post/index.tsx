@@ -37,8 +37,9 @@ const Post = ({ label, post }: { label: string; post: ModifiedPost }) => (
         })}
       >
         <PostMetadataList
-          datePublished={post.datePublished}
           description={post.description}
+          excerpt={post.excerpt}
+          datePublished={post.datePublished}
           lastModified={post.lastModified}
           url={post.url.href}
           views={post.views}
