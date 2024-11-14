@@ -9,6 +9,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PublishIcon from "@mui/icons-material/Publish";
 import UnpublishedIcon from "@mui/icons-material/Unpublished";
 
+import NextLink from "@components/ui/NextLink";
 import type { PostStatus } from "@apiTypes";
 import type { SxPropsArray } from "@types";
 
@@ -29,7 +30,7 @@ const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
       <IconButton
         id={`${slug}-post-action-btn`}
         size="small"
-        aria-label={`${title} blog post actions`}
+        aria-label={`${title} post actions`}
         aria-controls={isOpen ? `${slug}-post-menu` : undefined}
         aria-haspopup="true"
         aria-expanded={isOpen || undefined}
@@ -57,6 +58,9 @@ const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
           </MenuItem>
         )}
         <MenuItem
+          component={NextLink}
+          // href={{ pathname: "/posts/edit/[slug]", query: { slug } }}
+          href={`/posts/edit/${slug}`}
           sx={{
             columnGap: 3,
             ...(status !== "Draft" && {
