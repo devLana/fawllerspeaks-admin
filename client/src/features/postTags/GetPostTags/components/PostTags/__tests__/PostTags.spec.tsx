@@ -197,7 +197,6 @@ describe("Post Tags List", () => {
 
       expect(screen.getByRole("list")).toBeInTheDocument();
 
-      await user.hover(screen.getByRole("listitem", mocks.postTag(2)));
       await user.click(screen.getByRole("button", mocks.postTag(2)));
       await user.click(screen.getByRole("menuitem", { name: /^edit$/i }));
 
@@ -215,7 +214,6 @@ describe("Post Tags List", () => {
 
       expect(screen.getByRole("list")).toBeInTheDocument();
 
-      await user.hover(screen.getByRole("listitem", mocks.postTag(4)));
       await user.click(screen.getByRole("button", mocks.postTag(4)));
       await user.click(screen.getByRole("menuitem", { name: /^delete$/i }));
 

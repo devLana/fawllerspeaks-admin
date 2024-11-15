@@ -6,18 +6,20 @@ const useShiftPlusClickPostTags = (
   cachedPostTags: PostTagData[],
   dispatch: React.Dispatch<PostTagsListAction>
 ) => {
+  const skipOnChange = React.useRef(false);
   const anchorTag = React.useRef<{ id: string; index: number } | null>(null);
 
-  return React.useCallback(
-    (shiftKey: boolean, index: number, tagId: string) => {
+  const onShiftPlusClick = React.useCallback(
+    (shiftKey: boolean, index: number, id: string) => {
       if (!shiftKey) {
-        anchorTag.current = { index, id: tagId };
-      } else if (anchorTag.current && anchorTag.current.index !== index) {
+        anchorTag.current = { index, id };
+      } else if (anchorTag.current && index !== anchorTag.current.index) {
+        skipOnChange.current = true;
+
         dispatch({
           type: "SHIFT_PLUS_CLICK",
           payload: {
-            anchorTagId: anchorTag.current.id,
-            anchorTagIndex: anchorTag.current.index,
+            anchorTag: anchorTag.current,
             targetIndex: index,
             tags: cachedPostTags,
           },
@@ -26,6 +28,10 @@ const useShiftPlusClickPostTags = (
     },
     [cachedPostTags, dispatch]
   );
+
+  return React.useMemo(() => {
+    return { onShiftPlusClick, skipOnChange };
+  }, [onShiftPlusClick]);
 };
 
 export default useShiftPlusClickPostTags;

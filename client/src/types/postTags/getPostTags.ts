@@ -25,8 +25,7 @@ export type PostTagsListAction =
   | {
       type: "SHIFT_PLUS_CLICK";
       payload: {
-        anchorTagId: string;
-        anchorTagIndex: number;
+        anchorTag: { id: string; index: number };
         targetIndex: number;
         tags: PostTagData[];
       };

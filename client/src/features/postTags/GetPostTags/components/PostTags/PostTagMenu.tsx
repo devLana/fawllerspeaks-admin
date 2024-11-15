@@ -40,13 +40,13 @@ const PostTagMenu = ({ id, name, idName, dispatch }: PostTagMenuProps) => {
         aria-haspopup="true"
         aria-expanded={isOpen || undefined}
         onClick={e => setAnchor(e.currentTarget)}
-        sx={{
-          opacity: 0,
-          transition({ transitions: { create, easing } }) {
-            return create("opacity", { easing: easing.easeInOut });
+        sx={({ breakpoints, transitions: { create, easing } }) => ({
+          [breakpoints.up("lg")]: {
+            opacity: 0,
+            transition: create("opacity", { easing: easing.easeInOut }),
+            "&:focus": { opacity: 1 },
           },
-          "&:focus": { opacity: 1 },
-        }}
+        })}
       >
         <MoreVertIcon />
       </IconButton>

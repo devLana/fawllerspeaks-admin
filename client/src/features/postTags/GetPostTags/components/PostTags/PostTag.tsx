@@ -12,22 +12,34 @@ interface PostTagProps {
   id: string;
   name: string;
   index: number;
+  skipOnChange: React.MutableRefObject<boolean>;
   isChecked: boolean;
   dispatch: React.Dispatch<PostTagsListAction>;
-  onClickLabel: (shiftKey: boolean, index: number, id: string) => void;
+  onShiftPlusClick: (shiftKey: boolean, index: number, id: string) => void;
 }
 
-const PostTag = (props: PostTagProps) => {
-  const { id, name, index, isChecked, onClickLabel, dispatch } = props;
+const PostTag = ({
+  id,
+  name,
+  index,
+  isChecked,
+  skipOnChange,
+  onShiftPlusClick,
+  dispatch,
+}: PostTagProps) => {
   const idName = name.replace(/[\s_.]/g, "-");
+  const skipOnChangeRef = skipOnChange;
 
   const handleChange = (checked: boolean) => {
-    dispatch({ type: "SELECT_POST_TAG", payload: { checked, id, name } });
+    if (skipOnChangeRef.current) {
+      skipOnChangeRef.current = false;
+    } else {
+      dispatch({ type: "SELECT_POST_TAG", payload: { checked, id, name } });
+    }
   };
 
   return (
     <ListItem
-      aria-label={`${name} post tag`}
       disablePadding
       sx={{ "&:hover>div>.MuiIconButton-root": { opacity: 1 } }}
     >
@@ -41,7 +53,7 @@ const PostTag = (props: PostTagProps) => {
         }}
       >
         <FormControlLabel
-          onClick={e => onClickLabel(e.shiftKey, index, id)}
+          onClick={e => onShiftPlusClick(e.shiftKey, index, id)}
           control={
             <Checkbox
               id={`${idName}-checkbox`}
@@ -63,10 +75,10 @@ const PostTag = (props: PostTagProps) => {
               p: 1.25,
               borderRadius: 3,
               border: 1,
-              borderColor: isChecked ? "inherit" : "transparent",
+              borderColor: isChecked ? "inherit" : "divider",
+              ...(isChecked && { bgcolor: "action.selected" }),
               overflow: "hidden",
               whiteSpace: "nowrap",
-              bgcolor: "action.selected",
               userSelect: "none",
             },
           }}

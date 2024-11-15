@@ -227,8 +227,7 @@ describe("Post Tags List - State Reducer", () => {
       const result = reducer(initState, {
         type: "SHIFT_PLUS_CLICK",
         payload: {
-          anchorTagId: "id-1",
-          anchorTagIndex: 0,
+          anchorTag: { id: "id-1", index: 0 },
           targetIndex: 3,
           tags: [
             { name: "tag 1", id: "id-1" },
@@ -266,8 +265,7 @@ describe("Post Tags List - State Reducer", () => {
       const result = reducer(initState, {
         type: "SHIFT_PLUS_CLICK",
         payload: {
-          anchorTagId: "id-3",
-          anchorTagIndex: 2,
+          anchorTag: { id: "id-3", index: 2 },
           targetIndex: 0,
           tags: [
             { name: "tag 1", id: "id-1" },

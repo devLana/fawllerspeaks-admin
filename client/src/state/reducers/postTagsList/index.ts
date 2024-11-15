@@ -23,7 +23,7 @@ export const reducer: Reducer = (state, action) => {
 
     case "POST_TAG_EDITED": {
       const { name, id } = action.payload;
-      const { selectedTags } = state;
+      const selectedTags = { ...state.selectedTags };
 
       if (selectedTags[id]) {
         selectedTags[id] = name;
@@ -45,11 +45,11 @@ export const reducer: Reducer = (state, action) => {
       return { ...state, delete: { open: false, ids: [], name: "" } };
 
     case "REMOVE_POST_TAG_ON_DELETE": {
-      let { selectedTags } = state;
+      let selectedTags = { ...state.selectedTags };
 
       action.payload.tagIds.forEach(tagId => {
-        const { [tagId]: _, ...rest } = selectedTags;
-        selectedTags = rest;
+        const { [tagId]: _, ...selected } = selectedTags;
+        selectedTags = selected;
       });
 
       return {
@@ -87,19 +87,20 @@ export const reducer: Reducer = (state, action) => {
     }
 
     case "SHIFT_PLUS_CLICK": {
-      const { anchorTagId, anchorTagIndex, targetIndex, tags } = action.payload;
-      const start = Math.min(anchorTagIndex, targetIndex);
-      const end = Math.max(anchorTagIndex, targetIndex);
-      const { selectedTags } = state;
+      const { anchorTag, targetIndex, tags } = action.payload;
+      const { id: anchorId, index: anchorIndex } = anchorTag;
+      const start = Math.min(anchorIndex, targetIndex);
+      const end = Math.max(anchorIndex, targetIndex);
+      let selectedTags = { ...state.selectedTags };
 
-      if (selectedTags[anchorTagId]) {
-        for (let i = start; i <= end; i++) {
-          selectedTags[tags[i].id] = tags[i].name;
-        }
-      } else {
-        for (let i = start; i <= end; i++) {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete selectedTags[tags[i].id];
+      for (let i = start; i <= end; i++) {
+        const { id, name } = tags[i];
+
+        if (selectedTags[anchorId]) {
+          selectedTags[id] = name;
+        } else {
+          const { [id]: _, ...selected } = selectedTags;
+          selectedTags = selected;
         }
       }
 

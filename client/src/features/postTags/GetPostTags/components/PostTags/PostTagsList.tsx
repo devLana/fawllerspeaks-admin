@@ -27,7 +27,7 @@ const PostTagsList = (props: PostTagsListProps) => {
   if (!cachedPostTags) throw new Error();
 
   const selectedTagsIds = Object.keys(selectedTags);
-  const handleShiftClick = useShiftPlusClickPostTags(cachedPostTags, dispatch);
+  const shiftClick = useShiftPlusClickPostTags(cachedPostTags, dispatch);
 
   useControlPlusA(isNotDeleting, () => {
     dispatch({
@@ -44,13 +44,13 @@ const PostTagsList = (props: PostTagsListProps) => {
       <PostTag
         key={tag.id}
         {...tag}
+        {...shiftClick}
         index={index}
         isChecked={!!selectedTags[tag.id]}
-        onClickLabel={handleShiftClick}
         dispatch={dispatch}
       />
     ));
-  }, [cachedPostTags, selectedTags, handleShiftClick, dispatch]);
+  }, [cachedPostTags, shiftClick, selectedTags, dispatch]);
 
   const handleAllCheckboxChange = (isChecked: boolean) => {
     dispatch({
