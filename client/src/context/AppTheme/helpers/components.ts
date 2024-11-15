@@ -64,7 +64,7 @@ export const components: Components = {
     },
   },
   MuiSnackbar: {
-    defaultProps: { TransitionComponent: Right, autoHideDuration: 4000 },
+    defaultProps: { TransitionComponent: Right, autoHideDuration: 5500 },
   },
   MuiSnackbarContent: {
     styleOverrides: {
