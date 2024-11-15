@@ -15,14 +15,13 @@ const PaginationLink = ({ children, cursor, ml }: PaginationLinkProps) => {
 
   if (cursor) {
     const query = {
-      postsPage: cursor,
       ...(queryParams.status && { status: queryParams.status }),
       ...(queryParams.sort && { sort: queryParams.sort }),
     };
 
     return (
       <NextLink
-        href={{ pathname: "[[...postsPage]]", query }}
+        href={{ pathname: `/posts/${cursor.join("/")}`, query }}
         sx={{ ml, ...styles }}
       >
         {children}

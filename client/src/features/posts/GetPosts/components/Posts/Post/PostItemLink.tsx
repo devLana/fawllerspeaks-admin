@@ -20,13 +20,11 @@ const PostItemLink = ({ isLoadingMore, slug }: PostItemLinkProps) => {
         transform: "scale(1)",
       }}
     >
-      <NextLink href={{ pathname: "view/[slug]", query: { slug } }}>
-        View Post
-      </NextLink>
+      <NextLink href={`/posts/view/${slug}`}>View Post</NextLink>
     </Skeleton>
   ) : (
     <NextLink
-      href={{ pathname: "view/[slug]", query: { slug } }}
+      href={`/posts/view/${slug}`}
       sx={{
         mt: "auto",
         mx: "auto",
