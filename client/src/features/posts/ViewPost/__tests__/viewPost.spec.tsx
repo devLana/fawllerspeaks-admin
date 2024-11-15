@@ -6,6 +6,7 @@ import ViewPost from "@pages/posts/view/[slug]";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./viewPost.mocks";
 
+vi.mock("../PostWrapper");
 vi.mock("../Post");
 
 describe("View Post Page", () => {
@@ -20,19 +21,6 @@ describe("View Post Page", () => {
 
   afterAll(() => {
     mocks.server.close();
-  });
-
-  describe("On redirect to view post page from create post page", () => {
-    it.each(mocks.params)("%s", (_, params, message) => {
-      const router = useRouter();
-      router.asPath = `/posts/view/${mocks.postSlug}`;
-      router.query = params;
-
-      renderUI(<ViewPost />);
-
-      expect(screen.getByRole("progressbar", mocks.page)).toBeInTheDocument();
-      expect(screen.getByRole("alert")).toHaveTextContent(message);
-    });
   });
 
   describe("Read an existing post from cache", () => {

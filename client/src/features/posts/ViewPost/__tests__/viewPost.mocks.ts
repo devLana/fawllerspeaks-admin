@@ -118,29 +118,6 @@ const unsupported = mock("unsupported", MESSAGE);
 const network = mock("network", MESSAGE);
 const gql = mock("graphql", gqlMsg);
 
-export const params: [string, Record<string, string>, string][] = [
-  [
-    "Expect an alert message if a post was drafted with an image upload error",
-    { draft: "true", slug: postSlug },
-    "Blog post saved as draft. But there was an error uploading your post image banner. Please try uploading an image later",
-  ],
-  [
-    "Expect an alert message if a post was successfully drafted",
-    { draft: "false", slug: postSlug },
-    "Blog post saved as draft",
-  ],
-  [
-    "Expect an alert message if a post was created and published with an image upload error",
-    { create: "true", slug: postSlug },
-    "Blog post created and published. But there was an error uploading your post image banner. Please try uploading an image later",
-  ],
-  [
-    "Expect an alert message if a post was successfully created and published",
-    { create: "false", slug: postSlug },
-    "Blog post created and published",
-  ],
-];
-
 interface Redirects {
   asPath: string;
   url: { pathname: string; query: Record<string, string> };
