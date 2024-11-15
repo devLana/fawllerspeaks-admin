@@ -7,7 +7,7 @@ import { PostTagsPageContext } from "@context/PostTags";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./editPostTag.mocks";
 
-describe("Edit a post tag", () => {
+describe("Edit post tag", () => {
   const dispatchMock = vi.fn().mockName("dispatch");
   const mockFn = vi.fn().mockName("handleOpenAlert");
 

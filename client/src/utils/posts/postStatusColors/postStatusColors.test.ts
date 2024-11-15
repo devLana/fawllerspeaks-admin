@@ -13,7 +13,7 @@ const mocks: [string, ThemeMode, ColorVariant][] = [
   [testName("sunset", "main"), "sunset", "main"],
 ];
 
-describe("Post Status Color Picker", () => {
+describe("Post Status Color Mapper", () => {
   it.each(mocks)("%s", (_, mode, colorVariant) => {
     const result1 = postStatusColors("Draft", mode);
     expect(result1).toMatch(`warning.${colorVariant}`);

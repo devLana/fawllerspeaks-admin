@@ -7,7 +7,7 @@ import { renderUI } from "@utils/tests/renderUI";
 
 vi.mock("../LoginForm");
 
-describe("Forgot Password Page", () => {
+describe("Login Page", () => {
   afterAll(() => {
     const router = useRouter();
     router.query = {};

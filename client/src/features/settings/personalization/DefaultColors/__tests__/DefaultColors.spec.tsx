@@ -5,7 +5,7 @@ import DefaultColors from "..";
 import { renderUI } from "@utils/tests/renderUI";
 import { DEFAULT_THEME } from "@utils/constants";
 
-describe("Default color personalization Setting", () => {
+describe("Default color personalization setting", () => {
   afterEach(() => {
     localStorage.removeItem(DEFAULT_THEME);
   });

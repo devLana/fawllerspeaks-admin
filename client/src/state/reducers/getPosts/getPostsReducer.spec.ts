@@ -1,7 +1,7 @@
 import { reducer, initialState as state } from ".";
 import type { PostsPagePostData } from "types/posts/getPosts";
 
-describe("Get Posts List - State Reducer0", () => {
+describe("Get Posts List - State Reducer", () => {
   describe("Posts list view state", () => {
     it("Should change the 'view' state", () => {
       const result1 = reducer(state, {
