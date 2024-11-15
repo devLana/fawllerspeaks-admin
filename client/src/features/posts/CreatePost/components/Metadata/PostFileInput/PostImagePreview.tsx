@@ -33,6 +33,7 @@ const PostImagePreview = (props: PostImagePreviewProps) => {
       <Stack sx={{ position: "absolute", top: 8, right: 8, rowGap: 1 }}>
         <Tooltip title="Change Image" placement="left">
           <IconButton
+            role={undefined}
             htmlFor={id}
             component="label"
             size="small"

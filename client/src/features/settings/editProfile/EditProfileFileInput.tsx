@@ -91,6 +91,7 @@ const EditProfileFileInput = ({
           size="large"
           component="label"
           htmlFor={id}
+          role={undefined}
           onDrop={handleDrop}
           onDragOver={handleDragEvent()}
           onDragEnter={handleDragEvent(true)}

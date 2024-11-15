@@ -67,6 +67,7 @@ const PostFileInput = (props: PostFileInputProps) => {
             variant="outlined"
             component="label"
             htmlFor={id}
+            role={undefined}
             startIcon={<AddPhotoAlternateOutlinedIcon />}
             onDrop={handleDrop}
             onDragOver={handleDragEvent()}

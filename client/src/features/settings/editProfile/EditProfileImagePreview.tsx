@@ -43,6 +43,7 @@ const EditProfileImagePreview = (props: EditProfileImagePreviewProps) => {
           size="small"
           component="label"
           htmlFor={id}
+          role={undefined}
           startIcon={<AddPhotoAlternateOutlinedIcon />}
           onKeyDown={onKeyDown}
         >
