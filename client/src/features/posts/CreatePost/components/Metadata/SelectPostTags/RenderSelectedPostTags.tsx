@@ -14,12 +14,7 @@ const RenderSelectedValues = ({ selected, map }: RenderSelectValueProps) => (
     aria-label="selected post tags"
   >
     {selected.map(value => (
-      <ListItem
-        disablePadding
-        key={value}
-        aria-label={map[value]}
-        sx={{ width: "auto" }}
-      >
+      <ListItem disablePadding key={value} sx={{ width: "auto" }}>
         <Chip label={map[value]} sx={{ maxWidth: "15em" }} />
       </ListItem>
     ))}

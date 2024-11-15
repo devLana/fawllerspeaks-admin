@@ -15,22 +15,17 @@ const NavbarToggleButton = (props: NavbarToggleButtonProps) => {
 
   const text = "main app navigation";
   let title: string;
-  let label: string;
 
   if (md_Above) {
     title = isOpen ? `Maximize ${text}` : `Minimize ${text}`;
-    label = "Toggle main app navigation size";
   } else if (sm_Above) {
     title = isOpen ? `Minimize ${text}` : `Maximize ${text}`;
-    label = "Toggle main app navigation size";
   } else {
     title = `Hide ${text}`;
-    label = title;
   }
 
   return (
     <ListItem
-      aria-label={label}
       disablePadding
       sx={{ pb: 2, borderBottom: 1, borderColor: "divider" }}
     >

@@ -35,10 +35,10 @@ const Header = ({ onClick, isLoading }: HeaderProps) => (
         <MenuIcon />
       </IconButton>
       <Box sx={{ maxWidth: "10rem", width: "40%", mr: "auto" }}>
-        <NextLink href="/" aria-label="Dashboard page" sx={{ display: "flex" }}>
+        <NextLink href="/" sx={{ display: "flex" }}>
           <Image
             src="/logo.png"
-            alt="FawllerSpeaks brand logo"
+            alt="FawllerSpeaks brand logo link to dashboard page"
             width={465}
             height={88}
             style={{ maxWidth: "100%", height: "auto" }}

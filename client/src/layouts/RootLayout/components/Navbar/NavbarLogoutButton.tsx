@@ -22,7 +22,7 @@ const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
 
   return (
     <>
-      <ListItem disablePadding aria-label="App logout button">
+      <ListItem disablePadding>
         <Tooltip title={showTooltip ? label : null} placement="right">
           <ListItemButton
             sx={{

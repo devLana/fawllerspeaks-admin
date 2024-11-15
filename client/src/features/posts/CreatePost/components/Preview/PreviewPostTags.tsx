@@ -15,12 +15,7 @@ const PreviewPostTags = ({ tagIds }: { tagIds: string[] }) => {
     const tag = client.readFragment({ fragment: GET_POST_TAG_NAME, id });
 
     return (
-      <ListItem
-        key={tagId}
-        disablePadding
-        aria-label={tag?.name}
-        sx={{ width: "auto" }}
-      >
+      <ListItem key={tagId} disablePadding sx={{ width: "auto" }}>
         <Chip label={tag?.name} sx={{ maxWidth: "15em" }} />
       </ListItem>
     );

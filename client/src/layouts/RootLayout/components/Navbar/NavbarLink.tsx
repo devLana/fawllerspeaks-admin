@@ -43,7 +43,6 @@ const NavbarLink = ({
 
   return (
     <ListItem
-      aria-label="main app navigation"
       disablePadding
       sx={{ ...(label === "Settings" && { mt: "auto", pt: 4 }) }}
     >
