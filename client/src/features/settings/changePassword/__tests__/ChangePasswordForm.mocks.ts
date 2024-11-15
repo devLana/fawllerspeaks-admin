@@ -100,9 +100,9 @@ export const redirects: [string, Redirects, ReturnType<typeof mock>][] = [
     {
       params: {
         pathname: "/login",
-        query: { status: "unauthenticated", redirectTo: "/posts" },
+        query: { status: "unauthenticated", redirectTo: "/settings/password" },
       },
-      pathname: "/posts",
+      pathname: "/settings/password",
     },
     auth,
   ],
@@ -111,9 +111,9 @@ export const redirects: [string, Redirects, ReturnType<typeof mock>][] = [
     {
       params: {
         pathname: "/register",
-        query: { status: "unregistered", redirectTo: "/settings" },
+        query: { status: "unregistered", redirectTo: "/settings/password" },
       },
-      pathname: "/settings",
+      pathname: "/settings/password",
     },
     register,
   ],
@@ -121,7 +121,7 @@ export const redirects: [string, Redirects, ReturnType<typeof mock>][] = [
     "Should redirect the user to the login page if the user could not be verified",
     {
       params: { pathname: "/login", query: { status: "unauthorized" } },
-      pathname: "/post-tags",
+      pathname: "/settings/password",
     },
     unknown,
   ],

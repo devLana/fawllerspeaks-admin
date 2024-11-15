@@ -43,9 +43,9 @@ export const redirects: [string, Redirects, () => Promise<MswData>][] = [
     {
       params: {
         pathname: "/login",
-        query: { status: "unauthenticated", redirectTo: "/posts/new" },
+        query: { status: "unauthenticated", redirectTo: "/post-tags" },
       },
-      pathname: "/posts/new",
+      pathname: "/post-tags",
     },
     dataCb("AuthenticationError"),
   ],
@@ -53,7 +53,7 @@ export const redirects: [string, Redirects, () => Promise<MswData>][] = [
     "Expect the user to be redirected to the login page if the user could not be verified",
     {
       params: { pathname: "/login", query: { status: "unauthorized" } },
-      pathname: "/posts",
+      pathname: "/post-tags",
     },
     dataCb("UnknownError"),
   ],

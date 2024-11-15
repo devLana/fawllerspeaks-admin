@@ -133,9 +133,9 @@ export const redirects: [string, Redirects, Mok][] = [
     {
       params: {
         pathname: "/login",
-        query: { status: "unauthenticated", redirectTo: "/posts" },
+        query: { status: "unauthenticated", redirectTo: "/post-tags" },
       },
-      pathname: "/posts",
+      pathname: "/post-tags",
     },
     auth,
   ],
@@ -143,7 +143,7 @@ export const redirects: [string, Redirects, Mok][] = [
     "Expect a redirect to the login page if the user could not be verified",
     {
       params: { pathname: "/login", query: { status: "unauthorized" } },
-      pathname: "/settings/me/edit",
+      pathname: "/post-tags",
     },
     notAllowed,
   ],
@@ -152,9 +152,9 @@ export const redirects: [string, Redirects, Mok][] = [
     {
       params: {
         pathname: "/register",
-        query: { status: "unregistered", redirectTo: "/posts/edit" },
+        query: { status: "unregistered", redirectTo: "/post-tags" },
       },
-      pathname: "/posts/edit",
+      pathname: "/post-tags",
     },
     unregister,
   ],

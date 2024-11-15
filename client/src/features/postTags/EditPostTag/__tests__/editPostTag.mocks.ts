@@ -145,9 +145,9 @@ export const redirects: [string, Redirects, Mock][] = [
     {
       params: {
         pathname: "/login",
-        query: { status: "unauthenticated", redirectTo: "/posts/new" },
+        query: { status: "unauthenticated", redirectTo: "/post-tags" },
       },
-      pathname: "/posts/new",
+      pathname: "/post-tags",
     },
     auth,
   ],
@@ -155,7 +155,7 @@ export const redirects: [string, Redirects, Mock][] = [
     "Should redirect to the login page if the user could not be verified",
     {
       params: { pathname: "/login", query: { status: "unauthorized" } },
-      pathname: "posts",
+      pathname: "/post-tags",
     },
     notAllowed,
   ],

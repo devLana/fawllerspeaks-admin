@@ -6,7 +6,7 @@ import { REFRESH_TOKEN } from "@mutations/auth/REFRESH_TOKEN";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
 interface Redirects {
-  url: string;
+  url: { pathname: string; query: Record<string, string> };
   pathname: string;
 }
 
@@ -92,13 +92,19 @@ const network = mock("NETWORK_ERROR");
 export const redirects: [string, Redirects, string][] = [
   [
     "Should redirect to the login page if the user session could not be verified",
-    { url: "/login?status=unauthorized", pathname: "/" },
+    {
+      url: { pathname: "/login", query: { status: "unauthorized" } },
+      pathname: "/",
+    },
     notAllowed,
   ],
   [
     "Should redirect to the login page if the user session has expired",
     {
-      url: "/login?status=expired&redirectTo=/post-tags",
+      url: {
+        pathname: "/login",
+        query: { status: "expired", redirectTo: "/post-tags" },
+      },
       pathname: "/post-tags",
     },
     authCookie,

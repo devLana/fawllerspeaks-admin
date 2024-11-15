@@ -125,9 +125,9 @@ export const redirects: [string, Mock, { pathname: string; params: Params }][] =
       {
         params: {
           pathname: "/login",
-          query: { status: "unauthenticated", redirectTo: "/post-tags" },
+          query: { status: "unauthenticated", redirectTo: "/settings/me/edit" },
         },
-        pathname: "/post-tags",
+        pathname: "/settings/me/edit",
       },
     ],
     [
@@ -135,7 +135,7 @@ export const redirects: [string, Mock, { pathname: string; params: Params }][] =
       unknown,
       {
         params: { pathname: "/login", query: { status: "unauthorized" } },
-        pathname: "/",
+        pathname: "/settings/me/edit",
       },
     ],
     [

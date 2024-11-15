@@ -174,10 +174,10 @@ export const redirects: [string, string, Redirects][] = [
     "The user is not logged in, Expect a redirect to the login page",
     auth.title,
     {
-      pathname: "/settings/edit/me",
+      pathname: "/posts/new",
       url: {
         pathname: "/login",
-        query: { status: "unauthenticated", redirectTo: "/settings/edit/me" },
+        query: { status: "unauthenticated", redirectTo: "/posts/new" },
       },
     },
   ],
@@ -185,7 +185,7 @@ export const redirects: [string, string, Redirects][] = [
     "The logged in user could not be verified, Expect a redirect to the login page",
     notAllowed.title,
     {
-      pathname: "/",
+      pathname: "/posts/new",
       url: { pathname: "/login", query: { status: "unauthorized" } },
     },
   ],
@@ -193,10 +193,10 @@ export const redirects: [string, string, Redirects][] = [
     "The user's account is unregistered, Expect a redirect to the user registration page",
     unregister.title,
     {
-      pathname: "/post-tags",
+      pathname: "/posts/new",
       url: {
         pathname: "/register",
-        query: { status: "unregistered", redirectTo: "/post-tags" },
+        query: { status: "unregistered", redirectTo: "/posts/new" },
       },
     },
   ],
@@ -229,10 +229,7 @@ export const drafted: [string, DraftMock][] = [
     "Image banner uploaded, The new blog post should be saved as draft",
     {
       mock: savedPost,
-      url: {
-        pathname: "/posts/view/[slug]",
-        query: { slug: "post-url-slug", draft: false },
-      },
+      url: { pathname: "/posts/view/post-url-slug", query: { draft: false } },
       resolver() {
         return HttpResponse.json(
           { image: "path/to/image/on/storage", status: "SUCCESS" },
@@ -245,10 +242,7 @@ export const drafted: [string, DraftMock][] = [
     "Image banner upload failed, The new blog post should be saved as draft without an image banner",
     {
       mock: savedPost,
-      url: {
-        pathname: "/posts/view/[slug]",
-        query: { slug: "post-url-slug", draft: true },
-      },
+      url: { pathname: "/posts/view/post-url-slug", query: { draft: true } },
       resolver: () => HttpResponse.error(),
     },
   ],

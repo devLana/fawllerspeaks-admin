@@ -114,9 +114,9 @@ export const redirects: [string, Redirects, Mock][] = [
     {
       params: {
         pathname: "/login",
-        query: { status: "unauthenticated", redirectTo: "/settings/password" },
+        query: { status: "unauthenticated", redirectTo: "/post-tags" },
       },
-      pathname: "/settings/password",
+      pathname: "/post-tags",
     },
     auth,
   ],
@@ -133,9 +133,9 @@ export const redirects: [string, Redirects, Mock][] = [
     {
       params: {
         pathname: "/register",
-        query: { status: "unregistered", redirectTo: "/posts/new" },
+        query: { status: "unregistered", redirectTo: "/post-tags" },
       },
-      pathname: "/posts/new",
+      pathname: "/post-tags",
     },
     unregister,
   ],
