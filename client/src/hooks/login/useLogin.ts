@@ -42,7 +42,7 @@ const useLogin = (setError: UseFormSetError<MutationLoginArgs>) => {
         const { redirectTo } = query;
 
         const regex =
-          /^\/?(register|login|forgot-password|reset-password|404|500)/;
+          /^\/?(?:register|login|forgot-password|reset-password|404|500)/;
 
         if (!user.isRegistered) {
           void replace("/register");

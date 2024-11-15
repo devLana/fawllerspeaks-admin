@@ -92,9 +92,9 @@ export const useDraftPost = (postData: CreatePostData) => {
 
           case "SinglePost": {
             const { slug } = draftData.draftPost.post.url;
-            const query = { slug, draft: uploadHasError };
+            const query = { draft: uploadHasError };
 
-            void push({ pathname: "/posts/view/[slug]", query });
+            void push({ pathname: `/posts/view/${slug}`, query });
             break;
           }
 

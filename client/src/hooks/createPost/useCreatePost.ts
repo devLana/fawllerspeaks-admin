@@ -79,9 +79,9 @@ export const useCreatePost = (postData: CreatePostData) => {
 
           case "SinglePost": {
             const { slug } = createData.createPost.post.url;
-            const query = { slug, create: uploadHasError };
+            const query = { create: uploadHasError };
 
-            void push({ pathname: "/posts/view/[slug]", query });
+            void push({ pathname: `/posts/view/${slug}`, query });
             break;
           }
 

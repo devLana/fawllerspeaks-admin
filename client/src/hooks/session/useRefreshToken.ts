@@ -34,17 +34,23 @@ const useRefreshToken = () => {
           setIsOpen(true);
           break;
 
-        case "AuthCookieError":
-          localStorage.removeItem(SESSION_ID);
-          void client.clearStore();
-          void replace(`/login?status=expired&redirectTo=${pathname}`);
-          break;
+        case "AuthCookieError": {
+          const query = { status: "expired", redirectTo: pathname };
 
-        case "NotAllowedError":
           localStorage.removeItem(SESSION_ID);
           void client.clearStore();
-          void replace("/login?status=unauthorized");
+          void replace({ pathname: "/login", query });
           break;
+        }
+
+        case "NotAllowedError": {
+          const query = { status: "unauthorized" };
+
+          localStorage.removeItem(SESSION_ID);
+          void client.clearStore();
+          void replace({ pathname: "/login", query });
+          break;
+        }
 
         case "AccessToken":
           handleRefreshToken(data.refreshToken.accessToken);
