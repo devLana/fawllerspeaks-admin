@@ -1,5 +1,5 @@
-import { renderUI } from "@utils/tests/renderUI";
 import UserAvatar from "..";
+import { renderUI } from "@utils/tests/renderUI";
 import { screen } from "@testing-library/react";
 import * as mocks from "./UserAvatar.mocks";
 

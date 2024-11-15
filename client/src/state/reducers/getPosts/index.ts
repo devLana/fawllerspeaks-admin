@@ -105,14 +105,13 @@ export const reducer: Reducer = (state, action) => {
         }
       }
 
-      const shouldSelect = !!state.selectedPosts[anchorId];
       const start = Math.min(anchorIndex, targetIndex);
       const end = Math.max(anchorIndex, targetIndex);
 
       for (let i = start; i <= end; i++) {
         const { id, title } = posts[i];
 
-        if (shouldSelect) {
+        if (state.selectedPosts[anchorId]) {
           if (selectedPosts[id]) continue;
           selectedPosts[id] = title;
         } else {

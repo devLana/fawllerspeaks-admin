@@ -8,11 +8,7 @@ export const settingsLinks = [
     Icon: VpnKeyOutlinedIcon,
     label: "Change password",
   },
-  {
-    to: "/settings/me",
-    Icon: PersonOutlineOutlinedIcon,
-    label: "Profile",
-  },
+  { to: "/settings/me", Icon: PersonOutlineOutlinedIcon, label: "Profile" },
   {
     to: "/settings/personalization",
     Icon: TuneRoundedIcon,
