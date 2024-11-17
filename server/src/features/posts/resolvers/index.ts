@@ -10,6 +10,7 @@ import binPosts from "./binPosts";
 import unBinPosts from "./unBinPosts";
 import deletePostsFromBin from "./deletePostsFromBin";
 import emptyBin from "./emptyBin";
+import deletePostContentImages from "./deletePostContentImages";
 
 import { PostResolvers } from "./types/Post";
 import { PostAuthorResolvers } from "./types/PostAuthor";
@@ -30,6 +31,7 @@ import { EditPostValidationErrorResolver } from "./editPost/types/EditPostValida
 import { GetPostsDataResolvers } from "./getPosts/types/GetPostsData";
 import { GetPostsValidationErrorResolvers } from "./getPosts/types/GetPostsValidationError";
 import { GetPostValidationErrorResolvers } from "./getPost/types/GetPostValidationError";
+import { DeletePostContentImagesValidationErrorResolvers as DeletePostImagesResolvers } from "./deletePostContentImages/types/DeletePostContentImagesValidationError";
 
 import type {
   MutationResolvers,
@@ -47,7 +49,8 @@ type MutationsKeys =
   | "binPosts"
   | "unBinPosts"
   | "deletePostsFromBin"
-  | "emptyBin";
+  | "emptyBin"
+  | "deletePostContentImages";
 
 type TypeKeys =
   | "Post"
@@ -67,7 +70,8 @@ type TypeKeys =
   | "PostIdsValidationError"
   | "EditPostValidationError"
   | "GetPostsValidationError"
-  | "GetPostValidationError";
+  | "GetPostValidationError"
+  | "DeletePostContentImagesValidationError";
 
 interface PostsResolvers {
   Queries: ResolversMapper<Pick<QueryResolvers, "getPosts" | "getPost">>;
@@ -91,6 +95,7 @@ export const postsResolvers: PostsResolvers = {
     unBinPosts,
     deletePostsFromBin,
     emptyBin,
+    deletePostContentImages,
   },
 
   Types: {
@@ -112,5 +117,6 @@ export const postsResolvers: PostsResolvers = {
     EditPostValidationError: EditPostValidationErrorResolver,
     GetPostsValidationError: GetPostsValidationErrorResolvers,
     GetPostValidationError: GetPostValidationErrorResolvers,
+    DeletePostContentImagesValidationError: DeletePostImagesResolvers,
   },
 };

@@ -379,3 +379,20 @@ export const EMPTY_BIN = `#graphql
     }
   }
 `;
+
+export const DELETE_POST_CONTENT_IMAGES = `#graphql
+  mutation DeletePostContentImages($images: [String!]!) {
+    deletePostContentImages(images: $images) {
+      ... on BaseResponse {
+        __typename
+        message
+        status
+      }
+      ... on DeletePostContentImagesValidationError {
+        __typename
+        imagesError
+        status
+      }
+    }
+  }
+`;

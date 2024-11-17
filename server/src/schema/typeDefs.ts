@@ -72,6 +72,8 @@ const types = `#graphql
     deletePostsFromBin(postIds: [ID!]!): Bin_UnBin_Delete!
     "Empty bin(Delete all posts from bin)"
     emptyBin: EmptyBin!
+    "Delete post content images from storage bucket"
+    deletePostContentImages(images: [String!]!): DeletePostContentImages!
   }
 
   enum Status {

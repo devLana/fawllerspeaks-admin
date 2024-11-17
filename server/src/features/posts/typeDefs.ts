@@ -135,6 +135,11 @@ export const postsTypeDefs = `#graphql
     status: Status!
   }
 
+  type DeletePostContentImagesValidationError {
+    imagesError: String!
+    status: Status!
+  }
+
   union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
 
   union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError
@@ -148,6 +153,8 @@ export const postsTypeDefs = `#graphql
   union GetPosts = GetPostsData | GetPostsValidationError | AuthenticationError | NotAllowedError | RegistrationError | ForbiddenError
 
   union Publish_Unpublish = SinglePost | PostIdValidationError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
+
+  union DeletePostContentImages = Response | DeletePostContentImagesValidationError | AuthenticationError | ForbiddenError | RegistrationError | ServerError | UnknownError
 
   enum PostStatus {
     Draft
