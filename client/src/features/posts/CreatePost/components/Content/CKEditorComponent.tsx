@@ -1,17 +1,17 @@
-import * as React from "react";
-
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Box from "@mui/material/Box";
 
 import { useAuth } from "@context/Auth";
 import useCKEditor from "@hooks/createPost/useCKEditor";
+import useHandleCKEditor from "@hooks/createPost/useHandleCKEditor";
 import CustomEditor from "ckeditor5-custom-build";
 import type { CKEditorComponentProps } from "types/posts/createPost";
 
 const CKEditorComponent = (props: CKEditorComponentProps) => {
   const { id, data, contentHasError, dispatch, onBlur, onFocus } = props;
-  const { ckEditorRef, topOffset } = useCKEditor(id, contentHasError);
   const { jwt } = useAuth();
+  const { ckEditorRef, topOffset } = useCKEditor(id, contentHasError);
+  const handleChange = useHandleCKEditor();
 
   const handleContent = (content: string) => {
     dispatch({ type: "ADD_POST_CONTENT", payload: { content } });
@@ -251,6 +251,7 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
         data={data}
         onBlur={(_, editorRef) => handleContent(editorRef.getData())}
         onFocus={onFocus}
+        onChange={(_, editorRef) => handleChange(editorRef)}
         onReady={editorRef => {
           ckEditorRef.current = editorRef;
         }}
