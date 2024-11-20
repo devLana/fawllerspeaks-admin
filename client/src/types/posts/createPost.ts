@@ -14,6 +14,8 @@ export type CreatePostData = Omit<CreatePostInput, "imageBanner" | "tagIds"> & {
   imageBanner?: PostImageBanner;
 };
 
+export type StoragePostData = Partial<Omit<CreatePostData, "imageBanner">>;
+
 export interface CreatePostState {
   view: PostView;
   postData: CreatePostData;
