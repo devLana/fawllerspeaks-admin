@@ -12,6 +12,7 @@ import { useGetCachedPostTags } from "@hooks/getPostTags/useGetCachedPostTags";
 import TooltipHint from "../TooltipHint";
 import RenderSelectedPostTags from "./RenderSelectedPostTags";
 import type { CreatePostAction } from "types/posts/createPost";
+import { saveStoragePost } from "@utils/posts/storagePost";
 
 interface SelectPostTagsInputProps {
   tagIdsError: string | undefined;
@@ -51,6 +52,7 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
     const { value } = e.target;
     const selectedTags = typeof value === "string" ? value.split(",") : value;
 
+    saveStoragePost({ tagIds: selectedTags });
     dispatch({ type: "MANAGE_POST_TAGS", payload: { tagIds: selectedTags } });
   };
 

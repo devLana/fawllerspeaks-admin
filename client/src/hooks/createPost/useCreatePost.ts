@@ -5,6 +5,7 @@ import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
 import { CREATE_POST } from "@mutations/createPost/CREATE_POST";
+import { STORAGE_POST } from "@utils/posts/storagePost";
 import { SESSION_ID } from "@utils/constants";
 import type { CreatePostInput } from "@apiTypes";
 import type {
@@ -81,6 +82,7 @@ export const useCreatePost = (postData: CreatePostData) => {
             const { slug } = createData.createPost.post.url;
             const query = { create: uploadHasError };
 
+            localStorage.removeItem(STORAGE_POST);
             void push({ pathname: `/posts/view/${slug}`, query });
             break;
           }

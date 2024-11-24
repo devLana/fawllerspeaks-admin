@@ -7,6 +7,7 @@ type Reducer = (state: S, action: A) => S;
 
 export const initialState: S = {
   view: "metadata",
+  storageData: { open: false, post: {} },
   postData: { title: "", description: "", excerpt: "", content: "" },
 };
 
@@ -49,7 +50,12 @@ export const reducer: Reducer = (state, action) => {
 
     case "ADD_REQUIRED_METADATA": {
       const { metadata } = action.payload;
-      return { view: "content", postData: { ...state.postData, ...metadata } };
+
+      return {
+        ...state,
+        view: "content",
+        postData: { ...state.postData, ...metadata },
+      };
     }
 
     case "ADD_POST_CONTENT": {
@@ -61,6 +67,21 @@ export const reducer: Reducer = (state, action) => {
       const { key, value } = action.payload;
       return { ...state, postData: { ...state.postData, [key]: value } };
     }
+
+    case "SET_STORAGE_POST": {
+      const { post } = action.payload;
+      return { ...state, storageData: { open: true, post } };
+    }
+
+    case "UNSET_STORAGE_POST":
+      return { ...state, storageData: { open: false, post: {} } };
+
+    case "LOAD_STORAGE_POST":
+      return {
+        ...state,
+        postData: { ...state.postData, ...action.payload.post },
+        storageData: { open: false, post: {} },
+      };
 
     default:
       throw new Error("Unexpected action object dispatched");

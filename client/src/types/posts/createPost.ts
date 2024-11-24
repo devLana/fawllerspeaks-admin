@@ -18,10 +18,11 @@ export type StoragePostData = Partial<Omit<CreatePostData, "imageBanner">>;
 
 export interface CreatePostState {
   view: PostView;
+  storageData: { open: boolean; post: StoragePostData };
   postData: CreatePostData;
 }
 
-export type RequiredMetadataKeys = "title" | "description" | "excerpt";
+type RequiredMetadataKeys = "title" | "description" | "excerpt";
 export type RequiredPostMetadata = Pick<CreatePostData, RequiredMetadataKeys>;
 
 export type CreatePostAction =
@@ -37,6 +38,12 @@ export type CreatePostAction =
   | {
       type: "CHANGE_METADATA_FIELD";
       payload: { key: RequiredMetadataKeys; value: string };
+    }
+  | { type: "SET_STORAGE_POST"; payload: { post: StoragePostData } }
+  | { type: "UNSET_STORAGE_POST" }
+  | {
+      type: "LOAD_STORAGE_POST";
+      payload: { post: StoragePostData };
     };
 
 export interface CKEditorComponentProps {

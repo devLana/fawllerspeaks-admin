@@ -38,7 +38,7 @@ const Content = ({
   };
 
   const handleNext = () => {
-    if (content.trim().replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")) {
+    if (content.replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")) {
       handleView("preview");
     } else {
       setContentIsEmpty(true);

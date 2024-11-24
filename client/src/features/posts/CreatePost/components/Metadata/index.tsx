@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -16,10 +16,11 @@ import type {
   CreatePostAction,
   CreateStatus,
   RequiredPostMetadata,
-  RequiredMetadataKeys,
 } from "types/posts/createPost";
+import { saveStoragePost } from "@utils/posts/storagePost";
 
-type BlurEvent = React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>;
+type ChangeEvent = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
+type Keys = keyof RequiredPostMetadata;
 
 interface MetadataProps {
   title: string;
@@ -34,41 +35,40 @@ interface MetadataProps {
 }
 
 const Metadata = ({
-  title,
-  description,
-  excerpt,
   contentError,
   draftStatus,
   fileInput,
   selectPostTagsInput,
   dispatch,
   handleDraftPost,
+  ...props
 }: MetadataProps) => {
-  const { register, handleSubmit, setError, formState } =
+  const { control, handleSubmit, setError, formState } =
     useForm<RequiredPostMetadata>({
       resolver: yupResolver(metadataValidator),
-      defaultValues: { title, description, excerpt },
+      values: props,
+      mode: "onChange",
     });
 
   const handleDraft = () => {
     let hasError = false;
 
-    if (excerpt.length > 300) {
+    if (props.excerpt.length > 300) {
       const message = "Post excerpt can not be more than 300 characters";
       setError("excerpt", { message });
       hasError = true;
     }
 
-    if (description.length > 255) {
+    if (props.description.length > 255) {
       const message = "Post description can not be more than 255 characters";
       setError("description", { message });
       hasError = true;
     }
 
-    if (!title) {
+    if (!props.title) {
       setError("title", { message: "Enter post title" });
       hasError = true;
-    } else if (title.length > 255) {
+    } else if (props.title.length > 255) {
       const message = "Post title can not be more than 255 characters";
       setError("title", { message });
       hasError = true;
@@ -93,20 +93,20 @@ const Metadata = ({
     }
   };
 
-  const handleBlur = (e: BlurEvent) => {
-    const key = e.target.name as RequiredMetadataKeys;
-    const { value } = e.target;
-
-    if (value) {
-      dispatch({ type: "CHANGE_METADATA_FIELD", payload: { key, value } });
-    }
+  const handleChange = (e: ChangeEvent, onChange: (e: ChangeEvent) => void) => {
+    const { name, value } = e.target as { name: Keys; value: string };
+    onChange(e);
+    dispatch({ type: "CHANGE_METADATA_FIELD", payload: { key: name, value } });
   };
 
   const submitHandler = (values: RequiredPostMetadata) => {
+    saveStoragePost(values);
     dispatch({ type: "ADD_REQUIRED_METADATA", payload: { metadata: values } });
   };
 
-  const { errors, defaultValues } = formState;
+  const ariaId = (id: Keys) => {
+    return formState.errors[id] ? `${id}-helper-text` : undefined;
+  };
 
   return (
     <Box
@@ -120,7 +120,7 @@ const Metadata = ({
         Provide post metadata
       </Typography>
       <form
-        aria-label="Post metadata"
+        aria-labelledby="post-metadata-label"
         onSubmit={handleSubmit(submitHandler)}
         noValidate
       >
@@ -133,24 +133,27 @@ const Metadata = ({
         )}
         {metadataTextBoxes.map(({ id, label, hint }) => (
           <TooltipHint key={id} hint={hint}>
-            <TextField
-              type="text"
-              {...register(id)}
-              onBlur={handleBlur}
-              id={id}
+            <Controller
               name={id}
-              autoComplete="on"
-              autoFocus={id === "title"}
-              fullWidth
-              label={label}
-              defaultValue={defaultValues?.[id] ?? ""}
-              inputProps={{
-                "aria-errormessage": errors[id]
-                  ? `${id}-helper-text`
-                  : undefined,
-              }}
-              error={!!errors[id]}
-              helperText={errors[id]?.message ?? null}
+              control={control}
+              render={({ field: { onChange, ...rest } }) => (
+                <TextField
+                  type="text"
+                  {...rest}
+                  onChange={e => handleChange(e, onChange)}
+                  id={id}
+                  autoComplete="on"
+                  autoFocus={id === "title"}
+                  fullWidth
+                  label={label}
+                  inputProps={{
+                    "aria-errormessage": ariaId(id),
+                    "aria-describedby": ariaId(id),
+                  }}
+                  error={!!formState.errors[id]}
+                  helperText={formState.errors[id]?.message ?? null}
+                />
+              )}
             />
           </TooltipHint>
         ))}

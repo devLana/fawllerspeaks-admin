@@ -5,14 +5,16 @@ import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
 import { DRAFT_POST } from "@mutations/createPost/DRAFT_POST";
+import { saveStoragePost, STORAGE_POST } from "@utils/posts/storagePost";
 import { SESSION_ID } from "@utils/constants";
+import type { DraftPostInput } from "@apiTypes";
+import type { RemoveNull } from "@types";
 import type {
   CreateInputErrors,
   CreatePostData,
   CreateStatus,
   DraftErrorCb,
-} from "../../types/posts/createPost";
-import type { DraftPostInput } from "@apiTypes";
+} from "types/posts/createPost";
 
 export const useDraftPost = (postData: CreatePostData) => {
   const [draftStatus, setDraftStatus] = React.useState<CreateStatus>("idle");
@@ -27,7 +29,7 @@ export const useDraftPost = (postData: CreatePostData) => {
 
     let uploadHasError = false;
 
-    const post: DraftPostInput = {
+    const post: RemoveNull<DraftPostInput> = {
       title: postData.title,
       ...(postData.description && { description: postData.description }),
       ...(postData.excerpt && { excerpt: postData.excerpt }),
@@ -52,6 +54,7 @@ export const useDraftPost = (postData: CreatePostData) => {
           case "AuthenticationError": {
             const query = { status: "unauthenticated", redirectTo: pathname };
 
+            saveStoragePost(post);
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void replace({ pathname: "/login", query });
@@ -60,6 +63,8 @@ export const useDraftPost = (postData: CreatePostData) => {
 
           case "RegistrationError": {
             const query = { status: "unregistered", redirectTo: pathname };
+
+            saveStoragePost(post);
             void replace({ pathname: "/register", query });
             break;
           }
@@ -67,6 +72,7 @@ export const useDraftPost = (postData: CreatePostData) => {
           case "NotAllowedError": {
             const query = { status: "unauthorized" };
 
+            saveStoragePost(post);
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void replace({ pathname: "/login", query });
@@ -94,6 +100,7 @@ export const useDraftPost = (postData: CreatePostData) => {
             const { slug } = draftData.draftPost.post.url;
             const query = { draft: uploadHasError };
 
+            localStorage.removeItem(STORAGE_POST);
             void push({ pathname: `/posts/view/${slug}`, query });
             break;
           }
