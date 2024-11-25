@@ -1,6 +1,5 @@
+import { STORAGE_POST } from "../constants";
 import type { StoragePostData } from "types/posts/createPost";
-
-export const STORAGE_POST = "storage_post";
 
 export const getStoragePost = (): StoragePostData | null => {
   const storagePost = localStorage.getItem(STORAGE_POST);

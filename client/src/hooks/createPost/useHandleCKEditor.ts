@@ -1,8 +1,11 @@
 import * as React from "react";
-import type CustomEditor from "ckeditor5-custom-build";
+
 import { useMutation } from "@apollo/client";
+
 import { DELETE_POST_CONTENT_IMAGES } from "@mutations/deletePostContentImages/DELETE_POST_CONTENT_IMAGES";
 import { saveStoragePost } from "@utils/posts/storagePost";
+import { SUPABASE_HOST } from "@utils/posts/constants";
+import type CustomEditor from "ckeditor5-custom-build";
 
 const useHandleCKEditor = () => {
   const savedImageUrls = React.useRef(new Set<string>());
@@ -17,7 +20,6 @@ const useHandleCKEditor = () => {
   const [deleteImages] = useMutation(DELETE_POST_CONTENT_IMAGES);
 
   return (editorRef: CustomEditor) => {
-    const SUPABASE_HOST = "https://soeoohvasnrkaxvjduim.supabase.co";
     const root = editorRef.model.document.getRoot();
     const content = editorRef.getData().replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "");
 

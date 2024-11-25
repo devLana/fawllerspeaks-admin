@@ -5,8 +5,9 @@ import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
 import { DRAFT_POST } from "@mutations/createPost/DRAFT_POST";
-import { saveStoragePost, STORAGE_POST } from "@utils/posts/storagePost";
+import { saveStoragePost } from "@utils/posts/storagePost";
 import { SESSION_ID } from "@utils/constants";
+import { STORAGE_POST } from "@utils/posts/constants";
 import type { DraftPostInput } from "@apiTypes";
 import type { RemoveNull } from "@types";
 import type {
@@ -27,8 +28,6 @@ export const useDraftPost = (postData: CreatePostData) => {
   const handleDraftPost = async (errorCb?: DraftErrorCb) => {
     setDraftStatus("loading");
 
-    let uploadHasError = false;
-
     const post: RemoveNull<DraftPostInput> = {
       title: postData.title,
       ...(postData.description && { description: postData.description }),
@@ -36,6 +35,8 @@ export const useDraftPost = (postData: CreatePostData) => {
       ...(postData.content && { content: postData.content }),
       ...(postData.tagIds && { tagIds: postData.tagIds }),
     };
+
+    let uploadHasError = false;
 
     if (postData.imageBanner) {
       const imageData = await upload(postData.imageBanner.file, "postBanner");
