@@ -136,7 +136,7 @@ const Metadata = ({
             <Controller
               name={id}
               control={control}
-              render={({ field: { onChange, ...rest } }) => (
+              render={({ field: { onChange, ref, ...rest } }) => (
                 <TextField
                   type="text"
                   {...rest}
@@ -146,6 +146,7 @@ const Metadata = ({
                   autoFocus={id === "title"}
                   fullWidth
                   label={label}
+                  inputRef={ref}
                   inputProps={{
                     "aria-errormessage": ariaId(id),
                     "aria-describedby": ariaId(id),
