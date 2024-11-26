@@ -5,7 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import useDeletePostContentImages from "@hooks/deletePostContentImages/useDeletePostContentImages";
 import { STORAGE_POST, SUPABASE_HOST } from "@utils/posts/constants";
 import { getStoragePost } from "@utils/posts/storagePost";
-import type { CreatePostAction, StoragePostData } from "types/posts/createPost";
+import type { CreatePostAction } from "types/posts/createPost";
 
 interface StorageAlertActionsProps {
   dispatch: React.Dispatch<CreatePostAction>;
@@ -15,16 +15,21 @@ const StorageAlertActions = ({ dispatch }: StorageAlertActionsProps) => {
   const [deleteImages] = useDeletePostContentImages();
 
   const handleContinue = () => {
-    const post = getStoragePost() as StoragePostData;
-    dispatch({ type: "LOAD_STORAGE_POST", payload: { post } });
+    const post = getStoragePost();
+
+    if (post) {
+      dispatch({ type: "LOAD_STORAGE_POST", payload: { post } });
+    } else {
+      dispatch({ type: "HIDE_STORAGE_POST_ALERT" });
+    }
   };
 
   const handleCancel = () => {
-    const { content } = getStoragePost() as StoragePostData;
+    const post = getStoragePost();
 
-    if (content) {
+    if (post?.content) {
       const domParser = new DOMParser();
-      const doc = domParser.parseFromString(content, "text/html");
+      const doc = domParser.parseFromString(post.content, "text/html");
       const imgs = doc.querySelectorAll<HTMLImageElement>("img");
       const imgElements = Array.from(imgs);
 
