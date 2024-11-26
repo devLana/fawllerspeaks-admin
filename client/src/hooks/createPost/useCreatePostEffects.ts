@@ -10,9 +10,7 @@ const useCreatePostEffects = (
   React.useEffect(() => {
     const post = getStoragePost();
 
-    if (post) {
-      dispatch({ type: "SET_STORAGE_POST", payload: { post } });
-    }
+    if (post) dispatch({ type: "SHOW_STORAGE_POST_ALERT" });
   }, [dispatch]);
 
   React.useEffect(() => {

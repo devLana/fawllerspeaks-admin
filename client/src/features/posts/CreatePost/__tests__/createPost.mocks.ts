@@ -34,6 +34,15 @@ export const draftBtn = { name: /^save as draft$/i };
 export const draftErrors = { name: /^draft post errors$/i };
 export const draftErrorsBtn = { name: /^close draft post errors list$/i };
 export const loadSavedPost = { name: /^Continue with unfinished post$/i };
+export const deleteSavedPost = { name: /^Delete unfinished post$/i };
+
+export const storagePost = {
+  title: "Post Title",
+  description: "Post Description",
+  excerpt: "Post Excerpt",
+  tagIds: ["1", "3", "5"],
+  content: html,
+};
 
 export const tagName = (index: number) => ({
   name: new RegExp(`^${postTags[index]}$`),

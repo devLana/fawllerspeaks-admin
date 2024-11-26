@@ -42,16 +42,19 @@ describe("Create Post", () => {
 
         expect(getStoragePost).toHaveBeenCalledOnce();
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByRole("button", mocks.loadSavedPost)
+        ).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByRole("button", mocks.deleteSavedPost)
+        ).not.toBeInTheDocument();
       });
 
       it("A post is saved in localStorage, Expect UI input elements to be updated with the saved post values", async () => {
-        mockFn.mockReturnValueOnce({
-          title: "Post Title",
-          description: "Post Description",
-          excerpt: "Post Excerpt",
-          tagIds: ["1", "3", "5"],
-          content: mocks.html,
-        });
+        mockFn.mockReturnValueOnce(mocks.storagePost);
+        mockFn.mockReturnValueOnce(mocks.storagePost);
 
         const { user } = renderUI(<CreatePostPage />);
 

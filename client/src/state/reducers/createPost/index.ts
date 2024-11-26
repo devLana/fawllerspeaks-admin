@@ -7,7 +7,7 @@ type Reducer = (state: S, action: A) => S;
 
 export const initialState: S = {
   view: "metadata",
-  storageData: { open: false, post: {} },
+  showStoragePostAlert: false,
   postData: { title: "", description: "", excerpt: "", content: "" },
 };
 
@@ -68,19 +68,17 @@ export const reducer: Reducer = (state, action) => {
       return { ...state, postData: { ...state.postData, [key]: value } };
     }
 
-    case "SET_STORAGE_POST": {
-      const { post } = action.payload;
-      return { ...state, storageData: { open: true, post } };
-    }
+    case "SHOW_STORAGE_POST_ALERT":
+      return { ...state, showStoragePostAlert: true };
 
-    case "UNSET_STORAGE_POST":
-      return { ...state, storageData: { open: false, post: {} } };
+    case "HIDE_STORAGE_POST_ALERT":
+      return { ...state, showStoragePostAlert: false };
 
     case "LOAD_STORAGE_POST":
       return {
-        ...state,
+        view: "metadata",
+        showStoragePostAlert: false,
         postData: { ...state.postData, ...action.payload.post },
-        storageData: { open: false, post: {} },
       };
 
     default:

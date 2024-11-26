@@ -77,14 +77,9 @@ const CreatePostPage: NextPageWithLayout = () => {
         onClose={draft.handleCloseError}
       />
       <Snackbar
-        open={state.storageData.open}
+        open={state.showStoragePostAlert}
         message="It seems you have an unfinished post. Would you like to continue from where you stopped? Doing so will overwrite your current progress"
-        action={
-          <StorageAlertActions
-            dispatch={dispatch}
-            storagePost={state.storageData.post}
-          />
-        }
+        action={<StorageAlertActions dispatch={dispatch} />}
         ContentProps={{
           sx: { "&>.MuiSnackbarContent-action": { columnGap: 0.5 } },
         }}

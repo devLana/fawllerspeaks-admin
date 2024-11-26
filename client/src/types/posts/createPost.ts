@@ -18,7 +18,7 @@ export type StoragePostData = Partial<Omit<CreatePostData, "imageBanner">>;
 
 export interface CreatePostState {
   view: PostView;
-  storageData: { open: boolean; post: StoragePostData };
+  showStoragePostAlert: boolean;
   postData: CreatePostData;
 }
 
@@ -39,8 +39,8 @@ export type CreatePostAction =
       type: "CHANGE_METADATA_FIELD";
       payload: { key: RequiredMetadataKeys; value: string };
     }
-  | { type: "SET_STORAGE_POST"; payload: { post: StoragePostData } }
-  | { type: "UNSET_STORAGE_POST" }
+  | { type: "SHOW_STORAGE_POST_ALERT" }
+  | { type: "HIDE_STORAGE_POST_ALERT" }
   | {
       type: "LOAD_STORAGE_POST";
       payload: { post: StoragePostData };

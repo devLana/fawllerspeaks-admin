@@ -1,28 +1,26 @@
-import { useMutation } from "@apollo/client";
 import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { DELETE_POST_CONTENT_IMAGES } from "@mutations/deletePostContentImages/DELETE_POST_CONTENT_IMAGES";
+import useDeletePostContentImages from "@hooks/deletePostContentImages/useDeletePostContentImages";
 import { STORAGE_POST, SUPABASE_HOST } from "@utils/posts/constants";
+import { getStoragePost } from "@utils/posts/storagePost";
 import type { CreatePostAction, StoragePostData } from "types/posts/createPost";
 
 interface StorageAlertActionsProps {
   dispatch: React.Dispatch<CreatePostAction>;
-  storagePost: StoragePostData;
 }
 
-const StorageAlertActions = (props: StorageAlertActionsProps) => {
-  const { dispatch, storagePost } = props;
-
-  const [deleteImages] = useMutation(DELETE_POST_CONTENT_IMAGES);
+const StorageAlertActions = ({ dispatch }: StorageAlertActionsProps) => {
+  const [deleteImages] = useDeletePostContentImages();
 
   const handleContinue = () => {
-    dispatch({ type: "LOAD_STORAGE_POST", payload: { post: storagePost } });
+    const post = getStoragePost() as StoragePostData;
+    dispatch({ type: "LOAD_STORAGE_POST", payload: { post } });
   };
 
   const handleCancel = () => {
-    const { content } = storagePost;
+    const { content } = getStoragePost() as StoragePostData;
 
     if (content) {
       const domParser = new DOMParser();
@@ -44,7 +42,7 @@ const StorageAlertActions = (props: StorageAlertActionsProps) => {
     }
 
     localStorage.removeItem(STORAGE_POST);
-    dispatch({ type: "UNSET_STORAGE_POST" });
+    dispatch({ type: "HIDE_STORAGE_POST_ALERT" });
   };
 
   return (

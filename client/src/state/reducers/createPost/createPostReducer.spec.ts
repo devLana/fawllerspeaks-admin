@@ -41,7 +41,7 @@ describe("Create Post - State Reducer", () => {
 
       expect(result).toStrictEqual({
         view: "content",
-        storageData: { open: false, post: {} },
+        showStoragePostAlert: false,
         postData: { ...data, content: "" },
       });
     });
@@ -58,8 +58,7 @@ describe("Create Post - State Reducer", () => {
       });
 
       expect(result).toStrictEqual({
-        view: "metadata",
-        storageData: { open: false, post: {} },
+        ...state,
         postData: { ...state.postData, description: "new description" },
       });
     });
@@ -76,7 +75,7 @@ describe("Create Post - State Reducer", () => {
 
       expect(result).toStrictEqual({
         view: "metadata",
-        storageData: { open: false, post: {} },
+        showStoragePostAlert: false,
         postData: {
           ...state.postData,
           imageBanner: {
@@ -111,8 +110,7 @@ describe("Create Post - State Reducer", () => {
       });
 
       expect(result).toStrictEqual({
-        view: "metadata",
-        storageData: { open: false, post: {} },
+        ...state,
         postData: { ...state.postData, tagIds: ["id-1", "id-2", "id-3"] },
       });
     });
@@ -135,8 +133,7 @@ describe("Create Post - State Reducer", () => {
       });
 
       expect(result).toStrictEqual({
-        view: "metadata",
-        storageData: { open: false, post: {} },
+        ...state,
         postData: { ...state.postData, content },
       });
 
@@ -154,42 +151,27 @@ describe("Create Post - State Reducer", () => {
     };
 
     it("Should set 'storagePost' state", () => {
-      const result = reducer(state, {
-        type: "SET_STORAGE_POST",
-        payload: { post },
-      });
+      const result = reducer(state, { type: "SHOW_STORAGE_POST_ALERT" });
 
-      expect(result).toStrictEqual({
-        view: "metadata",
-        storageData: { open: true, post },
-        postData: { title: "", description: "", excerpt: "", content: "" },
-      });
+      expect(result).toStrictEqual({ ...state, showStoragePostAlert: true });
     });
 
     it("Should unset 'storagePost' state", () => {
-      const initState = { ...state, storageData: { open: true, post } };
-      const result = reducer(initState, { type: "UNSET_STORAGE_POST" });
+      const initState = { ...state, showStoragePostAlert: true };
+      const result = reducer(initState, { type: "HIDE_STORAGE_POST_ALERT" });
 
-      expect(result).toStrictEqual({
-        view: "metadata",
-        storageData: { open: false, post: {} },
-        postData: { title: "", description: "", excerpt: "", content: "" },
-      });
+      expect(result).toStrictEqual(state);
     });
 
     it("Should load 'storagePost' state into 'postData' state", () => {
-      const initState = { ...state, storageData: { open: true, post } };
+      const initState = { ...state, showStoragePostAlert: true };
 
       const result = reducer(initState, {
         type: "LOAD_STORAGE_POST",
         payload: { post },
       });
 
-      expect(result).toStrictEqual({
-        view: "metadata",
-        storageData: { open: false, post: {} },
-        postData: post,
-      });
+      expect(result).toStrictEqual({ ...state, postData: post });
     });
   });
 });

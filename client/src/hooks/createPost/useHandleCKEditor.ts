@@ -1,8 +1,6 @@
 import * as React from "react";
 
-import { useMutation } from "@apollo/client";
-
-import { DELETE_POST_CONTENT_IMAGES } from "@mutations/deletePostContentImages/DELETE_POST_CONTENT_IMAGES";
+import useDeletePostContentImages from "@hooks/deletePostContentImages/useDeletePostContentImages";
 import { saveStoragePost } from "@utils/posts/storagePost";
 import { SUPABASE_HOST } from "@utils/posts/constants";
 import type CustomEditor from "ckeditor5-custom-build";
@@ -17,7 +15,7 @@ const useHandleCKEditor = () => {
     };
   }, []);
 
-  const [deleteImages] = useMutation(DELETE_POST_CONTENT_IMAGES);
+  const [deleteImages] = useDeletePostContentImages();
 
   return (editorRef: CustomEditor) => {
     const root = editorRef.model.document.getRoot();
