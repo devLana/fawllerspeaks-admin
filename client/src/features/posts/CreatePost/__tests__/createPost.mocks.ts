@@ -24,7 +24,7 @@ export const excerpt = { name: /^post excerpt$/i };
 export const content = { name: /^editor editing area/i };
 export const metadataNext = { name: /^proceed to post content$/i };
 export const contentNext = { name: /^preview post$/i };
-export const meta = { name: /^provide post metadata$/i };
+export const metadata = { name: /^provide post metadata$/i };
 export const cont = { name: /^provide post content$/i };
 export const prevs = { name: /^preview blog post$/i };
 export const previewBtn = { name: /^publish post$/i };
@@ -33,6 +33,7 @@ export const contBack = { name: /^Go back to provide post metadata section$/i };
 export const draftBtn = { name: /^save as draft$/i };
 export const draftErrors = { name: /^draft post errors$/i };
 export const draftErrorsBtn = { name: /^close draft post errors list$/i };
+export const loadSavedPost = { name: /^Continue with unfinished post$/i };
 
 export const tagName = (index: number) => ({
   name: new RegExp(`^${postTags[index]}$`),

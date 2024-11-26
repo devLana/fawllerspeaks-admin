@@ -160,20 +160,16 @@ describe("Create Post - Preview", () => {
 
         const dialog = screen.getByRole("dialog", mocks.dialog);
 
-        await user.click(within(dialog).getByRole("button", mocks.publish));
+        await user.click(within(dialog).getByRole("button", mocks.pub));
 
-        expect(
-          within(dialog).getByRole("button", mocks.publish)
-        ).toBeDisabled();
+        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
         expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
 
         await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
 
         expect(router.replace).toHaveBeenCalledWith(url);
         expect(dialog).toBeInTheDocument();
-        expect(
-          within(dialog).getByRole("button", mocks.publish)
-        ).toBeDisabled();
+        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
         expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
       });
     });
@@ -186,11 +182,9 @@ describe("Create Post - Preview", () => {
 
         const dialog = screen.getByRole("dialog", mocks.dialog);
 
-        await user.click(within(dialog).getByRole("button", mocks.publish));
+        await user.click(within(dialog).getByRole("button", mocks.pub));
 
-        expect(
-          within(dialog).getByRole("button", mocks.publish)
-        ).toBeDisabled();
+        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
         expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
 
         await waitForElementToBeRemoved(dialog);
@@ -207,11 +201,9 @@ describe("Create Post - Preview", () => {
 
         const dialog = screen.getByRole("dialog", mocks.dialog);
 
-        await user.click(within(dialog).getByRole("button", mocks.publish));
+        await user.click(within(dialog).getByRole("button", mocks.pub));
 
-        expect(
-          within(dialog).getByRole("button", mocks.publish)
-        ).toBeDisabled();
+        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
         expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
 
         await waitForElementToBeRemoved(dialog);
@@ -233,11 +225,9 @@ describe("Create Post - Preview", () => {
 
         const dialog = screen.getByRole("dialog", mocks.dialog);
 
-        await user.click(within(dialog).getByRole("button", mocks.publish));
+        await user.click(within(dialog).getByRole("button", mocks.pub));
 
-        expect(
-          within(dialog).getByRole("button", mocks.publish)
-        ).toBeDisabled();
+        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
         expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
 
         await waitForElementToBeRemoved(dialog);
@@ -281,20 +271,16 @@ describe("Create Post - Preview", () => {
 
         const dialog = screen.getByRole("dialog", mocks.dialog);
 
-        await user.click(within(dialog).getByRole("button", mocks.publish));
+        await user.click(within(dialog).getByRole("button", mocks.pub));
 
-        expect(
-          within(dialog).getByRole("button", mocks.publish)
-        ).toBeDisabled();
+        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
         expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
 
         await waitFor(() => expect(push).toHaveBeenCalledOnce());
 
         expect(push).toHaveBeenCalledWith(url);
         expect(dialog).toBeInTheDocument();
-        expect(
-          within(dialog).getByRole("button", mocks.publish)
-        ).toBeDisabled();
+        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
         expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
       });
     });

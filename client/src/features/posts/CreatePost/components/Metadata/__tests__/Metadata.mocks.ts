@@ -25,11 +25,8 @@ export const descriptionMsg =
 export const postTagsErrorMsg =
   "You can't add post tags to this post at the moment. Please try again later";
 
-const tags = [
-  testPostTag("Tag 1", "1"),
-  testPostTag("Tag 2", "2"),
-  testPostTag("Tag 3", "3"),
-];
+const testTags = ["Tag 1", "Tag 2", "Tag 3"];
+const tags = testTags.map((tag, index) => testPostTag(tag, `${index + 1}`));
 
 export const server = setupServer(
   graphql.query(GET_POST_TAGS, async () => {

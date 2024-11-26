@@ -40,7 +40,7 @@ export const menuDraft = { name: /^save post as draft$/i };
 export const dialog = { name: /^publish blog post$/i };
 export const cancel = { name: /^cancel$/i };
 export const create = { name: /^publish post$/i };
-export const publish = { name: /^publish$/i };
+export const pub = { name: /^publish$/i };
 export const file = new File(["bar"], "bar.jpg", { type: "image/jpeg" });
 export const blobUrl = window.URL.createObjectURL(file);
 

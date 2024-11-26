@@ -5,6 +5,7 @@ import * as mocks from "./Content.mocks";
 import { renderUI } from "@utils/tests/renderUI";
 
 vi.mock("../CKEditorComponent");
+vi.mock("@utils/posts/storagePost");
 
 describe("Create Post - Content", () => {
   const mockDispatch = vi.fn().mockName("dispatch");
