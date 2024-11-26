@@ -1,4 +1,5 @@
-import { STORAGE_POST, getStoragePost, saveStoragePost } from ".";
+import { getStoragePost, saveStoragePost } from ".";
+import { STORAGE_POST } from "../constants";
 
 describe("LocalStorage Post Data", () => {
   const postData = {
