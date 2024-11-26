@@ -9,12 +9,12 @@ import { saveStoragePost } from "@utils/posts/storagePost";
 import { SESSION_ID } from "@utils/constants";
 import { STORAGE_POST } from "@utils/posts/constants";
 import type { DraftPostInput } from "@apiTypes";
-import type { RemoveNull } from "@types";
 import type {
   CreateInputErrors,
   CreatePostData,
   CreateStatus,
   DraftErrorCb,
+  RemoveNull,
 } from "types/posts/createPost";
 
 export const useDraftPost = (postData: CreatePostData) => {

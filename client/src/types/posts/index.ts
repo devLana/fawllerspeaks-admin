@@ -1,18 +1,14 @@
-import type { Query, Mutation, Post } from "@apiTypes";
+import type { Post } from "@apiTypes";
 import type { PostTagData } from "types/postTags";
 
-export type ModifiedPost = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
+export type PostData = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
 
 type PostDataHelper<T extends object> = T extends { posts: Post[] }
-  ? Omit<T, "posts"> & { posts: ModifiedPost[] }
+  ? Omit<T, "posts"> & { posts: PostData[] }
   : T extends { post: Post }
-  ? Omit<T, "post"> & { post: ModifiedPost }
+  ? Omit<T, "post"> & { post: PostData }
   : T;
 
-type PostDataMapper<T extends Record<string, object>> = {
+export type PostDataMapper<T extends Record<string, object>> = {
   [Key in keyof T]: PostDataHelper<T[Key]>;
 };
-
-export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
-export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
-export type GetPostData = PostDataMapper<Pick<Query, "getPost">>;

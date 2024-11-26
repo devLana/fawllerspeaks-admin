@@ -8,9 +8,9 @@ import PostTableOfContents from "./PostTableOfContents";
 import PostContentHeader from "./PostContentHeader";
 import PostImageBanner from "@features/posts/components/PostImageBanner";
 import PostContentView from "@features/posts/components/PostContentView";
-import type { ModifiedPost } from "types/posts";
+import type { PostData } from "types/posts";
 
-const Post = ({ label, post }: { label: string; post: ModifiedPost }) => (
+const Post = ({ label, post }: { label: string; post: PostData }) => (
   <PostWrapper label={label}>
     <PostHeader slug={post.url.slug} status={post.status} title={post.title} />
     <Typography variant="h1" align="center" gutterBottom>

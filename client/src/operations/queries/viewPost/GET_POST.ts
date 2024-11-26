@@ -2,9 +2,9 @@ import { gql, type TypedDocumentNode } from "@apollo/client";
 
 import { POST_FIELDS } from "@fragments/POST";
 import type { QueryGetPostArgs } from "@apiTypes";
-import type { GetPostData } from "types/posts";
+import type { ViewPostData } from "types/posts/viewPost";
 
-type GetPost = TypedDocumentNode<GetPostData, QueryGetPostArgs>;
+type GetPost = TypedDocumentNode<ViewPostData, QueryGetPostArgs>;
 
 export const GET_POST: GetPost = gql`
   ${POST_FIELDS}

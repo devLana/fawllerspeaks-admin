@@ -5,7 +5,8 @@ import type { Cache } from "@apollo/client/cache/core/types/Cache";
 
 import { GET_POST } from "@queries/viewPost/GET_POST";
 import { mswData, mswErrors } from "@utils/tests/msw";
-import type { GetPostData, ModifiedPost } from "types/posts";
+import type { PostData } from "types/posts";
+import type { ViewPostData } from "types/posts/viewPost";
 
 const testSlug = (prefix: string) => `${prefix}-test-post-slug`;
 export const region = { name: /^view post page$/i };
@@ -15,12 +16,12 @@ export const postSlug = testSlug("blog-post");
 
 const slugMsg = "Invalid slug format provided";
 const warningMsg = "Blog post not found";
-const gqlMsg = "Graphql server error ocurred";
+const gqlMsg = "Graphql server error occurred";
 
 const MESSAGE =
   "You are unable to view this post at the moment. Please try again later";
 
-const post: ModifiedPost = {
+const post: PostData = {
   __typename: "Post",
   id: "id-1",
   title: "Blog Post Test Post Slug",
@@ -52,7 +53,7 @@ const post: ModifiedPost = {
   tags: null,
 };
 
-export const writePost: Cache.WriteQueryOptions<GetPostData, object> = {
+export const writePost: Cache.WriteQueryOptions<ViewPostData, object> = {
   query: GET_POST,
   data: { getPost: { __typename: "SinglePost", post, status: "SUCCESS" } },
 };

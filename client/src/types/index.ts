@@ -43,7 +43,3 @@ export type RefetchQueriesFn<T extends object> = Extract<
 
 export type OnCompleted<T extends object> = MutationOptions<T>["onCompleted"];
 export type OnError = MutationOptions["onError"];
-
-export type RemoveNull<T extends object> = {
-  [Prop in keyof T]: NonNullable<T[Prop]>;
-};

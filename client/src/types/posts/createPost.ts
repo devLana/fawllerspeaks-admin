@@ -1,6 +1,9 @@
-import type { CreatePostInput, PostValidationError } from "@apiTypes";
+import type { CreatePostInput, Mutation, PostValidationError } from "@apiTypes";
 import type { Status } from "@types";
+import type { PostDataMapper } from ".";
 
+export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
+export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
 export type CreateStatus = Status | "inputError";
 export type PostView = "metadata" | "content" | "preview";
 
@@ -14,8 +17,6 @@ export type CreatePostData = Omit<CreatePostInput, "imageBanner" | "tagIds"> & {
   imageBanner?: PostImageBanner;
 };
 
-export type StoragePostData = Partial<Omit<CreatePostData, "imageBanner">>;
-
 export interface CreatePostState {
   view: PostView;
   showStoragePostAlert: boolean;
@@ -24,6 +25,7 @@ export interface CreatePostState {
 
 type RequiredMetadataKeys = "title" | "description" | "excerpt";
 export type RequiredPostMetadata = Pick<CreatePostData, RequiredMetadataKeys>;
+export type StoragePostData = Partial<Omit<CreatePostData, "imageBanner">>;
 
 export type CreatePostAction =
   | { type: "CHANGE_VIEW"; payload: { view: PostView } }
@@ -60,3 +62,7 @@ type CreateErrorParam = Pick<PostValidationError, MetadataErrorKeys>;
 type CreateErrorKeys = keyof Omit<PostValidationError, "__typename" | "status">;
 export type DraftErrorCb = (errors: CreateErrorParam) => void;
 export type CreateInputErrors = { [Key in CreateErrorKeys]?: string };
+
+export type RemoveNull<T extends object> = {
+  [Prop in keyof T]: NonNullable<T[Prop]>;
+};

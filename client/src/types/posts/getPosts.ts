@@ -1,5 +1,5 @@
 import type { GetPosts, GetPostsData, Post } from "@apiTypes";
-import type { ModifiedPost } from "types/posts";
+import type { PostData } from "types/posts";
 
 type PostsPageDataKeys =
   | "id"
@@ -16,9 +16,9 @@ type ValidationErrorKeys =
   | "postTagError";
 
 export type PostsView = "list" | "grid";
-export type PostItemSlug = Pick<ModifiedPost["url"], "slug">;
+export type PostItemSlug = Pick<PostData["url"], "slug">;
 
-export type PostsPagePostData = Pick<ModifiedPost, PostsPageDataKeys> & {
+export type PostsPagePostData = Pick<PostData, PostsPageDataKeys> & {
   url: PostItemSlug;
 };
 

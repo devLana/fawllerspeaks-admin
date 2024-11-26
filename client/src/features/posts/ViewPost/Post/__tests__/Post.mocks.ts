@@ -1,5 +1,5 @@
 import { testPostTag } from "@utils/tests/testPostTag";
-import type { ModifiedPost } from "types/posts";
+import type { PostData } from "types/posts";
 
 export const status = /^Test Blog Post blog post status$/i;
 export const heading = { name: /^Test Blog Post$/i };
@@ -16,7 +16,7 @@ export const postTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Tag 6"];
 const tags = postTags.map((items, index) => testPostTag(items, `${index + 1}`));
 
 type Post = {
-  [Prop in keyof ModifiedPost]-?: NonNullable<ModifiedPost[Prop]>;
+  [Prop in keyof PostData]-?: NonNullable<PostData[Prop]>;
 };
 
 export const post: Post = {
