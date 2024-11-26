@@ -34,7 +34,7 @@ describe("View Post Page", () => {
       expect(screen.getByRole("region", mocks.region)).toContainHTML(mocks.htm);
 
       expect(
-        screen.queryByRole("progressbar", mocks.page)
+        screen.queryByRole("progressbar", mocks.load)
       ).not.toBeInTheDocument();
     });
   });
@@ -48,12 +48,12 @@ describe("View Post Page", () => {
 
         renderUI(<ViewPost />);
 
-        expect(screen.getByRole("progressbar", mocks.page)).toBeInTheDocument();
+        expect(screen.getByRole("progressbar", mocks.load)).toBeInTheDocument();
 
         await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
 
         expect(router.replace).toHaveBeenCalledWith(url);
-        expect(screen.getByRole("progressbar", mocks.page)).toBeInTheDocument();
+        expect(screen.getByRole("progressbar", mocks.load)).toBeInTheDocument();
       });
     });
 
@@ -65,11 +65,11 @@ describe("View Post Page", () => {
 
         renderUI(<ViewPost />);
 
-        expect(screen.getByRole("progressbar", mocks.page)).toBeInTheDocument();
+        expect(screen.getByRole("progressbar", mocks.load)).toBeInTheDocument();
         expect(await screen.findByRole("status")).toHaveTextContent(message);
 
         expect(
-          screen.queryByRole("progressbar", mocks.page)
+          screen.queryByRole("progressbar", mocks.load)
         ).not.toBeInTheDocument();
       });
     });
@@ -82,11 +82,11 @@ describe("View Post Page", () => {
 
         renderUI(<ViewPost />);
 
-        expect(screen.getByRole("progressbar", mocks.page)).toBeInTheDocument();
+        expect(screen.getByRole("progressbar", mocks.load)).toBeInTheDocument();
         expect(await screen.findByText(/^view post$/i)).toBeInTheDocument();
 
         expect(
-          screen.queryByRole("progressbar", mocks.page)
+          screen.queryByRole("progressbar", mocks.load)
         ).not.toBeInTheDocument();
       });
     });

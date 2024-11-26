@@ -9,8 +9,8 @@ import type { PostData } from "types/posts";
 import type { ViewPostData } from "types/posts/viewPost";
 
 const testSlug = (prefix: string) => `${prefix}-test-post-slug`;
+export const load = { name: /^loading view post page$/i };
 export const region = { name: /^view post page$/i };
-export const page = { name: /^view post page$/i };
 export const htm = "<span>View Post</span>";
 export const postSlug = testSlug("blog-post");
 

@@ -16,12 +16,12 @@ interface PostsProps {
   postsData: PostsPageData;
 }
 
-const Posts = ({ id: labelId, postsData }: PostsProps) => {
+const Posts = ({ id, postsData }: PostsProps) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const isLoadingMore = false;
 
   return (
-    <PostsWrapper id={labelId} ariaBusy={false}>
+    <PostsWrapper id={id} ariaBusy={false}>
       <Box
         sx={{
           mb: 5,
