@@ -29,7 +29,7 @@ const PreviewDialog = (props: PreviewDialogProps) => {
       </DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ textAlign: "center" }}>
-          Create and publish your blog post, making it public for your readers
+          Create and publish this blog post, making it public for your readers
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center", pb: 2 }}>

@@ -31,7 +31,18 @@ const PostsToolbar = ({
 
   const checkboxRef = useSelectAllCheckbox(postsSelected, posts.length);
   const allSelected = postsSelected === posts.length;
-  const label = selectedPostsIds.length === 1 ? "post" : "all selected posts";
+  let label: string;
+
+  if (selectedPostsIds.length === 1) {
+    label = "post";
+  } else if (
+    postsSelected === posts.length &&
+    postsSelected === selectedPostsIds.length
+  ) {
+    label = "all posts on this page";
+  } else {
+    label = "all selected posts";
+  }
 
   const handleSelect = (shouldSelectAll: boolean) => {
     dispatch({ type: "SELECT_ALL_POSTS", payload: { shouldSelectAll, posts } });
@@ -48,7 +59,7 @@ const PostsToolbar = ({
   };
 
   return (
-    <Toolbar disableGutters variant="dense" sx={{ mb: 2, columnGap: 2 }}>
+    <Toolbar disableGutters variant="dense" sx={{ mb: 4 }}>
       <Checkbox
         inputRef={checkboxRef}
         id="all-posts-checkbox"
