@@ -107,6 +107,12 @@ describe("Middleware Service", () => {
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledTimes(6);
+
+      middlewareService(validCookies, "/posts/view/blög-póst1-slùg/", url);
+
+      expect(NextResponse.redirect).not.toHaveBeenCalled();
+      expect(NextResponse.rewrite).not.toHaveBeenCalled();
+      expect(NextResponse.next).toHaveBeenCalledTimes(7);
     });
 
     it.each([

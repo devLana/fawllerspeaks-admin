@@ -19,7 +19,7 @@ export const middlewareService = (
     if (
       /^\/posts\/new\/?$/i.test(pathname) ||
       /^\/posts\/?$/i.test(pathname) ||
-      /^\/posts\/(?:after|before|edit|view)\/[a-z0-9-]+\/?$/i.test(pathname)
+      /^\/posts\/(?:after|before|edit|view)\/[^/]+\/?$/i.test(pathname)
     ) {
       return NextResponse.next();
     }
