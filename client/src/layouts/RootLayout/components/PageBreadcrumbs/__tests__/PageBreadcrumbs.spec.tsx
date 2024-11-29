@@ -8,66 +8,119 @@ import { renderUI } from "@utils/tests/renderUI";
 describe("Page Breadcrumbs", () => {
   const name = { name: /^breadcrumb$/i };
 
-  it("Should not render breadcrumbs if the current page is a dynamic route", () => {
-    const router = useRouter();
-    router.pathname = "/posts/[dynamicRoute]";
+  describe("Breadcrumbs is not rendered", () => {
+    it("Should not render breadcrumbs if the current page is the Home(Dashboard) page", () => {
+      renderUI(<PageBreadcrumbs />);
+      expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
+    });
 
-    const { rerender } = renderUI(<PageBreadcrumbs />);
+    it("Should not render breadcrumbs if the current page is only one directory deep", () => {
+      const router = useRouter();
+      router.pathname = "/post-tags";
 
-    expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
+      renderUI(<PageBreadcrumbs />);
+      expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
+    });
 
-    router.pathname = "/posts/[...dynamicRoute]";
+    it("Should not render breadcrumbs if the current page is a posts dynamic route", () => {
+      const router = useRouter();
+      router.pathname = "/posts/[[...postsPage]]";
 
-    rerender(<PageBreadcrumbs />);
+      renderUI(<PageBreadcrumbs />);
+      expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
+    });
 
-    expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
+    it("Should not render breadcrumbs on an error(404 or 500) page", () => {
+      const router = useRouter();
+      router.pathname = "/500";
 
-    router.pathname = "/posts/[[...dynamicRoute]]";
-
-    rerender(<PageBreadcrumbs />);
-
-    expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
+      renderUI(<PageBreadcrumbs />);
+      expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
+    });
   });
 
-  it("Should not render breadcrumbs if the current page is the Home(Dashboard) page", () => {
-    renderUI(<PageBreadcrumbs />);
-    expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
-  });
+  describe("Breadcrumbs is rendered", () => {
+    it("Should render breadcrumbs for paths that are two directories deep", () => {
+      const router = useRouter();
+      router.pathname = "/settings/me";
 
-  it("Should not render breadcrumbs if the current pathname is only one directory deep", () => {
-    const router = useRouter();
-    router.pathname = "/posts";
+      renderUI(<PageBreadcrumbs />);
+      const breadcrumbs = screen.getByRole("navigation", name);
+      const crumbs = within(breadcrumbs).getAllByRole("listitem");
 
-    renderUI(<PageBreadcrumbs />);
-    expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
-  });
+      expect(crumbs).toHaveLength(2);
 
-  it("Should render breadcrumbs if the current pathname is two or more directories deep", async () => {
-    const router = useRouter();
-    router.pathname = "/settings/profile";
+      expect(crumbs[0]).toContainElement(
+        screen.getByRole("link", { name: "Settings" })
+      );
 
-    const { rerender, user } = renderUI(<PageBreadcrumbs />);
-    const breadcrumbs = screen.getByRole("navigation", name);
-    const crumbs = within(breadcrumbs).getAllByRole("listitem");
+      expect(
+        within(crumbs[0]).getByRole("link", { name: "Settings" })
+      ).toHaveAttribute("href", "/settings");
 
-    expect(crumbs).toHaveLength(2);
-    expect(crumbs[0]).toHaveTextContent("Settings");
-    expect(crumbs[1]).toHaveTextContent("Profile");
+      expect(crumbs[1]).toContainElement(screen.getByRole("paragraph"));
+      expect(within(crumbs[1]).getByRole("paragraph")).toHaveTextContent("Me");
+    });
 
-    router.pathname =
-      "/posts_page/post-preview/post/new-123-post-title-by-john-öleg";
+    it("Should render breadcrumbs for paths that are more than two directories deep", () => {
+      const router = useRouter();
+      router.pathname = "/settings/me/edit";
 
-    rerender(<PageBreadcrumbs />);
+      renderUI(<PageBreadcrumbs />);
 
-    await user.click(screen.getByRole("button", { name: /^show path$/i }));
+      const newBreadcrumbs = screen.getByRole("navigation", name);
+      const newCrumbs = within(newBreadcrumbs).getAllByRole("listitem");
 
-    const newBreadcrumbs = screen.getByRole("navigation", name);
-    const newCrumbs = within(newBreadcrumbs).getAllByRole("listitem");
+      expect(newCrumbs).toHaveLength(3);
 
-    expect(newCrumbs).toHaveLength(4);
-    expect(newCrumbs[0]).toHaveTextContent("Posts Page");
-    expect(newCrumbs[1]).toHaveTextContent("Post Preview");
-    expect(newCrumbs[1]).toHaveTextContent("Post");
-    expect(newCrumbs[3]).toHaveTextContent("New 123 Post Title By John Öleg");
+      expect(newCrumbs[0]).toContainElement(
+        screen.getByRole("link", { name: "Settings" })
+      );
+
+      expect(
+        within(newCrumbs[0]).getByRole("link", { name: "Settings" })
+      ).toHaveAttribute("href", "/settings");
+
+      expect(newCrumbs[1]).toContainElement(
+        screen.getByRole("link", { name: "Me" })
+      );
+
+      expect(
+        within(newCrumbs[1]).getByRole("link", { name: "Me" })
+      ).toHaveAttribute("href", "/settings/me");
+
+      expect(newCrumbs[2]).toContainElement(screen.getByRole("paragraph"));
+
+      expect(within(newCrumbs[2]).getByRole("paragraph")).toHaveTextContent(
+        "Edit"
+      );
+    });
+
+    it("Should render breadcrumbs if the current page is a nested posts dynamic route", () => {
+      const router = useRouter();
+      router.pathname = "/posts/edit/[slug]";
+      router.asPath = "/posts/edit/new-post-title-by-john-öleg";
+
+      renderUI(<PageBreadcrumbs />);
+
+      const breadcrumbs = screen.getByRole("navigation", name);
+      const crumbs = within(breadcrumbs).getAllByRole("listitem");
+
+      expect(crumbs).toHaveLength(2);
+
+      expect(crumbs[0]).toContainElement(
+        screen.getByRole("link", { name: "Posts" })
+      );
+
+      expect(
+        within(crumbs[0]).getByRole("link", { name: "Posts" })
+      ).toHaveAttribute("href", "/posts");
+
+      expect(crumbs[1]).toContainElement(screen.getByRole("paragraph"));
+
+      expect(within(crumbs[1]).getByRole("paragraph")).toHaveTextContent(
+        "New Post Title By John Öleg"
+      );
+    });
   });
 });
