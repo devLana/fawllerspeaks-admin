@@ -96,10 +96,10 @@ describe("Page Breadcrumbs", () => {
       );
     });
 
-    it("Should render breadcrumbs if the current page is a nested posts dynamic route", () => {
+    it("Current page is a nested posts dynamic route, Should render breadcrumbs with all types of latin alphabets and ignore any search params", () => {
       const router = useRouter();
       router.pathname = "/posts/edit/[slug]";
-      router.asPath = "/posts/edit/new-post-title-by-john-öleg";
+      router.query = { slug: "néw-pöst-tìtlë-by-jóhn-ölèg", draft: "true" };
 
       renderUI(<PageBreadcrumbs />);
 
@@ -119,7 +119,7 @@ describe("Page Breadcrumbs", () => {
       expect(crumbs[1]).toContainElement(screen.getByRole("paragraph"));
 
       expect(within(crumbs[1]).getByRole("paragraph")).toHaveTextContent(
-        "New Post Title By John Öleg"
+        "Néw Pöst Tìtlë By Jóhn Ölèg"
       );
     });
   });

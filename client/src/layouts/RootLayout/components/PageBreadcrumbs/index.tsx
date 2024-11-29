@@ -7,7 +7,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import NextLink from "@components/ui/NextLink";
 
 const PageBreadcrumbs = () => {
-  const { pathname, asPath } = useRouter();
+  const { pathname, query } = useRouter();
   let pathnames: string[];
 
   if (pathname === "/404" || pathname === "/500") return null;
@@ -16,10 +16,11 @@ const PageBreadcrumbs = () => {
     if (pathname === "/posts/[[...postsPage]]") return null;
 
     if (/^\/posts\/(?:edit|view)/.test(pathname)) {
-      const asPathStr = asPath.replace(/^\/posts\/(?:edit|view)/, "/posts");
-      pathnames = asPathStr.split("/").filter(Boolean);
+      const path = `/posts/${query.slug as string}`;
+      pathnames = path.split("/").filter(Boolean);
     } else {
-      pathnames = asPath.split("/").filter(Boolean);
+      // pathnames = decodeURI(asPath).split("/").filter(Boolean);
+      return null;
     }
   } else {
     pathnames = pathname.split("/").filter(Boolean);
