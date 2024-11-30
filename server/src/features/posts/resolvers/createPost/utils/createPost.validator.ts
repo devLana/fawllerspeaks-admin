@@ -45,10 +45,12 @@ export const createPostValidator = Joi.object<CreatePostInput>({
       })
     )
     .min(1)
+    .max(5)
     .unique()
     .messages({
       "array.unique": "The provided input post tag ids should be unique ids",
       "array.min": "No post tag id was provided",
+      "array.max": "Cannot add more than 5 post tags to a new post",
       "array.base": "Input value must be an array",
     }),
   imageBanner: Joi.string().allow(null).trim().messages({

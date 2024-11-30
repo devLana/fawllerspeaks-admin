@@ -148,6 +148,21 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     },
   ],
   [
+    "Should return a post tags input validation error if more than 5 post tag ids were provided",
+    {
+      title: "title",
+      tagIds: [...tagIds, randomUUID(), randomUUID(), randomUUID()],
+    },
+    {
+      titleError: nullOrUndefined,
+      descriptionError: nullOrUndefined,
+      excerptError: nullOrUndefined,
+      contentError: nullOrUndefined,
+      tagIdsError: "Cannot add more than 5 post tags to a new draft post",
+      imageBannerError: nullOrUndefined,
+    },
+  ],
+  [
     "Should return title, description and excerpt input validation error messages if the values exceed the maximum length",
     {
       title:
