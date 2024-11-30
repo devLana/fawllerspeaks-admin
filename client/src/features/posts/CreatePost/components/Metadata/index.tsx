@@ -10,7 +10,7 @@ import TooltipHint from "./TooltipHint";
 import SelectPostTags from "./SelectPostTags";
 import ActionButtons from "../ActionButtons";
 import { metadataValidator } from "@validators/metadataValidator";
-import { metadataTextBoxes } from "@uiHelpers/metadataTextBoxes";
+import { createPostMetadataTextBoxes } from "@uiHelpers/createPostMetadataTextBoxes";
 import type {
   DraftErrorCb,
   CreatePostAction,
@@ -131,7 +131,7 @@ const Metadata = ({
             </Alert>
           </Collapse>
         )}
-        {metadataTextBoxes.map(({ id, label, hint }) => (
+        {createPostMetadataTextBoxes.map(({ id, label, hint }) => (
           <TooltipHint key={id} hint={hint}>
             <Controller
               name={id}

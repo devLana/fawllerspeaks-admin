@@ -53,7 +53,7 @@ const PostFileInput = (props: PostFileInputProps) => {
   const errorMsg = imageError || imageBannerError;
 
   return (
-    <TooltipHint hint="An optional image banner that gives visual meaning to the post">
+    <TooltipHint hint="An optional image banner that can give visual meaning to this post">
       <FormControl fullWidth error={hasError}>
         {imageBanner?.blobUrl ? (
           <PostImagePreview
