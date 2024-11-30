@@ -32,7 +32,11 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
       map[id] = name;
 
       options.push(
-        <MenuItem key={id} value={id}>
+        <MenuItem
+          key={id}
+          value={id}
+          disabled={tagIds.length === 5 && !tagIds.includes(id)}
+        >
           <Box
             component="span"
             width="100%"
@@ -46,7 +50,7 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
     });
 
     return { map, options };
-  }, [postTags]);
+  }, [postTags, tagIds]);
 
   const handleChange = (e: SelectChangeEvent<string[]>) => {
     const { value } = e.target;
@@ -60,7 +64,7 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
 
   return (
     <TooltipHint
-      hint="An optional collection of labels used to categorize the post. Select up to five"
+      hint="Select up to 5 optional labels that will be used to categorize this post"
       addAriaBusy
     >
       <FormControl fullWidth error={!!tagIdsError}>
