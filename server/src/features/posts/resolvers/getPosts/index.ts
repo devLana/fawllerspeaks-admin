@@ -134,7 +134,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
       LEFT JOIN post_tags pt ON pt.id = ANY (p.tags)${where}
       GROUP BY p.id, p.post_id, u.first_name, u.last_name, u.image
       ORDER BY ${orderBy}
-      LIMIT 10`,
+      LIMIT 12`,
       sqlArgs
     );
 
