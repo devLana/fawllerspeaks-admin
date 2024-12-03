@@ -14,9 +14,9 @@ import { getPostSchema as schema } from "./utils/getPost.validator";
 import deleteSession from "@utils/deleteSession";
 
 import type { QueryResolvers } from "@resolverTypes";
-import type { GetPostDBData, ResolverFunc } from "@types";
+import type { GetPostDBData, PostFieldResolver, ResolverFunc } from "@types";
 
-type GetPost = ResolverFunc<QueryResolvers["getPost"]>;
+type GetPost = PostFieldResolver<ResolverFunc<QueryResolvers["getPost"]>>;
 
 const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
   try {
@@ -48,9 +48,15 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.description,
         p.excerpt,
         p.content,
-        u.first_name||' '||u.last_name||' '||u.image author,
+        json_build_object(
+          'image', u.image,
+          'name', u.first_name||' '||u.last_name
+        ) author,
         p.status,
-        p.slug url,
+        json_build_object(
+          'href', p.slug,
+          'slug', p.slug
+        ) url,
         p.image_banner "imageBanner",
         p.date_created "dateCreated",
         p.date_published "datePublished",

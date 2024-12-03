@@ -19,9 +19,17 @@ import generateErrorsObject from "@utils/generateErrorsObject";
 import deleteSession from "@utils/deleteSession";
 
 import type { MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc, PostDBData } from "@types";
+import type { ResolverFunc, PostDBData, PostFieldResolver } from "@types";
 
-type DraftPost = ResolverFunc<MutationResolvers["draftPost"]>;
+type DraftPost = PostFieldResolver<
+  ResolverFunc<MutationResolvers["draftPost"]>
+>;
+
+interface User {
+  isRegistered: boolean;
+  authorName: string;
+  authorImage: string | null;
+}
 
 const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
   try {
@@ -35,10 +43,11 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     const { title, description, excerpt, content, tagIds, imageBanner } = input;
     const slug = getPostSlug(title);
 
-    const checkUser = db.query<{ isRegistered: boolean; author: string }>(
+    const checkUser = db.query<User>(
       `SELECT
         is_registered "isRegistered",
-        concat(first_name,' ',last_name,' ',image) author
+        concat(first_name,' ',last_name) "authorName",
+        image "authorImage"
       FROM users
       WHERE user_id = $1`,
       [user]
@@ -61,7 +70,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       return new NotAllowedError("Unable to save post to draft");
     }
 
-    const [{ author, isRegistered }] = loggedInUser;
+    const [{ authorImage, authorName, isRegistered }] = loggedInUser;
 
     if (!isRegistered) {
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
@@ -153,9 +162,9 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       description,
       excerpt,
       content,
-      author,
+      author: { name: authorName, image: authorImage },
       status: "Draft",
-      url: slug,
+      url: { slug, href: slug },
       imageBanner,
       dateCreated: drafted.dateCreated,
       datePublished: drafted.datePublished,

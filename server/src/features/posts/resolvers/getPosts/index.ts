@@ -17,9 +17,9 @@ import deleteSession from "@utils/deleteSession";
 import generateErrorsObject from "@utils/generateErrorsObject";
 
 import type { QueryResolvers, GetPostsPageType } from "@resolverTypes";
-import type { GetPostDBData, ResolverFunc } from "@types";
+import type { GetPostDBData, PostFieldResolver, ResolverFunc } from "@types";
 
-type GetPosts = ResolverFunc<QueryResolvers["getPosts"]>;
+type GetPosts = PostFieldResolver<ResolverFunc<QueryResolvers["getPosts"]>>;
 type CursorDataTuple = [string, (number | string)[], string];
 
 interface Sort {
@@ -114,9 +114,15 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         p.description,
         p.excerpt,
         p.content,
-        u.first_name||' '||u.last_name||' '||u.image author,
+        json_build_object(
+          'image', u.image,
+          'name', u.first_name||' '||u.last_name
+        ) author,
         p.status,
-        p.slug url,
+        json_build_object(
+          'href', p.slug,
+          'slug', p.slug
+        ) url,
         p.image_banner "imageBanner",
         p.date_created "dateCreated",
         p.date_published "datePublished",

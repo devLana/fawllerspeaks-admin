@@ -90,10 +90,13 @@ describe("Test createPost resolver", () => {
   });
 
   describe("Create post", () => {
-    const author = "Author Name /author/image/path";
-    const mockRows = [{ isRegistered: true, author }];
+    const authorName = "Author Name";
+    const authorImage = "/author/image/path";
+    const mockRows = [{ isRegistered: true, authorName, authorImage }];
 
     it("Should create and publish a new post with an image banner and post tags", async () => {
+      const url = { slug: "blog-post-title", href: "blog-post-title" };
+      const author = { name: authorName, image: authorImage };
       const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
       const tags = ["tag", "tag", "tag"];
       const mockDBPost = [{ ...mocks.dbPost, tags }];
@@ -112,7 +115,7 @@ describe("Test createPost resolver", () => {
       expect(result).toHaveProperty("post.excerpt", post.excerpt);
       expect(result).toHaveProperty("post.description", post.description);
       expect(result).toHaveProperty("post.author", author);
-      expect(result).toHaveProperty("post.url", "blog-post-title");
+      expect(result).toHaveProperty("post.url", url);
       expect(result).toHaveProperty("post.status", "Published");
       expect(result).toHaveProperty("post.imageBanner", mocks.imageBanner);
       expect(result).toHaveProperty("post.dateCreated", mocks.dateCreated);
@@ -131,6 +134,8 @@ describe("Test createPost resolver", () => {
     });
 
     it("Should create and publish a new post without an image banner and post tags", async () => {
+      const slug = "another-blog-post-title";
+      const url = { href: slug, slug };
       const mockDBPost = [{ ...mocks.dbPost, tags: null }];
       const post = mocks.argsWithNoImage;
       const spy = spyDb({ rows: mockRows });
@@ -145,7 +150,7 @@ describe("Test createPost resolver", () => {
       expect(spy).toHaveNthReturnedWith(3, { rows: mockDBPost });
       expect(result).toHaveProperty("post.imageBanner", null);
       expect(result).toHaveProperty("post.tags", null);
-      expect(result).toHaveProperty("post.url", "another-blog-post-title");
+      expect(result).toHaveProperty("post.url", url);
       expect(result).toHaveProperty("status", "SUCCESS");
     });
   });

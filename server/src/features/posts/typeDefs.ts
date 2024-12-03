@@ -131,7 +131,7 @@ export const postsTypeDefs = `#graphql
   }
 
   type GetPostValidationError {
-    slugError: String
+    slugError: String!
     status: Status!
   }
 

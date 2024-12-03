@@ -2,7 +2,14 @@ import type { Request, Response } from "express";
 import type { Pool } from "pg";
 import type { BaseContext } from "@apollo/server";
 
-import type { Post, PostStatus, PostTag } from "@resolverTypes";
+import type {
+  Post,
+  PostAuthor,
+  PostStatus,
+  PostTag,
+  PostUrl,
+  ResolverTypeWrapper,
+} from "@resolverTypes";
 
 export interface IClientUrls {
   readonly login: string;
@@ -58,9 +65,9 @@ export interface GetPostDBData extends PostDBData {
   readonly description: string | null;
   readonly excerpt: string | null;
   readonly content: string | null;
-  readonly author: string;
+  readonly author: PostAuthor;
   readonly status: PostStatus;
-  readonly url: string;
+  readonly url: PostUrl;
   readonly imageBanner: string | null;
 }
 
@@ -122,10 +129,8 @@ export interface APIContext extends BaseContext {
   user: string | null;
 }
 
-export interface PostData extends Omit<Post, "content" | "url" | "author"> {
-  readonly author: string;
+export interface PostData extends Omit<Post, "content"> {
   readonly content?: string | null;
-  readonly url: string;
 }
 
 export type PostDataMapper<T extends object> = T extends { post: Post }
@@ -133,3 +138,18 @@ export type PostDataMapper<T extends object> = T extends { post: Post }
   : T extends { posts: readonly Post[] }
   ? Omit<T, "posts"> & { posts: PostData[] }
   : T;
+
+type FunctionLike = (...args: never[]) => object;
+
+type PostFieldTypes<T extends FunctionLike> = Exclude<
+  ReturnType<T>,
+  Promise<object>
+>;
+
+type PostFieldMapper<T extends FunctionLike> = PostDataMapper<
+  PostFieldTypes<T>
+>;
+
+export type PostFieldResolver<T extends FunctionLike> = (
+  ...args: Parameters<T>
+) => ResolverTypeWrapper<PostFieldMapper<T>>;

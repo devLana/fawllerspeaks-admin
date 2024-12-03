@@ -90,10 +90,13 @@ describe("Test draft post resolver", () => {
   });
 
   describe("Draft a new post", () => {
-    const author = "Author Name /author/image/path";
-    const spyData = [{ isRegistered: true, author }];
+    const authorName = "Author Name";
+    const authorImage = "/author/image/path";
+    const author = { name: authorName, image: authorImage };
+    const spyData = [{ isRegistered: true, authorName, authorImage }];
 
     it("Should save a new post with an image banner and post tags as draft", async () => {
+      const url = { slug: "blog-post-title", href: "blog-post-title" };
       const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
       const mockData = [{ ...mocks.dbData, tags: mocks.tags }];
       const spy = spyDb({ rows: spyData });
@@ -111,7 +114,7 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.description", undefined);
       expect(result).toHaveProperty("post.excerpt", undefined);
       expect(result).toHaveProperty("post.content", undefined);
-      expect(result).toHaveProperty("post.url", "blog-post-title");
+      expect(result).toHaveProperty("post.url", url);
       expect(result).toHaveProperty("post.author", author);
       expect(result).toHaveProperty("post.status", "Draft");
       expect(result).toHaveProperty("post.imageBanner", mocks.imageBanner);
@@ -126,6 +129,8 @@ describe("Test draft post resolver", () => {
     });
 
     it("Should save a new post with an image banner and post tags as draft", async () => {
+      const slug = "another-blog-post-title";
+      const url = { href: slug, slug };
       const post = mocks.argsWithNoImage;
       const mockDBPost = [{ ...mocks.dbData, tags: null }];
       const spy = spyDb({ rows: spyData });
@@ -149,7 +154,7 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.dateCreated", mocks.dateCreated);
       expect(result).toHaveProperty("post.datePublished", null);
       expect(result).toHaveProperty("post.lastModified", null);
-      expect(result).toHaveProperty("post.url", "another-blog-post-title");
+      expect(result).toHaveProperty("post.url", url);
       expect(result).toHaveProperty("post.views", 0);
       expect(result).toHaveProperty("post.isInBin", false);
       expect(result).toHaveProperty("post.isDeleted", false);
