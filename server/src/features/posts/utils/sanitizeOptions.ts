@@ -35,12 +35,14 @@ export const sanitizeOptions: IOptions = {
     "u",
     "ul",
   ],
-  selfClosing: ["br", "hr", "img", "input"],
-  nonBooleanAttributes: ["class", "href", "id", "rel", "style", "target"],
   allowedAttributes: {
     a: ["href", "rel", "target"],
     col: ["style"],
     figure: ["class", "style"],
+    h2: ["style"],
+    h3: ["style"],
+    h4: ["style"],
+    h5: ["style"],
     img: ["alt", "class", "height", "src", "style", "width"],
     input: [
       { name: "checked", values: [] },
@@ -57,4 +59,6 @@ export const sanitizeOptions: IOptions = {
     ul: ["class"],
   },
   allowedSchemes: ["http", "https", "mailto", "tel"],
+  nonBooleanAttributes: ["class", "href", "id", "rel", "style", "target"],
+  selfClosing: ["br", "hr", "img", "input"],
 };

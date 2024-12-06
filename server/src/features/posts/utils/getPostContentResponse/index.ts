@@ -1,43 +1,33 @@
+import * as cheerio from "cheerio";
 import type { PostContent, PostTableOfContents } from "@resolverTypes";
 
-interface Groups {
-  level: string | undefined;
-  innerHTML: string | undefined;
-}
-
-type SorU = string | undefined;
-type ReplaceParams = [SorU, SorU, number, string, Groups];
-
 export const getPostContentResponse = (content: string): PostContent => {
-  const regex = /<h(?<level>[2-5])>(?<innerHTML>.+?)<\/h\k<level>>/gi;
-  const tableContentsArr: PostTableOfContents[] = [];
+  const $ = cheerio.load(content, { xml: { xmlMode: true } }, false);
+  const toc: PostTableOfContents[] = [];
 
-  const html = content.replace(regex, (match, ...rest: ReplaceParams) => {
-    const [, , , , groups] = rest;
-    const { level, innerHTML } = groups;
+  $("h2,h3,h4,h5")
+    .toArray()
+    .forEach(heading => {
+      const $h = $(heading);
+      const textContent = $h.text().trim();
 
-    if (!level || !innerHTML) return match;
+      if (textContent) {
+        const id = textContent
+          .toLowerCase()
+          .replace(/[^\p{L}\p{N}]+/gu, "-")
+          .replace(/^-+|-+$/g, "");
 
-    const tagRegex =
-      /<\/?[a-z][a-z0-9]*(?:.+?=(['"])(?:(?!\1|\\).|\\.)*\1)*>/gi;
-    const textContent = innerHTML.replace(tagRegex, "");
+        if (id) {
+          $h.attr("id", id);
 
-    const id = textContent
-      .toLowerCase()
-      .replace(/(?:^[^\p{L}\d]+)|(?:[^\p{L}\d]+$)/gu, "")
-      .replace(/[^\p{L}\d]+/gu, "-");
-
-    tableContentsArr.push({
-      heading: textContent,
-      level: +level,
-      href: `#${id}`,
+          toc.push({
+            heading: textContent,
+            level: +heading.tagName.charAt(1),
+            href: `#${id}`,
+          });
+        }
+      }
     });
 
-    return `<h${level} id="${id}">${innerHTML}</h${level}>`;
-  });
-
-  return {
-    html,
-    tableOfContents: tableContentsArr.length > 0 ? tableContentsArr : null,
-  };
+  return { html: $.html(), tableOfContents: toc.length > 0 ? toc : null };
 };

@@ -2,11 +2,7 @@ import Joi from "joi";
 import sanitize from "sanitize-html";
 
 import { sanitizeOptions } from "@features/posts/utils/sanitizeOptions";
-
-import {
-  anchorTagRegex,
-  anchorTagReplacerFn,
-} from "@features/posts/utils/anchorTagReplacerFn";
+import { processAnchorTags } from "@features/posts/utils/processAnchorTags";
 
 import type { CreatePostInput } from "@resolverTypes";
 
@@ -31,9 +27,8 @@ export const createPostValidator = Joi.object<CreatePostInput>({
         .replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")
         .replace(/>&nbsp;<\//g, "></");
 
-      return sanitize(html, sanitizeOptions)
-        .replace(/\s\/>/g, "/>")
-        .replace(anchorTagRegex, anchorTagReplacerFn);
+      const sanitized = sanitize(html, sanitizeOptions).replace(/\s\/>/g, "/>");
+      return processAnchorTags(sanitized);
     }, "Custom content sanitizer")
     .messages({ "string.empty": "Provide post content" }),
   tagIds: Joi.array()
