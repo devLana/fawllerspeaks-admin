@@ -1,33 +1,40 @@
 const getPostSlug = (title: string) => {
-  const regex =
-    /let's|it's|s's|'s|won't|n't|'\p{L}{1,5}|(?: *[^\p{L}\p{N}]+ *)+/gu;
-
   return title
     .toLowerCase()
-    .replace(regex, (match, ...rest: [number, string]) => {
-      const [, titleStr] = rest;
+    .replace(/[^\p{L}\p{N}']+/gu, " ")
+    .trim()
+    .split(" ")
+    .reduce((slug, word, index, words) => {
+      let newSlug: string;
 
-      if (match === "let's") return "let-us";
-      if (match === "it's") return "it-is";
-      if (match === "s's" || match === "'s") return "s";
-
-      if (match === "won't") {
-        return titleStr.startsWith(match) ? "won-t" : "will-not";
+      if (word === "won't") {
+        newSlug = index === 0 ? "wont" : `${slug}will-not`;
+      } else if (word === "it's") {
+        newSlug = `${slug}it-is`;
+      } else if (word === "let's") {
+        newSlug = `${slug}let-us`;
+      } else if (word.endsWith("s's")) {
+        newSlug = `${slug}${word.replace("'s", "")}`;
+      } else if (word.endsWith("n't")) {
+        newSlug = `${slug}${word.replace("n't", "-not")}`;
+      } else if (word.endsWith("'re")) {
+        newSlug = `${slug}${word.replace("'re", "-are")}`;
+      } else if (word.endsWith("'ll")) {
+        newSlug = `${slug}${word.replace("'ll", "-will")}`;
+      } else if (word.endsWith("'ve")) {
+        newSlug = `${slug}${word.replace("'ve", "-have")}`;
+      } else if (word.includes("'")) {
+        newSlug = `${slug}${word.replace(/'/g, "")}`;
+      } else {
+        newSlug = `${slug}${word}`;
       }
 
-      if (match === "n't") return "-not";
-
-      if (match.includes("'")) {
-        if (match.includes("'re")) return "-are";
-        if (match.includes("'ll")) return "-will";
-        if (match.includes("'ve")) return "-have";
-
-        return "";
+      if (index !== words.length - 1) {
+        newSlug += "-";
       }
 
-      return "-";
-    })
-    .replace(/^-+|-+$/g, "");
+      return newSlug;
+    }, "");
 };
 
 export default getPostSlug;

@@ -13,15 +13,15 @@ describe("Posts | Should convert a post title to a lowercased post url slug", ()
     ["New Shoes Now cost $12.85 More.", "new-shoes-now-cost-12-85-more"],
     ["@john_doe's Blog Post Title!", "john-does-blog-post-title"],
     [
-      "A Tïtle With Nón Ãlphabet Charàcters",
-      "a-tïtle-with-nón-ãlphabet-charàcters",
+      "A Tïtle With Nón Látin Ãlphabet Charàcters",
+      "a-tïtle-with-nón-látin-ãlphabet-charàcters",
     ],
     [
       'My Friend\'s Birthday. The Day John Doe Told Me "I Love You" 🥰 - Part 1',
       "my-friends-birthday-the-day-john-doe-told-me-i-love-you-part-1",
     ],
     [
-      "These Guys Aren't Taller Than James's Brothers",
+      "These Guys' Aren't Taller Than James's Brothers",
       "these-guys-are-not-taller-than-james-brothers",
     ],
     [
@@ -38,7 +38,7 @@ describe("Posts | Should convert a post title to a lowercased post url slug", ()
     ],
     [
       "Won't The Government Reduce Oil Prices?",
-      "won-t-the-government-reduce-oil-prices",
+      "wont-the-government-reduce-oil-prices",
     ],
     [
       "\"Let's Go Fishing At Dexter's Creek\", Jack Told Jill",
