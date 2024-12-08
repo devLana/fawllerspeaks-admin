@@ -32,7 +32,7 @@
       "@services/*": ["services/*"],
       "@cache/*": ["state/cache/*"],
       "@reducers/*": ["state/reducers/*"],
-      "@apiTypes": ["types/graphql"],
+      "@apiTypes": ["types/api/graphql"],
       "@types": ["types/index"],
       "@uiHelpers/*": ["uiHelpers/*"],
       "@utils/*": ["utils/*"],
