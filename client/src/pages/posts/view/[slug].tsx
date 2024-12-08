@@ -63,7 +63,7 @@ const ViewPost: NextPageWithLayout = () => {
         <PostTextContent
           severity="error"
           label={label}
-          node={data.getPost.slugError as string}
+          node={data.getPost.slugError}
         />
       );
 
