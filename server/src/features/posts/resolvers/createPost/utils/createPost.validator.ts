@@ -22,13 +22,8 @@ export const createPostValidator = Joi.object<CreatePostInput>({
   content: Joi.string()
     .required()
     .trim()
-    .custom((value: string) => {
-      const html = value
-        .replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")
-        .replace(/>&nbsp;<\//g, "></");
-
-      const sanitized = sanitize(html, sanitizeOptions).replace(/\s\/>/g, "/>");
-      return processAnchorTags(sanitized);
+    .custom((html: string) => {
+      return processAnchorTags(sanitize(html, sanitizeOptions));
     }, "Custom content sanitizer")
     .messages({ "string.empty": "Provide post content" }),
   tagIds: Joi.array()

@@ -23,14 +23,8 @@ export const draftPostSchema = Joi.object<DraftPostInput>({
     .allow(null)
     .trim()
     .custom((value: string | null) => {
-      if (!value) return value;
-
-      const html = value
-        .replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")
-        .replace(/>&nbsp;<\//g, "></");
-
-      const sanitized = sanitize(html, sanitizeOptions).replace(/\s\/>/g, "/>");
-      return processAnchorTags(sanitized);
+      if (!value) return null;
+      return processAnchorTags(sanitize(value, sanitizeOptions));
     }, "Custom content sanitizer")
     .messages({ "string.empty": "Provide post content" }),
   tagIds: Joi.array()

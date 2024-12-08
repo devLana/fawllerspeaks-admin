@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import type { PostContent, PostTableOfContents } from "@resolverTypes";
 
 export const getPostContentResponse = (content: string): PostContent => {
-  const $ = cheerio.load(content, { xml: { xmlMode: true } }, false);
+  const $ = cheerio.load(content, undefined, false);
   const toc: PostTableOfContents[] = [];
 
   $("h2,h3,h4,h5")

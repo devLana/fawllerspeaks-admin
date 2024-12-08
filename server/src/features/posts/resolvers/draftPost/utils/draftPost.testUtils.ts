@@ -21,14 +21,14 @@ export const imageBanner = "post/image/banner";
 export const tagIds = [UUID, USER_ID, randomUUID()];
 
 const content =
-  '<h2 class="heading">heading element</h2><a href="blog/post/title">blog post link</a><p id="class-name">paragraph text</p><a href="//weird-link">weird link</a>';
+  '<h2 class="heading">heading element</h2><hr /><a href="blog/post/title">blog post link</a><p id="class-name">paragraph text <a href="//weird-link">weird link</a></p><p><img src="src" /></p>';
 
 export const html =
-  '<h2>heading element</h2><a href="blog/post/title">blog post link</a><p>paragraph text</p><a href="https://weird-link" target="_blank" rel="noopener noreferrer">weird link</a>';
+  '<h2>heading element</h2><hr><a href="blog/post/title">blog post link</a><p>paragraph text <a href="https://weird-link" target="_blank" rel="noopener noreferrer">weird link</a></p><p><img src="src"></p>';
 
 export const expectedPostContent: PostContent = {
   __typename: "PostContent",
-  html: '<h2 id="heading-element">heading element</h2><a href="blog/post/title">blog post link</a><p>paragraph text</p><a href="https://weird-link" target="_blank" rel="noopener noreferrer">weird link</a>',
+  html: '<h2 id="heading-element">heading element</h2><hr><a href="blog/post/title">blog post link</a><p>paragraph text <a href="https://weird-link" target="_blank" rel="noopener noreferrer">weird link</a></p><p><img src="src"></p>',
   tableOfContents: [
     {
       __typename: "PostTableOfContents",

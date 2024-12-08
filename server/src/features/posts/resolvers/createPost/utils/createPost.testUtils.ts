@@ -197,13 +197,14 @@ const mockData = { description: "post description", excerpt: "mock excerpt" };
 export const argsWithImage = {
   ...mockData,
   title: "blog post title",
-  content: '<p>post content</p><a id="link" href="google.com">google link</a>',
+  content:
+    '<p>post content</p><hr /><a id="link" href="google.com">google link</a><p></p><p><br/><br/><br/></p><p>hello world</p><p><img src="src" /></p>',
   imageBanner,
 };
 
 export const postContentWithImage: PostContent = {
   __typename: "PostContent",
-  html: '<p>post content</p><a href="https://google.com" target="_blank" rel="noopener noreferrer">google link</a>',
+  html: '<p>post content</p><hr><a href="https://google.com" target="_blank" rel="noopener noreferrer">google link</a><p>hello world</p><p><img src="src"></p>',
   tableOfContents: null,
 };
 

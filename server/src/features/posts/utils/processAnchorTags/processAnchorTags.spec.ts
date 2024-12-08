@@ -10,9 +10,9 @@ describe("Posts | Anchor tag Processor", () => {
 
   const testData1 = {
     input:
-      '<h2>heading text</h2><figure class="class-name"><a href="google.com"><img src="/image/src"/></a></figure>',
+      '<h2>heading text</h2><figure class="class-name"><a href="google.com"><img src="/image/src" /></a></figure>',
     output:
-      '<h2>heading text</h2><figure class="class-name"><a href="https://google.com" target="_blank" rel="noopener noreferrer"><img src="/image/src"/></a></figure>',
+      '<h2>heading text</h2><figure class="class-name"><a href="https://google.com" target="_blank" rel="noopener noreferrer"><img src="/image/src"></a></figure>',
   };
 
   const testData2 = {
@@ -31,9 +31,9 @@ describe("Posts | Anchor tag Processor", () => {
 
   const testData4 = {
     input:
-      '<p><a href="//some-link-url">some link url</a></p><hr/><h2>heading 2</h2><p><a href="////a-weird-link-url">weird link url</a></p>',
+      '<p><a href="//some-link-url">some link url</a></p><hr /><h2>heading 2</h2><p><a href="////a-weird-link-url">weird link url</a></p>',
     output:
-      '<p><a href="https://some-link-url" target="_blank" rel="noopener noreferrer">some link url</a></p><hr/><h2>heading 2</h2><p><a href="https:////a-weird-link-url" target="_blank" rel="noopener noreferrer">weird link url</a></p>',
+      '<p><a href="https://some-link-url" target="_blank" rel="noopener noreferrer">some link url</a></p><hr><h2>heading 2</h2><p><a href="https:////a-weird-link-url" target="_blank" rel="noopener noreferrer">weird link url</a></p>',
   };
 
   it("Should replace the 'href', 'target' and 'rel' attributes of all appropriate anchor tags", () => {

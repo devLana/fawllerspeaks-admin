@@ -21,7 +21,7 @@ test.each([
   [
     '<p>Paragraph 1</p><img src="src"/><strong>strong text</strong><em>Emphasized text</em><p>closing paragraph</p>',
     {
-      html: '<p>Paragraph 1</p><img src="src"/><strong>strong text</strong><em>Emphasized text</em><p>closing paragraph</p>',
+      html: '<p>Paragraph 1</p><img src="src"><strong>strong text</strong><em>Emphasized text</em><p>closing paragraph</p>',
       tableOfContents: null,
     },
   ],
@@ -37,9 +37,9 @@ test.each([
     },
   ],
   [
-    "<h2>Test <em>Heading</em> Text</h2><p>paragraph</p>",
+    "<h2>Test <em>Heading</em> Text</h2><hr /><p>paragraph</p>",
     {
-      html: '<h2 id="test-heading-text">Test <em>Heading</em> Text</h2><p>paragraph</p>',
+      html: '<h2 id="test-heading-text">Test <em>Heading</em> Text</h2><hr><p>paragraph</p>',
       tableOfContents: [
         { heading: "Test Heading Text", level: 2, href: "#test-heading-text" },
       ],

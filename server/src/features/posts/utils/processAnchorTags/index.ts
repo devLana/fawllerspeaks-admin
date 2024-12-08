@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 
 export const processAnchorTags = (html: string) => {
-  const $ = cheerio.load(html, { xml: { xmlMode: true } }, false);
+  const $ = cheerio.load(html, undefined, false);
 
   $("a").each((_, anchorElement) => {
     const $a = $(anchorElement);
