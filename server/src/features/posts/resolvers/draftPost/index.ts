@@ -53,12 +53,11 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       [user]
     );
 
-    const checkTitleSlug = db.query<{ slug: string }>(
-      `SELECT slug
+    const checkTitleSlug = db.query<{ slug: string; title: string }>(
+      `SELECT slug, title
       FROM posts
-      WHERE regexp_replace(title, '[-_\\s]', '', 'g') ~* $1
-      OR slug = $2`,
-      [title.replace(/[\s_-]/g, ""), slug]
+      WHERE slug = $1 OR lower(title) = $2`,
+      [slug, title.replace(/[\s_-]/g, "")]
     );
 
     const [{ rows: loggedInUser }, { rows: savedTitleSlug }] =
@@ -78,18 +77,18 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     }
 
     if (savedTitleSlug.length > 0) {
-      const [{ slug: savedSlug }] = savedTitleSlug;
+      const [{ slug: savedSlug, title: savedTitle }] = savedTitleSlug;
 
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
 
       if (savedSlug === slug) {
         return new ForbiddenError(
-          "The generated url slug for the provided post title already exists. Please ensure every post has a unique title"
+          "It seems this post title generates a slug that already exists. Please ensure the provided title is as unique as possible"
         );
       }
 
       return new DuplicatePostTitleError(
-        "A post with that title has already been created"
+        `A similar post title already exists - '${savedTitle}'. Please ensure every post has a unique title`
       );
     }
 

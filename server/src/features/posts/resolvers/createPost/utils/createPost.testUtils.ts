@@ -246,12 +246,12 @@ export const verifyUser: [string, object[]][] = [
 export const verifyTitleSlug: [string, string, object][] = [
   [
     "Should return an error object if the post url slug generated from the provided post title already exists",
-    "The generated url slug for the provided post title already exists. Please ensure every post has a unique title",
-    { slug: "another-blog-post-title" },
+    "It seems this post title generates a slug that already exists. Please ensure the provided title is as unique as possible",
+    { slug: "another-blog-post-title", title: argsWithNoImage.title },
   ],
   [
     "Should return an error object if the post title already exists",
-    "A post with that title has already been created",
-    {},
+    `A similar post title already exists - '${argsWithNoImage.title}'. Please ensure every post has a unique title`,
+    { slug: "another-blog-post-title-1", title: argsWithNoImage.title },
   ],
 ];

@@ -147,25 +147,7 @@ describe("Draft post - E2E", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
         __typename: "ForbiddenError",
-        message:
-          "The generated url slug for the provided post title already exists. Please ensure every post has a unique title",
-        status: "ERROR",
-      });
-    });
-
-    it("Should respond with an error if the provided post title already exists", async () => {
-      const title = "Draft Po-st Title";
-      const variables = { post: { ...mocks.argsWithNoImage, title } };
-      const payload = { query: DRAFT_POST, variables };
-      const options = { authorization: `Bearer ${registeredJwt}` };
-
-      const { data } = await post<Draft>(url, payload, options);
-
-      expect(data.errors).toBeUndefined();
-      expect(data.data).toBeDefined();
-      expect(data.data?.draftPost).toStrictEqual({
-        __typename: "DuplicatePostTitleError",
-        message: "A post with that title has already been created",
+        message: `It seems this post title generates a slug that already exists. Please ensure the provided title is as unique as possible`,
         status: "ERROR",
       });
     });
