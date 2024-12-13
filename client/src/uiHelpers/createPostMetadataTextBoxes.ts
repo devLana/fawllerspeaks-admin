@@ -2,7 +2,7 @@ export const createPostMetadataTextBoxes = [
   {
     id: "title",
     label: "Post Title",
-    hint: "A descriptive and unique blog post title",
+    hint: "A descriptive and unique blog post title that will also be used to generate the post's url slug",
   },
   {
     id: "description",
