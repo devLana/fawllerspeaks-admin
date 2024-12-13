@@ -94,10 +94,13 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
 
     const { rows: savedPost } = await db.query<PostDBData>(
       `WITH post_tag_ids AS (
-        SELECT ARRAY(
-          SELECT id
-          FROM post_tags
-          WHERE tag_id = ANY ($8::uuid[])
+        SELECT NULLIF(
+          ARRAY(
+            SELECT id
+            FROM post_tags
+            WHERE tag_id = ANY ($8::uuid[])
+          ),
+          '{}'
         ) AS tag_ids
       ),
       created_post AS (
