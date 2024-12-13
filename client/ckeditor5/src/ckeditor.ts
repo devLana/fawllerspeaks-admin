@@ -181,7 +181,7 @@ class Editor extends ClassicEditor {
         "|",
         "removeFormat",
       ],
-      shouldNotGroupWhenFull: false,
+      shouldNotGroupWhenFull: true,
     },
     language: "en",
     heading: {
@@ -266,4 +266,3 @@ class Editor extends ClassicEditor {
 }
 
 export default Editor;
-
