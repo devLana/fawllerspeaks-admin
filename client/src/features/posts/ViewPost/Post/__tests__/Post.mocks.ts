@@ -1,7 +1,7 @@
 import { testPostTag } from "@utils/tests/testPostTag";
 import type { PostData } from "types/posts";
 
-export const status = /^Test Blog Post blog post status$/i;
+export const status = /^post status - draft$/i;
 export const heading = { name: /^Test Blog Post$/i };
 export const metadataList = { name: /^post metadata$/i };
 export const tagsList = { name: /^post tags$/i };

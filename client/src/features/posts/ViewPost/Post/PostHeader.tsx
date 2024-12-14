@@ -6,13 +6,7 @@ import Typography from "@mui/material/Typography";
 import PostMenu from "@features/posts/components/PostMenu";
 import PostsPageBackButton from "@features/posts/components/PostsPageBackButton";
 import { postStatusColors as colors } from "@utils/posts/postStatusColors";
-import type { PostStatus } from "@apiTypes";
-
-interface PostHeaderProps {
-  slug: string;
-  status: PostStatus;
-  title: string;
-}
+import type { PostHeaderProps } from "types/posts/viewPost";
 
 const PostHeader = ({ slug, status, title }: PostHeaderProps) => {
   const { back } = useRouter();

@@ -5,11 +5,13 @@ import { formatPostDate } from "@utils/posts/formatPostDate";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./Post.mocks";
 
+vi.mock("../PostHeader");
+
 describe("Blog Post", () => {
   it("Should render all the provided blog post details", () => {
     renderUI(<Post label="View post page" post={mocks.post} />);
 
-    expect(screen.getByLabelText(mocks.status)).toBeInTheDocument();
+    expect(screen.getByText(mocks.status)).toBeInTheDocument();
     expect(screen.getByRole("heading", mocks.heading)).toBeInTheDocument();
 
     const aside = screen.getByRole("complementary");
