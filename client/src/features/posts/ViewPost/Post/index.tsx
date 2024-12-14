@@ -13,14 +13,11 @@ import type { PostData } from "types/posts";
 const Post = ({ label, post }: { label: string; post: PostData }) => (
   <PostWrapper label={label}>
     <PostHeader slug={post.url.slug} status={post.status} title={post.title} />
-    <Typography variant="h1" align="center" gutterBottom>
-      {post.title}
-    </Typography>
     <Box
       sx={{
         display: { md: "grid" },
         gridTemplateColumns: { md: "1fr 2fr" },
-        columnGap: { md: 4 },
+        columnGap: { md: 5 },
       }}
     >
       <Box
@@ -41,7 +38,7 @@ const Post = ({ label, post }: { label: string; post: PostData }) => (
           excerpt={post.excerpt}
           datePublished={post.datePublished}
           lastModified={post.lastModified}
-          url={post.url.href}
+          url={post.url}
           views={post.views}
           tags={post.tags}
         />
@@ -53,6 +50,9 @@ const Post = ({ label, post }: { label: string; post: PostData }) => (
         component="article"
         sx={{ gridRow: { md: 1 }, gridColumn: { md: 2 } }}
       >
+        <Typography variant="h1" gutterBottom>
+          {post.title}
+        </Typography>
         {post.imageBanner && (
           <PostImageBanner
             src={post.imageBanner}

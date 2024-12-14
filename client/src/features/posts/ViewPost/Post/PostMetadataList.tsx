@@ -7,13 +7,14 @@ import ListItemText from "@mui/material/ListItemText";
 import PostTags from "./PostTags";
 import PostDate from "@features/posts/components/PostDate";
 import type { PostTagData } from "types/postTags";
+import type { PostUrl } from "@apiTypes";
 
 interface PostMetadataListProps {
   description: string | null | undefined;
   excerpt: string | null | undefined;
   datePublished: string | null | undefined;
   lastModified: string | null | undefined;
-  url: string;
+  url: PostUrl;
   views: number;
   tags: PostTagData[] | null | undefined;
 }
@@ -64,7 +65,10 @@ const PostMetadataList = ({
       </ListItem>
     )}
     <ListItem disableGutters>
-      <ListItemText primary="Blog Post URL" secondary={url} />
+      <ListItemText primary="Blog Post Slug" secondary={url.slug} />
+    </ListItem>
+    <ListItem disableGutters>
+      <ListItemText primary="Blog Post URL" secondary={url.href} />
     </ListItem>
     <ListItem disableGutters>
       <ListItemText

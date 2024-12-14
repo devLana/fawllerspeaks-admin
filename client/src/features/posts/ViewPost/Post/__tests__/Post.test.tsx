@@ -32,10 +32,14 @@ describe("Blog Post", () => {
     );
 
     expect(within(metadata).getAllByRole("listitem")[4]).toHaveTextContent(
-      mocks.post.url.href
+      mocks.post.url.slug
     );
 
     expect(within(metadata).getAllByRole("listitem")[5]).toHaveTextContent(
+      mocks.post.url.href
+    );
+
+    expect(within(metadata).getAllByRole("listitem")[6]).toHaveTextContent(
       new Intl.NumberFormat("en-US").format(mocks.post.views)
     );
 
