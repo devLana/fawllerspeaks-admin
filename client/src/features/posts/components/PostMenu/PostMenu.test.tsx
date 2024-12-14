@@ -38,6 +38,7 @@ describe("PostMenu", () => {
     expect(menuItems).toHaveLength(3);
     expect(menuItems[0]).toHaveTextContent(/^Unpublish$/i);
     expect(menuItems[1]).toHaveTextContent(link);
+    expect(menuItems[1]).toHaveStyle({ borderTop: "1px solid" });
     expect(menuItems[2]).toHaveTextContent(/^send to bin$/i);
   });
 
@@ -52,6 +53,7 @@ describe("PostMenu", () => {
     expect(menuItems).toHaveLength(3);
     expect(menuItems[0]).toHaveTextContent(/^publish$/i);
     expect(menuItems[1]).toHaveTextContent(link);
+    expect(menuItems[1]).toHaveStyle({ borderTop: "1px solid" });
     expect(menuItems[2]).toHaveTextContent(/^send to bin$/i);
   });
 });
