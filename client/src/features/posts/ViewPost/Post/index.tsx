@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import PostWrapper from "../PostWrapper";
+import PostWrapper from "@features/posts/components/GetPost/PostWrapper";
 import PostHeader from "./PostHeader";
 import PostMetadataList from "./PostMetadataList";
 import PostTableOfContents from "./PostTableOfContents";

@@ -55,7 +55,7 @@ const post: PostData = {
 
 export const writePost: Cache.WriteQueryOptions<ViewPostData, object> = {
   query: GET_POST,
-  data: { getPost: { __typename: "SinglePost", post, status: "SUCCESS" } },
+  data: { getPost: { __typename: "SinglePost", post } },
 };
 
 export const server = setupServer(

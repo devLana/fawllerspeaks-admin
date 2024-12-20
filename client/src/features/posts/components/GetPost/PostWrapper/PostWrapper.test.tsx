@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 
 import { screen } from "@testing-library/react";
 
-import PostWrapper from "../PostWrapper";
+import PostWrapper from ".";
 import { renderUI } from "@utils/tests/renderUI";
 
 describe("ViewPost page, On redirect from create post page", () => {
