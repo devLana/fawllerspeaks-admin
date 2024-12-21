@@ -1,7 +1,7 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
-import type { Mutation, MutationVerifyResetTokenArgs as Args } from "@apiTypes";
+import type { MutationVerifyResetTokenArgs as Args } from "@apiTypes";
+import type { VerifyResetTokenData } from "types/auth/resetPassword";
 
-type VerifyResetTokenData = Pick<Mutation, "verifyResetToken">;
 type VerifyResetToken = TypedDocumentNode<VerifyResetTokenData, Args>;
 
 export const VERIFY_PASSWORD_RESET_TOKEN: VerifyResetToken = gql`

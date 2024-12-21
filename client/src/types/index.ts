@@ -7,6 +7,7 @@ import type { EmotionCache } from "@emotion/react";
 import type { OverridableComponent } from "@mui/material/OverridableComponent";
 import type { SvgIconTypeMap } from "@mui/material/SvgIcon/SvgIcon";
 import type { SxProps } from "@mui/material/styles";
+import type { Status as ApiStatus } from "@apiTypes";
 
 export type PageLayoutFn = (
   page: React.ReactElement,
@@ -43,3 +44,11 @@ export type RefetchQueriesFn<T extends object> = Extract<
 
 export type OnCompleted<T extends object> = MutationOptions<T>["onCompleted"];
 export type OnError = MutationOptions["onError"];
+
+type RemoveApiStatusHelper<T extends object> = T extends { status: ApiStatus }
+  ? Omit<T, "status">
+  : T;
+
+export type RemoveApiStatusMapper<T extends Record<string, object>> = {
+  [Key in keyof T]: RemoveApiStatusHelper<T[Key]>;
+};

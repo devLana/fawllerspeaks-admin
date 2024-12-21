@@ -5,8 +5,8 @@ import { useApolloClient } from "@apollo/client";
 
 import { useSession } from "@context/Session";
 import { SESSION_ID } from "@utils/constants";
-import type { Mutation } from "@apiTypes";
 import type { OnCompleted, Status } from "@types";
+import type { LogoutData } from "types/layouts/logout";
 
 const useLogout = (onCloseModal: () => void) => {
   const [status, setStatus] = React.useState<Status>("idle");
@@ -14,7 +14,7 @@ const useLogout = (onCloseModal: () => void) => {
   const client = useApolloClient();
   const { handleClearRefreshTokenTimer } = useSession();
 
-  const onCompleted: OnCompleted<Pick<Mutation, "logout">> = logoutData => {
+  const onCompleted: OnCompleted<LogoutData> = logoutData => {
     switch (logoutData.logout.__typename) {
       case "NotAllowedError":
       case "UnknownError":

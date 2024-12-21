@@ -4,7 +4,7 @@ import { ApolloError } from "@apollo/client";
 
 import apolloClient from "@context/Auth/helpers/apolloClient";
 import { VERIFY_PASSWORD_RESET_TOKEN } from "@mutations/resetPassword/VERIFY_PASSWORD_RESET_TOKEN";
-import type { ResetPasswordPageData } from "types/resetPassword";
+import type { ResetPasswordPageData } from "types/auth/resetPassword";
 
 type Query = GetServerSidePropsContext["query"];
 type ReturnData = GetServerSidePropsResult<ResetPasswordPageData>;

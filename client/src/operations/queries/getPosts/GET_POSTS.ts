@@ -6,17 +6,6 @@ import type { GetPostsPageData } from "types/posts/getPosts";
 type GetPostsData = TypedDocumentNode<GetPostsPageData, QueryGetPostsArgs>;
 
 export const GET_POSTS: GetPostsData = gql`
-  fragment PostsPageData on Post {
-    id
-    title
-    imageBanner
-    status
-    dateCreated
-    url {
-      slug
-    }
-  }
-
   query GetPosts($page: GetPostsPageInput, $filters: GetPostsFiltersInput) {
     getPosts(page: $page, filters: $filters) {
       ... on BaseResponse {
@@ -30,7 +19,14 @@ export const GET_POSTS: GetPostsData = gql`
       }
       ... on GetPostsData {
         posts {
-          ...PostsPageData
+          id
+          title
+          imageBanner
+          status
+          dateCreated
+          url {
+            slug
+          }
         }
         pageData {
           after

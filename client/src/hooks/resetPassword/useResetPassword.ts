@@ -1,10 +1,10 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import type { Mutation, MutationResetPasswordArgs } from "@apiTypes";
+import type { MutationResetPasswordArgs } from "@apiTypes";
 import type { OnCompleted, Status } from "@types";
 import type { UseFormSetError } from "react-hook-form";
-import type { View } from "types/resetPassword";
+import type { ResetPasswordData, View } from "types/auth/resetPassword";
 
 const useResetPassword = (
   setError: UseFormSetError<Omit<MutationResetPasswordArgs, "token">>,
@@ -13,7 +13,7 @@ const useResetPassword = (
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
   const { push } = useRouter();
 
-  const onCompleted: OnCompleted<Pick<Mutation, "resetPassword">> = data => {
+  const onCompleted: OnCompleted<ResetPasswordData> = data => {
     switch (data.resetPassword.__typename) {
       case "ResetPasswordValidationError": {
         const focus = { shouldFocus: true };

@@ -9,7 +9,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import Logout from "../Logout";
 import transition from "@utils/layouts/transition";
-import type { NavbarButtonItem } from "types/navbar";
+import type { NavbarButtonItem } from "types/layouts/navbar";
 
 interface NavbarLogoutButtonProps extends NavbarButtonItem {
   isOpen: boolean;

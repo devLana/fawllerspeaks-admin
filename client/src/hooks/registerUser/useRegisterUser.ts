@@ -5,8 +5,9 @@ import { useApolloClient } from "@apollo/client";
 import type { UseFormSetError } from "react-hook-form";
 
 import { SESSION_ID } from "@utils/constants";
-import type { Mutation, MutationRegisterUserArgs } from "@apiTypes";
+import type { MutationRegisterUserArgs } from "@apiTypes";
 import type { OnCompleted, Status } from "@types";
+import type { RegisterUserData } from "types/auth/registerUser";
 
 type RegisterUserArgs = MutationRegisterUserArgs["userInput"];
 
@@ -16,7 +17,7 @@ const useRegisterUser = (setError: UseFormSetError<RegisterUserArgs>) => {
 
   const client = useApolloClient();
 
-  const onCompleted: OnCompleted<Pick<Mutation, "registerUser">> = data => {
+  const onCompleted: OnCompleted<RegisterUserData> = data => {
     switch (data.registerUser.__typename) {
       case "RegisterUserValidationError": {
         const {

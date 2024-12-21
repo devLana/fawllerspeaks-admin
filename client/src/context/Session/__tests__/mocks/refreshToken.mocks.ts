@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
 
-import { REFRESH_TOKEN } from "@mutations/auth/REFRESH_TOKEN";
+import { REFRESH_TOKEN } from "@mutations/session/REFRESH_TOKEN";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
 interface Redirects {

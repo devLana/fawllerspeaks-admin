@@ -1,9 +1,9 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
 import { USER_FIELDS } from "@fragments/USER";
-import type { Mutation, MutationEditProfileArgs } from "@apiTypes";
+import type { MutationEditProfileArgs } from "@apiTypes";
+import type { EditProfileData } from "types/settings/editProfile";
 
-type EditProfileData = Pick<Mutation, "editProfile">;
 type EditProfile = TypedDocumentNode<EditProfileData, MutationEditProfileArgs>;
 
 export const EDIT_PROFILE: EditProfile = gql`

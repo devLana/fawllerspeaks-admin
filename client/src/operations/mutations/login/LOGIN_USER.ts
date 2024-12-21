@@ -1,9 +1,9 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
 import { USER_FIELDS } from "@fragments/USER";
-import type { Mutation, MutationLoginArgs } from "@apiTypes";
+import type { MutationLoginArgs } from "@apiTypes";
+import type { LoginData } from "types/auth/login";
 
-type LoginData = Pick<Mutation, "login">;
 type Login = TypedDocumentNode<LoginData, MutationLoginArgs>;
 
 export const LOGIN_USER: Login = gql`

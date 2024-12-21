@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { ApolloError, useApolloClient } from "@apollo/client";
 
 import { useAuth } from "@context/Auth";
-import { VERIFY_SESSION } from "@mutations/auth/VERIFY_SESSION";
+import { VERIFY_SESSION } from "@mutations/session/VERIFY_SESSION";
 import { SESSION_ID } from "@utils/constants";
 
 type HandleRefreshToken = (accessToken: string) => void;

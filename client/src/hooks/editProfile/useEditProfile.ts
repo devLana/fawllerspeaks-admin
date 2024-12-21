@@ -6,9 +6,12 @@ import type { UseFormSetError } from "react-hook-form";
 
 import useUploadImage from "@hooks/useUploadImage";
 import { SESSION_ID } from "@utils/constants";
-import type { Mutation, MutationEditProfileArgs as Args } from "@apiTypes";
+import type { MutationEditProfileArgs as Args } from "@apiTypes";
 import type { Status } from "@types";
-import type { EditProfileImage } from "types/editProfile";
+import type {
+  EditProfileData,
+  EditProfileImage,
+} from "types/settings/editProfile";
 
 const useEditProfile = (setError: UseFormSetError<Omit<Args, "image">>) => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
@@ -58,10 +61,7 @@ const useEditProfile = (setError: UseFormSetError<Omit<Args, "image">>) => {
     return { imageUrl, uploadHasError };
   };
 
-  const onCompleted = (
-    data: Pick<Mutation, "editProfile">,
-    uploadHasError: boolean
-  ) => {
+  const onCompleted = (data: EditProfileData, uploadHasError: boolean) => {
     switch (data.editProfile.__typename) {
       case "EditProfileValidationError": {
         const focus = { shouldFocus: true };

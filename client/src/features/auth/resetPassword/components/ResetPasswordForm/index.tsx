@@ -12,7 +12,7 @@ import PasswordInput from "@components/ui/PasswordInput";
 import { resetPasswordSchema } from "@validators/resetPasswordSchema";
 import { RESET_PASSWORD } from "@mutations/resetPassword/RESET_PASSWORD";
 import type { MutationResetPasswordArgs } from "@apiTypes";
-import type { ResetPasswordFormProps as Props } from "types/resetPassword";
+import type { ResetPasswordFormProps as Props } from "types/auth/resetPassword";
 
 type OmitToken = Omit<MutationResetPasswordArgs, "token">;
 

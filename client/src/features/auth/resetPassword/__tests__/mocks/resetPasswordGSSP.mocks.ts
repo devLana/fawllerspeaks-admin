@@ -4,7 +4,7 @@ import { setupServer } from "msw/node";
 
 import { VERIFY_PASSWORD_RESET_TOKEN } from "@mutations/resetPassword/VERIFY_PASSWORD_RESET_TOKEN";
 import { mswData, mswErrors } from "@utils/tests/msw";
-import type { PageView, Verified } from "types/resetPassword";
+import type { PageView, Verified } from "types/auth/resetPassword";
 
 interface Dict {
   token: string;

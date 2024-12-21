@@ -1,7 +1,7 @@
 import { gql, type TypedDocumentNode as DocNode } from "@apollo/client";
-import type { Mutation, MutationForgotPasswordArgs } from "@apiTypes";
+import type { ForgotPasswordData } from "types/auth/forgotPassword";
+import type { MutationForgotPasswordArgs } from "@apiTypes";
 
-type ForgotPasswordData = Pick<Mutation, "forgotPassword">;
 type ForgotPassword = DocNode<ForgotPasswordData, MutationForgotPasswordArgs>;
 
 export const FORGOT_PASSWORD: ForgotPassword = gql`

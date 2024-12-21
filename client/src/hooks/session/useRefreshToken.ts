@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useApolloClient } from "@apollo/client";
 
 import { useAuth } from "@context/Auth";
-import { REFRESH_TOKEN } from "@mutations/auth/REFRESH_TOKEN";
+import { REFRESH_TOKEN } from "@mutations/session/REFRESH_TOKEN";
 import { SESSION_ID } from "@utils/constants";
 
 const useRefreshToken = () => {

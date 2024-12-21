@@ -1,6 +1,4 @@
 import type { Mutation } from "@apiTypes";
-import type { PostTagDataMapper } from ".";
+import type { PostTagDataMapper as Mapper } from ".";
 
-export type CreatePostTagsData = PostTagDataMapper<
-  Pick<Mutation, "createPostTags">
->;
+export type CreatePostTagsData = Mapper<Pick<Mutation, "createPostTags">>;

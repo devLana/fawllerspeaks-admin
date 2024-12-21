@@ -4,7 +4,7 @@ import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternate
 import { useHandleFile } from "@hooks/useHandleFile";
 import EditProfileImagePreview from "./EditProfileImagePreview";
 import { FileInput } from "@components/ui/FileInput";
-import type { EditProfileImage } from "types/editProfile";
+import type { EditProfileImage } from "types/settings/editProfile";
 import type { Status, StateSetterFn } from "@types";
 
 interface EditProfileFileInputProps {

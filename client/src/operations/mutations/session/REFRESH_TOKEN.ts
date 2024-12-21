@@ -1,7 +1,7 @@
 import { gql, type TypedDocumentNode as DocNode } from "@apollo/client";
-import type { Mutation, MutationRefreshTokenArgs } from "@apiTypes";
+import type { MutationRefreshTokenArgs } from "@apiTypes";
+import type { RefreshTokenData } from "types/session/refreshToken";
 
-type RefreshTokenData = Pick<Mutation, "refreshToken">;
 type RefreshToken = DocNode<RefreshTokenData, MutationRefreshTokenArgs>;
 
 export const REFRESH_TOKEN: RefreshToken = gql`

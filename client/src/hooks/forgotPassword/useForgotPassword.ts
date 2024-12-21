@@ -2,7 +2,8 @@ import * as React from "react";
 
 import type { UseFormSetError } from "react-hook-form";
 
-import type { Mutation, MutationForgotPasswordArgs } from "@apiTypes";
+import type { ForgotPasswordData } from "types/auth/forgotPassword";
+import type { MutationForgotPasswordArgs } from "@apiTypes";
 import type { AuthPageView, OnCompleted, Status } from "@types";
 
 const useForgotPassword = (
@@ -11,7 +12,7 @@ const useForgotPassword = (
 ) => {
   const [formStatus, setFormStatus] = React.useState<Status>("idle");
 
-  const onCompleted: OnCompleted<Pick<Mutation, "forgotPassword">> = data => {
+  const onCompleted: OnCompleted<ForgotPasswordData> = data => {
     switch (data.forgotPassword.__typename) {
       case "EmailValidationError": {
         const { emailError } = data.forgotPassword;

@@ -1,10 +1,8 @@
 import type { Mutation } from "@apiTypes";
-import type { PostTagDataMapper } from ".";
+import type { PostTagDataMapper as Mapper } from ".";
 import type { PostTagsListAction } from "./getPostTags";
 
-export type DeletePostTagsData = PostTagDataMapper<
-  Pick<Mutation, "deletePostTags">
->;
+export type DeletePostTagsData = Mapper<Pick<Mutation, "deletePostTags">>;
 
 export interface DeletePostTagsProps {
   open: boolean;

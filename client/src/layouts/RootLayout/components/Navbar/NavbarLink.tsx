@@ -8,7 +8,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import NextLink from "@components/ui/NextLink";
 import transition from "@utils/layouts/transition";
-import type { NavbarLinkItem } from "types/navbar";
+import type { NavbarLinkItem } from "types/layouts/navbar";
 
 interface NavbarLinkProps extends NavbarLinkItem {
   isOpen: boolean;

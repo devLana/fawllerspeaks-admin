@@ -5,7 +5,7 @@ import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded";
-import type { NavbarButtonItem, NavbarLinkItem } from "types/navbar";
+import type { NavbarButtonItem, NavbarLinkItem } from "types/layouts/navbar";
 
 interface LinkItem extends NavbarLinkItem {
   type: "link";

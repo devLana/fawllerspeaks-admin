@@ -1,7 +1,7 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
-import type { Mutation, MutationLogoutArgs } from "@apiTypes";
+import type { MutationLogoutArgs } from "@apiTypes";
+import type { LogoutData } from "types/layouts/logout";
 
-type LogoutData = Pick<Mutation, "logout">;
 type Logout = TypedDocumentNode<LogoutData, MutationLogoutArgs>;
 
 export const LOGOUT: Logout = gql`

@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
 
-import { VERIFY_SESSION } from "@mutations/auth/VERIFY_SESSION";
+import { VERIFY_SESSION } from "@mutations/session/VERIFY_SESSION";
 import { mswData, mswErrors } from "@utils/tests/msw";
 
 export const TEXT_NODE = "Testing User Authentication";

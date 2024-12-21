@@ -6,7 +6,8 @@ import type { UseFormSetError } from "react-hook-form";
 import { useSession } from "@context/Session";
 import { useAuth } from "@context/Auth";
 import { SESSION_ID } from "@utils/constants";
-import type { Mutation, MutationLoginArgs } from "@apiTypes";
+import type { LoginData } from "types/auth/login";
+import type { MutationLoginArgs } from "@apiTypes";
 import type { OnCompleted, Status } from "@types";
 
 const useLogin = (setError: UseFormSetError<MutationLoginArgs>) => {
@@ -16,7 +17,7 @@ const useLogin = (setError: UseFormSetError<MutationLoginArgs>) => {
   const { handleUserId, handleRefreshToken } = useSession();
   const { handleAuthHeader } = useAuth();
 
-  const onCompleted: OnCompleted<Pick<Mutation, "login">> = loginData => {
+  const onCompleted: OnCompleted<LoginData> = loginData => {
     switch (loginData.login.__typename) {
       case "LoginValidationError": {
         const focus = { shouldFocus: true };

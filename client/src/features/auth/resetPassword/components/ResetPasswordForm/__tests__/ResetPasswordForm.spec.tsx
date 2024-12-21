@@ -5,7 +5,7 @@ import { screen, waitFor } from "@testing-library/react";
 import ResetPasswordForm from "..";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./ResetPasswordForm.mocks";
-import type { ResetPasswordFormProps } from "types/resetPassword";
+import type { ResetPasswordFormProps } from "types/auth/resetPassword";
 
 describe("Reset Password Form", () => {
   const mockHandleView = vi.fn().mockName("handleView");

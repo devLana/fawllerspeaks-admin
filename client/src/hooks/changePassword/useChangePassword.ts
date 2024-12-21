@@ -5,8 +5,9 @@ import { useApolloClient } from "@apollo/client";
 import type { UseFormReset, UseFormSetError } from "react-hook-form";
 
 import { SESSION_ID } from "@utils/constants";
-import type { Mutation, MutationChangePasswordArgs } from "@apiTypes";
+import type { MutationChangePasswordArgs } from "@apiTypes";
 import type { OnCompleted, Status } from "@types";
+import type { ChangePasswordData } from "types/settings/changePassword";
 
 type RequestStatus = Status | "success";
 
@@ -19,7 +20,7 @@ const useChangePassword = (
 
   const client = useApolloClient();
 
-  const onCompleted: OnCompleted<Pick<Mutation, "changePassword">> = data => {
+  const onCompleted: OnCompleted<ChangePasswordData> = data => {
     switch (data.changePassword.__typename) {
       case "ChangePasswordValidationError": {
         const fieldErrors = data.changePassword;

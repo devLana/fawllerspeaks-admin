@@ -1,4 +1,4 @@
-import type { ResetPasswordFormProps as Props } from "types/resetPassword";
+import type { ResetPasswordFormProps as Props } from "types/auth/resetPassword";
 
 const ResetPasswordForm = ({ email }: Pick<Props, "email">) => (
   <form aria-labelledby="page-title">

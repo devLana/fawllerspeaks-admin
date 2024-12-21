@@ -25,8 +25,8 @@ export type PostsPagePostData = Pick<PostData, PostsPageDataKeys> & {
 type PostsPageDataMapper<T extends object> = T extends { posts: Post[] }
   ? Omit<T, "posts" | "status"> & { posts: PostsPagePostData[] }
   : T extends { __typename?: "GetPostsValidationError" }
-  ? Omit<T, ValidationErrorKeys>
-  : T;
+  ? Omit<T, ValidationErrorKeys | "status">
+  : Omit<T, "status">;
 
 export interface GetPostsPageData {
   getPosts: PostsPageDataMapper<GetPosts>;
