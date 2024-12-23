@@ -2,10 +2,10 @@ import { useRouter } from "next/router";
 
 import { screen } from "@testing-library/react";
 
-import PostWrapper from ".";
+import ViewPostWrapper from ".";
 import { renderUI } from "@utils/tests/renderUI";
 
-describe("ViewPost page, On redirect from create post page", () => {
+describe("ViewPost page wrapper, On redirect from create post page", () => {
   afterAll(() => {
     const router = useRouter();
     router.query = {};
@@ -36,7 +36,7 @@ describe("ViewPost page, On redirect from create post page", () => {
     const router = useRouter();
     router.query = query;
 
-    renderUI(<PostWrapper label="View post page" />);
+    renderUI(<ViewPostWrapper label="View post page" />);
 
     expect(screen.getByRole("alert")).toHaveTextContent(message);
   });

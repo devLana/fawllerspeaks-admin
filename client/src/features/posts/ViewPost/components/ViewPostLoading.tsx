@@ -1,16 +1,16 @@
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 
-import PostWrapper from "./PostWrapper";
+import ViewPostWrapper from "./ViewPostWrapper";
 
-const PostLoading = ({ label }: { label: string }) => (
-  <PostWrapper ariaBusy={true} label={label}>
+const ViewPostLoading = ({ label }: { label: string }) => (
+  <ViewPostWrapper ariaBusy={true} label={label}>
     <Box
       sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
     >
       <CircularProgress size="1.9em" aria-label="Loading view post page" />
     </Box>
-  </PostWrapper>
+  </ViewPostWrapper>
 );
 
-export default PostLoading;
+export default ViewPostLoading;

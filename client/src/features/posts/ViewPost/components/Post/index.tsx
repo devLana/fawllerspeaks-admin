@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import PostWrapper from "@features/posts/components/GetPost/PostWrapper";
+import ViewPostWrapper from "../ViewPostWrapper";
 import PostHeader from "./PostHeader";
 import PostMetadataList from "./PostMetadataList";
 import PostTableOfContents from "./PostTableOfContents";
@@ -11,7 +11,7 @@ import PostContentView from "@features/posts/components/PostContentView";
 import type { PostData } from "types/posts";
 
 const Post = ({ label, post }: { label: string; post: PostData }) => (
-  <PostWrapper label={label}>
+  <ViewPostWrapper label={label}>
     <PostHeader slug={post.url.slug} status={post.status} title={post.title} />
     <Box
       sx={{
@@ -74,7 +74,7 @@ const Post = ({ label, post }: { label: string; post: PostData }) => (
         {post.content?.html && <PostContentView content={post.content.html} />}
       </Box>
     </Box>
-  </PostWrapper>
+  </ViewPostWrapper>
 );
 
 export default Post;

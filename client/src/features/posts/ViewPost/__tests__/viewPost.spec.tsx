@@ -6,7 +6,7 @@ import ViewPost from "@pages/posts/view/[slug]";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./viewPost.mocks";
 
-vi.mock("../../components/GetPost/PostWrapper");
+vi.mock("../ViewPostWrapper");
 vi.mock("../Post");
 
 describe("View Post Page", () => {

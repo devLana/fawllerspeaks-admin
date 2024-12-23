@@ -1,12 +1,12 @@
 import Snackbar from "@mui/material/Snackbar";
 import useStatusAlert from "@hooks/viewPost/useStatusAlert";
 
-type PostWrapperProps = React.PropsWithChildren<{
+type ViewPostWrapperProps = React.PropsWithChildren<{
   ariaBusy?: boolean;
   label: string;
 }>;
 
-const PostWrapper = (props: PostWrapperProps) => {
+const ViewPostWrapper = (props: ViewPostWrapperProps) => {
   const { ariaBusy = false, children, label } = props;
   const { onClose, message, open } = useStatusAlert();
 
@@ -18,4 +18,4 @@ const PostWrapper = (props: PostWrapperProps) => {
   );
 };
 
-export default PostWrapper;
+export default ViewPostWrapper;

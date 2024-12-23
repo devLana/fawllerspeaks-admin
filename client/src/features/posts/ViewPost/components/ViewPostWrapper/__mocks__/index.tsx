@@ -3,7 +3,7 @@ type PostWrapperProps = React.PropsWithChildren<{
   label: string;
 }>;
 
-const PostWrapper = (props: PostWrapperProps) => {
+const ViewPostWrapper = (props: PostWrapperProps) => {
   const { ariaBusy = false, children, label } = props;
 
   return (
@@ -13,4 +13,4 @@ const PostWrapper = (props: PostWrapperProps) => {
   );
 };
 
-export default PostWrapper;
+export default ViewPostWrapper;
