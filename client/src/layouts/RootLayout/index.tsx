@@ -47,6 +47,7 @@ const RootLayout = (props: RootLayoutProps) => {
       />
       <Navbar
         isOpen={navBarIsOpen}
+        isLoading={!clientHasRendered}
         onToggleNav={() => setNavBarIsOpen(!navBarIsOpen)}
         onCloseNav={() => setNavBarIsOpen(false)}
       />

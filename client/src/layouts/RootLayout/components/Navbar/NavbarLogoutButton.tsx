@@ -5,6 +5,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import Skeleton from "@mui/material/Skeleton";
 import Tooltip from "@mui/material/Tooltip";
 
 import Logout from "../Logout";
@@ -13,16 +14,26 @@ import type { NavbarButtonItem } from "types/layouts/navbar";
 
 interface NavbarLogoutButtonProps extends NavbarButtonItem {
   isOpen: boolean;
+  isLoading: boolean;
   showTooltip: boolean;
 }
 
 const NavbarLogoutButton = (props: NavbarLogoutButtonProps) => {
-  const { label, Icon, isOpen, showTooltip } = props;
+  const { label, Icon, isOpen, isLoading, showTooltip } = props;
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
-  return (
+  return isLoading ? (
+    <ListItem disablePadding aria-live="polite" aria-busy={true}>
+      <Skeleton
+        variant="rounded"
+        aria-label="Loading logout button"
+        height={40}
+        width={152}
+      />
+    </ListItem>
+  ) : (
     <>
-      <ListItem disablePadding>
+      <ListItem disablePadding aria-live="polite" aria-busy={false}>
         <Tooltip title={showTooltip ? label : null} placement="right">
           <ListItemButton
             sx={{

@@ -11,11 +11,13 @@ import transition from "@utils/layouts/transition";
 
 interface NavbarProps {
   isOpen: boolean;
+  isLoading: boolean;
   onToggleNav: () => void;
   onCloseNav: () => void;
 }
 
-const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
+const Navbar = (props: NavbarProps) => {
+  const { isOpen, isLoading, onToggleNav, onCloseNav } = props;
   const belowSm = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const sm_Above = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
   const md_Above = useMediaQuery((theme: Theme) => theme.breakpoints.up("md"));
@@ -54,6 +56,7 @@ const Navbar = ({ isOpen, onToggleNav, onCloseNav }: NavbarProps) => {
         key={item.label}
         {...items}
         isOpen={isOpen}
+        isLoading={isLoading}
         showTooltip={showTooltip}
       />
     );

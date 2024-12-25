@@ -54,7 +54,7 @@ const Header = ({ onClick, isLoading }: HeaderProps) => (
         }}
       >
         <HeaderThemeButton />
-        <div aria-label="polite" aria-busy={isLoading}>
+        <div aria-live="polite" aria-busy={isLoading}>
           {isLoading ? (
             <Skeleton
               variant="circular"
