@@ -26,7 +26,7 @@ type Draft = TestData<{ draftPost: Record<string, unknown> }>;
 jest.mock("@lib/supabase/supabaseEvent");
 
 const mockEvent = jest.spyOn(supabaseEvent, "emit");
-mockEvent.mockImplementation(() => true);
+mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
 describe("Draft post - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
@@ -79,6 +79,7 @@ describe("Draft post - E2E", () => {
 
       const { data } = await post<Draft>(url, payload);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -90,22 +91,13 @@ describe("Draft post - E2E", () => {
   });
 
   describe("Validate user input", () => {
-    it.each(mocks.gqlValidations)("%s", async (_, postData) => {
-      const payload = { query: DRAFT_POST, variables: { post: postData } };
-      const options = { authorization: `Bearer ${unRegisteredJwt}` };
-
-      const { data } = await post<Draft>(url, payload, options);
-
-      expect(data.errors).toBeDefined();
-      expect(data.data).toBeUndefined();
-    });
-
     it.each(mocks.validations(null))("%s", async (_, input, errors) => {
       const payload = { query: DRAFT_POST, variables: { post: input } };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
 
       const { data } = await post<Draft>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -118,12 +110,13 @@ describe("Draft post - E2E", () => {
 
   describe("Verify logged in user", () => {
     it("Should send an error response if the user is unregistered", async () => {
-      const variables = { post: { ...mocks.argsWithNoImage } };
+      const variables = { post: { ...mocks.argsWithImage } };
       const payload = { query: DRAFT_POST, variables };
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
 
       const { data } = await post<Draft>(url, payload, options);
 
+      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -143,6 +136,7 @@ describe("Draft post - E2E", () => {
 
       const { data } = await post<Draft>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -171,6 +165,7 @@ describe("Draft post - E2E", () => {
 
       const { data } = await post<Draft>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -209,6 +204,7 @@ describe("Draft post - E2E", () => {
 
       const { data } = await post<Draft>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({

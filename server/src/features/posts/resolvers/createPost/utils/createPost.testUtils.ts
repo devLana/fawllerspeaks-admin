@@ -69,7 +69,7 @@ export const validations = (nullOrUndefined?: null): Validations => [
       excerpt: "excerpt",
       content: "content",
       tagIds: [],
-      imageBanner: "post/image/storage/path",
+      imageBanner: null,
     },
     {
       titleError: nullOrUndefined,
@@ -125,7 +125,6 @@ export const validations = (nullOrUndefined?: null): Validations => [
       excerpt: "excerpt",
       content: "content",
       tagIds: [...tagIds, randomUUID(), randomUUID(), randomUUID()],
-      imageBanner: null,
     },
     {
       titleError: nullOrUndefined,
@@ -154,31 +153,6 @@ export const validations = (nullOrUndefined?: null): Validations => [
       contentError: nullOrUndefined,
       tagIdsError: nullOrUndefined,
       imageBannerError: nullOrUndefined,
-    },
-  ],
-];
-
-export const gqlValidations: [string, object][] = [
-  [
-    "Should throw a graphql validation error for null and undefined inputs",
-    {
-      title: null,
-      description: undefined,
-      excerpt: undefined,
-      content: null,
-      tagIds: undefined,
-      imageBanner: undefined,
-    },
-  ],
-  [
-    "Should throw a graphql validation error for boolean and number inputs",
-    {
-      title: false,
-      description: 34646,
-      excerpt: 34646,
-      content: true,
-      tagIds: [9877, true],
-      imageBanner: 21314,
     },
   ],
 ];

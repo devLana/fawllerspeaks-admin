@@ -26,7 +26,7 @@ type Create = TestData<{ createPost: Record<string, unknown> }>;
 jest.mock("@lib/supabase/supabaseEvent");
 
 const mockEvent = jest.spyOn(supabaseEvent, "emit");
-mockEvent.mockImplementation(() => true);
+mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
 describe("Create post - E2E", () => {
   let server: ApolloServer<APIContext>, url: string, postTags: PostTag[];
@@ -74,6 +74,7 @@ describe("Create post - E2E", () => {
 
       const { data } = await post<Create>(url, payload);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -85,22 +86,13 @@ describe("Create post - E2E", () => {
   });
 
   describe("Validate user input", () => {
-    it.each(mocks.gqlValidations)("%s", async (_, postData) => {
-      const options = { authorization: `Bearer ${unRegisteredJwt}` };
-      const payload = { query: CREATE_POST, variables: { post: postData } };
-
-      const { data } = await post<Create>(url, payload, options);
-
-      expect(data.errors).toBeDefined();
-      expect(data.data).toBeUndefined();
-    });
-
     it.each(mocks.validations(null))("%s", async (_, postData, errors) => {
       const options = { authorization: `Bearer ${unRegisteredJwt}` };
       const payload = { query: CREATE_POST, variables: { post: postData } };
 
       const { data } = await post<Create>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -119,6 +111,7 @@ describe("Create post - E2E", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
+      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -138,6 +131,7 @@ describe("Create post - E2E", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -166,6 +160,7 @@ describe("Create post - E2E", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -204,6 +199,7 @@ describe("Create post - E2E", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({

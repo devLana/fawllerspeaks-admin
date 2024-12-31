@@ -4,7 +4,7 @@ import { ValidationError } from "joi";
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import { EditedProfile } from "./types/EditedProfile";
 import { EditProfileValidationError } from "./types/EditProfileValidationError";
-import { editProfileValidator } from "./utils/editProfile.validator";
+import { editProfileValidator as schema } from "./utils/editProfile.validator";
 import {
   AuthenticationError,
   RegistrationError,
@@ -30,17 +30,16 @@ interface UserInfo {
 }
 
 const editProfile: EditProfile = async (_, args, { db, user, req, res }) => {
+  const argsImage = args.image && args.image.trim();
+
   try {
     if (!user) {
-      if (args.image) supabaseEvent.emit("removeImage", args.image);
-      await deleteSession(db, req, res);
+      void deleteSession(db, req, res);
+      if (argsImage) supabaseEvent.emit("removeImage", argsImage);
       return new AuthenticationError("Unable to edit user profile");
     }
 
-    const validated = await editProfileValidator.validateAsync(args, {
-      abortEarly: false,
-    });
-
+    const validated = await schema.validateAsync(args, { abortEarly: false });
     const { firstName, lastName, image } = validated;
 
     const { rows } = await db.query<SelectUSerInfo>(
@@ -49,8 +48,8 @@ const editProfile: EditProfile = async (_, args, { db, user, req, res }) => {
     );
 
     if (rows.length === 0) {
+      void deleteSession(db, req, res);
       if (image) supabaseEvent.emit("removeImage", image);
-      await deleteSession(db, req, res);
       return new UnknownError("Unable to edit user profile");
     }
 
@@ -61,28 +60,17 @@ const editProfile: EditProfile = async (_, args, { db, user, req, res }) => {
       return new RegistrationError("Unable to edit user profile");
     }
 
-    let query: string;
-    let params: (string | null)[];
+    const updateImg = image !== undefined ? image : userImage;
 
-    if (image === undefined) {
-      params = [firstName, lastName, user];
-      query = `
-        UPDATE users
-        SET first_name = $1, last_name = $2
-        WHERE user_id = $3
-        RETURNING email, date_created "dateCreated", image
-      `;
-    } else {
-      params = [firstName, lastName, image, user];
-      query = `
-        UPDATE users
-        SET first_name = $1, last_name = $2, image = $3
-        WHERE user_id = $4
-        RETURNING email, date_created "dateCreated", image
-      `;
-    }
-
-    const { rows: userInfo } = await db.query<UserInfo>(query, params);
+    const { rows: userInfo } = await db.query<UserInfo>(
+      `UPDATE users SET
+        first_name = $1,
+        last_name = $2,
+        image = $3
+      WHERE user_id = $4
+      RETURNING email, date_created "dateCreated", image`,
+      [firstName, lastName, updateImg, user]
+    );
 
     if (image !== undefined && userImage) {
       supabaseEvent.emit("removeImage", userImage);
@@ -98,7 +86,7 @@ const editProfile: EditProfile = async (_, args, { db, user, req, res }) => {
       dateCreated: userInfo[0].dateCreated,
     });
   } catch (err) {
-    if (args.image) supabaseEvent.emit("removeImage", args.image);
+    if (argsImage) supabaseEvent.emit("removeImage", argsImage);
 
     if (err instanceof ValidationError) {
       const { firstNameError, lastNameError, imageError } =

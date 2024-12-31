@@ -15,7 +15,7 @@ jest.mock("@utils/deleteSession", () => {
 jest.mock("@lib/supabase/supabaseEvent");
 
 const mockEvent = jest.spyOn(supabaseEvent, "emit");
-mockEvent.mockImplementation(() => true);
+mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
 beforeEach(() => {
   mockContext.user = "mocked_user_id";
@@ -29,6 +29,7 @@ describe("Test createPost resolver", () => {
       const post = mocks.argsWithNoImage;
       const result = await createPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to create post");
       expect(result).toHaveProperty("status", "ERROR");
@@ -39,6 +40,7 @@ describe("Test createPost resolver", () => {
     it.each(mocks.validations())("%s", async (_, post, errors) => {
       const data = await createPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data).toHaveProperty("titleError", errors.titleError);
       expect(data).toHaveProperty("descriptionError", errors.descriptionError);
       expect(data).toHaveProperty("excerptError", errors.excerptError);
@@ -51,11 +53,12 @@ describe("Test createPost resolver", () => {
 
   describe("Verify user", () => {
     it.each(mocks.verifyUser)("%s", async (_, data) => {
-      spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
+      spyDb({ rows: data });
 
       const post = { ...mocks.argsWithImage };
       const result = await createPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to create post");
       expect(result).toHaveProperty("status", "ERROR");
     });
@@ -69,6 +72,7 @@ describe("Test createPost resolver", () => {
       const post = { ...mocks.argsWithNoImage, tagIds: null };
       const data = await createPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data).toHaveProperty("status", "ERROR");
       expect(data).toHaveProperty("message", errorMsg);
     });
@@ -83,6 +87,7 @@ describe("Test createPost resolver", () => {
       const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
       const result = await createPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(result).toHaveProperty("post.id", mocks.dbPost.id);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.excerpt", post.excerpt);
@@ -114,6 +119,7 @@ describe("Test createPost resolver", () => {
       const post = mocks.argsWithNoImage;
       const result = await createPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(result).toHaveProperty("post.imageBanner", null);
       expect(result).toHaveProperty("post.tags", null);
       expect(result).toHaveProperty("post.url", mocks.url2);

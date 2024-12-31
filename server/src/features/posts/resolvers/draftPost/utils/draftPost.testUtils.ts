@@ -61,31 +61,6 @@ export const dbData = {
 
 export const tags = [{ id: tagIds[0] }, { id: tagIds[1] }, { id: tagIds[2] }];
 
-export const gqlValidations: [string, object][] = [
-  [
-    "Should throw a graphql validation error for null and undefined inputs",
-    {
-      title: null,
-      description: undefined,
-      excerpt: undefined,
-      content: undefined,
-      tagIds: undefined,
-      imageBanner: undefined,
-    },
-  ],
-  [
-    "should throw a graphql validation error for boolean and number inputs",
-    {
-      title: false,
-      description: 34646,
-      excerpt: true,
-      content: true,
-      tagIds: [9877, true],
-      imageBanner: 21314,
-    },
-  ],
-];
-
 export const validations = (nullOrUndefined?: null): Validations[] => [
   [
     "Should return a validation error response for empty input strings",

@@ -30,10 +30,12 @@ interface User {
 }
 
 const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
+  const postImage = post.imageBanner && post.imageBanner.trim();
+
   try {
     if (!user) {
-      await deleteSession(db, req, res);
-      if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
+      if (postImage) supabaseEvent.emit("removeImage", postImage);
+      void deleteSession(db, req, res);
       return new AuthenticationError("Unable to create post");
     }
 
@@ -41,7 +43,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     const { title, description, excerpt, content, tagIds, imageBanner } = input;
     const slug = getPostSlug(title);
 
-    const checkUser = db.query<User>(
+    const { rows: loggedInUser } = await db.query<User>(
       `SELECT
         is_registered "isRegistered",
         concat(first_name,' ',last_name) "authorName",
@@ -51,18 +53,8 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       [user]
     );
 
-    const checkTitleSlug = db.query<{ slug: string; title: string }>(
-      `SELECT slug, title
-      FROM posts
-      WHERE slug = $1 OR lower(title) = $2`,
-      [slug, title.toLowerCase()]
-    );
-
-    const [{ rows: loggedInUser }, { rows: savedTitleSlug }] =
-      await Promise.all([checkUser, checkTitleSlug]);
-
     if (loggedInUser.length === 0) {
-      await deleteSession(db, req, res);
+      void deleteSession(db, req, res);
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new NotAllowedError("Unable to create post");
     }
@@ -74,8 +66,15 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       return new RegistrationError("Unable to create post");
     }
 
-    if (savedTitleSlug.length > 0) {
-      const [{ slug: savedSlug, title: savedTitle }] = savedTitleSlug;
+    const { rows: findPost } = await db.query<{ slug: string; title: string }>(
+      `SELECT slug, title
+      FROM posts
+      WHERE slug = $1 OR lower(title) = $2`,
+      [slug, title.toLowerCase()]
+    );
+
+    if (findPost.length > 0) {
+      const [{ slug: savedSlug, title: savedTitle }] = findPost;
 
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
 
@@ -176,7 +175,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       tags: saved.tags,
     });
   } catch (err) {
-    if (post.imageBanner) supabaseEvent.emit("removeImage", post.imageBanner);
+    if (postImage) supabaseEvent.emit("removeImage", postImage);
 
     if (err instanceof ValidationError) {
       return new PostValidationError(generateErrorsObject(err.details));

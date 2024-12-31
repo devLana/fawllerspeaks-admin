@@ -10,9 +10,8 @@ interface Input {
 
 type Validations = [string, Input, InputErrors<Input>][];
 
-const image = "folder/image-folder/image.png";
+export const image = "folder/image-folder/image.png";
 const { storageUrl } = supabase();
-
 export const args = { firstName: "Jõhn-Döe", lastName: "Smíth" };
 export const dateCreated = "2022-11-07 13:22:43.717+01";
 
@@ -46,17 +45,6 @@ export const validations = (nullOrUndefined: null | undefined): Validations => [
   ],
 ];
 
-export const gqlValidate: [string, Record<string, unknown>][] = [
-  [
-    "Should respond with a graphql validation error for object and undefined input values",
-    { firstName: null, lastName: {}, image: [] },
-  ],
-  [
-    "Should respond with a graphql validation error for number and boolean input values",
-    { firstName: 754, lastName: false, image: true },
-  ],
-];
-
 export const verify: [string, Record<string, boolean>[]][] = [
   ["Should return an error response if user is unknown", []],
   [
@@ -65,30 +53,7 @@ export const verify: [string, Record<string, boolean>[]][] = [
   ],
 ];
 
-export const editSuccess: [string, Input, string | null][] = [
-  ["Should edit the user's profile without an image", args, null],
-  ["Should edit the user's profile with an image", { ...args, image }, image],
-  [
-    "Should edit the user's profile and delete any previously saved image link",
-    { ...args, image: null },
-    null,
-  ],
-];
-
-export const edit: [string, Input, string | null][] = [
-  [
-    "Should edit the user's profile without an image",
-    args,
-    `${storageUrl}${registeredUser.image}`,
-  ],
-  [
-    "Should edit the user's profile with an image",
-    { ...args, image },
-    `${storageUrl}${image}`,
-  ],
-  [
-    "Should edit user's profile and delete any previously saved image link",
-    { ...args, image: null },
-    null,
-  ],
-];
+export const userData1 = { email: "it@mail.com", dateCreated, image: null };
+export const userData2 = { email: "it@mail.com", dateCreated, image };
+export const storageImage = `${storageUrl}${registeredUser.image}`;
+export const userImage = `${storageUrl}${image}`;

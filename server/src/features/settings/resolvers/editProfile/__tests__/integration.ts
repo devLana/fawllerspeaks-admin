@@ -1,23 +1,10 @@
-import {
-  describe,
-  test,
-  expect,
-  beforeEach,
-  jest,
-  afterEach,
-} from "@jest/globals";
+import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 
 import editProfile from "..";
 import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import spyDb from "@tests/spyDb";
 import { mockContext, info } from "@tests/resolverArguments";
-import {
-  args,
-  dateCreated,
-  editSuccess,
-  validations,
-  verify,
-} from "../utils/editProfile.testUtils";
+import * as mocks from "../utils/editProfile.testUtils";
 import deleteSession from "@utils/deleteSession";
 
 jest.mock("@lib/supabase/supabaseEvent");
@@ -27,23 +14,20 @@ jest.mock("@utils/deleteSession", () => {
 });
 
 const mockEvent = jest.spyOn(supabaseEvent, "emit");
-mockEvent.mockImplementation(() => true);
+mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
 describe("Test edit profile resolver", () => {
   beforeEach(() => {
     mockContext.user = "insane_user_id";
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe("Verify user authentication", () => {
-    test("Should return an error response if the user is not logged in", async () => {
+    it("Should return an error response if the user is not logged in", async () => {
       mockContext.user = null;
 
-      const result = await editProfile({}, args, mockContext, info);
+      const result = await editProfile({}, mocks.args, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to edit user profile");
       expect(result).toHaveProperty("status", "ERROR");
@@ -51,9 +35,10 @@ describe("Test edit profile resolver", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(validations(undefined))("%s", async (_, data, errors) => {
+    it.each(mocks.validations(undefined))("%s", async (_, data, errors) => {
       const result = await editProfile({}, data, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(result).toHaveProperty("firstNameError", errors.firstNameError);
       expect(result).toHaveProperty("lastNameError", errors.lastNameError);
       expect(result).toHaveProperty("imageError", errors.imageError);
@@ -62,36 +47,59 @@ describe("Test edit profile resolver", () => {
   });
 
   describe("Verify user", () => {
-    test.each(verify)("%s", async (_, data) => {
-      const spy = spyDb({ rows: data });
-      const result = await editProfile({}, args, mockContext, info);
+    it.each(mocks.verify)("%s", async (_, data) => {
+      spyDb({ rows: data });
 
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveReturnedWith({ rows: data });
+      const result = await editProfile({}, mocks.args, mockContext, info);
+
       expect(result).toHaveProperty("message", "Unable to edit user profile");
       expect(result).toHaveProperty("status", "ERROR");
     });
   });
 
   describe("Edit the user's profile data, Return updated user details", () => {
-    test.each(editSuccess)("%s", async (_, input, image) => {
-      const mock = [{ email: "test@mail.com", dateCreated, image }];
-      const spy = spyDb({ rows: [{ isRegistered: true }] });
-      spy.mockReturnValueOnce({ rows: mock });
+    it("Should edit the user's profile without an image", async () => {
+      const spy = spyDb({ rows: [{ isRegistered: true, image: null }] });
+      spy.mockReturnValueOnce({ rows: [mocks.userData1] });
 
+      const data = await editProfile({}, mocks.args, mockContext, info);
+
+      expect(mockEvent).not.toHaveBeenCalled();
+      expect(data).toHaveProperty("user.id", "insane_user_id");
+      expect(data).toHaveProperty("user.email", "it@mail.com");
+      expect(data).toHaveProperty("user.firstName", mocks.args.firstName);
+      expect(data).toHaveProperty("user.lastName", mocks.args.lastName);
+      expect(data).toHaveProperty("user.image", null);
+      expect(data).toHaveProperty("user.isRegistered", true);
+      expect(data).toHaveProperty("user.dateCreated", mocks.dateCreated);
+      expect(data).toHaveProperty("status", "SUCCESS");
+    });
+
+    it("Should edit the user's profile with an image", async () => {
+      const spy = spyDb({ rows: [{ isRegistered: true, image: null }] });
+      spy.mockReturnValueOnce({ rows: [mocks.userData2] });
+
+      const input = { ...mocks.args, image: mocks.image };
       const data = await editProfile({}, input, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(2);
-      expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-      expect(spy).toHaveNthReturnedWith(2, { rows: mock });
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data).toHaveProperty("user.id", "insane_user_id");
-      expect(data).toHaveProperty("user.email", "test@mail.com");
-      expect(data).toHaveProperty("user.firstName", args.firstName);
-      expect(data).toHaveProperty("user.lastName", args.lastName);
-      expect(data).toHaveProperty("user.image", image);
+      expect(data).toHaveProperty("user.email", "it@mail.com");
+      expect(data).toHaveProperty("user.firstName", mocks.args.firstName);
+      expect(data).toHaveProperty("user.lastName", mocks.args.lastName);
+      expect(data).toHaveProperty("user.image", mocks.userData2.image);
       expect(data).toHaveProperty("user.isRegistered", true);
-      expect(data).toHaveProperty("user.dateCreated", dateCreated);
+      expect(data).toHaveProperty("user.dateCreated", mocks.dateCreated);
       expect(data).toHaveProperty("status", "SUCCESS");
+    });
+
+    it("Should edit user's profile and delete any previously saved image link", async () => {
+      const spy = spyDb({ rows: [{ isRegistered: true, image: "old/image" }] });
+      spy.mockReturnValueOnce({ rows: [mocks.userData2] });
+
+      await editProfile({}, { ...mocks.args, image: null }, mockContext, info);
+
+      expect(mockEvent).toHaveBeenCalledTimes(1);
     });
   });
 });

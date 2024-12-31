@@ -17,7 +17,7 @@ jest.mock("@lib/supabase/supabaseEvent");
 
 describe("Test draft post resolver", () => {
   const mockEvent = jest.spyOn(supabaseEvent, "emit");
-  mockEvent.mockImplementation(() => true);
+  mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
   beforeEach(() => {
     mockContext.user = mocks.USER_ID;
@@ -30,6 +30,7 @@ describe("Test draft post resolver", () => {
       const post = mocks.argsWithNoImage;
       const result = await draftPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(deleteSession).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to save post to draft");
       expect(result).toHaveProperty("status", "ERROR");
@@ -40,6 +41,7 @@ describe("Test draft post resolver", () => {
     it.each(mocks.validations())("%s", async (_, post, errors) => {
       const data = await draftPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data).toHaveProperty("titleError", errors.titleError);
       expect(data).toHaveProperty("descriptionError", errors.descriptionError);
       expect(data).toHaveProperty("excerptError", errors.excerptError);
@@ -52,11 +54,12 @@ describe("Test draft post resolver", () => {
 
   describe("Verify user", () => {
     it.each(mocks.verifyUser)("%s", async (_, data) => {
-      spyDb({ rows: data }).mockReturnValue({ rows: [] });
+      spyDb({ rows: data });
 
       const post = mocks.argsWithImage;
       const result = await draftPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty("message", "Unable to save post to draft");
       expect(result).toHaveProperty("status", "ERROR");
     });
@@ -70,6 +73,7 @@ describe("Test draft post resolver", () => {
       const post = { ...mocks.argsWithNoImage, tagIds: null };
       const result = await draftPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(result).toHaveProperty("status", "ERROR");
       expect(result).toHaveProperty("message", errorMsg);
     });
@@ -84,6 +88,7 @@ describe("Test draft post resolver", () => {
       const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
       const result = await draftPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(result).toHaveProperty("post.id", mocks.dbData.id);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.description", undefined);
@@ -111,6 +116,7 @@ describe("Test draft post resolver", () => {
       const post = mocks.argsWithNoImage;
       const result = await draftPost({}, { post }, mockContext, info);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(result).toHaveProperty("post.id", mocks.dbData.id);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.description", undefined);

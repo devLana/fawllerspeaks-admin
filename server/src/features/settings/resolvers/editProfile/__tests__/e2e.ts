@@ -1,12 +1,4 @@
-import {
-  test,
-  expect,
-  describe,
-  beforeAll,
-  jest,
-  afterEach,
-  afterAll,
-} from "@jest/globals";
+import { it, expect, describe, beforeAll, jest, afterAll } from "@jest/globals";
 
 import type { ApolloServer } from "@apollo/server";
 
@@ -19,12 +11,7 @@ import testUsers from "@tests/createTestUsers/testUsers";
 import loginTestUser from "@tests/loginTestUser";
 import post from "@tests/post";
 import { EDIT_PROFILE } from "@tests/gqlQueries/settingsTestQueries";
-import {
-  args as variables,
-  gqlValidate,
-  validations,
-  edit,
-} from "../utils/editProfile.testUtils";
+import * as mocks from "../utils/editProfile.testUtils";
 
 import type { APIContext, DbTestUser, TestData } from "@types";
 
@@ -33,7 +20,7 @@ type EditProfile = TestData<{ editProfile: Record<string, unknown> }>;
 jest.mock("@lib/supabase/supabaseEvent");
 
 const mockEvent = jest.spyOn(supabaseEvent, "emit");
-mockEvent.mockImplementation(() => true);
+mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
 describe("Edit user profile - E2E", () => {
   let server: ApolloServer<APIContext>, url: string, user: DbTestUser;
@@ -54,24 +41,19 @@ describe("Edit user profile - E2E", () => {
     ]);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   afterAll(async () => {
-    const stop = server.stop();
-    const clearUsers = db.query(`DELETE FROM users`);
-    await Promise.all([stop, clearUsers]);
-    await db.end();
+    await db.query("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
+    await Promise.all([server.stop(), db.end()]);
   });
 
   describe("Verify user authentication", () => {
-    test("Should send an error response if the user is not logged in", async () => {
+    it("Should send an error response if the user is not logged in", async () => {
       const input = { firstName: "", lastName: "" };
       const payload = { query: EDIT_PROFILE, variables: input };
 
       const { data } = await post<EditProfile>(url, payload);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editProfile).toStrictEqual({
@@ -83,22 +65,13 @@ describe("Edit user profile - E2E", () => {
   });
 
   describe("Validate user input", () => {
-    test.each(gqlValidate)("%s", async (_, args) => {
+    it.each(mocks.validations(null))("%s", async (_, args, errors) => {
       const payload = { query: EDIT_PROFILE, variables: args };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
       const { data } = await post<EditProfile>(url, payload, options);
 
-      expect(data.errors).toBeDefined();
-      expect(data.data).toBeUndefined();
-    });
-
-    test.each(validations(null))("%s", async (_, args, errors) => {
-      const payload = { query: EDIT_PROFILE, variables: args };
-      const options = { authorization: `Bearer ${registeredJwt}` };
-
-      const { data } = await post<EditProfile>(url, payload, options);
-
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editProfile).toStrictEqual({
@@ -110,12 +83,14 @@ describe("Edit user profile - E2E", () => {
   });
 
   describe("Verify user registration status", () => {
-    test("Should respond with an error if the user is unregistered", async () => {
+    it("Should respond with an error if the user is unregistered", async () => {
+      const variables = { ...mocks.args, image: "image/string/path" };
       const payload = { query: EDIT_PROFILE, variables };
       const options = { authorization: `Bearer ${unregisteredJwt}` };
 
       const { data } = await post<EditProfile>(url, payload, options);
 
+      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editProfile).toStrictEqual({
@@ -127,26 +102,52 @@ describe("Edit user profile - E2E", () => {
   });
 
   describe("Edit user details", () => {
-    test.each(edit)("%s", async (_, args, image) => {
-      const payload = { query: EDIT_PROFILE, variables: args };
+    it("Should edit the user's profile without an input image", async () => {
+      const payload = { query: EDIT_PROFILE, variables: mocks.args };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
       const { data } = await post<EditProfile>(url, payload, options);
 
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-
       expect(data.data).not.toHaveProperty("message");
-
       expect(data.data?.editProfile).toStrictEqual({
         __typename: "EditedProfile",
         user: {
           __typename: "User",
           id: user.userId,
           email: mockUser.email,
-          firstName: variables.firstName,
-          lastName: variables.lastName,
-          image,
+          firstName: mocks.args.firstName,
+          lastName: mocks.args.lastName,
+          image: mocks.storageImage,
+          isRegistered: mockUser.registered,
+          dateCreated: user.dateCreated,
+        },
+        status: "SUCCESS",
+      });
+    });
+
+    it("Should edit the user's profile with an image", async () => {
+      const variables = { ...mocks.args, image: mocks.image };
+      const payload = { query: EDIT_PROFILE, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<EditProfile>(url, payload, options);
+
+      expect(mockEvent).toHaveBeenCalledTimes(1);
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data).not.toHaveProperty("message");
+      expect(data.data?.editProfile).toStrictEqual({
+        __typename: "EditedProfile",
+        user: {
+          __typename: "User",
+          id: user.userId,
+          email: mockUser.email,
+          firstName: mocks.args.firstName,
+          lastName: mocks.args.lastName,
+          image: mocks.userImage,
           isRegistered: mockUser.registered,
           dateCreated: user.dateCreated,
         },
