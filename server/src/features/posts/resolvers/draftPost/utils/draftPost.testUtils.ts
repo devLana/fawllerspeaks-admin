@@ -1,24 +1,26 @@
 import { randomUUID } from "node:crypto";
 
 import type { InputErrors } from "@types";
-import type { PostContent } from "@resolverTypes";
+import type { DraftPostInput, PostContent } from "@resolverTypes";
 
-interface Input {
-  title: string;
-  description?: string | null;
-  excerpt?: string | null;
-  content?: string | null;
-  tagIds?: string[] | null;
-  imageBanner?: string | null;
-}
-
-type Validations = [string, Input, InputErrors<Input>];
+type Validations = [string, DraftPostInput, InputErrors<DraftPostInput>];
 
 export const USER_ID = randomUUID();
 export const UUID = randomUUID();
 export const dateCreated = "2021-05-17 13:22:43.717+01";
 export const imageBanner = "post/image/banner";
 export const tagIds = [UUID, USER_ID, randomUUID()];
+export const url1 = { slug: "blog-post-title", href: "blog-post-title" };
+const slug = "another-blog-post-title";
+export const url2 = { href: "another-blog-post-title", slug };
+
+export const user = {
+  isRegistered: true,
+  authorName: "Author Name",
+  authorImage: "/author/image/path",
+};
+
+export const author = { name: user.authorName, image: user.authorImage };
 
 const content =
   '<h2 class="heading">heading element</h2><hr /><a href="blog/post/title">blog post link</a><p id="class-name">paragraph text <a href="//weird-link">weird link</a></p><p><img src="src" /></p>';

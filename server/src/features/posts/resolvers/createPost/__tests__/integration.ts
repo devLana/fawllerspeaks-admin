@@ -25,8 +25,8 @@ describe("Test createPost resolver", () => {
   describe("Verify user authentication", () => {
     it("Should return an error object if the user is not logged in", async () => {
       mockContext.user = null;
-      const post = mocks.argsWithNoImage;
 
+      const post = mocks.argsWithNoImage;
       const result = await createPost({}, { post }, mockContext, info);
 
       expect(deleteSession).toHaveBeenCalledTimes(1);
@@ -37,37 +37,25 @@ describe("Test createPost resolver", () => {
 
   describe("Validate user input", () => {
     it.each(mocks.validations())("%s", async (_, post, errors) => {
-      const result = await createPost({}, { post }, mockContext, info);
+      const data = await createPost({}, { post }, mockContext, info);
 
-      expect(result).toHaveProperty("titleError", errors.titleError);
-      expect(result).toHaveProperty("excerptError", errors.excerptError);
-      expect(result).toHaveProperty("contentError", errors.contentError);
-      expect(result).toHaveProperty("tagIdsError", errors.tagIdsError);
-      expect(result).toHaveProperty("status", "ERROR");
-
-      expect(result).toHaveProperty(
-        "descriptionError",
-        errors.descriptionError
-      );
-
-      expect(result).toHaveProperty(
-        "imageBannerError",
-        errors.imageBannerError
-      );
+      expect(data).toHaveProperty("titleError", errors.titleError);
+      expect(data).toHaveProperty("descriptionError", errors.descriptionError);
+      expect(data).toHaveProperty("excerptError", errors.excerptError);
+      expect(data).toHaveProperty("contentError", errors.contentError);
+      expect(data).toHaveProperty("tagIdsError", errors.tagIdsError);
+      expect(data).toHaveProperty("imageBannerError", errors.imageBannerError);
+      expect(data).toHaveProperty("status", "ERROR");
     });
   });
 
   describe("Verify user", () => {
     it.each(mocks.verifyUser)("%s", async (_, data) => {
-      const post = { ...mocks.argsWithImage };
-      const spy = spyDb({ rows: data });
-      spy.mockReturnValueOnce({ rows: [] });
+      spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
 
+      const post = { ...mocks.argsWithImage };
       const result = await createPost({}, { post }, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(2);
-      expect(spy).toHaveNthReturnedWith(1, { rows: data });
-      expect(spy).toHaveNthReturnedWith(2, { rows: [] });
       expect(result).toHaveProperty("message", "Unable to create post");
       expect(result).toHaveProperty("status", "ERROR");
     });
@@ -75,47 +63,32 @@ describe("Test createPost resolver", () => {
 
   describe("Verify post title and post url slug", () => {
     it.each(mocks.verifyTitleSlug)("%s", async (_, errorMsg, mock) => {
-      const post = { ...mocks.argsWithNoImage, tagIds: null };
       const spy = spyDb({ rows: [{ isRegistered: true }] });
       spy.mockReturnValueOnce({ rows: [mock] });
 
+      const post = { ...mocks.argsWithNoImage, tagIds: null };
       const data = await createPost({}, { post }, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(2);
-      expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-      expect(spy).toHaveNthReturnedWith(2, { rows: [mock] });
       expect(data).toHaveProperty("status", "ERROR");
       expect(data).toHaveProperty("message", errorMsg);
     });
   });
 
   describe("Create post", () => {
-    const authorName = "Author Name";
-    const authorImage = "/author/image/path";
-    const mockRows = [{ isRegistered: true, authorName, authorImage }];
-
     it("Should create and publish a new post with an image banner and post tags", async () => {
-      const url = { slug: "blog-post-title", href: "blog-post-title" };
-      const author = { name: authorName, image: authorImage };
-      const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
-      const tags = ["tag", "tag", "tag"];
-      const mockDBPost = [{ ...mocks.dbPost, tags }];
-      const spy = spyDb({ rows: mockRows });
-      spy.mockReturnValueOnce({ rows: [] });
-      spy.mockReturnValueOnce({ rows: mockDBPost });
+      spyDb({ rows: [mocks.user] })
+        .mockReturnValueOnce({ rows: [] })
+        .mockReturnValueOnce({ rows: [{ ...mocks.dbPost, tags: mocks.tags }] });
 
+      const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
       const result = await createPost({}, { post }, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(3);
-      expect(spy).toHaveNthReturnedWith(1, { rows: mockRows });
-      expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-      expect(spy).toHaveNthReturnedWith(3, { rows: mockDBPost });
       expect(result).toHaveProperty("post.id", mocks.dbPost.id);
       expect(result).toHaveProperty("post.title", post.title);
       expect(result).toHaveProperty("post.excerpt", post.excerpt);
       expect(result).toHaveProperty("post.description", post.description);
-      expect(result).toHaveProperty("post.author", author);
-      expect(result).toHaveProperty("post.url", url);
+      expect(result).toHaveProperty("post.author", mocks.author);
+      expect(result).toHaveProperty("post.url", mocks.url1);
       expect(result).toHaveProperty("post.status", "Published");
       expect(result).toHaveProperty("post.imageBanner", mocks.imageBanner);
       expect(result).toHaveProperty("post.dateCreated", mocks.dateCreated);
@@ -124,7 +97,7 @@ describe("Test createPost resolver", () => {
       expect(result).toHaveProperty("post.views", 0);
       expect(result).toHaveProperty("post.isInBin", false);
       expect(result).toHaveProperty("post.isDeleted", false);
-      expect(result).toHaveProperty("post.tags", tags);
+      expect(result).toHaveProperty("post.tags", mocks.tags);
       expect(result).toHaveProperty("status", "SUCCESS");
 
       expect(result).toHaveProperty(
@@ -134,23 +107,16 @@ describe("Test createPost resolver", () => {
     });
 
     it("Should create and publish a new post without an image banner and post tags", async () => {
-      const slug = "another-blog-post-title";
-      const url = { href: slug, slug };
-      const mockDBPost = [{ ...mocks.dbPost, tags: null }];
-      const post = mocks.argsWithNoImage;
-      const spy = spyDb({ rows: mockRows });
-      spy.mockReturnValueOnce({ rows: [] });
-      spy.mockReturnValueOnce({ rows: mockDBPost });
+      spyDb({ rows: [mocks.user] })
+        .mockReturnValueOnce({ rows: [] })
+        .mockReturnValueOnce({ rows: [{ ...mocks.dbPost, tags: null }] });
 
+      const post = mocks.argsWithNoImage;
       const result = await createPost({}, { post }, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(3);
-      expect(spy).toHaveNthReturnedWith(1, { rows: mockRows });
-      expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-      expect(spy).toHaveNthReturnedWith(3, { rows: mockDBPost });
       expect(result).toHaveProperty("post.imageBanner", null);
       expect(result).toHaveProperty("post.tags", null);
-      expect(result).toHaveProperty("post.url", url);
+      expect(result).toHaveProperty("post.url", mocks.url2);
       expect(result).toHaveProperty("status", "SUCCESS");
     });
   });

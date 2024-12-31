@@ -1,22 +1,26 @@
 import { randomUUID } from "node:crypto";
 
 import type { InputErrors } from "@types";
-import type { PostContent } from "@resolverTypes";
+import type { CreatePostInput, PostContent } from "@resolverTypes";
 
-interface Input {
-  title: string;
-  description: string;
-  excerpt: string;
-  content: string;
-  tagIds?: string[] | null;
-  imageBanner?: string | null;
-}
-
-type Validations = [string, Input, InputErrors<Input>][];
+type Validations = [string, CreatePostInput, InputErrors<CreatePostInput>][];
 
 const TAG_ID = randomUUID();
 export const UUID = randomUUID();
 export const tagIds = [TAG_ID, UUID, randomUUID()];
+export const dateCreated = "2021-05-17 13:22:43.717+01";
+export const tags = ["tag", "tag", "tag"];
+export const url1 = { slug: "blog-post-title", href: "blog-post-title" };
+const slug = "another-blog-post-title";
+export const url2 = { href: "another-blog-post-title", slug };
+
+export const user = {
+  isRegistered: true,
+  authorName: "Author Name",
+  authorImage: "/author/image/path",
+};
+
+export const author = { name: user.authorName, image: user.authorImage };
 
 export const validations = (nullOrUndefined?: null): Validations => [
   [
@@ -178,8 +182,6 @@ export const gqlValidations: [string, object][] = [
     },
   ],
 ];
-
-export const dateCreated = "2021-05-17 13:22:43.717+01";
 
 export const dbPost = {
   id: "1",
