@@ -4,7 +4,7 @@ import getPosts from "./getPosts";
 import createPost from "./createPost";
 import draftPost from "./draftPost";
 import deletePostContentImages from "./deletePostContentImages";
-// import editPost from "./editPost";
+import editPost from "./editPost";
 // import publishPost from "./publishPost";
 // import unpublishPost from "./unpublishPost";
 // import binPosts from "./binPosts";
@@ -40,7 +40,7 @@ export const postsResolvers = {
     createPost,
     draftPost,
     deletePostContentImages,
-    // editPost,
+    editPost,
     // publishPost,
     // unpublishPost,
     // binPosts,

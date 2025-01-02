@@ -99,6 +99,7 @@ export const postsTypeDefs = `#graphql
     contentError: String
     tagIdsError: String
     imageBannerError: String
+    editStatusError: String
     status: Status!
   }
 
@@ -144,7 +145,7 @@ export const postsTypeDefs = `#graphql
 
   union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError
 
-  union EditPost = SinglePost | EditPostValidationError | DuplicatePostTitleError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
+  union EditPost = SinglePost | EditPostValidationError | AuthenticationError |  NotAllowedError | UnknownError | RegistrationError | ForbiddenError | DuplicatePostTitleError
 
   union EmptyBin = Posts | EmptyBinWarning | NotAllowedError
 
@@ -205,10 +206,11 @@ export const postsTypeDefs = `#graphql
   input EditPostInput {
     postId: ID!
     title: String!
-    description: String!
-    excerpt: String!
-    content: String!
-    tagIds: [Int!]
+    description: String
+    excerpt: String
+    content: String
+    tagIds: [ID!]
     imageBanner: String
+    editStatus: Boolean
   }
 `;

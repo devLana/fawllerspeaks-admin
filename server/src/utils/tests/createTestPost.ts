@@ -14,7 +14,7 @@ import type {
   PostTag,
 } from "@resolverTypes";
 
-interface Params {
+interface Options {
   db: Pool;
   postTags?: PostTag[];
   postAuthor: TestPostAuthor;
@@ -23,7 +23,7 @@ interface Params {
 
 type OmitKeys = "author" | "url" | "tags" | "postId";
 
-const createTestPost = async (params: Params): Promise<Post> => {
+const createTestPost = async (params: Options): Promise<Post> => {
   const { db, postTags, postAuthor, postData } = params;
   const tagIds = postTags?.map(postTag => postTag.id);
   const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
@@ -31,10 +31,13 @@ const createTestPost = async (params: Params): Promise<Post> => {
   try {
     const { rows } = await db.query<Omit<GetPostDBData, OmitKeys>>(
       `WITH post_tag_ids AS (
-        SELECT ARRAY(
-          SELECT id
-          FROM post_tags
-          WHERE tag_id = ANY ($13::uuid[])
+        SELECT NULLIF(
+          ARRAY(
+            SELECT id
+            FROM post_tags
+            WHERE tag_id = ANY ($13::uuid[])
+          ),
+          ARRAY[]::smallint[]
         ) AS tag_ids
       )
       INSERT INTO posts (

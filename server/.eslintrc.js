@@ -76,6 +76,9 @@ module.exports = {
     "@typescript-eslint/no-dupe-class-members": 1,
     "@typescript-eslint/no-redeclare": [1, { ignoreDeclarationMerge: true }],
     "@typescript-eslint/no-shadow": [2, { ignoreTypeValueShadow: false }],
-    "@typescript-eslint/no-unused-vars": [1, { argsIgnorePattern: "^_+" }],
+    "@typescript-eslint/no-unused-vars": [
+      1,
+      { argsIgnorePattern: "^_+", varsIgnorePattern: "^_+" },
+    ],
   },
 };

@@ -93,7 +93,7 @@ export const EDIT_POST = `#graphql
         status
       }
 
-      ...on EditPostValidationError {
+      ... on EditPostValidationError {
         __typename
         postIdError
         titleError
@@ -102,6 +102,7 @@ export const EDIT_POST = `#graphql
         contentError
         tagIdsError
         imageBannerError
+        editStatusError
         status
       }
     }

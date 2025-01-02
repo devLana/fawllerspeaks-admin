@@ -1,230 +1,294 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
-import getPostTags from "@features/posts/utils/getPostTags";
+import { supabaseEvent } from "@lib/supabase/supabaseEvent";
 import getPostSlug from "@features/posts/utils/getPostSlug";
+import { editPostValidator as schema } from "./utils/editPost.validator";
 import { EditPostValidationError } from "./types/EditPostValidationError";
 import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
-import { NotAllowedPostActionError } from "../types/NotAllowedPostActionError";
 import { SinglePost } from "../types/SinglePost";
-import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
-import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
-import dateToISOString from "@utils/dateToISOString";
+import {
+  AuthenticationError,
+  ForbiddenError,
+  NotAllowedError,
+  RegistrationError,
+  UnknownError,
+} from "@utils/ObjectTypes";
 import generateErrorsObject from "@utils/generateErrorsObject";
+import deleteSession from "@utils/deleteSession";
 
-import type { MutationResolvers, PostTag, PostStatus } from "@resolverTypes";
-import type { PostDBData, ResolverFunc, ValidationErrorObject } from "@types";
+import type { MutationResolvers, PostStatus } from "@resolverTypes";
+import type { PostDBData, PostFieldResolver, ResolverFunc } from "@types";
 
-type EditPost = ResolverFunc<MutationResolvers["editPost"]>;
+type EditPost = PostFieldResolver<ResolverFunc<MutationResolvers["editPost"]>>;
 
-interface DbFindPost {
-  authorId: string;
-  authorName: string;
-  authorImage: string | null;
+interface FindById {
   postStatus: PostStatus;
-  foundImageBanner: string | null;
-  foundTags: string[] | null;
+  postImageBanner: string | null;
+  postTags: number[] | null;
 }
 
-const editPost: EditPost = async (_, { post }, { user, db }) => {
-  const schema = Joi.object<typeof post>({
-    postId: Joi.string()
-      .required()
-      .trim()
-      .uuid({ version: "uuidv4", separator: "-" })
-      .messages({
-        "string.empty": "Provide post id",
-        "string.guid": "Invalid post id",
-      }),
-    title: Joi.string().required().trim().messages({
-      "string.empty": "Provide post title",
-    }),
-    description: Joi.string().required().trim().messages({
-      "string.empty": "Provide post description",
-    }),
-    content: Joi.string().required().trim().messages({
-      "string.empty": "Provide post content",
-    }),
-    tagIds: Joi.array()
-      .items(
-        Joi.string()
-          .trim()
-          .uuid({ version: "uuidv4", separator: "-" })
-          .messages({
-            "string.empty": "Input post tags cannot be empty values",
-            "string.guid": "Invalid post tag id",
-          })
-      )
-      .min(1)
-      .unique()
-      .messages({
-        "array.unique": "Input tags can only contain unique tags",
-        "array.min": "No post tags were provided",
-        "array.base": "Post tags input must be an array",
-      }),
-    imageBanner: Joi.string()
-      .trim()
-      .messages({ "string.empty": "Provide post image banner link" }),
-  });
+interface FindBySlug {
+  id: string;
+  postSlug: string;
+  postTitle: string;
+}
+
+interface User {
+  isRegistered: boolean;
+  userName: string;
+  userImage: string | null;
+}
+
+interface EditedData extends Omit<PostDBData, "id"> {
+  imageBanner: string | null;
+}
+
+const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
+  const postImage = post.imageBanner && post.imageBanner.trim();
 
   try {
-    if (!user) return new NotAllowedError("Unable to edit post");
-
-    const input = await schema.validateAsync(post, { abortEarly: false });
-    const {
-      postId,
-      title,
-      description,
-      content,
-      tagIds,
-      imageBanner = null,
-    } = input;
-
-    let postTags: PostTag[] = [];
-
-    if (tagIds) {
-      const gottenTags = await getPostTags(db, tagIds);
-
-      if (!gottenTags || gottenTags.length < tagIds.length) {
-        return new UnknownError("Unknown post tag id provided");
-      }
-
-      postTags = gottenTags;
+    if (!user) {
+      if (postImage) supabaseEvent.emit("removeImage", postImage);
+      void deleteSession(db, req, res);
+      return new AuthenticationError("Unable to edit post");
     }
 
-    const findUser = db.query<{ isRegistered: boolean }>(
-      `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
+    const input = await schema.validateAsync(post, { abortEarly: false });
+    const { postId, title, description, excerpt, content, tagIds } = input;
+    const { imageBanner, editStatus } = input;
+    const slug = getPostSlug(title);
+
+    const { rows: loggedInUser } = await db.query<User>(
+      `SELECT
+        is_registered "isRegistered",
+        first_name||' '||last_name "userName",
+        image "userImage"
+      FROM users
+      WHERE user_id = $1`,
       [user]
     );
 
-    const findPostById = db.query<DbFindPost>(
+    if (loggedInUser.length === 0) {
+      void deleteSession(db, req, res);
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+      return new NotAllowedError("Unable to edit post");
+    }
+
+    const [{ userName, userImage, isRegistered }] = loggedInUser;
+
+    if (!isRegistered) {
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+      return new RegistrationError("Unable to edit post");
+    }
+
+    const findPostById = db.query<FindById>(
       `SELECT
-        author "authorId",
-        first_name || ' ' || last_name "authorName",
-        image "authorImage",
         status "postStatus",
-        image_banner "foundImageBanner",
-        tags "foundTags"
-      FROM posts LEFT JOIN users ON author = user_id
+        image_banner "postImageBanner",
+        tags "postTags"
+      FROM posts
       WHERE post_id = $1`,
       [postId]
     );
 
-    const checkTitle = db.query<{ postId: string }>(
-      `SELECT post_id "postId" FROM posts WHERE lower(title) = $1`,
-      [title.toLowerCase()]
+    const checkPostSlug = db.query<FindBySlug>(
+      `SELECT
+        post_id id,
+        slug "postSlug",
+        title "postTitle"
+      FROM posts
+      WHERE slug = $1 OR lower(title) = $2`,
+      [slug, title.toLowerCase()]
     );
 
-    const [{ rows: foundUser }, { rows: foundPost }, { rows: checkedTitle }] =
-      await Promise.all([findUser, findPostById, checkTitle]);
-
-    if (foundUser.length === 0 || !foundUser[0].isRegistered) {
-      return new NotAllowedError("Unable to edit post");
-    }
+    const [{ rows: foundPost }, { rows: checkedSlug }] = await Promise.all([
+      findPostById,
+      checkPostSlug,
+    ]);
 
     if (foundPost.length === 0) {
-      return new UnknownError(
-        "We could not find the post you are trying to edit"
-      );
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+      return new UnknownError("Unable to edit post");
     }
 
-    const [
-      {
-        authorId,
-        authorName,
-        authorImage,
-        postStatus,
-        foundImageBanner,
-        foundTags,
-      },
-    ] = foundPost;
+    const [{ postImageBanner, postTags }] = foundPost;
+    let [{ postStatus }] = foundPost;
+    let datePublished = "";
 
-    if (authorId !== user) {
-      return new UnauthorizedAuthorError(
-        "Unable to edit another author's post"
-      );
+    if (editStatus) {
+      if (postStatus === "Draft" || postStatus === "Unpublished") {
+        postStatus = "Published";
+        datePublished = ",date_published = CURRENT_TIMESTAMP(3)";
+      } else {
+        postStatus = "Unpublished";
+        datePublished = ",date_published = NULL";
+      }
     }
 
-    if (postStatus !== "Published" && postStatus !== "Unpublished") {
-      return new NotAllowedPostActionError(
-        "Can only edit published or unpublished posts"
-      );
+    if (
+      (postStatus === "Published" || postStatus === "Unpublished") &&
+      (!description || !excerpt || !content)
+    ) {
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+
+      return new EditPostValidationError({
+        ...(!content && { contentError: "Provide post content" }),
+        ...(!description && { descriptionError: "Provide post description" }),
+        ...(!excerpt && { excerptError: "Provide post excerpt" }),
+      });
     }
 
-    if (checkedTitle.length > 0 && checkedTitle[0].postId !== postId) {
+    if (checkedSlug.length > 0 && checkedSlug[0].id !== postId) {
+      const [{ postSlug, postTitle }] = checkedSlug;
+
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+
+      if (postSlug === slug) {
+        return new ForbiddenError(
+          "This blog post's title generates a slug that already exists. Please ensure the provided title is as unique as possible"
+        );
+      }
+
       return new DuplicatePostTitleError(
-        "A post has already been created with that title"
+        `A similar post title already exists - '${postTitle}'. Please ensure every post has a unique title`
       );
     }
 
-    // if (!tagIds && foundTags) {
-    //   const gottenTags = await getPostTags(db, foundTags);
-    //   postTags = gottenTags ?? [];
-    // }
+    const image = imageBanner === undefined ? postImageBanner : imageBanner;
+    let query: string;
+    let param: unknown[];
 
-    const dbImageBanner = imageBanner ?? foundImageBanner;
-    const tagsToSave = tagIds ?? foundTags;
-    const dbTags = tagsToSave ? `{${tagsToSave.join(", ")}}` : null;
+    if (tagIds) {
+      const tags = `{${tagIds.join(",")}}`;
 
-    const { rows: editedPost } = await db.query<Omit<PostDBData, "postId">>(
-      `UPDATE posts SET
-        title = $1,
-        description = $2,
-        content = $3,
-        image_banner = $4,
-        last_modified = $5,
-        tags = $6
-      WHERE post_id = $7
-      RETURNING
-        slug,
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
-        views,
-        likes,
-        is_in_bin "isInBin",
-        is_deleted "isDeleted"`,
-      [
-        title,
-        description,
-        content,
-        dbImageBanner,
-        new Date().toISOString(),
-        dbTags,
-        postId,
-      ]
+      query = `
+        WITH post_tag_ids AS (
+          SELECT NULLIF(
+            ARRAY(
+              SELECT id
+              FROM post_tags
+              WHERE tag_id = ANY ($1::uuid[])
+            ),
+            ARRAY[]::smallint[]
+          ) AS tag_ids
+        ),
+        edited_post AS (
+          UPDATE posts SET
+            title = $2,
+            description = $3,
+            excerpt = $4,
+            content = $5,
+            slug = $6,
+            image_banner = $7,
+            last_modified = CURRENT_TIMESTAMP(3),
+            tags = (SELECT tag_ids FROM post_tag_ids)
+            ${datePublished}
+          WHERE post_id = $8
+          RETURNING
+            image_banner,
+            date_created,
+            date_published,
+            last_modified,
+            views,
+            is_in_bin,
+            is_deleted,
+            tags
+        )
+      `;
+
+      param = [tags, title, description, excerpt, content, slug, image, postId];
+    } else {
+      const tags = tagIds === undefined ? postTags : tagIds;
+
+      query = `
+        WITH edited_post AS (
+          UPDATE posts SET
+            title = $1,
+            description = $2,
+            excerpt = $3,
+            content = $4,
+            slug = $5,
+            image_banner = $6,
+            last_modified = CURRENT_TIMESTAMP(3),
+            tags = $7
+            ${datePublished}
+          WHERE post_id = $8
+          RETURNING
+            image_banner,
+            date_created,
+            date_published,
+            last_modified,
+            views,
+            is_in_bin,
+            is_deleted,
+            tags
+        )
+      `;
+
+      param = [title, description, excerpt, content, slug, image, tags, postId];
+    }
+
+    const { rows: editedPost } = await db.query<EditedData>(
+      `
+        ${query}
+        SELECT
+          ep.image_banner "imageBanner",
+          ep.date_created "dateCreated",
+          ep.date_published "datePublished",
+          ep.last_modified "lastModified",
+          ep.views,
+          ep.is_in_bin "isInBin",
+          ep.is_deleted "isDeleted",
+          json_agg(json_build_object(
+            'id', pt.tag_id,
+            'name', pt.name,
+            'dateCreated', pt.date_created,
+            'lastModified', pt.last_modified
+          )) FILTER (WHERE pt.tag_id IS NOT NULL) tags
+        FROM edited_post ep LEFT JOIN post_tags pt
+        ON pt.id = ANY (ep.tags)
+        GROUP BY
+          ep.image_banner,
+          ep.date_created,
+          ep.date_published,
+          ep.last_modified,
+          ep.views,
+          ep.is_in_bin,
+          ep.is_deleted
+      `,
+      param
     );
 
+    if (imageBanner !== undefined && postImageBanner) {
+      supabaseEvent.emit("removeImage", postImageBanner);
+    }
+
     const [edited] = editedPost;
-    const slug = getPostSlug(dbImageBanner ?? title);
-    const returnTags = postTags.length === 0 ? null : postTags;
 
     return new SinglePost({
-      ...edited,
       id: postId,
       title,
       description,
+      excerpt,
       content,
-      author: "{ name: authorName, image: authorImage }",
+      author: { name: userName, image: userImage },
       status: postStatus,
-      url: slug,
-      imageBanner: dbImageBanner,
-      dateCreated: dateToISOString(edited.dateCreated),
-      datePublished: edited.datePublished
-        ? dateToISOString(edited.datePublished)
-        : edited.datePublished,
-      lastModified: edited.lastModified
-        ? dateToISOString(edited.lastModified)
-        : edited.lastModified,
-      tags: returnTags,
+      url: { slug, href: slug },
+      imageBanner: edited.imageBanner,
+      dateCreated: edited.dateCreated,
+      datePublished: edited.datePublished,
+      lastModified: edited.lastModified,
+      views: edited.views,
+      isInBin: edited.isInBin,
+      isDeleted: edited.isDeleted,
+      tags: edited.tags,
     });
   } catch (err) {
-    if (err instanceof ValidationError) {
-      const errors = generateErrorsObject(err.details) as ValidationErrorObject<
-        typeof post
-      >;
+    if (postImage) supabaseEvent.emit("removeImage", postImage);
 
-      return new EditPostValidationError(errors);
+    if (err instanceof ValidationError) {
+      return new EditPostValidationError(generateErrorsObject(err.details));
     }
 
     throw new GraphQLError("Unable to edit post. Please try again later");

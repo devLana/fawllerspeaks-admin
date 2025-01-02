@@ -20,7 +20,7 @@ const types = `#graphql
     ####AUTHENTICATION####
     "Create a new user"
     createUser(email: String!): CreateUser!
-    "Verify user email and initiate reset password"
+    "Verify user email and initiate password reset"
     forgotPassword(email: String!): ForgotGeneratePassword!
     "Login a user"
     login(email: String!, password: String!): Login!
@@ -58,7 +58,7 @@ const types = `#graphql
     createPost(post: CreatePostInput!): CreateDraftPost!
     "Draft a post"
     draftPost(post: DraftPostInput!): CreateDraftPost!
-    "Edit a created/published post"
+    "Edit a post"
     editPost(post: EditPostInput!): EditPost!
     "Publish a post"
     publishPost(postId: ID!): Publish_Unpublish!
