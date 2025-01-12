@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 
-import { useHandleFile } from "@hooks/useHandleFile";
+import { useSingleFileHandler } from "@hooks/useSingleFileHandler";
 import EditProfileImagePreview from "./EditProfileImagePreview";
 import { FileInput } from "@components/ui/FileInput";
 import type { EditProfileImage } from "types/settings/editProfile";
@@ -31,7 +31,7 @@ const EditProfileFileInput = ({
     handleDragEvent,
     handleDrop,
     handleKeydown,
-  } = useHandleFile({
+  } = useSingleFileHandler({
     blobUrl: image.blobUrl,
     imageFilename: image.file?.name,
     errorCb: handleFileError,

@@ -1,13 +1,13 @@
 import * as React from "react";
 
-interface HandleFileOptions {
+interface SingleFileOptions {
   blobUrl: string;
   imageFilename: string | undefined;
   errorCb: (errorMsg: string) => void;
   successCb: (imageFile: File) => void;
 }
 
-export const useHandleFile = (options: HandleFileOptions) => {
+export const useSingleFileHandler = (options: SingleFileOptions) => {
   const { blobUrl, imageFilename, errorCb, successCb } = options;
   const [hasEnteredDropZone, setHasEnteredDropZone] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -30,12 +30,12 @@ export const useHandleFile = (options: HandleFileOptions) => {
     handleFile(e.target.files);
   };
 
-  const handleDragEvent = (value: boolean | null = null) => {
+  const handleDragEvent = (value?: boolean) => {
     return (e: React.DragEvent<HTMLLabelElement>) => {
       e.stopPropagation();
       e.preventDefault();
 
-      if (value !== null) setHasEnteredDropZone(value);
+      if (value !== undefined) setHasEnteredDropZone(value);
     };
   };
 
