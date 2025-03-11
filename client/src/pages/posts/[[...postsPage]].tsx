@@ -24,9 +24,7 @@ const GetPosts: NextPageWithLayout = () => {
 
   const id = "blog-posts";
   const msg1 = "Invalid posts search filters provided";
-
-  const msg2 =
-    "You are unable to get posts at the moment. Please try again later";
+  const msg2 = `You are unable to get posts at the moment. Please try again later`;
 
   if ((!isReady || loading) && !previousData) return <PostsLoading id={id} />;
 

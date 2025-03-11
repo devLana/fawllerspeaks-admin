@@ -20,9 +20,7 @@ const ViewPost: NextPageWithLayout = () => {
   });
 
   const label = "View post page";
-
-  const msg =
-    "You are unable to view this post at the moment. Please try again later";
+  const msg = `You are unable to view this post at the moment. Please try again later`;
 
   if (!isReady || loading) return <ViewPostLoading label={label} />;
 

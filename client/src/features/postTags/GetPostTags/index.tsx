@@ -10,8 +10,7 @@ const GetPostTags = ({ id }: { id: string }) => {
   const { replace, pathname } = useRouter();
   const { data, loading, error, client } = useGetPostTags();
 
-  const msg =
-    "You are unable to get post tags at the moment. Please try again later";
+  const msg = `You are unable to get post tags at the moment. Please try again later`;
 
   if (loading) return <PostTagsLoading id={id} />;
 
@@ -21,9 +20,7 @@ const GetPostTags = ({ id }: { id: string }) => {
   }
 
   if (!data) {
-    const text =
-      "No post tags found. Click on 'Create Post Tags' above to get started";
-
+    const text = `No post tags found. Click on 'Create Post Tags' above to get started`;
     return <PostTagsTextContent id={id} text={text} />;
   }
 
@@ -51,9 +48,7 @@ const GetPostTags = ({ id }: { id: string }) => {
 
     case "PostTags":
       if (data.getPostTags.tags.length === 0) {
-        const text =
-          "No post tags have been created yet. Click on 'Create Post Tags' above to get started";
-
+        const text = `No post tags have been created yet. Click on 'Create Post Tags' above to get started`;
         return <PostTagsTextContent id={id} text={text} />;
       }
 
