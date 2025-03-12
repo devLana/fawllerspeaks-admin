@@ -4,21 +4,23 @@ import Tooltip from "@mui/material/Tooltip";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
 
-import PostImageBanner from "@features/posts/components/PostImageBanner";
+import PostImageBanner from ".";
 
-interface PostImagePreviewProps {
+interface PostImageBannerPreviewProps {
   id: string;
   src: string;
+  sizes?: string;
   onClick: () => void;
   onKeydown: (e: React.KeyboardEvent<HTMLLabelElement>) => void;
 }
 
-const PostImagePreview = (props: PostImagePreviewProps) => {
-  const { id, src, onKeydown, onClick } = props;
+const PostImageBannerPreview = (props: PostImageBannerPreviewProps) => {
+  const { id, src, sizes, onKeydown, onClick } = props;
 
   return (
     <PostImageBanner
       src={src}
+      sizes={sizes}
       alt="Post image banner preview"
       sx={{
         width: "100%",
@@ -67,4 +69,4 @@ const PostImagePreview = (props: PostImagePreviewProps) => {
   );
 };
 
-export default PostImagePreview;
+export default PostImageBannerPreview;

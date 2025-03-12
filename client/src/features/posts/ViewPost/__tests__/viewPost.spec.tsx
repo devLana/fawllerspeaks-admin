@@ -6,8 +6,8 @@ import ViewPost from "@pages/posts/view/[slug]";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./viewPost.mocks";
 
-vi.mock("../ViewPostWrapper");
-vi.mock("../Post");
+vi.mock("../components/ViewPostWrapper");
+vi.mock("../components/Post");
 
 describe("View Post Page", () => {
   beforeAll(() => {

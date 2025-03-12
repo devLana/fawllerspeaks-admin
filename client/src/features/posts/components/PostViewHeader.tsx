@@ -1,25 +1,26 @@
-import { useRouter } from "next/router";
-
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import PostMenu from "@features/posts/components/PostMenu";
 import PostsPageBackButton from "@features/posts/components/PostsPageBackButton";
 import { postStatusColors as colors } from "@utils/posts/postStatusColors";
-import type { PostHeaderProps } from "types/posts/viewPost";
+import type { PostViewHeaderProps } from "types/posts";
 
-const PostHeader = ({ slug, status, title }: PostHeaderProps) => {
-  const { back } = useRouter();
+const PostViewHeader = (props: PostViewHeaderProps) => {
+  const { buttonLabel, status, title, children, onClick } = props;
 
   return (
-    <Box sx={{ display: "flex", columnGap: 2, mb: 4.5 }}>
-      <PostsPageBackButton
-        buttonLabel=" Go back to posts page"
-        onClick={() => back()}
-      />
+    <Box
+      sx={{
+        display: "flex",
+        columnGap: 2,
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        mb: 4.5,
+      }}
+    >
+      <PostsPageBackButton buttonLabel={buttonLabel} onClick={onClick} />
       <Box
         sx={{
-          ml: "auto",
           pl: 1,
           display: "flex",
           alignItems: "center",
@@ -40,15 +41,10 @@ const PostHeader = ({ slug, status, title }: PostHeaderProps) => {
         >
           {status}
         </Typography>
-        <PostMenu
-          status={status}
-          title={title}
-          slug={slug}
-          sx={{ bgcolor: "action.selected" }}
-        />
+        {children}
       </Box>
     </Box>
   );
 };
 
-export default PostHeader;
+export default PostViewHeader;

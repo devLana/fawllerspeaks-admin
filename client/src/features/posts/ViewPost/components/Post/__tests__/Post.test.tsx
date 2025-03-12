@@ -5,7 +5,7 @@ import { formatPostDate } from "@utils/posts/formatPostDate";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./Post.mocks";
 
-vi.mock("../PostHeader");
+vi.mock("@features/posts/components/PostViewHeader");
 
 describe("Blog Post", () => {
   it("Should render all the provided blog post details", () => {

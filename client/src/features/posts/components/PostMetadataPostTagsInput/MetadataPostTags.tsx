@@ -1,22 +1,28 @@
 import { useRouter } from "next/router";
 
-import { useApolloClient } from "@apollo/client";
+import { type ApolloError, useApolloClient } from "@apollo/client";
 import Alert from "@mui/material/Alert";
 
-import useGetPostTags from "@hooks/getPostTags/useGetPostTags";
-import SelectPostTagsSkeleton from "./SelectPostTagsSkeleton";
+import MetadataPostTagsSkeleton from "./MetadataPostTagsSkeleton";
 import { SESSION_ID } from "@utils/constants";
+import type { GetPostTagsData } from "types/postTags/getPostTags";
 
-const SelectPostTags = ({ children }: { children: React.ReactElement }) => {
+interface MetadataPostTagsProps {
+  children: React.ReactElement;
+  loading: boolean;
+  data: GetPostTagsData | undefined;
+  error: ApolloError | undefined;
+}
+
+const MetadataPostTags = (props: MetadataPostTagsProps) => {
+  const { children, data, error, loading } = props;
   const { replace, pathname } = useRouter();
-
   const client = useApolloClient();
-  const { data, error, loading } = useGetPostTags();
 
   const msg =
     "You can't add post tags to this post at the moment. Please try again later";
 
-  if (loading) return <SelectPostTagsSkeleton />;
+  if (loading) return <MetadataPostTagsSkeleton />;
 
   if (error) {
     const message = error.graphQLErrors[0]?.message ?? msg;
@@ -45,20 +51,20 @@ const SelectPostTags = ({ children }: { children: React.ReactElement }) => {
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
       void replace({ pathname: "/login", query });
-      return <SelectPostTagsSkeleton />;
+      return <MetadataPostTagsSkeleton />;
     }
 
     case "UnknownError":
       localStorage.removeItem(SESSION_ID);
       void client.clearStore();
       void replace({ pathname: "/login", query: { status: "unauthorized" } });
-      return <SelectPostTagsSkeleton />;
+      return <MetadataPostTagsSkeleton />;
 
     case "RegistrationError": {
       const query = { status: "unregistered", redirectTo: pathname };
 
       void replace({ pathname: "/register", query });
-      return <SelectPostTagsSkeleton />;
+      return <MetadataPostTagsSkeleton />;
     }
 
     case "PostTags": {
@@ -90,4 +96,4 @@ const SelectPostTags = ({ children }: { children: React.ReactElement }) => {
   }
 };
 
-export default SelectPostTags;
+export default MetadataPostTags;

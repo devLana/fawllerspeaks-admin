@@ -6,11 +6,12 @@ import PostImageBanner from "@features/posts/components/PostImageBanner";
 
 interface ArticleProps {
   content: string;
-  imageBannerBlobUrl: string | undefined;
+  imageSrc: string | null;
+  sizes: string | undefined;
   title: string;
 }
 
-const Article = ({ content, imageBannerBlobUrl, title }: ArticleProps) => (
+const Article = ({ content, imageSrc, title, sizes }: ArticleProps) => (
   <Box
     component="article"
     sx={({ breakpoints: { down } }) => ({
@@ -28,9 +29,10 @@ const Article = ({ content, imageBannerBlobUrl, title }: ArticleProps) => (
     >
       {title}
     </Typography>
-    {imageBannerBlobUrl && (
+    {imageSrc && (
       <PostImageBanner
-        src={imageBannerBlobUrl}
+        src={imageSrc}
+        sizes={sizes}
         alt={`${title} image banner`}
         sx={{
           height: { height: 200, sm: 250, md: 300 },

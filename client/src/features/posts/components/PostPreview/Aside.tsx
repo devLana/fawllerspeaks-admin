@@ -3,7 +3,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 
-import PreviewPostTags from "./PreviewPostTags";
+import PostTags from "./PostTags";
 
 interface AsideProps {
   description: string;
@@ -45,7 +45,7 @@ const Aside = ({ description, excerpt, tagIds }: AsideProps) => (
         />
       </ListItem>
     </List>
-    <PreviewPostTags tagIds={tagIds ?? []} />
+    {tagIds && tagIds.length > 0 && <PostTags tagIds={tagIds} />}
   </Box>
 );
 

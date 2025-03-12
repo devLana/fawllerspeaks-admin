@@ -5,10 +5,8 @@ import Chip from "@mui/material/Chip";
 
 import { GET_POST_TAG_NAME } from "@fragments/GET_POST_TAG_NAME";
 
-const PreviewPostTags = ({ tagIds }: { tagIds: string[] }) => {
+const PostTags = ({ tagIds }: { tagIds: string[] }) => {
   const client = useApolloClient();
-
-  if (tagIds.length === 0) return null;
 
   const selectedTags = tagIds.map(tagId => {
     const id = `PostTag:${tagId}`;
@@ -41,4 +39,4 @@ const PreviewPostTags = ({ tagIds }: { tagIds: string[] }) => {
   );
 };
 
-export default PreviewPostTags;
+export default PostTags;

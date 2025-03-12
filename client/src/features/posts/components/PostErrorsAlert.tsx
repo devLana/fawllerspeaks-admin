@@ -7,38 +7,42 @@ import Snackbar from "@mui/material/Snackbar";
 import Tooltip from "@mui/material/Tooltip";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 
-import type { CreateInputErrors } from "types/posts/createPost";
+import type { PostInputData } from "types/posts";
 
-interface CreatePostErrorsAlertProps extends CreateInputErrors {
-  ariaLabel: string | undefined;
-  shouldOpen: boolean;
+type PostFieldErrors = {
+  [Prop in keyof PostInputData as `${Prop}Error`]?: string;
+};
+
+interface PostErrorsAlertProps extends PostFieldErrors {
+  shouldShowErrors: boolean;
+  children?: React.ReactNode;
   onClick: (() => void) | undefined;
 }
 
-const CreatePostErrorsAlert = ({
+const PostErrorsAlert = ({
   titleError,
   descriptionError,
   excerptError,
   contentError,
   tagIdsError,
   imageBannerError,
-  ariaLabel,
-  shouldOpen,
+  shouldShowErrors,
+  children,
   onClick,
-}: CreatePostErrorsAlertProps) => (
-  <Snackbar open={shouldOpen} autoHideDuration={null}>
+}: PostErrorsAlertProps) => (
+  <Snackbar open={shouldShowErrors} autoHideDuration={null}>
     <Alert
       severity="error"
       sx={{ width: "100%", "&>.MuiAlert-icon,&>.MuiAlert-action": { mt: 1 } }}
       action={
-        <Tooltip title={`Close${ariaLabel ? ` ${ariaLabel} ` : " "}list`}>
+        <Tooltip title="Hide input validation errors list alert">
           <IconButton size="small" color="inherit" onClick={onClick}>
             <CancelOutlinedIcon fontSize="small" />
           </IconButton>
         </Tooltip>
       }
     >
-      <List disablePadding aria-label={ariaLabel}>
+      <List disablePadding aria-label="Input validation errors">
         {titleError && (
           <ListItem disableGutters disablePadding>
             <ListItemText primary="Post Title" secondary={titleError} />
@@ -75,9 +79,10 @@ const CreatePostErrorsAlert = ({
             />
           </ListItem>
         )}
+        {children}
       </List>
     </Alert>
   </Snackbar>
 );
 
-export default CreatePostErrorsAlert;
+export default PostErrorsAlert;

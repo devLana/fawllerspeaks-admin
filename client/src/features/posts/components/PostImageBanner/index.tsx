@@ -5,7 +5,7 @@ import type { SxPropsArray } from "@types";
 interface PostImageBannerProps {
   src: string;
   alt: string;
-  sizes?: string;
+  sizes: string | undefined;
   sx?: BoxProps["sx"];
   children?: React.ReactElement;
 }

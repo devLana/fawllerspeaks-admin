@@ -3,7 +3,7 @@ import Skeleton from "@mui/material/Skeleton";
 import TextField from "@mui/material/TextField";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
-const SelectPostTagsSkeleton = () => (
+const MetadataPostTagsSkeleton = () => (
   <Box
     aria-label="Loading post tags"
     aria-busy="true"
@@ -29,4 +29,4 @@ const SelectPostTagsSkeleton = () => (
   </Box>
 );
 
-export default SelectPostTagsSkeleton;
+export default MetadataPostTagsSkeleton;

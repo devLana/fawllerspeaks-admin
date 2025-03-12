@@ -1,7 +1,7 @@
-import type { CKEditorComponentProps } from "types/posts/createPost";
+import type { CKEditorComponentProps } from "types/posts";
 
 const CKEditorComponent = (props: CKEditorComponentProps) => {
-  const { id, data, contentHasError, dispatch, onBlur, onFocus } = props;
+  const { id, data, contentHasError, dispatchFn, onBlur, onFocus } = props;
 
   return (
     <textarea
@@ -13,7 +13,7 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
       onFocus={onFocus}
       onBlur={e => {
         const { value: content } = e.target;
-        dispatch({ type: "ADD_POST_CONTENT", payload: { content } });
+        dispatchFn(content);
         onBlur(!content.trim());
       }}
     />

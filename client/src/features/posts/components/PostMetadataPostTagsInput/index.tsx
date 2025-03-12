@@ -6,22 +6,36 @@ import FormHelperText from "@mui/material/FormHelperText";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import Select, { type SelectChangeEvent } from "@mui/material/Select";
+import Select, { type SelectProps } from "@mui/material/Select";
+import type { RefCallBack } from "react-hook-form";
 
 import { useGetCachedPostTags } from "@hooks/getPostTags/useGetCachedPostTags";
-import TooltipHint from "../TooltipHint";
+import TooltipHint from "@features/posts/components/TooltipHint";
 import RenderSelectedPostTags from "./RenderSelectedPostTags";
-import type { CreatePostAction } from "types/posts/createPost";
-import { saveStoragePost } from "@utils/posts/storagePost";
 
-interface SelectPostTagsInputProps {
-  tagIdsError: string | undefined;
-  tagIds: string[] | undefined;
-  dispatch: React.Dispatch<CreatePostAction>;
+interface Field {
+  name: "tagIds";
+  ref: RefCallBack;
+  onChange: SelectProps["onChange"];
 }
 
-const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
-  const { tagIdsError, tagIds = [], dispatch } = props;
+interface Controlled extends Field {
+  value: string[];
+  defaultValue?: never;
+}
+
+interface Uncontrolled extends Field {
+  defaultValue: string[];
+  value?: never;
+}
+
+interface PostMetadataPostTagsInputProps {
+  tagIdsError: string | undefined;
+  field: Controlled | Uncontrolled;
+}
+
+const PostMetadataPostTagsInput = (props: PostMetadataPostTagsInputProps) => {
+  const { tagIdsError, field } = props;
   const postTags = useGetCachedPostTags();
 
   const postTagsMap = React.useMemo(() => {
@@ -32,11 +46,7 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
       map[id] = name;
 
       options.push(
-        <MenuItem
-          key={id}
-          value={id}
-          disabled={tagIds.length === 5 && !tagIds.includes(id)}
-        >
+        <MenuItem key={id} value={id}>
           <Box
             component="span"
             width="100%"
@@ -50,16 +60,9 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
     });
 
     return { map, options };
-  }, [postTags, tagIds]);
+  }, [postTags]);
 
-  const handleChange = (e: SelectChangeEvent<string[]>) => {
-    const { value } = e.target;
-    const selectedTags = typeof value === "string" ? value.split(",") : value;
-
-    saveStoragePost({ tagIds: selectedTags });
-    dispatch({ type: "MANAGE_POST_TAGS", payload: { tagIds: selectedTags } });
-  };
-
+  const { ref, ...selectProps } = field;
   const ariaId = tagIdsError ? "post-tags-error-message" : undefined;
 
   return (
@@ -72,11 +75,11 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
           Post Tags
         </InputLabel>
         <Select
+          {...selectProps}
           labelId="post-tags-label"
           id="post-tags"
           multiple
-          value={tagIds}
-          onChange={handleChange}
+          inputRef={ref}
           input={<OutlinedInput id="post-tags-input" label="Post Tags" />}
           MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
           SelectDisplayProps={{
@@ -100,4 +103,4 @@ const SelectPostTagsInput = (props: SelectPostTagsInputProps) => {
   );
 };
 
-export default SelectPostTagsInput;
+export default PostMetadataPostTagsInput;
