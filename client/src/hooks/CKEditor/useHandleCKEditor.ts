@@ -5,9 +5,12 @@ import { saveStoragePost } from "@utils/posts/storagePost";
 import { SUPABASE_HOST } from "@utils/posts/constants";
 import type CustomEditor from "ckeditor5-custom-build";
 
-const useHandleCKEditor = () => {
-  const savedImageUrls = React.useRef(new Set<string>());
+const useHandleCKEditor = (
+  savedImageUrls: React.MutableRefObject<Set<string>>,
+  shouldSaveToStorage: boolean
+) => {
   const timerId = React.useRef<number>();
+  const savedImageUrlsRef = savedImageUrls;
 
   React.useEffect(() => {
     return () => {
@@ -21,7 +24,7 @@ const useHandleCKEditor = () => {
     const root = editorRef.model.document.getRoot();
     const content = editorRef.getData().replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "");
 
-    if (content) {
+    if (shouldSaveToStorage && content) {
       if (timerId.current) window.clearTimeout(timerId.current);
 
       timerId.current = window.setTimeout(() => {
@@ -47,15 +50,15 @@ const useHandleCKEditor = () => {
         }
       });
 
-      const removedImages = Array.from(savedImageUrls.current).filter(url => {
-        return !currentImageUrls.has(url);
-      });
+      const removedImages = Array.from(savedImageUrlsRef.current).filter(
+        url => !currentImageUrls.has(url)
+      );
 
       if (removedImages.length > 0) {
         void deleteImages({ variables: { images: removedImages } });
       }
 
-      savedImageUrls.current = currentImageUrls;
+      savedImageUrlsRef.current = currentImageUrls;
     }
   };
 };
