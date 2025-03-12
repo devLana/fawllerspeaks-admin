@@ -3,18 +3,27 @@ import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import type { SxPropsArray } from "@types";
-import type { CreateStatus } from "types/posts/createPost";
+import type { PostActionStatus } from "types/posts";
 
-interface ActionButtonsProps {
-  status: CreateStatus;
-  label: string;
-  onDraft: VoidFunction;
-  onNext?: VoidFunction;
+interface CreatePostActionButtonsProps {
+  status: PostActionStatus;
+  nextLabel: string;
+  actionLabel: string;
   sx?: BoxProps["sx"];
+  hasPopUp?: boolean;
+  onAction: VoidFunction;
+  onNext?: VoidFunction;
 }
 
-const ActionButtons = (props: ActionButtonsProps) => {
-  const { onDraft, onNext, status, label, sx = [] } = props;
+const CreatePostActionButtons = ({
+  onAction,
+  onNext,
+  status,
+  nextLabel,
+  actionLabel,
+  hasPopUp = false,
+  sx = [],
+}: CreatePostActionButtonsProps) => {
   const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
   return (
@@ -33,19 +42,20 @@ const ActionButtons = (props: ActionButtonsProps) => {
       <LoadingButton
         variant="outlined"
         loading={status === "loading"}
-        onClick={onDraft}
+        onClick={onAction}
       >
-        <span>Save as draft</span>
+        <span>{actionLabel}</span>
       </LoadingButton>
       <Button
         variant="contained"
         disabled={status === "loading"}
+        aria-haspopup={hasPopUp ? "dialog" : undefined}
         {...(onNext ? { onClick: onNext } : { type: "submit" })}
       >
-        {label}
+        {nextLabel}
       </Button>
     </Box>
   );
 };
 
-export default ActionButtons;
+export default CreatePostActionButtons;

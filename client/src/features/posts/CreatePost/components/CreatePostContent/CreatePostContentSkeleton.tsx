@@ -2,13 +2,13 @@ import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 
-const ContentSkeleton = () => (
+const CreatePostContentSkeleton = () => (
   <section
     aria-live="polite"
     aria-busy="true"
     aria-labelledby="post-content-label"
   >
-    <Box sx={{ mb: 1.5, display: "flex", alignItems: "center", columnGap: 3 }}>
+    <Box sx={{ mb: 2.5, display: "flex", columnGap: 3 }}>
       <Skeleton variant="circular" width={38} height={38} />
       <Typography variant="h2" id="post-content-label">
         Provide post content
@@ -31,4 +31,4 @@ const ContentSkeleton = () => (
   </section>
 );
 
-export default ContentSkeleton;
+export default CreatePostContentSkeleton;

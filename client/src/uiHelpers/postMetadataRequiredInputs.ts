@@ -1,4 +1,4 @@
-export const createPostMetadataTextBoxes = [
+export const postMetadataRequiredInputs = [
   {
     id: "title",
     label: "Post Title",

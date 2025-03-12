@@ -2,15 +2,13 @@ import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 
-const PreviewSkeleton = () => (
+const CreatePostPreviewSkeleton = () => (
   <section
     aria-live="polite"
     aria-busy="false"
     aria-labelledby="post-preview-label"
   >
-    <Box
-      sx={{ mb: 1.5, display: "flex", alignItems: "flex-start", columnGap: 3 }}
-    >
+    <Box sx={{ mb: 2.5, display: "flex", columnGap: 3 }}>
       <Skeleton variant="circular" width={38} height={38} />
       <Typography variant="h2" id="post-preview-label">
         Preview blog post
@@ -27,7 +25,6 @@ const PreviewSkeleton = () => (
     </Box>
     <Box
       sx={{
-        mt: { md: 6 },
         display: { md: "grid" },
         gridTemplateColumns: { md: "1.2fr 2fr" },
         gridTemplateRows: { md: "auto auto" },
@@ -136,4 +133,4 @@ const PreviewSkeleton = () => (
   </section>
 );
 
-export default PreviewSkeleton;
+export default CreatePostPreviewSkeleton;

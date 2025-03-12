@@ -6,16 +6,16 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import type { CreateStatus } from "types/posts/createPost";
+import type { PostActionStatus } from "types/posts";
 
-interface PreviewDialogProps {
+interface CreatePostPreviewDialogProps {
   isOpen: boolean;
-  createStatus: CreateStatus;
+  createStatus: PostActionStatus;
   onCloseDialog: () => void;
   handleCreatePost: () => Promise<void>;
 }
 
-const PreviewDialog = (props: PreviewDialogProps) => {
+const CreatePostPreviewDialog = (props: CreatePostPreviewDialogProps) => {
   const { isOpen, createStatus, onCloseDialog, handleCreatePost } = props;
 
   return (
@@ -48,4 +48,4 @@ const PreviewDialog = (props: PreviewDialogProps) => {
   );
 };
 
-export default PreviewDialog;
+export default CreatePostPreviewDialog;

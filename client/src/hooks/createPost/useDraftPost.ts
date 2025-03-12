@@ -9,37 +9,45 @@ import { saveStoragePost } from "@utils/posts/storagePost";
 import { SESSION_ID } from "@utils/constants";
 import { STORAGE_POST } from "@utils/posts/constants";
 import type { DraftPostInput } from "@apiTypes";
-import type {
-  CreateInputErrors,
-  CreatePostData,
-  CreateStatus,
-  DraftErrorCb,
-  RemoveNull,
-} from "types/posts/createPost";
+import type * as create from "types/posts/createPost";
+import type * as posts from "types/posts";
 
-export const useDraftPost = (postData: CreatePostData) => {
-  const [draftStatus, setDraftStatus] = React.useState<CreateStatus>("idle");
+export const useDraftPost = (
+  postData: posts.PostInputData
+): create.DraftHookReturnData => {
+  const [status, setStatus] = React.useState<posts.PostActionStatus>("idle");
   const { pathname, replace, push } = useRouter();
-
   const [draftPost, { client, data, error }] = useMutation(DRAFT_POST);
-
   const upload = useUploadImage();
 
-  const handleDraftPost = async (errorCb?: DraftErrorCb) => {
-    setDraftStatus("loading");
+  const handleDraftPost = async (metadata?: posts.PostMetadataFields) => {
+    let post: create.CreatePostRemoveNull<DraftPostInput>;
 
-    const post: RemoveNull<DraftPostInput> = {
-      title: postData.title,
-      ...(postData.description && { description: postData.description }),
-      ...(postData.excerpt && { excerpt: postData.excerpt }),
-      ...(postData.content && { content: postData.content }),
-      ...(postData.tagIds && { tagIds: postData.tagIds }),
-    };
+    setStatus("loading");
 
+    if (metadata) {
+      post = {
+        title: metadata.title,
+        ...(metadata.description && { description: metadata.description }),
+        ...(metadata.excerpt && { excerpt: metadata.excerpt }),
+        ...(metadata.tagIds.length > 0 && { tagIds: metadata.tagIds }),
+        ...(postData.content && { content: postData.content }),
+      };
+    } else {
+      post = {
+        title: postData.title,
+        ...(postData.description && { description: postData.description }),
+        ...(postData.excerpt && { excerpt: postData.excerpt }),
+        ...(postData.tagIds.length > 0 && { tagIds: postData.tagIds }),
+        ...(postData.content && { content: postData.content }),
+      };
+    }
+
+    const imageFile = metadata ? metadata.imageBanner : postData.imageBanner;
     let uploadHasError = false;
 
-    if (postData.imageBanner) {
-      const imageData = await upload(postData.imageBanner.file, "postBanner");
+    if (imageFile) {
+      const imageData = await upload(imageFile, "postBanner");
       ({ uploadHasError } = imageData);
 
       if (imageData.imageLink) {
@@ -49,7 +57,7 @@ export const useDraftPost = (postData: CreatePostData) => {
 
     void draftPost({
       variables: { post },
-      onError: () => setDraftStatus("error"),
+      onError: () => setStatus("error"),
       onCompleted(draftData) {
         switch (draftData.draftPost.__typename) {
           case "AuthenticationError": {
@@ -80,20 +88,10 @@ export const useDraftPost = (postData: CreatePostData) => {
             break;
           }
 
-          case "PostValidationError": {
-            const { titleError, descriptionError, excerptError } =
-              draftData.draftPost;
-
-            errorCb?.({ titleError, descriptionError, excerptError });
-            setDraftStatus("inputError");
-            break;
-          }
-
+          case "PostValidationError":
           case "DuplicatePostTitleError":
           case "ForbiddenError": {
-            const { message } = draftData.draftPost;
-            errorCb?.({ titleError: message });
-            setDraftStatus("inputError");
+            setStatus("inputError");
             break;
           }
 
@@ -107,40 +105,35 @@ export const useDraftPost = (postData: CreatePostData) => {
           }
 
           default:
-            setDraftStatus("error");
+            setStatus("error");
         }
       },
     });
   };
 
-  let errors: CreateInputErrors = {};
-
-  let msg =
-    "You are unable to save this post as draft at the moment. Please try again later";
-
-  if (error?.graphQLErrors?.[0]) {
-    msg = error.graphQLErrors[0].message;
-  }
+  const handleHideErrors = () => setStatus("idle");
+  let errors: create.CreatePostFieldErrors = {};
+  let msg = `You are unable to save this post as draft at the moment. Please try again later`;
 
   if (data?.draftPost.__typename === "PostValidationError") {
-    const { descriptionError, imageBannerError, ...rest } = data.draftPost;
+    const errs = data.draftPost;
 
     errors = {
-      ...(rest.titleError && { titleError: rest.titleError }),
-      ...(descriptionError && { descriptionError }),
-      ...(rest.excerptError && { excerptError: rest.excerptError }),
-      ...(rest.contentError && { contentError: rest.contentError }),
-      ...(rest.tagIdsError && { tagIdsError: rest.tagIdsError }),
-      ...(imageBannerError && { imageBannerError }),
+      ...(errs.titleError && { titleError: errs.titleError }),
+      ...(errs.descriptionError && { descriptionError: errs.descriptionError }),
+      ...(errs.excerptError && { excerptError: errs.excerptError }),
+      ...(errs.contentError && { contentError: errs.contentError }),
+      ...(errs.tagIdsError && { tagIdsError: errs.tagIdsError }),
+      ...(errs.imageBannerError && { imageBannerError: errs.imageBannerError }),
     };
   } else if (
     data?.draftPost.__typename === "ForbiddenError" ||
     data?.draftPost.__typename === "DuplicatePostTitleError"
   ) {
-    errors.titleError = data.draftPost.message;
+    errors = { titleError: data.draftPost.message };
+  } else if (error?.graphQLErrors?.[0]) {
+    msg = error.graphQLErrors[0].message;
   }
 
-  const handleCloseError = () => setDraftStatus("idle");
-
-  return { msg, draftStatus, errors, handleDraftPost, handleCloseError };
+  return { msg, status, errors, handleDraftPost, handleHideErrors };
 };

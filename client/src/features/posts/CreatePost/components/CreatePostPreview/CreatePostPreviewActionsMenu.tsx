@@ -6,15 +6,15 @@ import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 import type { FunctionLike } from "@types";
-import type { CreateStatus, DraftErrorCb } from "types/posts/createPost";
+import type { PostActionStatus, PostMetadataFields } from "types/posts";
 
 interface PreviewActionsMenuProps {
-  draftStatus: CreateStatus;
+  draftStatus: PostActionStatus;
   onCreate: () => void;
-  onDraft: (errorCb?: DraftErrorCb) => Promise<void>;
+  onDraft: (metadata?: PostMetadataFields) => Promise<void>;
 }
 
-const PreviewActionsMenu = (props: PreviewActionsMenuProps) => {
+const CreatePostPreviewActionsMenu = (props: PreviewActionsMenuProps) => {
   const { draftStatus, onDraft, onCreate } = props;
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
 
@@ -68,4 +68,4 @@ const PreviewActionsMenu = (props: PreviewActionsMenuProps) => {
   );
 };
 
-export default PreviewActionsMenu;
+export default CreatePostPreviewActionsMenu;

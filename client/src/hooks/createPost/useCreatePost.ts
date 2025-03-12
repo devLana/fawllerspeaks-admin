@@ -8,15 +8,11 @@ import { CREATE_POST } from "@mutations/createPost/CREATE_POST";
 import { SESSION_ID } from "@utils/constants";
 import { STORAGE_POST } from "@utils/posts/constants";
 import type { CreatePostInput } from "@apiTypes";
-import type {
-  CreateInputErrors,
-  CreatePostData,
-  CreateStatus,
-} from "types/posts/createPost";
+import type { PostActionStatus, PostInputData as Data } from "types/posts";
+import type * as types from "types/posts/createPost";
 
-export const useCreatePost = (postData: CreatePostData) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [status, setStatus] = React.useState<CreateStatus>("idle");
+export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
+  const [status, setStatus] = React.useState<PostActionStatus>("idle");
   const { push, replace, pathname } = useRouter();
 
   const [createPost, { client, data, error }] = useMutation(CREATE_POST);
@@ -27,11 +23,15 @@ export const useCreatePost = (postData: CreatePostData) => {
     setStatus("loading");
 
     const { imageBanner, tagIds, ...rest } = postData;
-    const post: CreatePostInput = { ...rest, ...(tagIds && { tagIds }) };
     let uploadHasError = false;
 
+    const post: CreatePostInput = {
+      ...rest,
+      ...(tagIds.length > 0 && { tagIds }),
+    };
+
     if (imageBanner) {
-      const imageData = await upload(imageBanner.file, "postBanner");
+      const imageData = await upload(imageBanner, "postBanner");
       ({ uploadHasError } = imageData);
 
       if (imageData.imageLink) {
@@ -41,10 +41,7 @@ export const useCreatePost = (postData: CreatePostData) => {
 
     void createPost({
       variables: { post },
-      onError: () => {
-        setStatus("error");
-        setIsOpen(false);
-      },
+      onError: () => setStatus("error"),
       onCompleted(createData) {
         switch (createData.createPost.__typename) {
           case "AuthenticationError": {
@@ -75,7 +72,6 @@ export const useCreatePost = (postData: CreatePostData) => {
           case "DuplicatePostTitleError":
           case "ForbiddenError":
             setStatus("inputError");
-            setIsOpen(false);
             break;
 
           case "SinglePost": {
@@ -89,16 +85,14 @@ export const useCreatePost = (postData: CreatePostData) => {
 
           default:
             setStatus("error");
-            setIsOpen(false);
         }
       },
     });
   };
 
-  let errors: CreateInputErrors = {};
-
-  let msg =
-    "You are unable to create and publish this post at the moment. Please try again later";
+  const handleHideErrors = () => setStatus("idle");
+  let errors: types.CreatePostFieldErrors = {};
+  let msg = `You are unable to create and publish this post at the moment. Please try again later`;
 
   if (error?.graphQLErrors?.[0]) {
     msg = error.graphQLErrors[0].message;
@@ -119,16 +113,8 @@ export const useCreatePost = (postData: CreatePostData) => {
     data?.createPost.__typename === "ForbiddenError" ||
     data?.createPost.__typename === "DuplicatePostTitleError"
   ) {
-    errors.titleError = data.createPost.message;
+    errors = { titleError: data.createPost.message };
   }
 
-  return {
-    isOpen,
-    setIsOpen,
-    msg,
-    errors,
-    status,
-    handleCreatePost,
-    handleCloseError: () => setStatus("idle"),
-  };
+  return { msg, status, errors, handleCreatePost, handleHideErrors };
 };

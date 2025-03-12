@@ -1,11 +1,11 @@
 import { screen } from "@testing-library/react";
 import type { Mock } from "vitest";
 
-import Metadata from "..";
-import PostFileInput from "../PostFileInput";
-import SelectPostTagsInput from "../SelectPostTags/SelectPostTagsInput";
+import CreatePostMetadata from "..";
+import CreatePostFileInput from "../CreatePostFileInput";
+import PostMetadataPostTagsInput from "@features/posts/components/PostMetadataPostTagsInput";
 import { saveStoragePost } from "@utils/posts/storagePost";
-import * as mocks from "./Metadata.mocks";
+import * as mocks from "./CreatePostMetadata.mocks";
 import { renderUI } from "@utils/tests/renderUI";
 import type { StoragePostData } from "types/posts/createPost";
 
@@ -27,7 +27,7 @@ describe("Create Post - Metadata", () => {
   const mockHandleDraftPost = vi.fn().mockName("handleDraftPost");
 
   const UI = (props: mocks.Props) => (
-    <Metadata
+    <CreatePostMetadata
       title={props.title}
       description={props.description}
       excerpt={props.excerpt}
@@ -36,17 +36,17 @@ describe("Create Post - Metadata", () => {
       handleDraftPost={mockHandleDraftPost}
       dispatch={mockDispatch}
       fileInput={
-        <PostFileInput
+        <CreatePostFileInput
           imageBanner={undefined}
           imageBannerError={props.imageBannerError}
           dispatch={mockDispatch}
         />
       }
-      selectPostTagsInput={
-        <SelectPostTagsInput
+      postTagsInput={
+        <PostMetadataPostTagsInput
           tagIds={undefined}
           tagIdsError={props.tagIdsError}
-          dispatch={mockDispatch}
+          dispatchFn={mockDispatch}
         />
       }
     />

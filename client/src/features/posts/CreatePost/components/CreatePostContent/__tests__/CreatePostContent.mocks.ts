@@ -1,9 +1,10 @@
-import type { CreateInputErrors, CreateStatus } from "types/posts/createPost";
+import type { CreatePostFieldErrors } from "types/posts/createPost";
+import type { PostActionStatus } from "types/posts";
 
 export interface Props {
   content: string;
-  draftErrors: CreateInputErrors;
-  draftStatus: CreateStatus;
+  draftErrors: CreatePostFieldErrors;
+  draftStatus: PostActionStatus;
 }
 
 export const next = { name: /^preview post$/i };

@@ -4,7 +4,7 @@ import { getStoragePost } from "@utils/posts/storagePost";
 import type { CreatePostAction } from "types/posts/createPost";
 
 const useCreatePostEffects = (
-  blobUrl: string | undefined,
+  fileUrl: string | null,
   dispatch: React.Dispatch<CreatePostAction>
 ) => {
   React.useEffect(() => {
@@ -15,11 +15,9 @@ const useCreatePostEffects = (
 
   React.useEffect(() => {
     return () => {
-      if (blobUrl) {
-        window.URL.revokeObjectURL(blobUrl);
-      }
+      if (fileUrl) window.URL.revokeObjectURL(fileUrl);
     };
-  }, [blobUrl]);
+  }, [fileUrl]);
 };
 
 export default useCreatePostEffects;

@@ -69,7 +69,7 @@ describe("Create Post - State Reducer", () => {
       });
 
       const result = reducer(state, {
-        type: "ADD_POST_BANNER_IMAGE",
+        type: "ADD_POST_IMAGE_BANNER_FILE",
         payload: { imageFile: file },
       });
 
@@ -98,7 +98,9 @@ describe("Create Post - State Reducer", () => {
         postData: { ...state.postData, imageBanner: { file, blobUrl } },
       };
 
-      const result = reducer(initState, { type: "REMOVE_POST_BANNER_IMAGE" });
+      const result = reducer(initState, {
+        type: "REMOVE_POST_IMAGE_BANNER_FILE",
+      });
 
       expect(result).toStrictEqual(state);
     });

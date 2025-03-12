@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography";
 
 import PostsPageBackButton from "@features/posts/components/PostsPageBackButton";
 
-interface SectionHeaderProps {
+interface CreatePostSectionHeaderProps {
   onClick: VoidFunction;
   id: string;
   buttonLabel: string;
@@ -11,13 +11,11 @@ interface SectionHeaderProps {
   actionsMenu?: React.ReactElement;
 }
 
-const SectionHeader = (props: SectionHeaderProps) => {
+const CreatePostSectionHeader = (props: CreatePostSectionHeaderProps) => {
   const { onClick, heading, buttonLabel, id, actionsMenu } = props;
 
   return (
-    <Box
-      sx={{ mb: 3, display: "flex", alignItems: "flex-start", columnGap: 3 }}
-    >
+    <Box sx={{ mb: 2.5, display: "flex", columnGap: 3 }}>
       <PostsPageBackButton buttonLabel={buttonLabel} onClick={onClick} />
       <Typography variant="h2" id={id}>
         {heading}
@@ -27,4 +25,4 @@ const SectionHeader = (props: SectionHeaderProps) => {
   );
 };
 
-export default SectionHeader;
+export default CreatePostSectionHeader;

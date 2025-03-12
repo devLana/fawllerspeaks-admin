@@ -1,6 +1,6 @@
 import type {
   CreatePostAction as A,
-  CreatePostState as S,
+  CreatePostStateData as S,
 } from "types/posts/createPost";
 
 type Reducer = (state: S, action: A) => S;
@@ -8,53 +8,54 @@ type Reducer = (state: S, action: A) => S;
 export const initialState: S = {
   view: "metadata",
   showStoragePostAlert: false,
-  postData: { title: "", description: "", excerpt: "", content: "" },
+  postData: {
+    title: "",
+    description: "",
+    excerpt: "",
+    content: "",
+    tagIds: [],
+    imageBanner: null,
+  },
+  fileUrl: null,
 };
 
 export const reducer: Reducer = (state, action) => {
   switch (action.type) {
-    case "CHANGE_VIEW": {
-      return { ...state, view: action.payload.view };
+    case "GO_BACK_TO_CONTENT": {
+      if (state.fileUrl) window.URL.revokeObjectURL(state.fileUrl);
+      return { ...state, view: "content", fileUrl: null };
     }
 
-    case "MANAGE_POST_TAGS": {
-      const { tagIds } = action.payload;
+    case "GO_BACK_TO_METADATA": {
+      let fileUrl = null;
 
-      if (tagIds.length === 0) {
-        const { tagIds: _, ...rest } = state.postData;
-        return { ...state, postData: rest };
-      } else {
-        return { ...state, postData: { ...state.postData, tagIds } };
+      if (state.postData.imageBanner) {
+        fileUrl = window.URL.createObjectURL(state.postData.imageBanner);
       }
+
+      return { ...state, view: "metadata", fileUrl };
     }
 
-    case "ADD_POST_BANNER_IMAGE": {
-      const { imageFile } = action.payload;
-      const blobUrl = window.URL.createObjectURL(imageFile);
+    case "ADD_FILE_URL": {
+      if (state.fileUrl) window.URL.revokeObjectURL(state.fileUrl);
 
-      return {
-        ...state,
-        postData: {
-          ...state.postData,
-          imageBanner: { file: imageFile, blobUrl },
-        },
-      };
+      const fileUrl = window.URL.createObjectURL(action.payload.file);
+      return { ...state, fileUrl };
     }
 
-    case "REMOVE_POST_BANNER_IMAGE": {
-      const { imageBanner: _, ...rest } = state.postData;
-
-      window.URL.revokeObjectURL(state.postData.imageBanner?.blobUrl as string);
-      return { ...state, postData: rest };
+    case "REMOVE_FILE_URL": {
+      if (state.fileUrl) window.URL.revokeObjectURL(state.fileUrl);
+      return { ...state, fileUrl: null };
     }
 
-    case "ADD_REQUIRED_METADATA": {
-      const { metadata } = action.payload;
+    case "PROCEED_TO_POST_CONTENT": {
+      if (state.fileUrl) window.URL.revokeObjectURL(state.fileUrl);
 
       return {
         ...state,
         view: "content",
-        postData: { ...state.postData, ...metadata },
+        fileUrl: null,
+        postData: { ...state.postData, ...action.payload.metadata },
       };
     }
 
@@ -63,23 +64,32 @@ export const reducer: Reducer = (state, action) => {
       return { ...state, postData: { ...state.postData, content } };
     }
 
-    case "CHANGE_METADATA_FIELD": {
-      const { key, value } = action.payload;
-      return { ...state, postData: { ...state.postData, [key]: value } };
+    case "PREVIEW_POST": {
+      let fileUrl = null;
+
+      if (state.postData.imageBanner) {
+        fileUrl = window.URL.createObjectURL(state.postData.imageBanner);
+      }
+
+      return { ...state, view: "preview", fileUrl };
     }
 
-    case "SHOW_STORAGE_POST_ALERT":
+    case "SHOW_STORAGE_POST_ALERT": {
       return { ...state, showStoragePostAlert: true };
+    }
 
-    case "HIDE_STORAGE_POST_ALERT":
+    case "HIDE_STORAGE_POST_ALERT": {
       return { ...state, showStoragePostAlert: false };
+    }
 
-    case "LOAD_STORAGE_POST":
+    case "LOAD_STORAGE_POST": {
       return {
+        ...state,
         view: "metadata",
         showStoragePostAlert: false,
         postData: { ...state.postData, ...action.payload.post },
       };
+    }
 
     default:
       throw new Error("Unexpected action object dispatched");

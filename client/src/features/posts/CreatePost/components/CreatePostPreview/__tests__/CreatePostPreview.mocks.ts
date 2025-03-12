@@ -8,11 +8,8 @@ import { CREATE_POST } from "@mutations/createPost/CREATE_POST";
 import { mswData, mswErrors } from "@utils/tests/msw";
 import { testPostTag } from "@utils/tests/testPostTag";
 import type { GetPostTagsData } from "types/postTags/getPostTags";
-import type {
-  CreateInputErrors,
-  CreateStatus,
-  PostImageBanner,
-} from "types/posts/createPost";
+import type { CreatePostFieldErrors } from "types/posts/createPost";
+import type { PostActionStatus } from "types/posts";
 
 const titleStr = (prefix: string) => `${prefix} Test Post Title`;
 const tagNames = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5"];
@@ -53,9 +50,9 @@ const CREATE_MESSAGE =
 export interface Props {
   title: string;
   tagIds?: string[];
-  imageBanner?: PostImageBanner;
-  draftStatus: CreateStatus;
-  draftErrors: CreateInputErrors;
+  imageBanner?: File;
+  draftStatus: PostActionStatus;
+  draftErrors: CreatePostFieldErrors;
 }
 
 export const props: Props = {
@@ -283,5 +280,5 @@ export const created: [string, CreateMock][] = [
 
 export const writeTags: Cache.WriteQueryOptions<GetPostTagsData, object> = {
   query: GET_POST_TAGS,
-  data: { getPostTags: { __typename: "PostTags", tags, status: "SUCCESS" } },
+  data: { getPostTags: { __typename: "PostTags", tags } },
 };

@@ -8,8 +8,8 @@ import {
 } from "@testing-library/react";
 import { http } from "msw";
 
-import Preview from "..";
-import * as mocks from "./Preview.mocks";
+import CreatePostPreview from "..";
+import * as mocks from "./CreatePostPreview.mocks";
 import { renderUI } from "@utils/tests/renderUI";
 
 describe("Create Post - Preview", () => {
@@ -21,7 +21,7 @@ describe("Create Post - Preview", () => {
     const { title, imageBanner, tagIds, draftErrors, draftStatus } = props;
 
     return (
-      <Preview
+      <CreatePostPreview
         post={{
           content: mocks.html,
           description: "Post Description",
