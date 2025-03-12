@@ -76,7 +76,7 @@ const PostMetadataList = ({
         secondary={new Intl.NumberFormat("en-US").format(views)}
       />
     </ListItem>
-    {tags && <PostTags tags={tags} />}
+    {tags && tags.length > 0 && <PostTags tags={tags} />}
   </List>
 );
 
