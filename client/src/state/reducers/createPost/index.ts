@@ -16,45 +16,22 @@ export const initialState: S = {
     tagIds: [],
     imageBanner: null,
   },
-  fileUrl: null,
 };
 
 export const reducer: Reducer = (state, action) => {
   switch (action.type) {
     case "GO_BACK_TO_CONTENT": {
-      if (state.fileUrl) window.URL.revokeObjectURL(state.fileUrl);
-      return { ...state, view: "content", fileUrl: null };
+      return { ...state, view: "content" };
     }
 
     case "GO_BACK_TO_METADATA": {
-      let fileUrl = null;
-
-      if (state.postData.imageBanner) {
-        fileUrl = window.URL.createObjectURL(state.postData.imageBanner);
-      }
-
-      return { ...state, view: "metadata", fileUrl };
-    }
-
-    case "ADD_FILE_URL": {
-      if (state.fileUrl) window.URL.revokeObjectURL(state.fileUrl);
-
-      const fileUrl = window.URL.createObjectURL(action.payload.file);
-      return { ...state, fileUrl };
-    }
-
-    case "REMOVE_FILE_URL": {
-      if (state.fileUrl) window.URL.revokeObjectURL(state.fileUrl);
-      return { ...state, fileUrl: null };
+      return { ...state, view: "metadata" };
     }
 
     case "PROCEED_TO_POST_CONTENT": {
-      if (state.fileUrl) window.URL.revokeObjectURL(state.fileUrl);
-
       return {
         ...state,
         view: "content",
-        fileUrl: null,
         postData: { ...state.postData, ...action.payload.metadata },
       };
     }
@@ -65,13 +42,7 @@ export const reducer: Reducer = (state, action) => {
     }
 
     case "PREVIEW_POST": {
-      let fileUrl = null;
-
-      if (state.postData.imageBanner) {
-        fileUrl = window.URL.createObjectURL(state.postData.imageBanner);
-      }
-
-      return { ...state, view: "preview", fileUrl };
+      return { ...state, view: "preview" };
     }
 
     case "SHOW_STORAGE_POST_ALERT": {

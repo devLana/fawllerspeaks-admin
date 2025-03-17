@@ -20,14 +20,11 @@ export interface CreatePostStateData {
   view: PostView;
   showStoragePostAlert: boolean;
   postData: PostInputData;
-  fileUrl: string | null;
 }
 
 export type CreatePostAction =
   | { type: "GO_BACK_TO_METADATA" }
   | { type: "GO_BACK_TO_CONTENT" }
-  | { type: "ADD_FILE_URL"; payload: { file: File } }
-  | { type: "REMOVE_FILE_URL" }
   | { type: "PROCEED_TO_POST_CONTENT"; payload: { metadata: Fields } }
   | { type: "ADD_POST_CONTENT"; payload: { content: string } }
   | { type: "PREVIEW_POST" }

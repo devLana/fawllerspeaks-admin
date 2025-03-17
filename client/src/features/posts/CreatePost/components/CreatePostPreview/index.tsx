@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import useHandleFileUrl from "@hooks/createPost/useHandleFileUrl";
 import PostPreview from "@features/posts/components/PostPreview";
 import CreatePostSectionHeader from "../CreatePostSectionHeader";
 import CreatePostPreviewActionsMenu from "./CreatePostPreviewActionsMenu";
@@ -10,7 +11,6 @@ import type * as creates from "types/posts/createPost";
 import type * as types from "types/posts";
 
 interface CreatePostPreviewProps {
-  fileUrl: string | null;
   post: types.PostInputData;
   draftStatus: types.PostActionStatus;
   createStatus: types.PostActionStatus;
@@ -23,7 +23,6 @@ interface CreatePostPreviewProps {
 }
 
 const CreatePostPreview = ({
-  fileUrl,
   post,
   draftStatus,
   createStatus,
@@ -35,6 +34,7 @@ const CreatePostPreview = ({
   dispatch,
 }: CreatePostPreviewProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { fileUrl } = useHandleFileUrl(post.imageBanner);
 
   return (
     <section

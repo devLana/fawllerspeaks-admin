@@ -1,145 +1,87 @@
 import { reducer, initialState as state } from ".";
+import type { CreatePostStateData } from "types/posts/createPost";
 
 describe("Create Post - State Reducer", () => {
-  describe("View state", () => {
-    it("Should change the 'view' state", () => {
-      const result1 = reducer(state, {
-        type: "CHANGE_VIEW",
-        payload: { view: "content" },
-      });
+  describe("Go back to different 'view' states", () => {
+    const state1: CreatePostStateData = { ...state, view: "content" };
+    const state2: CreatePostStateData = { ...state, view: "preview" };
 
-      expect(result1).toStrictEqual({ ...state, view: "content" });
+    it("Should change the 'view' state back to metadata", () => {
+      const data = reducer(state1, { type: "GO_BACK_TO_METADATA" });
+      expect(data).toStrictEqual({ ...state1, view: "metadata" });
+    });
 
-      const result2 = reducer(state, {
-        type: "CHANGE_VIEW",
-        payload: { view: "preview" },
-      });
-
-      expect(result2).toStrictEqual({ ...state, view: "preview" });
-
-      const result3 = reducer(state, {
-        type: "CHANGE_VIEW",
-        payload: { view: "metadata" },
-      });
-
-      expect(result3).toStrictEqual({ ...state, view: "metadata" });
+    it("Should change the 'view' state back to content", () => {
+      const data = reducer(state2, { type: "GO_BACK_TO_CONTENT" });
+      expect(data).toStrictEqual({ ...state2, view: "content" });
     });
   });
 
-  describe("PostData state", () => {
-    it("Should set the values for the required metadata fields in the 'postData' state", () => {
-      const data = {
-        description: "description",
-        excerpt: "excerpt",
-        title: "title",
+  describe("Proceed to post content", () => {
+    it("Should add post metadata data to 'postData' and change 'view' to content", () => {
+      const metadata = {
+        title: "New Title",
+        description: "New Description",
+        excerpt: "New Excerpt",
+        imageBanner: new File(["image"], "avatar.jpg", { type: "image/jpeg" }),
+        tagIds: ["id-1", "id-2"],
       };
 
-      const result = reducer(state, {
-        type: "ADD_REQUIRED_METADATA",
-        payload: { metadata: data },
+      const data = reducer(state, {
+        type: "PROCEED_TO_POST_CONTENT",
+        payload: { metadata },
       });
 
-      expect(result).toStrictEqual({
+      expect(data).toStrictEqual({
+        ...state,
         view: "content",
-        showStoragePostAlert: false,
-        postData: { ...data, content: "" },
+        postData: { ...state.postData, ...metadata },
       });
     });
+  });
 
-    it("Should change the value of a required metadata field in the 'postData' state", () => {
-      const initState = {
+  describe("Post content", () => {
+    it("Should add provided post content to 'postData'", () => {
+      const content = "<h2>Heading</h2><p>Paragraph 1</p><h3>Heading 3</h3>";
+
+      const initState: CreatePostStateData = {
         ...state,
-        postData: { ...state.postData, description: "description" },
+        view: "content",
+        postData: { ...state.postData, content },
       };
 
-      const result = reducer(initState, {
-        type: "CHANGE_METADATA_FIELD",
-        payload: { key: "description", value: "new description" },
-      });
-
-      expect(result).toStrictEqual({
-        ...state,
-        postData: { ...state.postData, description: "new description" },
-      });
-    });
-
-    it("Should add an image to the 'postData' state", () => {
-      const file = new File(["test image file"], "avatar.jpg", {
-        type: "image/jpeg",
-      });
-
-      const result = reducer(state, {
-        type: "ADD_POST_IMAGE_BANNER_FILE",
-        payload: { imageFile: file },
-      });
-
-      expect(result).toStrictEqual({
-        view: "metadata",
-        showStoragePostAlert: false,
-        postData: {
-          ...state.postData,
-          imageBanner: {
-            file,
-            blobUrl: expect.stringMatching(/^data:/) as string,
-          },
-        },
-      });
-    });
-
-    it("Should remove an image from the 'postData' state", () => {
-      const file = new File(["test image file"], "avatar.jpg", {
-        type: "image/jpeg",
-      });
-
-      const blobUrl = window.URL.createObjectURL(file);
-
-      const initState = {
-        ...state,
-        postData: { ...state.postData, imageBanner: { file, blobUrl } },
-      };
-
-      const result = reducer(initState, {
-        type: "REMOVE_POST_IMAGE_BANNER_FILE",
-      });
-
-      expect(result).toStrictEqual(state);
-    });
-
-    it("Should add post tag(s) to the 'postData' state", () => {
-      const result = reducer(state, {
-        type: "MANAGE_POST_TAGS",
-        payload: { tagIds: ["id-1", "id-2", "id-3"] },
-      });
-
-      expect(result).toStrictEqual({
-        ...state,
-        postData: { ...state.postData, tagIds: ["id-1", "id-2", "id-3"] },
-      });
-    });
-
-    it("Should remove post tag(s) from the 'postData' state", () => {
-      const result = reducer(state, {
-        type: "MANAGE_POST_TAGS",
-        payload: { tagIds: [] },
-      });
-
-      expect(result).toStrictEqual(state);
-    });
-
-    it("Should add post content to the 'postData' state", () => {
-      const content = "<p>post content html</p>";
-
-      const result = reducer(state, {
+      const data = reducer(initState, {
         type: "ADD_POST_CONTENT",
         payload: { content },
       });
 
-      expect(result).toStrictEqual({
-        ...state,
-        postData: { ...state.postData, content },
+      expect(data).toStrictEqual({
+        ...initState,
+        postData: { ...initState.postData, content },
       });
+    });
+  });
 
-      expect(result.postData).toHaveProperty("content", content);
+  describe("Preview post", () => {
+    it("Should change 'view' to preview", () => {
+      const file = new File(["image"], "avatar.jpg", { type: "image/jpeg" });
+
+      const initState: CreatePostStateData = {
+        view: "content",
+        postData: {
+          title: "New Title",
+          description: "New Description",
+          excerpt: "New Excerpt",
+          content: "<h2>Heading</h2><p>Paragraph 1</p><h3>Heading 3</h3>",
+          imageBanner: file,
+          tagIds: ["id-1", "id-2"],
+        },
+        showStoragePostAlert: false,
+      };
+
+      const data = reducer(initState, { type: "PREVIEW_POST" });
+
+      expect(data).toStrictEqual({ ...initState, view: "preview" });
     });
   });
 
@@ -154,7 +96,6 @@ describe("Create Post - State Reducer", () => {
 
     it("Should set 'storagePost' state", () => {
       const result = reducer(state, { type: "SHOW_STORAGE_POST_ALERT" });
-
       expect(result).toStrictEqual({ ...state, showStoragePostAlert: true });
     });
 
@@ -173,7 +114,10 @@ describe("Create Post - State Reducer", () => {
         payload: { post },
       });
 
-      expect(result).toStrictEqual({ ...state, postData: post });
+      expect(result).toStrictEqual({
+        ...state,
+        postData: { ...post, imageBanner: null },
+      });
     });
   });
 });

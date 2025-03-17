@@ -1,19 +1,19 @@
+import * as React from "react";
+
 import FormHelperText from "@mui/material/FormHelperText";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
+import useHandleFileUrl from "@hooks/createPost/useHandleFileUrl";
 import { useSingleFileHandler } from "@hooks/useSingleFileHandler";
 import { FileInput } from "@components/ui/FileInput";
 import PostImageBannerPreview from "@features/posts/components/PostImageBanner/PostImageBannerPreview";
 import PostImageBannerInputButton from "@features/posts/components/PostImageBannerInput/InputButton";
 import PostImageBannerInputWrapper from "@features/posts/components/PostImageBannerInput/InputWrapper";
-import type { CreatePostAction } from "types/posts/createPost";
 
 interface CreatePostFileInputProps {
   imageBannerError: string | undefined;
   imageBanner: File | null;
-  fileUrl: string | null;
   register: UseFormRegisterReturn<"imageBanner">;
-  dispatch: React.Dispatch<CreatePostAction>;
   onError: (errorMsg: string) => void;
   onSelectImage: (file: File) => void;
   clearError: VoidFunction;
@@ -21,16 +21,16 @@ interface CreatePostFileInputProps {
 }
 
 const CreatePostFileInput = ({
-  fileUrl,
   imageBanner,
   imageBannerError,
   register,
   clearError,
-  dispatch,
   onError,
   onSelectImage,
   resetField,
 }: CreatePostFileInputProps) => {
+  const { fileUrl, setFileUrl } = useHandleFileUrl(imageBanner);
+
   const {
     fileInputRef,
     hasEnteredDropZone,
@@ -46,14 +46,18 @@ const CreatePostFileInput = ({
   });
 
   function handleAddImage(file: File) {
+    if (fileUrl) window.URL.revokeObjectURL(fileUrl);
+
     clearError();
     onSelectImage(file);
-    dispatch({ type: "ADD_FILE_URL", payload: { file } });
+    setFileUrl(window.URL.createObjectURL(file));
   }
 
   const handleRemoveImage = () => {
+    if (fileUrl) window.URL.revokeObjectURL(fileUrl);
+
     resetField();
-    dispatch({ type: "REMOVE_FILE_URL" });
+    setFileUrl(null);
   };
 
   const id = "post-image-banner";

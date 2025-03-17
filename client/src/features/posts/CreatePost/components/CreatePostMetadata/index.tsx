@@ -17,7 +17,6 @@ import type * as p from "types/posts";
 import type * as types from "types/posts/createPost";
 
 interface CreatePostMetadataProps {
-  fileUrl: string | null;
   postData: p.PostMetadataFields;
   draftStatus: p.PostActionStatus;
   errors: types.CreatePostFieldErrors;
@@ -113,10 +112,8 @@ const CreatePostMetadata = (props: CreatePostMetadataProps) => {
           />
         </MetadataPostTags>
         <CreatePostFileInput
-          fileUrl={props.fileUrl}
           imageBanner={imageBanner}
           imageBannerError={errors.imageBanner?.message ?? imageBannerError}
-          dispatch={props.dispatch}
           onError={message => setError("imageBanner", { message })}
           onSelectImage={payload => setValue("imageBanner", payload)}
           resetField={() => resetField("imageBanner")}

@@ -22,7 +22,7 @@ const CreatePostPage: NextPageWithLayout = () => {
   const draft = useDraftPost(state.postData);
   const create = useCreatePost(state.postData);
   const data = useCreatePostDTO(draft, create);
-  useCreatePostEffects(state.fileUrl, dispatch);
+  useCreatePostEffects(dispatch);
 
   const { content, ...postData } = state.postData;
 
@@ -33,7 +33,6 @@ const CreatePostPage: NextPageWithLayout = () => {
       </Typography>
       {state.view === "metadata" ? (
         <CreatePostMetadata
-          fileUrl={state.fileUrl}
           postData={postData}
           draftStatus={draft.status}
           onDraft={draft.handleDraftPost}
@@ -54,7 +53,6 @@ const CreatePostPage: NextPageWithLayout = () => {
         />
       ) : (
         <LazyCreatePostPreview
-          fileUrl={state.fileUrl}
           post={state.postData}
           draftStatus={draft.status}
           createStatus={create.status}
