@@ -53,13 +53,15 @@ const CreatePostPage: NextPageWithLayout = () => {
         />
       ) : (
         <LazyCreatePostPreview
+          isOpen={create.isOpen}
+          setIsOpen={create.setIsOpen}
           post={state.postData}
           draftStatus={draft.status}
           createStatus={create.status}
           handleDraftPost={draft.handleDraftPost}
           handleCreatePost={create.handleCreatePost}
           dispatch={dispatch}
-          errors={draft.errors}
+          errors={data.errors}
           shouldShowErrors={data.shouldShowErrors}
           handleHideErrors={data.handleHideErrors}
         />

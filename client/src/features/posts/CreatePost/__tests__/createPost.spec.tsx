@@ -1,17 +1,13 @@
-import { useRouter } from "next/router";
-
 import {
   screen,
-  waitFor,
   waitForElementToBeRemoved,
   within,
 } from "@testing-library/react";
-import { http } from "msw";
 
 import CreatePostPage from "@pages/posts/new";
 import { getStoragePost, saveStoragePost } from "@utils/posts/storagePost";
 import { renderUI } from "@utils/tests/renderUI";
-import * as mocks from "./createPost.mocks";
+import * as mocks from "./mocks/createPost.mocks";
 import type { StoragePostData } from "types/posts/createPost";
 
 type MockFn = ReturnType<typeof vi.fn<never, StoragePostData | null>>;
@@ -20,10 +16,10 @@ vi.mock("@features/posts/components/CKEditorComponent");
 vi.mock("@utils/posts/storagePost");
 
 describe("Create Post", () => {
-  const mockFn = getStoragePost as MockFn;
+  const mockGetStoragePost = getStoragePost as MockFn;
 
   beforeAll(() => {
-    mockFn.mockReturnValue(null);
+    mockGetStoragePost.mockReturnValue(null);
     mocks.server.listen({ onUnhandledRequest: "error" });
   });
 
@@ -53,8 +49,8 @@ describe("Create Post", () => {
       });
 
       it("A post is saved in localStorage, Expect UI input elements to be updated with the saved post values", async () => {
-        mockFn.mockReturnValueOnce(mocks.storagePost);
-        mockFn.mockReturnValueOnce(mocks.storagePost);
+        mockGetStoragePost.mockReturnValueOnce(mocks.storagePost);
+        mockGetStoragePost.mockReturnValueOnce(mocks.storagePost);
 
         const { user } = renderUI(<CreatePostPage />);
 
@@ -63,23 +59,20 @@ describe("Create Post", () => {
         ).resolves.toBeInTheDocument();
 
         expect(getStoragePost).toHaveBeenCalledOnce();
-
-        expect(screen.getByRole("alert")).toHaveTextContent(
-          "It seems you have an unfinished post. Would you like to continue from where you stopped? Doing so will overwrite your current progress"
-        );
+        expect(screen.getByRole("alert")).toHaveTextContent(mocks.storageMsg);
 
         await user.click(screen.getByRole("button", mocks.loadSavedPost));
         await waitForElementToBeRemoved(() => screen.queryByRole("alert"));
 
-        expect(screen.getByRole("textbox", mocks.titleLabel)).toHaveValue(
+        expect(screen.getByRole("textbox", mocks.titleBox)).toHaveValue(
           "Post Title"
         );
 
-        expect(screen.getByRole("textbox", mocks.description)).toHaveValue(
+        expect(screen.getByRole("textbox", mocks.descBox)).toHaveValue(
           "Post Description"
         );
 
-        expect(screen.getByRole("textbox", mocks.excerpt)).toHaveValue(
+        expect(screen.getByRole("textbox", mocks.extBox)).toHaveValue(
           "Post Excerpt"
         );
 
@@ -109,7 +102,7 @@ describe("Create Post", () => {
           screen.findByRole("button", mocks.contentNext)
         ).resolves.toBeInTheDocument();
 
-        expect(screen.getByRole("textbox", mocks.content)).toHaveValue(
+        expect(screen.getByRole("textbox", mocks.contBox)).toHaveValue(
           mocks.html
         );
       });
@@ -175,9 +168,14 @@ describe("Create Post", () => {
           screen.findByRole("combobox", mocks.postTag)
         ).resolves.toBeInTheDocument();
 
-        await user.type(screen.getByRole("textbox", mocks.titleLabel), "abcde");
-        await user.type(screen.getByRole("textbox", mocks.description), "abcd");
-        await user.type(screen.getByRole("textbox", mocks.excerpt), "abcdefgh");
+        await user.type(screen.getByRole("textbox", mocks.titleBox), "abcde");
+        await user.type(screen.getByRole("textbox", mocks.descBox), "abcd");
+        await user.type(screen.getByRole("textbox", mocks.extBox), "abcdefgh");
+        await user.upload(screen.getByLabelText(mocks.image), mocks.file);
+        await user.click(screen.getByRole("combobox", mocks.postTag));
+        await user.click(screen.getByRole("option", mocks.tagName(0)));
+        await user.click(screen.getByRole("option", mocks.tagName(1)));
+        await user.keyboard("{Escape}");
         await user.click(screen.getByRole("button", mocks.metadataNext));
 
         expect(
@@ -191,7 +189,7 @@ describe("Create Post", () => {
           screen.findByRole("button", mocks.contentNext)
         ).resolves.toBeInTheDocument();
 
-        await user.type(screen.getByRole("textbox", mocks.content), mocks.html);
+        await user.type(screen.getByRole("textbox", mocks.contBox), mocks.html);
         await user.click(screen.getByRole("button", mocks.contentNext));
 
         expect(
@@ -220,163 +218,6 @@ describe("Create Post", () => {
         ).not.toBeInTheDocument();
 
         expect(screen.getByRole("region", mocks.metadata)).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe("Draft post API request", () => {
-    describe("API responds with a user authentication error", () => {
-      it.each(mocks.redirects)("%s", async (_, title, { pathname, url }) => {
-        const router = useRouter();
-        router.pathname = pathname;
-
-        const { user } = renderUI(<CreatePostPage />);
-
-        await expect(
-          screen.findByRole("combobox", mocks.postTag)
-        ).resolves.toBeInTheDocument();
-
-        await user.type(screen.getByRole("textbox", mocks.titleLabel), title);
-        await user.click(screen.getByRole("button", mocks.draftBtn));
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeDisabled();
-
-        await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
-
-        expect(router.replace).toHaveBeenCalledWith(url);
-        expect(saveStoragePost).toHaveBeenCalledOnce();
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeDisabled();
-      });
-    });
-
-    describe("API response is an error/unsupported object type", () => {
-      it.each(mocks.alerts)("%s", async (_, { title, message }) => {
-        const { user } = renderUI(<CreatePostPage />);
-
-        await expect(
-          screen.findByRole("combobox", mocks.postTag)
-        ).resolves.toBeInTheDocument();
-
-        await user.type(screen.getByRole("textbox", mocks.titleLabel), title);
-        await user.click(screen.getByRole("button", mocks.draftBtn));
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeDisabled();
-        expect(await screen.findByRole("alert")).toHaveTextContent(message);
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeEnabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeEnabled();
-      });
-    });
-
-    describe("API responds with an input validation error", () => {
-      it("Expect input validation UI error messages", async () => {
-        const { title } = mocks.validate;
-        const { user } = renderUI(<CreatePostPage />);
-
-        await expect(
-          screen.findByRole("combobox", mocks.postTag)
-        ).resolves.toBeInTheDocument();
-
-        await user.type(screen.getByRole("textbox", mocks.titleLabel), title);
-        await user.type(screen.getByRole("textbox", mocks.description), "abcd");
-        await user.type(screen.getByRole("textbox", mocks.excerpt), "abcdefgh");
-        await user.click(screen.getByRole("button", mocks.metadataNext));
-
-        await expect(
-          screen.findByRole("button", mocks.contentNext)
-        ).resolves.toBeInTheDocument();
-
-        await user.type(screen.getByRole("textbox", mocks.content), mocks.html);
-        await user.click(screen.getByRole("button", mocks.draftBtn));
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.contentNext)).toBeDisabled();
-
-        const alert = await screen.findByRole("alert");
-        const list = within(alert).getByRole("list", mocks.draftErrors);
-
-        expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
-          mocks.titleMsg
-        );
-
-        expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent(
-          mocks.descriptionMsg
-        );
-
-        expect(within(list).getAllByRole("listitem")[2]).toHaveTextContent(
-          mocks.excerptMsg
-        );
-
-        expect(within(list).getAllByRole("listitem")[3]).toHaveTextContent(
-          mocks.tagsMsg
-        );
-
-        expect(within(list).getAllByRole("listitem")[4]).toHaveTextContent(
-          mocks.imageBannerMsg
-        );
-
-        expect(
-          screen.getByRole("textbox", mocks.content)
-        ).toHaveAccessibleErrorMessage(mocks.contentMsg);
-
-        await user.click(screen.getByRole("button", mocks.draftErrorsBtn));
-        await waitForElementToBeRemoved(list);
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeEnabled();
-        expect(screen.getByRole("button", mocks.contentNext)).toBeEnabled();
-      });
-    });
-
-    describe("Verify post title", () => {
-      it.each(mocks.verifyTitle)("%s", async (_, { title, message }) => {
-        const { user } = renderUI(<CreatePostPage />);
-        const textbox = screen.getByRole("textbox", mocks.titleLabel);
-
-        await user.type(textbox, title);
-        await user.click(screen.getByRole("button", mocks.draftBtn));
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeDisabled();
-
-        await waitFor(() => {
-          expect(textbox).toHaveAccessibleErrorMessage(message);
-        });
-
-        expect(textbox).toHaveFocus();
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeEnabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeEnabled();
-      });
-    });
-
-    describe("Post drafted", () => {
-      it.each(mocks.drafted)("%s", async (_, { resolver, mock, url }) => {
-        mocks.server.use(http.post(/upload-image$/, resolver));
-
-        const { user } = renderUI(<CreatePostPage />);
-        const { push } = useRouter();
-
-        await expect(
-          screen.findByRole("combobox", mocks.postTag)
-        ).resolves.toBeInTheDocument();
-
-        await user.type(
-          screen.getByRole("textbox", mocks.titleLabel),
-          mock.title
-        );
-
-        await user.upload(screen.getByLabelText(mocks.image), mocks.file);
-        await user.click(screen.getByRole("button", mocks.draftBtn));
-
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeDisabled();
-
-        await waitFor(() => expect(push).toHaveBeenCalledOnce());
-
-        expect(push).toHaveBeenCalledWith(url);
-        expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
-        expect(screen.getByRole("button", mocks.metadataNext)).toBeDisabled();
       });
     });
   });

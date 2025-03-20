@@ -35,7 +35,7 @@ const PostErrorsAlert = ({
       severity="error"
       sx={{ width: "100%", "&>.MuiAlert-icon,&>.MuiAlert-action": { mt: 1 } }}
       action={
-        <Tooltip title="Hide input validation errors list alert">
+        <Tooltip title="Hide input validation errors alert">
           <IconButton size="small" color="inherit" onClick={onClick}>
             <CancelOutlinedIcon fontSize="small" />
           </IconButton>

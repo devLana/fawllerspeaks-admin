@@ -1,12 +1,4 @@
-import { useRouter } from "next/router";
-
-import {
-  screen,
-  within,
-  waitFor,
-  waitForElementToBeRemoved,
-} from "@testing-library/react";
-import { http } from "msw";
+import { screen, within } from "@testing-library/react";
 
 import CreatePostPreview from "..";
 import * as mocks from "./CreatePostPreview.mocks";
@@ -15,29 +7,25 @@ import { renderUI } from "@utils/tests/renderUI";
 describe("Create Post - Preview", () => {
   const mockDispatch = vi.fn().mockName("dispatch");
   const mockHandleDraftPost = vi.fn().mockName("handleDraftPost");
-  const mockHandleCloseDraftError = vi.fn().mockName("handleCloseDraftError");
+  const mockHandleHideErrors = vi.fn().mockName("handleHideErrors");
+  const mockHandleCreatePost = vi.fn().mockName("handleCreatePost");
+  const mockSetIsOpen = vi.fn().mockName("setIsOpen");
 
-  const UI = (props: mocks.Props) => {
-    const { title, imageBanner, tagIds, draftErrors, draftStatus } = props;
-
-    return (
-      <CreatePostPreview
-        post={{
-          content: mocks.html,
-          description: "Post Description",
-          excerpt: "Post Excerpt",
-          title,
-          imageBanner,
-          tagIds,
-        }}
-        draftStatus={draftStatus}
-        draftErrors={draftErrors}
-        handleDraftPost={mockHandleDraftPost}
-        handleCloseDraftError={mockHandleCloseDraftError}
-        dispatch={mockDispatch}
-      />
-    );
-  };
+  const UI = ({ isOpen, errors, shouldShow, postData }: mocks.Props) => (
+    <CreatePostPreview
+      isOpen={isOpen}
+      setIsOpen={mockSetIsOpen}
+      post={postData}
+      draftStatus="idle"
+      createStatus="idle"
+      errors={errors}
+      shouldShowErrors={shouldShow}
+      handleHideErrors={mockHandleHideErrors}
+      handleDraftPost={mockHandleDraftPost}
+      handleCreatePost={mockHandleCreatePost}
+      dispatch={mockDispatch}
+    />
+  );
 
   describe("Preview blog post", () => {
     it("Should render the provided post metadata and content", () => {
@@ -86,12 +74,12 @@ describe("Create Post - Preview", () => {
     });
   });
 
-  describe("Draft post", () => {
-    it("Should display any draft post input validation errors", async () => {
-      const { user } = renderUI(<UI {...mocks.draftErrorsProps} />);
+  describe("API request responds with an input validation error", () => {
+    it("Expect an alert errors list in the UI", async () => {
+      const { user } = renderUI(<UI {...mocks.errorsProps} />);
 
       const alert = screen.getByRole("alert");
-      const list = within(alert).getByRole("list", mocks.draftErrors);
+      const list = within(alert).getByRole("list", mocks.errors);
 
       expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
         "Post title error"
@@ -117,12 +105,14 @@ describe("Create Post - Preview", () => {
         "Post image banner error"
       );
 
-      await user.click(within(alert).getByRole("button", mocks.closeDraft));
+      await user.click(within(alert).getByRole("button", mocks.hideErrors));
 
-      expect(mockHandleCloseDraftError).toHaveBeenCalledOnce();
+      expect(mockHandleHideErrors).toHaveBeenCalledOnce();
     });
+  });
 
-    it("Expect a draft post API request when the 'Save to Draft' button is clicked", async () => {
+  describe("Draft post API request", () => {
+    it("Expect a draft post API request when the 'Save as Draft' button is clicked", async () => {
       const { user } = renderUI(<UI {...mocks.props} />);
 
       await user.click(screen.getByRole("button", mocks.draftBtn));
@@ -141,148 +131,31 @@ describe("Create Post - Preview", () => {
   });
 
   describe("Create post API request", () => {
-    beforeAll(() => {
-      mocks.server.listen({ onUnhandledRequest: "error" });
+    it("Attempt to open the publish post dialog from the preview menu", async () => {
+      const { user } = renderUI(<UI {...mocks.props} />);
+
+      await user.click(screen.getByRole("button", mocks.previewMenu));
+      await user.click(screen.getByRole("menuitem", mocks.publish));
+
+      expect(mockSetIsOpen).toHaveBeenCalledOnce();
     });
 
-    afterAll(() => {
-      mocks.server.close();
+    it("Attempt to open the publish post dialog box using the publish post preview button", async () => {
+      const { user } = renderUI(<UI {...mocks.props} />);
+
+      await user.click(screen.getByRole("button", mocks.create));
+
+      expect(mockSetIsOpen).toHaveBeenCalledOnce();
     });
 
-    describe("API responds with a user authentication error", () => {
-      it.each(mocks.redirects)("%s", async (_, title, { url, pathname }) => {
-        const { user } = renderUI(<UI {...mocks.createProps(title)} />);
-        const router = useRouter();
-        router.pathname = pathname;
+    it("Expect a create post API request when the 'Publish Post' button is clicked in the preview dialog", async () => {
+      const { user } = renderUI(<UI {...mocks.apiProps} />);
 
-        await user.click(screen.getByRole("button", mocks.previewMenu));
-        await user.click(screen.getByRole("menuitem", mocks.menuCreate));
+      const dialog = screen.getByRole("dialog", mocks.dialog);
 
-        const dialog = screen.getByRole("dialog", mocks.dialog);
+      await user.click(within(dialog).getByRole("button", mocks.pub));
 
-        await user.click(within(dialog).getByRole("button", mocks.pub));
-
-        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
-        expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
-
-        await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
-
-        expect(router.replace).toHaveBeenCalledWith(url);
-        expect(dialog).toBeInTheDocument();
-        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
-        expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
-      });
-    });
-
-    describe("API response is an error/unsupported object type", () => {
-      it.each(mocks.alerts)("%s", async (_, { title, message }) => {
-        const { user } = renderUI(<UI {...mocks.createProps(title)} />);
-
-        await user.click(screen.getByRole("button", mocks.create));
-
-        const dialog = screen.getByRole("dialog", mocks.dialog);
-
-        await user.click(within(dialog).getByRole("button", mocks.pub));
-
-        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
-        expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
-
-        await waitForElementToBeRemoved(dialog);
-
-        expect(screen.getByRole("alert")).toHaveTextContent(message);
-      });
-    });
-
-    describe("Verify post title", () => {
-      it.each(mocks.verifyTitle)("%s", async (_, { title, message }) => {
-        const { user } = renderUI(<UI {...mocks.createProps(title)} />);
-
-        await user.click(screen.getByRole("button", mocks.create));
-
-        const dialog = screen.getByRole("dialog", mocks.dialog);
-
-        await user.click(within(dialog).getByRole("button", mocks.pub));
-
-        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
-        expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
-
-        await waitForElementToBeRemoved(dialog);
-
-        const alert = screen.getByRole("alert");
-        const list = within(alert).getByRole("list", mocks.createErrors);
-
-        expect(within(list).getByRole("listitem")).toHaveTextContent(message);
-      });
-    });
-
-    describe("API responds with an input validation error", () => {
-      it("Expect an alert with a list of all relevant error messages", async () => {
-        const { validate: mock } = mocks;
-        const { user } = renderUI(<UI {...mocks.createProps(mock.title)} />);
-
-        await user.click(screen.getByRole("button", mocks.previewMenu));
-        await user.click(screen.getByRole("menuitem", mocks.menuCreate));
-
-        const dialog = screen.getByRole("dialog", mocks.dialog);
-
-        await user.click(within(dialog).getByRole("button", mocks.pub));
-
-        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
-        expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
-
-        await waitForElementToBeRemoved(dialog);
-
-        const alert = screen.getByRole("alert");
-        const list = within(alert).getByRole("list", mocks.createErrors);
-
-        expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
-          mocks.descriptionMsg
-        );
-
-        expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent(
-          mocks.excerptMsg
-        );
-
-        expect(within(list).getAllByRole("listitem")[2]).toHaveTextContent(
-          mocks.contentMsg
-        );
-
-        expect(within(list).getAllByRole("listitem")[3]).toHaveTextContent(
-          mocks.tagsMsg
-        );
-
-        expect(within(list).getAllByRole("listitem")[4]).toHaveTextContent(
-          mocks.imageBannerMsg
-        );
-
-        await user.click(within(alert).getByRole("button", mocks.closeCreate));
-        await waitForElementToBeRemoved(alert);
-      });
-    });
-
-    describe("Post created", () => {
-      it.each(mocks.created)("%s", async (_, { resolver, mock, url }) => {
-        mocks.server.use(http.post(/upload-image$/, resolver));
-
-        const { user } = renderUI(<UI {...mocks.savedProps(mock.title)} />);
-        const { push } = useRouter();
-
-        await user.click(screen.getByRole("button", mocks.create));
-
-        const dialog = screen.getByRole("dialog", mocks.dialog);
-
-        await user.click(within(dialog).getByRole("button", mocks.pub));
-
-        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
-        expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
-
-        await waitFor(() => expect(push).toHaveBeenCalledOnce());
-
-        expect(push).toHaveBeenCalledWith(url);
-        expect(dialog).toBeInTheDocument();
-        expect(within(dialog).getByRole("button", mocks.pub)).toBeDisabled();
-        expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();
-      });
+      expect(mockHandleCreatePost).toHaveBeenCalledOnce();
     });
   });
 });

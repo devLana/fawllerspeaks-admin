@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import useHandleFileUrl from "@hooks/createPost/useHandleFileUrl";
 import PostPreview from "@features/posts/components/PostPreview";
 import CreatePostSectionHeader from "../CreatePostSectionHeader";
@@ -9,8 +7,11 @@ import CreatePostActionButtons from "../CreatePostActionButtons";
 import PostErrorsAlert from "@features/posts/components/PostErrorsAlert";
 import type * as creates from "types/posts/createPost";
 import type * as types from "types/posts";
+import type { StateSetterFn } from "@types";
 
 interface CreatePostPreviewProps {
+  isOpen: boolean;
+  setIsOpen: StateSetterFn<boolean>;
   post: types.PostInputData;
   draftStatus: types.PostActionStatus;
   createStatus: types.PostActionStatus;
@@ -23,6 +24,8 @@ interface CreatePostPreviewProps {
 }
 
 const CreatePostPreview = ({
+  isOpen,
+  setIsOpen,
   post,
   draftStatus,
   createStatus,
@@ -33,7 +36,6 @@ const CreatePostPreview = ({
   handleCreatePost,
   dispatch,
 }: CreatePostPreviewProps) => {
-  const [isOpen, setIsOpen] = React.useState(false);
   const { fileUrl } = useHandleFileUrl(post.imageBanner);
 
   return (

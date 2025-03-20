@@ -10,15 +10,16 @@ vi.mock("@utils/posts/storagePost");
 describe("Create Post - Content", () => {
   const mockDispatch = vi.fn().mockName("dispatch");
   const mockHandleDraftPost = vi.fn().mockName("handleDraftPost");
-  const mockHandleCloseDraftError = vi.fn().mockName("handleCloseDraftError");
+  const mockHandleHideErrors = vi.fn().mockName("handleHideErrors");
 
-  const UI = ({ content, draftErrors, draftStatus }: mocks.Props) => (
+  const UI = ({ content, errors, draftStatus, shouldShow }: mocks.Props) => (
     <CreatePostContent
       content={content}
       draftStatus={draftStatus}
-      draftErrors={draftErrors}
+      errors={errors}
+      shouldShowErrors={shouldShow}
+      handleHideErrors={mockHandleHideErrors}
       handleDraftPost={mockHandleDraftPost}
-      handleCloseDraftError={mockHandleCloseDraftError}
       dispatch={mockDispatch}
     />
   );
@@ -47,8 +48,8 @@ describe("Create Post - Content", () => {
     });
   });
 
-  describe("Draft post API input validation error response", () => {
-    it("Expect error messages in the UI if the draft post request gets an input validation error response", async () => {
+  describe("API request responds with input validation errors", () => {
+    it("Expect an alert errors list and an input error message to be displayed in the UI", async () => {
       const { user } = renderUI(<UI {...mocks.apiErrorsProps} />);
 
       expect(
@@ -56,7 +57,7 @@ describe("Create Post - Content", () => {
       ).toHaveAccessibleErrorMessage(mocks.contentError);
 
       const alert = screen.getByRole("alert");
-      const list = within(alert).getByRole("list", mocks.draftErrorsList);
+      const list = within(alert).getByRole("list", mocks.errors);
 
       expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
         mocks.titleError
@@ -80,7 +81,7 @@ describe("Create Post - Content", () => {
 
       await user.click(within(alert).getByRole("button", mocks.errorsBtn));
 
-      expect(mockHandleCloseDraftError).toHaveBeenCalledOnce();
+      expect(mockHandleHideErrors).toHaveBeenCalledOnce();
     });
   });
 

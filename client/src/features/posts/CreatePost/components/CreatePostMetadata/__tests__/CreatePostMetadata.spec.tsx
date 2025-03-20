@@ -2,8 +2,6 @@ import { screen } from "@testing-library/react";
 import type { Mock } from "vitest";
 
 import CreatePostMetadata from "..";
-import CreatePostFileInput from "../CreatePostFileInput";
-import PostMetadataPostTagsInput from "@features/posts/components/PostMetadataPostTagsInput";
 import { saveStoragePost } from "@utils/posts/storagePost";
 import * as mocks from "./CreatePostMetadata.mocks";
 import { renderUI } from "@utils/tests/renderUI";
@@ -24,31 +22,18 @@ describe("Create Post - Metadata", () => {
 
   const mockSaveStoragePost = saveStoragePost as MockSaveStoragePost;
   const mockDispatch = vi.fn().mockName("dispatch");
-  const mockHandleDraftPost = vi.fn().mockName("handleDraftPost");
+  const mockOnDraft = vi.fn().mockName("onDraft");
+  const mockHandleHideErrors = vi.fn().mockName("handleHideErrors");
 
   const UI = (props: mocks.Props) => (
     <CreatePostMetadata
-      title={props.title}
-      description={props.description}
-      excerpt={props.excerpt}
-      contentError={props.contentError}
+      postData={props.postData}
       draftStatus="idle"
-      handleDraftPost={mockHandleDraftPost}
+      errors={props.errors}
+      shouldShowErrors={props.shouldShow}
+      handleHideErrors={mockHandleHideErrors}
+      onDraft={mockOnDraft}
       dispatch={mockDispatch}
-      fileInput={
-        <CreatePostFileInput
-          imageBanner={undefined}
-          imageBannerError={props.imageBannerError}
-          dispatch={mockDispatch}
-        />
-      }
-      postTagsInput={
-        <PostMetadataPostTagsInput
-          tagIds={undefined}
-          tagIdsError={props.tagIdsError}
-          dispatchFn={mockDispatch}
-        />
-      }
     />
   );
 
@@ -98,11 +83,13 @@ describe("Create Post - Metadata", () => {
         expect(
           screen.getByRole("textbox", mocks.excerpt)
         ).toHaveAccessibleErrorMessage(mocks.excerptMsg);
+
+        expect(mockDispatch).not.toHaveBeenCalled();
       });
     });
 
     describe("Text box input validations when the user tries to save a post as draft", () => {
-      it("No value entered into the title input field, Expect the title input field to have an error message", async () => {
+      it("No values entered in the text boxes, Expect the text boxes to have an error message", async () => {
         const { user } = renderUI(<UI {...mocks.props} />);
 
         await expect(
@@ -115,7 +102,15 @@ describe("Create Post - Metadata", () => {
           screen.getByRole("textbox", mocks.title)
         ).toHaveAccessibleErrorMessage("Enter post title");
 
-        expect(mockHandleDraftPost).not.toHaveBeenCalled();
+        expect(
+          screen.getByRole("textbox", mocks.description)
+        ).not.toHaveAccessibleErrorMessage();
+
+        expect(
+          screen.getByRole("textbox", mocks.excerpt)
+        ).not.toHaveAccessibleErrorMessage();
+
+        expect(mockOnDraft).not.toHaveBeenCalled();
       });
 
       it("Text box values exceed the maximum limit, Expect the text boxes to have an error message", async () => {
@@ -139,7 +134,7 @@ describe("Create Post - Metadata", () => {
           screen.getByRole("textbox", mocks.excerpt)
         ).toHaveAccessibleErrorMessage(mocks.excerptMsg);
 
-        expect(mockHandleDraftPost).not.toHaveBeenCalled();
+        expect(mockOnDraft).not.toHaveBeenCalled();
       });
     });
 
@@ -157,11 +152,9 @@ describe("Create Post - Metadata", () => {
         expect(screen.getByLabelText(mocks.image)).toHaveAccessibleErrorMessage(
           "You can only upload an image file"
         );
-
-        expect(mockDispatch).not.toHaveBeenCalledOnce();
       });
 
-      it("Should allow the user to be able to select an image for upload", async () => {
+      it("Should allow the user to be able to select an image file for upload", async () => {
         const file = new File(["bar"], "bar.jpg", { type: "image/jpeg" });
         const { user } = renderUI(<UI {...mocks.props} />);
 
@@ -171,11 +164,13 @@ describe("Create Post - Metadata", () => {
 
         await user.upload(screen.getByLabelText(mocks.image), file);
 
+        expect(screen.queryByLabelText(mocks.image)).not.toBeInTheDocument();
+
         expect(
-          screen.getByLabelText(mocks.image)
+          screen.getByLabelText(mocks.changeImg)
         ).not.toHaveAccessibleErrorMessage();
 
-        expect(mockDispatch).toHaveBeenCalledOnce();
+        expect(screen.getByRole("img", mocks.img)).toBeInTheDocument();
       });
     });
   });
@@ -212,11 +207,34 @@ describe("Create Post - Metadata", () => {
 
       mocks.server.resetHandlers();
     });
+
+    it("More than 5 post tags selected, Expect the post tags select box to have an error message", async () => {
+      const { user } = renderUI(<UI {...mocks.props} />);
+
+      await expect(
+        screen.findByRole("combobox", mocks.postTags)
+      ).resolves.toBeInTheDocument();
+
+      await user.click(screen.getByRole("combobox", mocks.postTags));
+      await user.click(screen.getByRole("option", mocks.tagName(0)));
+      await user.click(screen.getByRole("option", mocks.tagName(1)));
+      await user.click(screen.getByRole("option", mocks.tagName(2)));
+      await user.click(screen.getByRole("option", mocks.tagName(3)));
+      await user.click(screen.getByRole("option", mocks.tagName(4)));
+      await user.click(screen.getByRole("option", mocks.tagName(5)));
+      await user.keyboard("{Escape}");
+
+      expect(
+        screen.queryByRole("combobox", mocks.postTags)
+      ).toHaveAccessibleErrorMessage(mocks.tagsErrMsg);
+    });
   });
 
-  describe("Draft post API input validation error response", () => {
-    it("The API responds with a 'contentError' or 'tagIdsError' or 'imageBannerError', Expect the applicable input fields to have an error message", async () => {
-      renderUI(<UI {...mocks.errorsProps} />);
+  describe("API request gets an input validation error response", () => {
+    it("Expect an alert errors list and input error messages to be displayed in the UI", async () => {
+      const { user } = renderUI(
+        <UI {...mocks.errorsProps} shouldShow={true} />
+      );
 
       await expect(
         screen.findByRole("combobox", mocks.postTags)
@@ -224,25 +242,9 @@ describe("Create Post - Metadata", () => {
 
       expect(screen.getByRole("alert")).toHaveTextContent(mocks.contentMsg);
 
-      expect(screen.getByLabelText(mocks.image)).toHaveAccessibleErrorMessage(
-        mocks.imageBannerMsg
-      );
-    });
-
-    it("The API responds with a 'titleError' or 'descriptionError' or 'excerptError', Expect the applicable text boxes to have an error message", async () => {
-      mockHandleDraftPost.mockImplementationOnce(mocks.callback);
-
-      const { user } = renderUI(<UI {...mocks.textBoxProps} />);
-
-      await expect(
-        screen.findByRole("combobox", mocks.postTags)
-      ).resolves.toBeInTheDocument();
-
-      await user.click(screen.getByRole("button", mocks.draftBtn));
-
-      await expect(
-        screen.findByRole("textbox", mocks.title)
-      ).resolves.toHaveAccessibleErrorMessage(mocks.titleMsg);
+      expect(
+        screen.getByRole("textbox", mocks.title)
+      ).toHaveAccessibleErrorMessage(mocks.titleMsg);
 
       expect(
         screen.getByRole("textbox", mocks.description)
@@ -252,8 +254,31 @@ describe("Create Post - Metadata", () => {
         screen.getByRole("textbox", mocks.excerpt)
       ).toHaveAccessibleErrorMessage(mocks.excerptMsg);
 
-      expect(screen.getByRole("textbox", mocks.title)).toHaveFocus();
-      expect(mockHandleDraftPost).toHaveBeenCalledOnce();
+      expect(screen.getByLabelText(mocks.image)).toHaveAccessibleErrorMessage(
+        mocks.imageBannerMsg
+      );
+
+      expect(
+        screen.queryByRole("combobox", mocks.postTags)
+      ).toHaveAccessibleErrorMessage(mocks.tagsMsg);
+
+      await user.click(screen.getByRole("button", mocks.alertBtn));
+
+      expect(mockHandleHideErrors).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe("Draft post API request", () => {
+    it("Should be able to save a post as a draft", async () => {
+      const { user } = renderUI(<UI {...mocks.textBoxProps} />);
+
+      await expect(
+        screen.findByRole("combobox", mocks.postTags)
+      ).resolves.toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", mocks.draftBtn));
+
+      expect(mockOnDraft).toHaveBeenCalledOnce();
     });
   });
 

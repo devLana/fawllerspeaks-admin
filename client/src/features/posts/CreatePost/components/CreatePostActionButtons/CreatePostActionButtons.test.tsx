@@ -14,7 +14,7 @@ describe("Create Post Action Buttons", () => {
     <CreatePostActionButtons
       status="idle"
       nextLabel="Proceed To Next Section"
-      actionLabel="Edit Post"
+      actionLabel="Publish Post"
       onAction={vi.fn().mockName("onAction")}
       onNext={onNext}
       hasPopUp={hasPopUp}
@@ -30,7 +30,7 @@ describe("Create Post Action Buttons", () => {
 
     expect(
       screen.getByRole("button", { name: /^proceed to next section$/i })
-    ).toHaveAttribute("aria-haspopup");
+    ).not.toHaveAttribute("aria-haspopup");
   });
 
   it("Should render a normal button as the next button", async () => {

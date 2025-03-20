@@ -7,61 +7,47 @@ import { GET_POST_TAGS } from "@queries/getPostTags/GET_POST_TAGS";
 import { mswData, mswErrors } from "@utils/tests/msw";
 import { testPostTag } from "@utils/tests/testPostTag";
 
-const titleStr = (prefix: string) => `${prefix} Test Post Title`;
-export const postTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Tag 6"];
-const tags = postTags.map((items, index) => testPostTag(items, `${index + 1}`));
-export const file = new File(["bar"], "bar.jpg", { type: "image/jpeg" });
-export const html = "<h2>Heading 2</h2><p>paragraph</p>";
 export const postTag = { name: /^post tags$/i };
 export const image = /^Select A Post Image Banner$/i;
-export const changeImage = /^change image$/i;
-export const imagePreview = { name: /^Post image banner preview$/i };
-export const imageBtn = { name: /^remove image$/i };
-export const selectedPostTags = { name: /^selected post tags$/i };
-export const titleLabel = { name: /^post title$/i };
-export const description = { name: /^post description$/i };
-export const excerpt = { name: /^post excerpt$/i };
-export const content = { name: /^editor editing area/i };
+export const titleBox = { name: /^post title$/i };
+export const descBox = { name: /^post description$/i };
+export const extBox = { name: /^post excerpt$/i };
+export const contBox = { name: /^editor editing area/i };
 export const metadataNext = { name: /^proceed to post content$/i };
 export const contentNext = { name: /^preview post$/i };
-export const metadata = { name: /^provide post metadata$/i };
-export const cont = { name: /^provide post content$/i };
-export const prevs = { name: /^preview blog post$/i };
-export const previewBtn = { name: /^publish post$/i };
-export const prevBack = { name: /^Go back to provide post content section$/i };
-export const contBack = { name: /^Go back to provide post metadata section$/i };
 export const draftBtn = { name: /^save as draft$/i };
-export const draftErrors = { name: /^draft post errors$/i };
-export const draftErrorsBtn = { name: /^close draft post errors list$/i };
-export const loadSavedPost = { name: /^Continue with unfinished post$/i };
-export const deleteSavedPost = { name: /^Delete unfinished post$/i };
+export const errors = { name: /^input validation errors$/i };
+export const hideErrorsBtn = { name: /^hide input validation errors alert$/i };
 
-export const storagePost = {
-  title: "Post Title",
-  description: "Post Description",
-  excerpt: "Post Excerpt",
-  tagIds: ["1", "3", "5"],
-  content: html,
-};
+const postTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Tag 6"];
 
-export const tagName = (index: number) => ({
-  name: new RegExp(`^${postTags[index]}$`),
+const postTagIds = [
+  "fc2f2351-80c7-4e4c-b462-11b3512f1293",
+  "377fba48-d9e3-4b06-aab6-0b29e2c98413",
+  "a2ee44f1-323c-41aa-addd-5fca6f3cc309",
+  "3240e4d2-f157-4991-90b2-a7795d75b01f",
+  "4589dc3b-eb31-4d53-a34f-d75e14288b59",
+  "c11cb682-8a2d-46b8-99d5-8ba33c450ed9",
+];
+
+const tags = postTags.map((items, index) => {
+  return testPostTag(items, postTagIds[index]);
 });
 
+const titleStr = (prefix: string) => `${prefix} Test Post Title`;
+
+export const html = "<h2>Heading 2</h2><p>paragraph</p>";
+export const file = new File(["bar"], "bar.jpg", { type: "image/jpeg" });
 export const titleMsg = "Post title can not be more than 255 characters";
 export const excerptMsg = "Post excerpt can not be more than 300 characters";
 export const contentMsg = "Provide post content";
 export const tagsMsg = "Invalid post tag id provided";
 export const imageBannerMsg = "Image banner string cannot be empty";
+export const descriptionMsg = `Post description can not be more than 255 characters`;
 const duplicateMsg = "Post title already exists";
 const forbidMsg = "Generated post slug from post title already exists. Change!";
-const gqlMsg = "Graphql server error ocurred";
-
-export const descriptionMsg =
-  "Post description can not be more than 255 characters";
-
-const MESSAGE =
-  "You are unable to save this post as draft at the moment. Please try again later";
+const gqlMsg = "Graphql server error occurred";
+const MESSAGE = `You are unable to save this post as draft at the moment. Please try again later`;
 
 export const server = setupServer(
   graphql.query(GET_POST_TAGS, async () => {
@@ -231,7 +217,7 @@ export const verifyTitle: [string, ReturnType<typeof mock<string>>][] = [
 interface DraftMock {
   mock: ReturnType<typeof mock>;
   url: { pathname: string; query: Record<string, string | boolean> };
-  resolver: () => Response;
+  resolver: () => HttpResponse;
 }
 
 export const drafted: [string, DraftMock][] = [

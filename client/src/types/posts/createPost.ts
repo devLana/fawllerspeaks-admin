@@ -7,6 +7,7 @@ import type {
   PostActionStatus,
   PostMetadataFields,
 } from ".";
+import type { StateSetterFn } from "@types";
 
 export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
@@ -48,5 +49,7 @@ export interface DraftHookReturnData extends HookReturnData {
 }
 
 export interface CreateHookReturnData extends HookReturnData {
+  isOpen: boolean;
   handleCreatePost: () => Promise<void>;
+  setIsOpen: StateSetterFn<boolean>;
 }

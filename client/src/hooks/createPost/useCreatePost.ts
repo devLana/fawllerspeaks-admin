@@ -12,6 +12,7 @@ import type { PostActionStatus, PostInputData as Data } from "types/posts";
 import type * as types from "types/posts/createPost";
 
 export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
+  const [isOpen, setIsOpen] = React.useState(false);
   const [status, setStatus] = React.useState<PostActionStatus>("idle");
   const { push, replace, pathname } = useRouter();
 
@@ -41,7 +42,10 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
 
     void createPost({
       variables: { post },
-      onError: () => setStatus("error"),
+      onError: () => {
+        setStatus("error");
+        setIsOpen(false);
+      },
       onCompleted(createData) {
         switch (createData.createPost.__typename) {
           case "AuthenticationError": {
@@ -72,6 +76,7 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
           case "DuplicatePostTitleError":
           case "ForbiddenError":
             setStatus("inputError");
+            setIsOpen(false);
             break;
 
           case "SinglePost": {
@@ -85,6 +90,7 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
 
           default:
             setStatus("error");
+            setIsOpen(false);
         }
       },
     });
@@ -116,5 +122,13 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
     errors = { titleError: data.createPost.message };
   }
 
-  return { msg, status, errors, handleCreatePost, handleHideErrors };
+  return {
+    msg,
+    isOpen,
+    status,
+    errors,
+    handleCreatePost,
+    handleHideErrors,
+    setIsOpen,
+  };
 };

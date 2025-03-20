@@ -3,15 +3,16 @@ import type { PostActionStatus } from "types/posts";
 
 export interface Props {
   content: string;
-  draftErrors: CreatePostFieldErrors;
+  errors: CreatePostFieldErrors;
   draftStatus: PostActionStatus;
+  shouldShow: boolean;
 }
 
 export const next = { name: /^preview post$/i };
 export const draftBtn = { name: /^save as draft$/i };
-export const errorsBtn = { name: /^close draft post errors list$/i };
+export const errors = { name: /^input validation errors$/i };
+export const errorsBtn = { name: /^hide input validation errors alert$/i };
 export const content = { name: /^editor editing area/i };
-export const draftErrorsList = { name: /^draft post errors$/i };
 export const html = "<h2>Heading 2</h2><p>paragraph</p>";
 export const titleError = "Post title error";
 export const descriptionError = "Invalid description length";
@@ -22,13 +23,14 @@ export const contentError = "Invalid html content string";
 
 export const props: Props = {
   content: "",
-  draftErrors: {},
+  errors: {},
   draftStatus: "idle",
+  shouldShow: false,
 };
 
 export const apiErrorsProps: Props = {
   content: html,
-  draftErrors: {
+  errors: {
     titleError,
     descriptionError,
     excerptError,
@@ -37,4 +39,5 @@ export const apiErrorsProps: Props = {
     imageBannerError,
   },
   draftStatus: "inputError",
+  shouldShow: true,
 };
