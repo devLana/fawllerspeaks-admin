@@ -3,7 +3,7 @@ import * as React from "react";
 import FormHelperText from "@mui/material/FormHelperText";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
-import useHandleFileUrl from "@hooks/createPost/useHandleFileUrl";
+import useHandleFileUrl from "@hooks/useHandleFileUrl";
 import { useSingleFileHandler } from "@hooks/useSingleFileHandler";
 import { FileInput } from "@components/ui/FileInput";
 import PostImageBannerPreview from "@features/posts/components/PostImageBanner/PostImageBannerPreview";

@@ -1,4 +1,4 @@
-import useHandleFileUrl from "@hooks/createPost/useHandleFileUrl";
+import useHandleFileUrl from "@hooks/useHandleFileUrl";
 import PostPreview from "@features/posts/components/PostPreview";
 import CreatePostSectionHeader from "../CreatePostSectionHeader";
 import CreatePostPreviewActionsMenu from "./CreatePostPreviewActionsMenu";
