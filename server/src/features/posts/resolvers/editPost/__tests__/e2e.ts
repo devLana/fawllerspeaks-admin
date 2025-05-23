@@ -181,8 +181,8 @@ describe("Edit post - E2E", () => {
 
   describe("Validate input for non Draft posts", () => {
     it("Should return an error object if no post metadata is provided for a published post", async () => {
-      const { id: postId } = unpublishedPost;
-      const postData = { postId, title: "Post Title", editStatus: true };
+      const { id } = unpublishedPost;
+      const postData = { id, title: "Post Title", editStatus: true };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -197,7 +197,7 @@ describe("Edit post - E2E", () => {
         excerptError: "Provide post excerpt",
         contentError: "Provide post content",
         imageBannerError: null,
-        postIdError: null,
+        idError: null,
         editStatusError: null,
         tagIdsError: null,
         titleError: null,
@@ -206,8 +206,8 @@ describe("Edit post - E2E", () => {
     });
 
     it("Should return an error object if no post metadata is provided for an unpublished post", async () => {
-      const { id: postId } = publishedPost;
-      const postData = { postId, title: "Post Title", editStatus: true };
+      const { id } = publishedPost;
+      const postData = { id, title: "Post Title", editStatus: true };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -222,7 +222,7 @@ describe("Edit post - E2E", () => {
         excerptError: "Provide post excerpt",
         contentError: "Provide post content",
         imageBannerError: null,
-        postIdError: null,
+        idError: null,
         editStatusError: null,
         tagIdsError: null,
         titleError: null,
@@ -233,9 +233,9 @@ describe("Edit post - E2E", () => {
 
   describe("Verify post title and post url slug", () => {
     it("Returns error if post title is used on another post in db", async () => {
-      const { id: postId } = publishedPost;
+      const { id } = publishedPost;
       const title = "Create Test.Post Unpublished#Title";
-      const postData = { ...mocks.post, postId, title, editStatus: true };
+      const postData = { ...mocks.post, id, title, editStatus: true };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -256,9 +256,9 @@ describe("Edit post - E2E", () => {
     const { storageUrl } = supabase();
 
     it("All input fields are passed, Expect the post status and all relevant post fields to be edited", async () => {
-      const { id: postId } = publishedPost;
+      const { id } = publishedPost;
       const tagIds = postTags.map(postTag => postTag.id);
-      const postData = { ...mocks.post1, postId, tagIds };
+      const postData = { ...mocks.post1, id, tagIds };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -291,10 +291,10 @@ describe("Edit post - E2E", () => {
     });
 
     it("Should edit a post with the provided input data without editing the post status", async () => {
-      const { id: postId } = draftPost;
+      const { id } = draftPost;
       const { editStatus: _, ...rest } = mocks.post2;
       const title = "Another Draft Blog Post Title";
-      const postData = { ...rest, postId, title };
+      const postData = { ...rest, id, title };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -323,9 +323,9 @@ describe("Edit post - E2E", () => {
     });
 
     it("Input passed has the same title but different metadata, Expect the post title to remain the same but with different metadata", async () => {
-      const { id: postId, title } = unpublishedPost;
+      const { id, title } = unpublishedPost;
       const { imageBanner = null, tagIds = null } = mocks.post2;
-      const postData = { ...mocks.post2, postId, title, tagIds, imageBanner };
+      const postData = { ...mocks.post2, id, title, tagIds, imageBanner };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 

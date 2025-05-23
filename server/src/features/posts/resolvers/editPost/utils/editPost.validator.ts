@@ -7,7 +7,7 @@ import { processAnchorTags } from "@features/posts/utils/processAnchorTags";
 import type { EditPostInput } from "@resolverTypes";
 
 export const editPostValidator = Joi.object<EditPostInput>({
-  postId: Joi.string()
+  id: Joi.string()
     .required()
     .trim()
     .uuid({ version: "uuidv4", separator: "-" })

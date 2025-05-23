@@ -40,7 +40,7 @@ describe("Test editPost resolver", () => {
       const data = await editPost({}, { post: mockPost }, mockContext, info);
 
       expect(mockEvent).not.toHaveBeenCalled();
-      expect(data).toHaveProperty("postIdError", errors.postIdError);
+      expect(data).toHaveProperty("idError", errors.idError);
       expect(data).toHaveProperty("titleError", errors.titleError);
       expect(data).toHaveProperty("descriptionError", errors.descriptionError);
       expect(data).toHaveProperty("excerptError", errors.excerptError);
@@ -123,7 +123,7 @@ describe("Test editPost resolver", () => {
       const data = await editPost({}, { post: mocks.post1 }, mockContext, info);
 
       expect(mockEvent).toHaveBeenCalledTimes(1);
-      expect(data).toHaveProperty("post.id", mocks.post1.postId);
+      expect(data).toHaveProperty("post.id", mocks.post1.id);
       expect(data).toHaveProperty("post.title", mocks.post1.title);
       expect(data).toHaveProperty("post.description", mocks.post1.description);
       expect(data).toHaveProperty("post.excerpt", mocks.post1.excerpt);
@@ -159,7 +159,7 @@ describe("Test editPost resolver", () => {
       const data = await editPost({}, { post: mocks.post2 }, mockContext, info);
 
       expect(mockEvent).not.toHaveBeenCalled();
-      expect(data).toHaveProperty("post.id", mocks.post.postId);
+      expect(data).toHaveProperty("post.id", mocks.post.id);
       expect(data).toHaveProperty("post.title", mocks.post.title);
       expect(data).toHaveProperty("post.description", mocks.post.description);
       expect(data).toHaveProperty("post.excerpt", mocks.post.excerpt);

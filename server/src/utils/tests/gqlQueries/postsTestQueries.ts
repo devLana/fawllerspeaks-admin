@@ -95,7 +95,7 @@ export const EDIT_POST = `#graphql
 
       ... on EditPostValidationError {
         __typename
-        postIdError
+        idError
         titleError
         descriptionError
         excerptError

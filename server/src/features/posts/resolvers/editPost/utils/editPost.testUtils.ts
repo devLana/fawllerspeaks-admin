@@ -31,7 +31,7 @@ export const expectedPostContent: PostContent = {
 };
 
 const input: EditPostInput = {
-  postId: UUID,
+  id: UUID,
   title: "Blog Post Title",
   description: "post description",
   excerpt: "post excerpt",
@@ -53,7 +53,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   [
     "Should return a validation error response for empty input values",
     {
-      postId: "",
+      id: "",
       title: "",
       description: "",
       excerpt: "",
@@ -63,7 +63,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
       editStatus: false,
     },
     {
-      postIdError: "Provide post id",
+      idError: "Provide post id",
       titleError: "Provide post title",
       descriptionError: "Provide post description",
       excerptError: "Provide post excerpt",
@@ -76,7 +76,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   [
     "Should return a validation error response for empty whitespace input strings",
     {
-      postId: "  ",
+      id: "  ",
       title: "  ",
       description: " ",
       excerpt: " ",
@@ -85,7 +85,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
       imageBanner: "  ",
     },
     {
-      postIdError: "Provide post id",
+      idError: "Provide post id",
       titleError: "Provide post title",
       descriptionError: "Provide post description",
       excerptError: "Provide post excerpt",
@@ -97,9 +97,9 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   ],
   [
     "Should return a post id input validation error if an invalid post id is provided",
-    { postId: "invalid-id", title: "title", editStatus: true },
+    { id: "invalid-id", title: "title", editStatus: true },
     {
-      postIdError: "Invalid post id",
+      idError: "Invalid post id",
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
       excerptError: nullOrUndefined,
@@ -112,14 +112,14 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   [
     "Should return a post tags input validation error if the post tags input array is empty",
     {
-      postId: UUID,
+      id: UUID,
       title: "title",
       tagIds: [],
       description: null,
       excerpt: null,
     },
     {
-      postIdError: nullOrUndefined,
+      idError: nullOrUndefined,
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
       excerptError: nullOrUndefined,
@@ -131,9 +131,9 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   ],
   [
     "Should return a post tags input validation error if duplicate post tag ids was provided",
-    { postId: UUID, title: "title", tagIds: [UUID, UUID], imageBanner: null },
+    { id: UUID, title: "title", tagIds: [UUID, UUID], imageBanner: null },
     {
-      postIdError: nullOrUndefined,
+      idError: nullOrUndefined,
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
       excerptError: nullOrUndefined,
@@ -146,12 +146,12 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   [
     "Should return a post tags input validation error if more than 5 post tag ids were provided",
     {
-      postId: UUID,
+      id: UUID,
       title: "title",
       tagIds: [...tagIds, randomUUID(), randomUUID(), randomUUID()],
     },
     {
-      postIdError: nullOrUndefined,
+      idError: nullOrUndefined,
       titleError: nullOrUndefined,
       descriptionError: nullOrUndefined,
       excerptError: nullOrUndefined,
@@ -164,7 +164,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   [
     "Should return title, description and excerpt input validation error messages if the values exceed the maximum length",
     {
-      postId: UUID,
+      id: UUID,
       title:
         "256 characters max 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters 256 characters",
       description:
@@ -177,7 +177,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
       editStatus: null,
     },
     {
-      postIdError: nullOrUndefined,
+      idError: nullOrUndefined,
       titleError: "Post title can not be more than 255 characters",
       descriptionError: "Post description can not be more than 255 characters",
       excerptError: "Post excerpt can not be more than 300 characters",
@@ -203,7 +203,7 @@ type Errors = InputErrors<Pick<EditPostInput, Keys>>;
 export const metadata: [string, EditPostInput, PostStatus, Errors][] = [
   [
     "Should return an error object if no post metadata is provided for a published post",
-    { postId: UUID, title: "Post Title", editStatus: true },
+    { id: UUID, title: "Post Title", editStatus: true },
     "Unpublished",
     {
       descriptionError: "Provide post description",
@@ -213,7 +213,7 @@ export const metadata: [string, EditPostInput, PostStatus, Errors][] = [
   ],
   [
     "Should return an error object if no post metadata is provided for an unpublished post",
-    { postId: UUID, title: "Post Title" },
+    { id: UUID, title: "Post Title" },
     "Published",
     {
       descriptionError: "Provide post description",

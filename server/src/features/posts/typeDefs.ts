@@ -92,7 +92,7 @@ export const postsTypeDefs = `#graphql
   }
 
   type EditPostValidationError {
-    postIdError: String
+    idError: String
     titleError: String
     descriptionError: String
     excerptError: String
@@ -204,7 +204,7 @@ export const postsTypeDefs = `#graphql
   }
 
   input EditPostInput {
-    postId: ID!
+    id: ID!
     title: String!
     description: String
     excerpt: String

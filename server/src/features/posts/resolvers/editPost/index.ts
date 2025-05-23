@@ -54,9 +54,9 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
       return new AuthenticationError("Unable to edit post");
     }
 
-    const input = await schema.validateAsync(post, { abortEarly: false });
-    const { postId, title, description, excerpt, content, tagIds } = input;
-    const { imageBanner, editStatus } = input;
+    const postInput = await schema.validateAsync(post, { abortEarly: false });
+    const { id, title, description, excerpt, content, tagIds } = postInput;
+    const { imageBanner, editStatus } = postInput;
     const slug = getPostSlug(title);
 
     const { rows: loggedInUser } = await db.query<User>(
@@ -89,7 +89,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
         tags "postTags"
       FROM posts
       WHERE post_id = $1`,
-      [postId]
+      [id]
     );
 
     const checkPostSlug = db.query<FindBySlug>(
@@ -139,7 +139,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
       });
     }
 
-    if (checkedSlug.length > 0 && checkedSlug[0].id !== postId) {
+    if (checkedSlug.length > 0 && checkedSlug[0].id !== id) {
       const [{ postSlug, postTitle }] = checkedSlug;
 
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
@@ -197,7 +197,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
         )
       `;
 
-      param = [tags, title, description, excerpt, content, slug, image, postId];
+      param = [tags, title, description, excerpt, content, slug, image, id];
     } else {
       const tags = tagIds === undefined ? postTags : tagIds;
 
@@ -226,7 +226,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
         )
       `;
 
-      param = [title, description, excerpt, content, slug, image, tags, postId];
+      param = [title, description, excerpt, content, slug, image, tags, id];
     }
 
     const { rows: editedPost } = await db.query<EditedData>(
@@ -267,7 +267,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
     const [edited] = editedPost;
 
     return new SinglePost({
-      id: postId,
+      id,
       title,
       description,
       excerpt,
