@@ -7,9 +7,6 @@ import { testPostTag } from "@utils/tests/testPostTag";
 
 export const postTag = { name: /^post tags$/i };
 export const image = /^Select A Post Image Banner$/i;
-export const changeImage = /^change image$/i;
-export const imagePreview = { name: /^Post image banner preview$/i };
-export const imageBtn = { name: /^remove image$/i };
 export const selectedPostTags = { name: /^selected post tags$/i };
 export const titleBox = { name: /^post title$/i };
 export const descBox = { name: /^post description$/i };
@@ -44,7 +41,7 @@ export const storagePost = {
 
 export const postTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Tag 6"];
 
-const postTagIds = [
+const tagIds = [
   "fc2f2351-80c7-4e4c-b462-11b3512f1293",
   "377fba48-d9e3-4b06-aab6-0b29e2c98413",
   "a2ee44f1-323c-41aa-addd-5fca6f3cc309",
@@ -53,9 +50,7 @@ const postTagIds = [
   "c11cb682-8a2d-46b8-99d5-8ba33c450ed9",
 ];
 
-const tags = postTags.map((items, index) => {
-  return testPostTag(items, postTagIds[index]);
-});
+const tags = postTags.map((items, index) => testPostTag(items, tagIds[index]));
 
 export const tagName = (index: number) => ({
   name: new RegExp(`^${postTags[index]}$`),

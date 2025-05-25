@@ -11,7 +11,6 @@ import type { StateSetterFn } from "@types";
 
 interface CreatePostPreviewProps {
   isOpen: boolean;
-  setIsOpen: StateSetterFn<boolean>;
   post: types.PostInputData;
   draftStatus: types.PostActionStatus;
   createStatus: types.PostActionStatus;
@@ -21,6 +20,7 @@ interface CreatePostPreviewProps {
   handleDraftPost: (metadata?: types.PostMetadataFields) => Promise<void>;
   handleCreatePost: () => Promise<void>;
   dispatch: React.Dispatch<creates.CreatePostAction>;
+  setIsOpen: StateSetterFn<boolean>;
 }
 
 const CreatePostPreview = ({

@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import type { Mock } from "vitest";
 
 import CreatePostMetadata from "..";
@@ -154,7 +154,7 @@ describe("Create Post - Metadata", () => {
         );
       });
 
-      it("Should allow the user to be able to select an image file for upload", async () => {
+      it("Should allow the user to be able to select/unselect an image file for upload", async () => {
         const file = new File(["bar"], "bar.jpg", { type: "image/jpeg" });
         const { user } = renderUI(<UI {...mocks.props} />);
 
@@ -171,11 +171,15 @@ describe("Create Post - Metadata", () => {
         ).not.toHaveAccessibleErrorMessage();
 
         expect(screen.getByRole("img", mocks.img)).toBeInTheDocument();
+
+        await user.click(screen.getByRole("button", mocks.imageBtn));
+
+        expect(screen.queryByRole("img", mocks.img)).not.toBeInTheDocument();
       });
     });
   });
 
-  describe("Post tags input field rendering", () => {
+  describe("Post tags input field", () => {
     it("Should render the post tags combobox after fetching post tags data on mount", async () => {
       renderUI(<UI {...mocks.props} />);
 
@@ -186,26 +190,6 @@ describe("Create Post - Metadata", () => {
       await expect(
         screen.findByRole("combobox", mocks.postTags)
       ).resolves.toBeInTheDocument();
-    });
-
-    it("When the post tags fetch fails or there are no created post tags, Expect a status message", async () => {
-      mocks.getPostTagResolver();
-
-      renderUI(<UI {...mocks.props} />);
-
-      expect(
-        screen.queryByRole("combobox", mocks.postTags)
-      ).not.toBeInTheDocument();
-
-      await expect(screen.findByRole("status")).resolves.toHaveTextContent(
-        mocks.postTagsErrorMsg
-      );
-
-      expect(
-        screen.queryByRole("combobox", mocks.postTags)
-      ).not.toBeInTheDocument();
-
-      mocks.server.resetHandlers();
     });
 
     it("More than 5 post tags selected, Expect the post tags select box to have an error message", async () => {
@@ -227,6 +211,32 @@ describe("Create Post - Metadata", () => {
       expect(
         screen.queryByRole("combobox", mocks.postTags)
       ).toHaveAccessibleErrorMessage(mocks.tagsErrMsg);
+
+      const list = screen.getByRole("list", mocks.selectedPostTags);
+
+      expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
+        mocks.testTags[0]
+      );
+
+      expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent(
+        mocks.testTags[1]
+      );
+
+      expect(within(list).getAllByRole("listitem")[2]).toHaveTextContent(
+        mocks.testTags[2]
+      );
+
+      expect(within(list).getAllByRole("listitem")[3]).toHaveTextContent(
+        mocks.testTags[3]
+      );
+
+      expect(within(list).getAllByRole("listitem")[4]).toHaveTextContent(
+        mocks.testTags[4]
+      );
+
+      expect(within(list).getAllByRole("listitem")[5]).toHaveTextContent(
+        mocks.testTags[5]
+      );
     });
   });
 

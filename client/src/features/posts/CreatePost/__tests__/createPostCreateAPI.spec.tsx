@@ -11,7 +11,6 @@ import { http } from "msw";
 import CreatePostPage from "@pages/posts/new";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./mocks/createPostCreateAPI.mocks";
-import type { UserEvent } from "@testing-library/user-event";
 
 vi.mock("@features/posts/components/CKEditorComponent");
 vi.mock("@utils/posts/storagePost");
@@ -25,28 +24,6 @@ describe("Create Post", () => {
     mocks.server.close();
   });
 
-  const setup = async (user: UserEvent, title: string) => {
-    await expect(
-      screen.findByRole("combobox", mocks.postTag)
-    ).resolves.toBeInTheDocument();
-
-    await user.type(screen.getByRole("textbox", mocks.titleBox), title);
-    await user.type(screen.getByRole("textbox", mocks.descBox), "abcd");
-    await user.type(screen.getByRole("textbox", mocks.extBox), "abcdefgh");
-    await user.click(screen.getByRole("button", mocks.metadataNext));
-
-    await expect(
-      screen.findByRole("button", mocks.contentNext)
-    ).resolves.toBeInTheDocument();
-
-    await user.type(screen.getByRole("textbox", mocks.contBox), mocks.html);
-    await user.click(screen.getByRole("button", mocks.contentNext));
-
-    await expect(
-      screen.findByRole("button", mocks.pubPost)
-    ).resolves.toBeInTheDocument();
-  };
-
   describe("Create post API request", () => {
     describe("API responds with a user authentication error", () => {
       it.each(mocks.redirects)("%s", async (_, title, { url, pathname }) => {
@@ -55,7 +32,7 @@ describe("Create Post", () => {
 
         const { user } = renderUI(<CreatePostPage />);
 
-        await setup(user, title);
+        await mocks.setup(user, title);
         await user.click(screen.getByRole("button", mocks.previewMenu));
         await user.click(screen.getByRole("menuitem", mocks.pubPost));
 
@@ -79,7 +56,7 @@ describe("Create Post", () => {
       it.each(mocks.alerts)("%s", async (_, { title, message }) => {
         const { user } = renderUI(<CreatePostPage />);
 
-        await setup(user, title);
+        await mocks.setup(user, title);
         await user.click(screen.getByRole("button", mocks.pubPost));
 
         const dialog = screen.getByRole("dialog", mocks.dialog);
@@ -99,7 +76,7 @@ describe("Create Post", () => {
       it.each(mocks.verifyTitle)("%s", async (_, { title, message }) => {
         const { user } = renderUI(<CreatePostPage />);
 
-        await setup(user, title);
+        await mocks.setup(user, title);
         await user.click(screen.getByRole("button", mocks.pubPost));
 
         const dialog = screen.getByRole("dialog", mocks.dialog);
@@ -122,7 +99,7 @@ describe("Create Post", () => {
       it("Expect an alert with a list of all relevant error messages", async () => {
         const { user } = renderUI(<CreatePostPage />);
 
-        await setup(user, mocks.validate.title);
+        await mocks.setup(user, mocks.validate.title);
         await user.click(screen.getByRole("button", mocks.previewMenu));
         await user.click(screen.getByRole("menuitem", mocks.pubPost));
 
@@ -163,7 +140,7 @@ describe("Create Post", () => {
       });
     });
 
-    describe.only("Post created", () => {
+    describe("Post created", () => {
       it.each(mocks.created)("%s", async (_, { resolver, mock, url }) => {
         mocks.server.use(http.post(/upload-image$/, resolver));
 

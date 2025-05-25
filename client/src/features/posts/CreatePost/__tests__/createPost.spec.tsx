@@ -108,58 +108,6 @@ describe("Create Post", () => {
       });
     });
 
-    describe("Image banner & post tags metadata", () => {
-      it("Should add or remove post image banner", async () => {
-        const { user } = renderUI(<CreatePostPage />);
-
-        await expect(
-          screen.findByRole("combobox", mocks.postTag)
-        ).resolves.toBeInTheDocument();
-
-        await user.upload(screen.getByLabelText(mocks.image), mocks.file);
-
-        expect(
-          screen.getByLabelText(mocks.changeImage)
-        ).not.toHaveAccessibleErrorMessage();
-
-        expect(screen.getByRole("img", mocks.imagePreview)).toBeInTheDocument();
-
-        await user.click(screen.getByRole("button", mocks.imageBtn));
-
-        expect(
-          screen.queryByRole("img", mocks.imagePreview)
-        ).not.toBeInTheDocument();
-      });
-
-      it("Should select post tags from the post tags select input", async () => {
-        const { user } = renderUI(<CreatePostPage />);
-
-        await expect(
-          screen.findByRole("combobox", mocks.postTag)
-        ).resolves.toBeInTheDocument();
-
-        await user.click(screen.getByRole("combobox", mocks.postTag));
-        await user.click(screen.getByRole("option", mocks.tagName(0)));
-        await user.click(screen.getByRole("option", mocks.tagName(1)));
-        await user.click(screen.getByRole("option", mocks.tagName(2)));
-        await user.keyboard("{Escape}");
-
-        const list = screen.getByRole("list", mocks.selectedPostTags);
-
-        expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
-          mocks.postTags[0]
-        );
-
-        expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent(
-          mocks.postTags[1]
-        );
-
-        expect(within(list).getAllByRole("listitem")[2]).toHaveTextContent(
-          mocks.postTags[2]
-        );
-      });
-    });
-
     describe("Page sections", () => {
       it("Should be able to switch between different page sections", async () => {
         const { user } = renderUI(<CreatePostPage />);

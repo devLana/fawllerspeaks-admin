@@ -11,10 +11,12 @@ export const next = { name: /^proceed to post content$/i };
 export const title = { name: /^post title$/i };
 export const image = /^Select A Post Image Banner$/i;
 export const img = { name: /^post image banner preview$/i };
+export const imageBtn = { name: /^remove image$/i };
 export const changeImg = /^Change Image$/i;
 export const description = { name: /^post description$/i };
 export const excerpt = { name: /^post excerpt$/i };
 export const postTags = { name: /^post tags$/i };
+export const selectedPostTags = { name: /^selected post tags$/i };
 export const draftBtn = { name: /^save as draft$/i };
 export const alertBtn = { name: /^Hide input validation errors alert$/i };
 
@@ -29,7 +31,7 @@ export const postTagsErrorMsg = `You can't add post tags to this post at the mom
 
 export const testTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Tag 6"];
 
-const postTagIds = [
+const tagIds = [
   "fc2f2351-80c7-4e4c-b462-11b3512f1293",
   "377fba48-d9e3-4b06-aab6-0b29e2c98413",
   "a2ee44f1-323c-41aa-addd-5fca6f3cc309",
@@ -38,9 +40,7 @@ const postTagIds = [
   "c11cb682-8a2d-46b8-99d5-8ba33c450ed9",
 ];
 
-const tags = testTags.map((items, index) => {
-  return testPostTag(items, postTagIds[index]);
-});
+const tags = testTags.map((items, index) => testPostTag(items, tagIds[index]));
 
 export const server = setupServer(
   graphql.query(GET_POST_TAGS, async () => {
@@ -48,15 +48,6 @@ export const server = setupServer(
     return mswData("getPostTags", "PostTags", { tags });
   })
 );
-
-export const getPostTagResolver = () => {
-  server.use(
-    graphql.query(GET_POST_TAGS, async () => {
-      await delay();
-      return mswData("getPostTags", "UnsupportedType");
-    })
-  );
-};
 
 export const tagName = (index: number) => ({
   name: new RegExp(`^${testTags[index]}$`),

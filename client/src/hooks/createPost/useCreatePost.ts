@@ -96,7 +96,6 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
     });
   };
 
-  const handleHideErrors = () => setStatus("idle");
   let errors: types.CreatePostFieldErrors = {};
   let msg = `You are unable to create and publish this post at the moment. Please try again later`;
 
@@ -128,7 +127,7 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
     status,
     errors,
     handleCreatePost,
-    handleHideErrors,
+    handleHideErrors: () => setStatus("idle"),
     setIsOpen,
   };
 };

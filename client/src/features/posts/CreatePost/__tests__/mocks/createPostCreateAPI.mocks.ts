@@ -1,6 +1,8 @@
 import { GraphQLError } from "graphql";
 import { delay, graphql, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import { screen } from "@testing-library/react";
+import type { UserEvent } from "@testing-library/user-event";
 
 import { GET_POST_TAGS } from "@queries/getPostTags/GET_POST_TAGS";
 import { CREATE_POST } from "@mutations/createPost/CREATE_POST";
@@ -25,7 +27,7 @@ export const hideErrorsBtn = { name: /^hide input validation errors alert$/i };
 
 const postTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Tag 6"];
 
-const postTagIds = [
+const tagIds = [
   "fc2f2351-80c7-4e4c-b462-11b3512f1293",
   "377fba48-d9e3-4b06-aab6-0b29e2c98413",
   "a2ee44f1-323c-41aa-addd-5fca6f3cc309",
@@ -34,10 +36,7 @@ const postTagIds = [
   "c11cb682-8a2d-46b8-99d5-8ba33c450ed9",
 ];
 
-const tags = postTags.map((items, index) => {
-  return testPostTag(items, postTagIds[index]);
-});
-
+const tags = postTags.map((items, index) => testPostTag(items, tagIds[index]));
 const titleStr = (prefix: string) => `${prefix} Test Post Title`;
 
 export const file = new File(["bar"], "bar.jpg", { type: "image/jpeg" });
@@ -246,3 +245,25 @@ export const created: [string, CreateMock][] = [
     },
   ],
 ];
+
+export const setup = async (user: UserEvent, title: string) => {
+  await expect(
+    screen.findByRole("combobox", postTag)
+  ).resolves.toBeInTheDocument();
+
+  await user.type(screen.getByRole("textbox", titleBox), title);
+  await user.type(screen.getByRole("textbox", descBox), "abcd");
+  await user.type(screen.getByRole("textbox", extBox), "abcdefgh");
+  await user.click(screen.getByRole("button", metadataNext));
+
+  await expect(
+    screen.findByRole("button", contentNext)
+  ).resolves.toBeInTheDocument();
+
+  await user.type(screen.getByRole("textbox", contBox), html);
+  await user.click(screen.getByRole("button", contentNext));
+
+  await expect(
+    screen.findByRole("button", pubPost)
+  ).resolves.toBeInTheDocument();
+};
