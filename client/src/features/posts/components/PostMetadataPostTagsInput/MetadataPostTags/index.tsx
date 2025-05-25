@@ -19,8 +19,7 @@ const MetadataPostTags = (props: MetadataPostTagsProps) => {
   const { replace, pathname } = useRouter();
   const client = useApolloClient();
 
-  const msg =
-    "You can't add post tags to this post at the moment. Please try again later";
+  const msg = `You can't add post tags to this post at the moment. Please try again later`;
 
   if (loading) return <MetadataPostTagsSkeleton />;
 
@@ -34,8 +33,7 @@ const MetadataPostTags = (props: MetadataPostTagsProps) => {
   }
 
   if (!data) {
-    const text =
-      "No post tags found. Go to the 'Post Tags' page to create some post tags";
+    const text = `No post tags found. Go to the 'Post Tags' page to create some post tags`;
 
     return (
       <Alert severity="info" sx={{ mb: 2.5 }} role="status" aria-busy="false">
@@ -69,8 +67,7 @@ const MetadataPostTags = (props: MetadataPostTagsProps) => {
 
     case "PostTags": {
       if (data.getPostTags.tags.length === 0) {
-        const text =
-          "No post tags have been created yet. Go to the 'Post Tags' page to get started";
+        const text = `No post tags have been created yet. Go to the 'Post Tags' page to get started`;
 
         return (
           <Alert

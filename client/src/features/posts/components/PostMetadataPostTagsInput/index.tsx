@@ -62,7 +62,6 @@ const PostMetadataPostTagsInput = (props: PostMetadataPostTagsInputProps) => {
     return { map, options };
   }, [postTags]);
 
-  const { ref, ...selectProps } = field;
   const ariaId = tagIdsError ? "post-tags-error-message" : undefined;
 
   return (
@@ -75,11 +74,10 @@ const PostMetadataPostTagsInput = (props: PostMetadataPostTagsInputProps) => {
           Post Tags
         </InputLabel>
         <Select
-          {...selectProps}
+          {...field}
           labelId="post-tags-label"
           id="post-tags"
           multiple
-          inputRef={ref}
           input={<OutlinedInput id="post-tags-input" label="Post Tags" />}
           MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
           SelectDisplayProps={{
