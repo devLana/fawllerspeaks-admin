@@ -6,7 +6,7 @@ const supabase = () => {
   }
 
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl = "https://soeoohvasnrkaxvjduim.supabase.co";
+  const supabaseUrl = "https://fbhlqmxmksuadysmuitp.supabase.co";
 
   const storageUrl = `${supabaseUrl}/storage/v1/object/public/images/`;
   const client = createClient(supabaseUrl, supabaseKey, {
