@@ -120,7 +120,7 @@ const EditPostTagForm = (props: EditPostTagFormProps) => {
       <Snackbar
         message={alertMessage}
         open={alertIsOpen}
-        onClose={handleCloseAlert<boolean>(false, setAlertIsOpen)}
+        onClose={handleCloseAlert(false, setAlertIsOpen)}
       />
     </>
   );
