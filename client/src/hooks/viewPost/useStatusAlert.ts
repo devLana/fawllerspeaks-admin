@@ -22,8 +22,15 @@ const useStatusAlert = () => {
           : "Blog post created and published";
 
       setAlert({ open: true, message });
+    } else if (query.edit && typeof query.edit === "string") {
+      const message =
+        query.edit === "true"
+          ? "Blog post edited. But there was an error uploading your post image banner. Please try uploading an image later"
+          : "Blog post edited";
+
+      setAlert({ open: true, message });
     }
-  }, [query.draft, query.create]);
+  }, [query.draft, query.create, query.edit]);
 
   const onClose = handleCloseAlert({ ...alert, open: false }, setAlert);
 

@@ -1,9 +1,9 @@
-type PostWrapperProps = React.PropsWithChildren<{
+type ViewPostWrapperProps = React.PropsWithChildren<{
   ariaBusy?: boolean;
   label: string;
 }>;
 
-const ViewPostWrapper = (props: PostWrapperProps) => {
+const ViewPostWrapper = (props: ViewPostWrapperProps) => {
   const { ariaBusy = false, children, label } = props;
 
   return (
