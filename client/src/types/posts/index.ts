@@ -1,6 +1,6 @@
 import type { Post, PostStatus } from "@apiTypes";
-import type { PostTagData } from "types/postTags";
 import type { Status } from "@types";
+import type { PostTagData } from "types/postTags";
 
 export type PostData = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
 
