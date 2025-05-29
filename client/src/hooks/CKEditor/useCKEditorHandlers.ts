@@ -2,15 +2,11 @@ import * as React from "react";
 
 import useDeletePostContentImages from "@hooks/deletePostContentImages/useDeletePostContentImages";
 import { saveStoragePost } from "@utils/posts/storagePost";
-import { SUPABASE_HOST } from "@utils/posts/constants";
 import type CustomEditor from "ckeditor5-custom-build";
 
-const useHandleCKEditor = (
-  savedImageUrls: React.MutableRefObject<Set<string>>,
-  shouldSaveToStorage: boolean
-) => {
+const useCKEditorHandlers = (shouldSaveToStorage: boolean) => {
+  const savedImageUrls = React.useRef(new Set<string>());
   const timerId = React.useRef<number>();
-  const savedImageUrlsRef = savedImageUrls;
 
   React.useEffect(() => {
     return () => {
@@ -20,7 +16,26 @@ const useHandleCKEditor = (
 
   const [deleteImages] = useDeletePostContentImages();
 
-  return (editorRef: CustomEditor) => {
+  const handleLoadstorageImages = (editorRef: CustomEditor) => {
+    const root = editorRef.model.document.getRoot();
+
+    if (root) {
+      const range = editorRef.model.createRangeIn(root);
+      const items = Array.from(range.getItems());
+
+      items.forEach(item => {
+        if (
+          item.is("element", "imageBlock") ||
+          item.is("element", "imageInline")
+        ) {
+          const src = item.getAttribute("src");
+          if (src && typeof src === "string") savedImageUrls.current.add(src);
+        }
+      });
+    }
+  };
+
+  const handleChange = (editorRef: CustomEditor) => {
     const root = editorRef.model.document.getRoot();
     const content = editorRef.getData().replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "");
 
@@ -43,14 +58,11 @@ const useHandleCKEditor = (
           item.is("element", "imageInline")
         ) {
           const src = item.getAttribute("src");
-
-          if (src && typeof src === "string" && src.startsWith(SUPABASE_HOST)) {
-            currentImageUrls.add(src);
-          }
+          if (src && typeof src === "string") currentImageUrls.add(src);
         }
       });
 
-      const removedImages = Array.from(savedImageUrlsRef.current).filter(
+      const removedImages = Array.from(savedImageUrls.current).filter(
         url => !currentImageUrls.has(url)
       );
 
@@ -58,9 +70,11 @@ const useHandleCKEditor = (
         void deleteImages({ variables: { images: removedImages } });
       }
 
-      savedImageUrlsRef.current = currentImageUrls;
+      savedImageUrls.current = currentImageUrls;
     }
   };
+
+  return { handleChange, handleLoadstorageImages };
 };
 
-export default useHandleCKEditor;
+export default useCKEditorHandlers;

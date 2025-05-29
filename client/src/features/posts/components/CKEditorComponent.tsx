@@ -5,9 +5,8 @@ import Box from "@mui/material/Box";
 
 import { useAuth } from "@context/Auth";
 import useCKEditor from "@hooks/CKEditor/useCKEditor";
-import useHandleCKEditor from "@hooks/CKEditor/useHandleCKEditor";
+import useCKEditorHandlers from "@hooks/CKEditor/useCKEditorHandlers";
 import CustomEditor from "ckeditor5-custom-build";
-import { SUPABASE_HOST as STORAGE } from "@utils/posts/constants";
 import type { CKEditorComponentProps } from "types/posts";
 
 const CKEditorComponent = ({
@@ -19,33 +18,11 @@ const CKEditorComponent = ({
   onBlur,
   onFocus,
 }: CKEditorComponentProps) => {
-  const savedImageUrls = React.useRef(new Set<string>());
   const { jwt } = useAuth();
   const { ckEditorRef, topOffset } = useCKEditor(id, contentHasError);
 
-  const handleChange = useHandleCKEditor(savedImageUrls, shouldSaveToStorage);
-
-  const handleLoadstorageImages = (editorRef: CustomEditor) => {
-    const root = editorRef.model.document.getRoot();
-
-    if (root) {
-      const range = editorRef.model.createRangeIn(root);
-      const items = Array.from(range.getItems());
-
-      items.forEach(item => {
-        if (
-          item.is("element", "imageBlock") ||
-          item.is("element", "imageInline")
-        ) {
-          const src = item.getAttribute("src");
-
-          if (src && typeof src === "string" && src.startsWith(STORAGE)) {
-            savedImageUrls.current.add(src);
-          }
-        }
-      });
-    }
-  };
+  const { handleChange, handleLoadstorageImages } =
+    useCKEditorHandlers(shouldSaveToStorage);
 
   const handleContent = (content: string) => {
     dispatchFn(content);

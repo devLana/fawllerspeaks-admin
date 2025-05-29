@@ -3,7 +3,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 
 import useDeletePostContentImages from "@hooks/deletePostContentImages/useDeletePostContentImages";
-import { STORAGE_POST, SUPABASE_HOST } from "@utils/posts/constants";
+import { STORAGE_POST } from "@utils/posts/constants";
 import { getStoragePost } from "@utils/posts/storagePost";
 import type { CreatePostAction } from "types/posts/createPost";
 
@@ -30,20 +30,14 @@ const StorageAlertActions = ({ dispatch }: StorageAlertActionsProps) => {
     if (post?.content) {
       const domParser = new DOMParser();
       const doc = domParser.parseFromString(post.content, "text/html");
-      const imgs = doc.querySelectorAll<HTMLImageElement>("img");
-      const imgElements = Array.from(imgs);
+      const imgs = doc.querySelectorAll("img");
 
-      const images = imgElements.reduce((sources: string[], img) => {
-        if (img.src && img.src.startsWith(SUPABASE_HOST)) {
-          sources.push(img.src);
-        }
-
+      const images = Array.from(imgs).reduce((sources: string[], img) => {
+        if (img.src) sources.push(img.src);
         return sources;
       }, []);
 
-      if (images.length > 0) {
-        void deleteImages({ variables: { images } });
-      }
+      if (images.length > 0) void deleteImages({ variables: { images } });
     }
 
     localStorage.removeItem(STORAGE_POST);
