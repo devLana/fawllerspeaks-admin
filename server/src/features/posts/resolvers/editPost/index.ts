@@ -160,8 +160,6 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
     let param: unknown[];
 
     if (tagIds) {
-      const tags = `{${tagIds.join(",")}}`;
-
       query = `
         WITH post_tag_ids AS (
           SELECT NULLIF(
@@ -181,10 +179,11 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
             content = $5,
             slug = $6,
             image_banner = $7,
+            status = $8,
             last_modified = CURRENT_TIMESTAMP(3),
             tags = (SELECT tag_ids FROM post_tag_ids)
             ${datePublished}
-          WHERE post_id = $8
+          WHERE post_id = $9
           RETURNING
             image_banner,
             date_created,
@@ -197,10 +196,18 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
         )
       `;
 
-      param = [tags, title, description, excerpt, content, slug, image, id];
+      param = [
+        `{${tagIds.join(",")}}`,
+        title,
+        description,
+        excerpt,
+        content,
+        slug,
+        image,
+        postStatus,
+        id,
+      ];
     } else {
-      const tags = tagIds === undefined ? postTags : tagIds;
-
       query = `
         WITH edited_post AS (
           UPDATE posts SET
@@ -210,10 +217,11 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
             content = $4,
             slug = $5,
             image_banner = $6,
-            last_modified = CURRENT_TIMESTAMP(3),
-            tags = $7
+            status = $7,
+            tags = $8,
+            last_modified = CURRENT_TIMESTAMP(3)
             ${datePublished}
-          WHERE post_id = $8
+          WHERE post_id = $9
           RETURNING
             image_banner,
             date_created,
@@ -226,7 +234,17 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
         )
       `;
 
-      param = [title, description, excerpt, content, slug, image, tags, id];
+      param = [
+        title,
+        description,
+        excerpt,
+        content,
+        slug,
+        image,
+        postStatus,
+        tagIds === undefined ? postTags : tagIds,
+        id,
+      ];
     }
 
     const { rows: editedPost } = await db.query<EditedData>(
