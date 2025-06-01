@@ -83,6 +83,7 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
             const { slug } = createData.createPost.post.url;
             const query = { create: uploadHasError };
 
+            client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
             localStorage.removeItem(STORAGE_POST);
             void push({ pathname: `/posts/view/${slug}`, query });
             break;

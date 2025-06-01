@@ -111,9 +111,9 @@ const useEditPost = (postData: EditPostStateData, oldPost: OldPost) => {
             const query = { edit: uploadHasError };
             const redirect = oldPost.slug !== url.slug ? replace : push;
 
-            if (oldPost.title !== title && oldPost.slug !== url.slug) {
-              client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
+            client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
 
+            if (oldPost.title !== title && oldPost.slug !== url.slug) {
               client.cache.evict({
                 id: "ROOT_QUERY",
                 fieldName: "getPost",

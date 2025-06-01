@@ -99,6 +99,7 @@ export const useDraftPost = (
             const { slug } = draftData.draftPost.post.url;
             const query = { draft: uploadHasError };
 
+            client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
             localStorage.removeItem(STORAGE_POST);
             void push({ pathname: `/posts/view/${slug}`, query });
             break;
