@@ -64,6 +64,7 @@ const CreatePostMetadata = (props: CreatePostMetadataProps) => {
   };
 
   const submitHandler = (metadata: p.PostMetadataFields) => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     props.dispatch({ type: "PROCEED_TO_POST_CONTENT", payload: { metadata } });
     saveStoragePost(metadata);
   };

@@ -46,6 +46,7 @@ const EditPostMetadata = (props: EditPostMetadataProps) => {
   });
 
   const submitHandler = (metadata: types.EditPostMetadataFields) => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     props.dispatch({ type: "PROCEED_TO_POST_CONTENT", payload: { metadata } });
   };
 
