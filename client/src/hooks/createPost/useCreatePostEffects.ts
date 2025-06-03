@@ -1,13 +1,13 @@
 import * as React from "react";
 
-import { getStoragePost } from "@utils/posts/storagePost";
+import { getCreateStoragePost } from "@utils/posts/createStoragePost";
 import type { CreatePostAction } from "types/posts/createPost";
 
 const useCreatePostEffects = (dispatch: React.Dispatch<CreatePostAction>) => {
   React.useEffect(() => {
-    const post = getStoragePost();
+    const post = getCreateStoragePost();
 
-    if (post) dispatch({ type: "SHOW_STORAGE_POST_ALERT" });
+    if (post) dispatch({ type: "SHOW_CREATE_STORAGE_POST_ALERT" });
   }, [dispatch]);
 };
 

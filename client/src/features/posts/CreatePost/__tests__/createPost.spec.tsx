@@ -5,18 +5,18 @@ import {
 } from "@testing-library/react";
 
 import CreatePostPage from "@pages/posts/new";
-import { getStoragePost, saveStoragePost } from "@utils/posts/storagePost";
-import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./mocks/createPost.mocks";
-import type { StoragePostData } from "types/posts/createPost";
+import * as storage from "@utils/posts/createStoragePost";
+import { renderUI } from "@utils/tests/renderUI";
+import type { CreateStoragePostData } from "types/posts/createPost";
 
-type MockFn = ReturnType<typeof vi.fn<never, StoragePostData | null>>;
+type MockFn = ReturnType<typeof vi.fn<never, CreateStoragePostData | null>>;
 
 vi.mock("@features/posts/components/CKEditorComponent");
-vi.mock("@utils/posts/storagePost");
+vi.mock("@utils/posts/createStoragePost");
 
 describe("Create Post", () => {
-  const mockGetStoragePost = getStoragePost as MockFn;
+  const mockGetStoragePost = storage.getCreateStoragePost as MockFn;
 
   beforeAll(() => {
     mockGetStoragePost.mockReturnValue(null);
@@ -36,7 +36,7 @@ describe("Create Post", () => {
           screen.findByRole("combobox", mocks.postTag)
         ).resolves.toBeInTheDocument();
 
-        expect(getStoragePost).toHaveBeenCalledOnce();
+        expect(storage.getCreateStoragePost).toHaveBeenCalledOnce();
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 
         expect(
@@ -58,7 +58,7 @@ describe("Create Post", () => {
           screen.findByRole("combobox", mocks.postTag)
         ).resolves.toBeInTheDocument();
 
-        expect(getStoragePost).toHaveBeenCalledOnce();
+        expect(storage.getCreateStoragePost).toHaveBeenCalledOnce();
         expect(screen.getByRole("alert")).toHaveTextContent(mocks.storageMsg);
 
         await user.click(screen.getByRole("button", mocks.loadSavedPost));
@@ -130,7 +130,7 @@ describe("Create Post", () => {
           screen.queryByRole("region", mocks.metadata)
         ).not.toBeInTheDocument();
 
-        expect(saveStoragePost).toHaveBeenCalledOnce();
+        expect(storage.saveCreateStoragePost).toHaveBeenCalledOnce();
         expect(screen.getByRole("region", mocks.cont)).toBeInTheDocument();
 
         await expect(
@@ -144,7 +144,7 @@ describe("Create Post", () => {
           screen.queryByRole("region", mocks.cont)
         ).not.toBeInTheDocument();
 
-        expect(saveStoragePost).toHaveBeenCalled();
+        expect(storage.saveCreateStoragePost).toHaveBeenCalled();
         expect(screen.getByRole("region", mocks.prevs)).toBeInTheDocument();
 
         await expect(

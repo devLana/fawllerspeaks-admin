@@ -29,6 +29,7 @@ export const tagsErrMsg = "Only a maximum of 5 post tags can be selected";
 export const descriptionMsg = `Post description cannot be more than 255 characters`;
 export const postTagsErrorMsg = `You can't add post tags to this post at the moment. Please try again later`;
 
+export const html = "<p>Paragraph One</p>";
 export const testTags = ["Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Tag 6"];
 
 const tagIds = [
@@ -57,11 +58,13 @@ export interface Props {
   postData: PostMetadataFields;
   errors: CreatePostFieldErrors;
   shouldShow: boolean;
+  storagePostIsNotLoaded: boolean;
 }
 
 export const props: Props = {
   shouldShow: false,
   errors: {},
+  storagePostIsNotLoaded: false,
   postData: {
     title: "",
     description: "",
@@ -86,6 +89,7 @@ export const maxValuesProps: Props = {
 
 export const errorsProps: Props = {
   ...props,
+  shouldShow: true,
   errors: {
     titleError: titleMsg,
     descriptionError: descriptionMsg,
@@ -104,4 +108,16 @@ export const textBoxProps: Props = {
     description: "Post Description",
     excerpt: "Post Excerpt",
   },
+};
+
+export const storagePost = {
+  title: "Post Title",
+  description: "Post Description",
+  excerpt: "Post Excerpt",
+  tagIds: [
+    "377fba48-d9e3-4b06-aab6-0b29e2c98413",
+    "3240e4d2-f157-4991-90b2-a7795d75b01f",
+    "4589dc3b-eb31-4d53-a34f-d75e14288b59",
+  ],
+  content: html,
 };

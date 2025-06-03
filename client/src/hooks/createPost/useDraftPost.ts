@@ -5,9 +5,8 @@ import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
 import { DRAFT_POST } from "@mutations/createPost/DRAFT_POST";
-import { saveStoragePost } from "@utils/posts/storagePost";
+import * as storage from "@utils/posts/createStoragePost";
 import { SESSION_ID } from "@utils/constants";
-import { STORAGE_POST } from "@utils/posts/constants";
 import type { DraftPostInput } from "@apiTypes";
 import type * as create from "types/posts/createPost";
 import type * as posts from "types/posts";
@@ -63,7 +62,7 @@ export const useDraftPost = (
           case "AuthenticationError": {
             const query = { status: "unauthenticated", redirectTo: pathname };
 
-            saveStoragePost(post);
+            storage.saveCreateStoragePost(post);
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void replace({ pathname: "/login", query });
@@ -73,7 +72,7 @@ export const useDraftPost = (
           case "RegistrationError": {
             const query = { status: "unregistered", redirectTo: pathname };
 
-            saveStoragePost(post);
+            storage.saveCreateStoragePost(post);
             void replace({ pathname: "/register", query });
             break;
           }
@@ -81,7 +80,7 @@ export const useDraftPost = (
           case "NotAllowedError": {
             const query = { status: "unauthorized" };
 
-            saveStoragePost(post);
+            storage.saveCreateStoragePost(post);
             localStorage.removeItem(SESSION_ID);
             void client.clearStore();
             void replace({ pathname: "/login", query });
@@ -100,7 +99,7 @@ export const useDraftPost = (
             const query = { draft: uploadHasError };
 
             client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
-            localStorage.removeItem(STORAGE_POST);
+            localStorage.removeItem(storage.CREATE_STORAGE_POST);
             void push({ pathname: `/posts/view/${slug}`, query });
             break;
           }

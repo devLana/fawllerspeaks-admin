@@ -33,6 +33,7 @@ export const reducer: Reducer = (state, action) => {
         ...state,
         view: "content",
         postData: { ...state.postData, ...action.payload.metadata },
+        showStoragePostAlert: false,
       };
     }
 
@@ -45,15 +46,15 @@ export const reducer: Reducer = (state, action) => {
       return { ...state, view: "preview" };
     }
 
-    case "SHOW_STORAGE_POST_ALERT": {
+    case "SHOW_CREATE_STORAGE_POST_ALERT": {
       return { ...state, showStoragePostAlert: true };
     }
 
-    case "HIDE_STORAGE_POST_ALERT": {
+    case "HIDE_CREATE_STORAGE_POST_ALERT": {
       return { ...state, showStoragePostAlert: false };
     }
 
-    case "LOAD_STORAGE_POST": {
+    case "LOAD_CREATE_STORAGE_POST": {
       return {
         ...state,
         view: "metadata",

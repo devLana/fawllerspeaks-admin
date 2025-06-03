@@ -1,7 +1,10 @@
-import { getStoragePost, saveStoragePost } from ".";
-import { STORAGE_POST } from "../constants";
+import {
+  CREATE_STORAGE_POST,
+  getCreateStoragePost,
+  saveCreateStoragePost,
+} from ".";
 
-describe("LocalStorage Post Data", () => {
+describe("LocalStorage Create Post Data", () => {
   const postData = {
     title: "Blog Post Title",
     description: "Blog Post Description",
@@ -10,28 +13,31 @@ describe("LocalStorage Post Data", () => {
     content: "<h2>Blog Post Content</h2><p>Blog post paragraph</p>",
   };
 
-  describe("Get post data from localStorage", () => {
+  describe("Get create post data from localStorage", () => {
     afterAll(() => {
-      localStorage.removeItem(STORAGE_POST);
+      localStorage.removeItem(CREATE_STORAGE_POST);
     });
 
     it("Expect null if no post data is saved to localStorage", () => {
-      expect(getStoragePost()).toBeNull();
+      expect(getCreateStoragePost()).toBeNull();
     });
 
     it("Expect null if the saved post data is an empty object", () => {
-      localStorage.setItem(STORAGE_POST, JSON.stringify({}));
-      expect(getStoragePost()).toBeNull();
+      localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify({}));
+      expect(getCreateStoragePost()).toBeNull();
     });
 
     it("Expect null if the saved post data does not have the right post properties", () => {
-      localStorage.setItem(STORAGE_POST, JSON.stringify({ name: "John Doe" }));
-      expect(getStoragePost()).toBeNull();
+      localStorage.setItem(
+        CREATE_STORAGE_POST,
+        JSON.stringify({ name: "John Doe" })
+      );
+      expect(getCreateStoragePost()).toBeNull();
     });
 
     it("Saved post has expected & unexpected properties, Expect the returned posts to contain only the expected properties", () => {
       localStorage.setItem(
-        STORAGE_POST,
+        CREATE_STORAGE_POST,
         JSON.stringify({
           name: "John Doe",
           title: "Blog Post Title",
@@ -40,27 +46,27 @@ describe("LocalStorage Post Data", () => {
         })
       );
 
-      expect(getStoragePost()).toStrictEqual({
+      expect(getCreateStoragePost()).toStrictEqual({
         title: "Blog Post Title",
         excerpt: "Blog Post Excerpt",
       });
     });
 
     it("Should return all saved post data in the localStorage", () => {
-      localStorage.setItem(STORAGE_POST, JSON.stringify(postData));
-      expect(getStoragePost()).toStrictEqual(postData);
+      localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify(postData));
+      expect(getCreateStoragePost()).toStrictEqual(postData);
     });
   });
 
-  describe("Save post data to localStorage", () => {
+  describe("Save create post data to localStorage", () => {
     afterEach(() => {
-      localStorage.removeItem(STORAGE_POST);
+      localStorage.removeItem(CREATE_STORAGE_POST);
     });
 
     it("Should save all provided post data to localStorage", () => {
-      saveStoragePost(postData);
+      saveCreateStoragePost(postData);
 
-      const postString = localStorage.getItem(STORAGE_POST) as string;
+      const postString = localStorage.getItem(CREATE_STORAGE_POST) as string;
       const savedPost = JSON.parse(postString) as object;
 
       expect(savedPost).toStrictEqual(postData);
@@ -69,10 +75,10 @@ describe("LocalStorage Post Data", () => {
     it("Should update an already saved post data in localStorage", () => {
       const { content, ...data } = postData;
 
-      localStorage.setItem(STORAGE_POST, JSON.stringify(data));
-      saveStoragePost({ content });
+      localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify(data));
+      saveCreateStoragePost({ content });
 
-      const postString = localStorage.getItem(STORAGE_POST) as string;
+      const postString = localStorage.getItem(CREATE_STORAGE_POST) as string;
       const savedPost = JSON.parse(postString) as object;
 
       expect(savedPost).toStrictEqual(postData);

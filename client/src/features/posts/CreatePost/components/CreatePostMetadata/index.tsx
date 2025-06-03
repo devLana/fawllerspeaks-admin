@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 import useGetPostTags from "@hooks/getPostTags/useGetPostTags";
+import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
 import CreatePostRequiredMetadataInputs from "./CreatePostRequiredMetadataInputs";
 import MetadataPostTags from "@features/posts/components/PostMetadataPostTagsInput/MetadataPostTags";
 import PostMetadataPostTagsInput from "@features/posts/components/PostMetadataPostTagsInput";
@@ -12,7 +13,7 @@ import CreatePostFileInput from "./CreatePostFileInput";
 import CreatePostActionButtons from "@features/posts/CreatePost/components/CreatePostActionButtons";
 import PostErrorsAlert from "@features/posts/components/PostErrorsAlert";
 import { create, draft } from "@validators/createPostMetadataSchema";
-import { saveStoragePost } from "@utils/posts/storagePost";
+import * as storagePost from "@utils/posts/createStoragePost";
 import type * as p from "types/posts";
 import type * as types from "types/posts/createPost";
 
@@ -21,6 +22,7 @@ interface CreatePostMetadataProps {
   draftStatus: p.PostActionStatus;
   errors: types.CreatePostFieldErrors;
   shouldShowErrors: boolean;
+  storagePostIsNotLoaded: boolean;
   handleHideErrors: VoidFunction | undefined;
   onDraft: (metadata?: p.PostMetadataFields) => Promise<void>;
   dispatch: React.Dispatch<types.CreatePostAction>;
@@ -46,13 +48,14 @@ const CreatePostMetadata = (props: CreatePostMetadataProps) => {
     mode: "onChange",
   });
 
+  const deleteImages = useDeletePostContentImages();
+
   const handleDraftPost = () => {
     const values = getValues();
     clearErrors();
 
     try {
       const metadata = draft.validateSync(values, { abortEarly: false });
-
       void props.onDraft(metadata);
     } catch (err) {
       if (err instanceof ValidationError) {
@@ -64,9 +67,16 @@ const CreatePostMetadata = (props: CreatePostMetadataProps) => {
   };
 
   const submitHandler = (metadata: p.PostMetadataFields) => {
+    const post = storagePost.getCreateStoragePost();
+
+    if (post?.content && props.storagePostIsNotLoaded) {
+      deleteImages(post.content);
+      localStorage.removeItem(storagePost.CREATE_STORAGE_POST);
+    }
+
     window.scrollTo({ top: 0, behavior: "smooth" });
+    storagePost.saveCreateStoragePost(metadata);
     props.dispatch({ type: "PROCEED_TO_POST_CONTENT", payload: { metadata } });
-    saveStoragePost(metadata);
   };
 
   const { tagIdsError, imageBannerError, descriptionError } = props.errors;

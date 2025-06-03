@@ -38,6 +38,7 @@ const CreatePostPage: NextPageWithLayout = () => {
           onDraft={draft.handleDraftPost}
           dispatch={dispatch}
           errors={data.errors}
+          storagePostIsNotLoaded={state.showStoragePostAlert}
           shouldShowErrors={data.shouldShowErrors}
           handleHideErrors={data.handleHideErrors}
         />

@@ -2,46 +2,32 @@ import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 
-import useDeletePostContentImages from "@hooks/deletePostContentImages/useDeletePostContentImages";
-import { STORAGE_POST } from "@utils/posts/constants";
-import { getStoragePost } from "@utils/posts/storagePost";
+import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
+import * as storagePost from "@utils/posts/createStoragePost";
 import type { CreatePostAction } from "types/posts/createPost";
 
-interface StorageAlertActionsProps {
-  dispatch: React.Dispatch<CreatePostAction>;
-}
+type Dispatch = React.Dispatch<CreatePostAction>;
 
-const StorageAlertActions = ({ dispatch }: StorageAlertActionsProps) => {
-  const [deleteImages] = useDeletePostContentImages();
+const StorageAlertActions = ({ dispatch }: { dispatch: Dispatch }) => {
+  const deleteImages = useDeletePostContentImages();
 
   const handleContinue = () => {
-    const post = getStoragePost();
+    const post = storagePost.getCreateStoragePost();
 
     if (post) {
-      dispatch({ type: "LOAD_STORAGE_POST", payload: { post } });
+      dispatch({ type: "LOAD_CREATE_STORAGE_POST", payload: { post } });
     } else {
-      dispatch({ type: "HIDE_STORAGE_POST_ALERT" });
+      dispatch({ type: "HIDE_CREATE_STORAGE_POST_ALERT" });
     }
   };
 
   const handleCancel = () => {
-    const post = getStoragePost();
+    const post = storagePost.getCreateStoragePost();
 
-    if (post?.content) {
-      const domParser = new DOMParser();
-      const doc = domParser.parseFromString(post.content, "text/html");
-      const imgs = doc.querySelectorAll("img");
+    if (post?.content) deleteImages(post.content);
 
-      const images = Array.from(imgs).reduce((sources: string[], img) => {
-        if (img.src) sources.push(img.src);
-        return sources;
-      }, []);
-
-      if (images.length > 0) void deleteImages({ variables: { images } });
-    }
-
-    localStorage.removeItem(STORAGE_POST);
-    dispatch({ type: "HIDE_STORAGE_POST_ALERT" });
+    localStorage.removeItem(storagePost.CREATE_STORAGE_POST);
+    dispatch({ type: "HIDE_CREATE_STORAGE_POST_ALERT" });
   };
 
   return (

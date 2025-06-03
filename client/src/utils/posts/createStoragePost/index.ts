@@ -1,13 +1,14 @@
-import { STORAGE_POST } from "../constants";
-import type { StoragePostData } from "types/posts/createPost";
+import type { CreateStoragePostData } from "types/posts/createPost";
 
-export const getStoragePost = (): StoragePostData | null => {
-  const storagePost = localStorage.getItem(STORAGE_POST);
+export const CREATE_STORAGE_POST = "create_storage_post";
+
+export const getCreateStoragePost = (): CreateStoragePostData | null => {
+  const storagePost = localStorage.getItem(CREATE_STORAGE_POST);
 
   if (!storagePost) return null;
 
   try {
-    const post = JSON.parse(storagePost) as StoragePostData;
+    const post = JSON.parse(storagePost) as CreateStoragePostData;
 
     if (
       !Object.hasOwn(post, "title") &&
@@ -31,11 +32,11 @@ export const getStoragePost = (): StoragePostData | null => {
   }
 };
 
-export const saveStoragePost = (post: StoragePostData) => {
-  const savedPost = getStoragePost();
+export const saveCreateStoragePost = (post: CreateStoragePostData) => {
+  const savedPost = getCreateStoragePost();
   let postToSave: string;
 
-  const postDraft: StoragePostData = {
+  const postDraft: CreateStoragePostData = {
     ...(post.title && { title: post.title }),
     ...(post.description && { description: post.description }),
     ...(post.excerpt && { excerpt: post.excerpt }),
@@ -49,5 +50,5 @@ export const saveStoragePost = (post: StoragePostData) => {
     postToSave = JSON.stringify(postDraft);
   }
 
-  localStorage.setItem(STORAGE_POST, postToSave);
+  localStorage.setItem(CREATE_STORAGE_POST, postToSave);
 };

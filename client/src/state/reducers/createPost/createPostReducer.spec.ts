@@ -1,10 +1,10 @@
 import { reducer, initialState as state } from ".";
-import type { CreatePostStateData } from "types/posts/createPost";
+import type { CreatePostStateData as State } from "types/posts/createPost";
 
 describe("Create Post - State Reducer", () => {
   describe("Go back to different 'view' states", () => {
-    const state1: CreatePostStateData = { ...state, view: "content" };
-    const state2: CreatePostStateData = { ...state, view: "preview" };
+    const state1: State = { ...state, view: "content" };
+    const state2: State = { ...state, view: "preview" };
 
     it("Should change the 'view' state back to metadata", () => {
       const data = reducer(state1, { type: "GO_BACK_TO_METADATA" });
@@ -18,15 +18,15 @@ describe("Create Post - State Reducer", () => {
   });
 
   describe("Proceed to post content", () => {
-    it("Should add post metadata data to 'postData' and change 'view' to content", () => {
-      const metadata = {
-        title: "New Title",
-        description: "New Description",
-        excerpt: "New Excerpt",
-        imageBanner: new File(["image"], "avatar.jpg", { type: "image/jpeg" }),
-        tagIds: ["id-1", "id-2"],
-      };
+    const metadata = {
+      title: "New Title",
+      description: "New Description",
+      excerpt: "New Excerpt",
+      imageBanner: new File(["image"], "avatar.jpg", { type: "image/jpeg" }),
+      tagIds: ["id-1", "id-2"],
+    };
 
+    it("Should add post metadata data to 'postData' and change 'view' to content", () => {
       const data = reducer(state, {
         type: "PROCEED_TO_POST_CONTENT",
         payload: { metadata },
@@ -38,13 +38,29 @@ describe("Create Post - State Reducer", () => {
         postData: { ...state.postData, ...metadata },
       });
     });
+
+    it("Should add post metadata data to 'postData', change 'view' to content and change storageAlert state to 'false'", () => {
+      const initState: State = { ...state, showStoragePostAlert: true };
+
+      const data = reducer(initState, {
+        type: "PROCEED_TO_POST_CONTENT",
+        payload: { metadata },
+      });
+
+      expect(data).toStrictEqual({
+        ...state,
+        view: "content",
+        postData: { ...state.postData, ...metadata },
+        showStoragePostAlert: false,
+      });
+    });
   });
 
   describe("Post content", () => {
     it("Should add provided post content to 'postData'", () => {
       const content = "<h2>Heading</h2><p>Paragraph 1</p><h3>Heading 3</h3>";
 
-      const initState: CreatePostStateData = {
+      const initState: State = {
         ...state,
         view: "content",
         postData: { ...state.postData, content },
@@ -66,7 +82,7 @@ describe("Create Post - State Reducer", () => {
     it("Should change 'view' to preview", () => {
       const file = new File(["image"], "avatar.jpg", { type: "image/jpeg" });
 
-      const initState: CreatePostStateData = {
+      const initState: State = {
         view: "content",
         postData: {
           title: "New Title",
@@ -95,13 +111,15 @@ describe("Create Post - State Reducer", () => {
     };
 
     it("Should set 'storagePost' state", () => {
-      const result = reducer(state, { type: "SHOW_STORAGE_POST_ALERT" });
+      const result = reducer(state, { type: "SHOW_CREATE_STORAGE_POST_ALERT" });
       expect(result).toStrictEqual({ ...state, showStoragePostAlert: true });
     });
 
     it("Should unset 'storagePost' state", () => {
       const initState = { ...state, showStoragePostAlert: true };
-      const result = reducer(initState, { type: "HIDE_STORAGE_POST_ALERT" });
+      const result = reducer(initState, {
+        type: "HIDE_CREATE_STORAGE_POST_ALERT",
+      });
 
       expect(result).toStrictEqual(state);
     });
@@ -110,7 +128,7 @@ describe("Create Post - State Reducer", () => {
       const initState = { ...state, showStoragePostAlert: true };
 
       const result = reducer(initState, {
-        type: "LOAD_STORAGE_POST",
+        type: "LOAD_CREATE_STORAGE_POST",
         payload: { post },
       });
 

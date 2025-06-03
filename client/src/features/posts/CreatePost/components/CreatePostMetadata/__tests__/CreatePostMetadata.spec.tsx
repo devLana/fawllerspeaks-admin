@@ -2,14 +2,18 @@ import { screen, within } from "@testing-library/react";
 import type { Mock } from "vitest";
 
 import CreatePostMetadata from "..";
-import { saveStoragePost } from "@utils/posts/storagePost";
 import * as mocks from "./CreatePostMetadata.mocks";
+import {
+  saveCreateStoragePost,
+  getCreateStoragePost,
+} from "@utils/posts/createStoragePost";
 import { renderUI } from "@utils/tests/renderUI";
-import type { StoragePostData } from "types/posts/createPost";
+import type { CreateStoragePostData } from "types/posts/createPost";
 
-type MockSaveStoragePost = Mock<[StoragePostData], undefined>;
+type MockGetStoragePost = Mock<[], CreateStoragePostData | null>;
+type MockSaveStoragePost = Mock<[CreateStoragePostData], undefined>;
 
-vi.mock("@utils/posts/storagePost");
+vi.mock("@utils/posts/createStoragePost");
 
 describe("Create Post - Metadata", () => {
   beforeAll(() => {
@@ -20,7 +24,8 @@ describe("Create Post - Metadata", () => {
     mocks.server.close();
   });
 
-  const mockSaveStoragePost = saveStoragePost as MockSaveStoragePost;
+  const mockGetStoragePost = getCreateStoragePost as MockGetStoragePost;
+  const mockSaveStoragePost = saveCreateStoragePost as MockSaveStoragePost;
   const mockDispatch = vi.fn().mockName("dispatch");
   const mockOnDraft = vi.fn().mockName("onDraft");
   const mockHandleHideErrors = vi.fn().mockName("handleHideErrors");
@@ -30,6 +35,7 @@ describe("Create Post - Metadata", () => {
       postData={props.postData}
       draftStatus="idle"
       errors={props.errors}
+      storagePostIsNotLoaded={props.storagePostIsNotLoaded}
       shouldShowErrors={props.shouldShow}
       handleHideErrors={mockHandleHideErrors}
       onDraft={mockOnDraft}
@@ -242,9 +248,7 @@ describe("Create Post - Metadata", () => {
 
   describe("API request gets an input validation error response", () => {
     it("Expect an alert errors list and input error messages to be displayed in the UI", async () => {
-      const { user } = renderUI(
-        <UI {...mocks.errorsProps} shouldShow={true} />
-      );
+      const { user } = renderUI(<UI {...mocks.errorsProps} />);
 
       await expect(
         screen.findByRole("combobox", mocks.postTags)
@@ -294,6 +298,8 @@ describe("Create Post - Metadata", () => {
 
   describe("Create post section change", () => {
     it("User fills in the required metadata information, Expect the page to change to the content section", async () => {
+      mockGetStoragePost.mockReturnValueOnce(mocks.storagePost);
+
       const { user } = renderUI(<UI {...mocks.textBoxProps} />);
 
       await expect(
@@ -302,6 +308,7 @@ describe("Create Post - Metadata", () => {
 
       await user.click(screen.getByRole("button", mocks.next));
 
+      expect(mockGetStoragePost).toHaveBeenCalledOnce();
       expect(mockSaveStoragePost).toHaveBeenCalledOnce();
       expect(mockDispatch).toHaveBeenCalledOnce();
     });

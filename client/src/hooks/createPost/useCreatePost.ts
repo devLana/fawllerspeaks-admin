@@ -6,7 +6,7 @@ import { useMutation } from "@apollo/client";
 import useUploadImage from "@hooks/useUploadImage";
 import { CREATE_POST } from "@mutations/createPost/CREATE_POST";
 import { SESSION_ID } from "@utils/constants";
-import { STORAGE_POST } from "@utils/posts/constants";
+import { CREATE_STORAGE_POST } from "@utils/posts/createStoragePost";
 import type { CreatePostInput } from "@apiTypes";
 import type { PostActionStatus, PostInputData as Data } from "types/posts";
 import type * as types from "types/posts/createPost";
@@ -84,7 +84,7 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
             const query = { create: uploadHasError };
 
             client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
-            localStorage.removeItem(STORAGE_POST);
+            localStorage.removeItem(CREATE_STORAGE_POST);
             void push({ pathname: `/posts/view/${slug}`, query });
             break;
           }

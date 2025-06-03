@@ -13,7 +13,7 @@ import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./mocks/createPostCreateAPI.mocks";
 
 vi.mock("@features/posts/components/CKEditorComponent");
-vi.mock("@utils/posts/storagePost");
+vi.mock("@utils/posts/createStoragePost");
 
 describe("Create Post", () => {
   beforeAll(() => {

@@ -9,12 +9,12 @@ import {
 import { http } from "msw";
 
 import CreatePostPage from "@pages/posts/new";
-import { saveStoragePost } from "@utils/posts/storagePost";
+import { saveCreateStoragePost } from "@utils/posts/createStoragePost";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./mocks/createPostDraftAPI.mocks";
 
 vi.mock("@features/posts/components/CKEditorComponent");
-vi.mock("@utils/posts/storagePost");
+vi.mock("@utils/posts/createStoragePost");
 
 describe("Create Post", () => {
   beforeAll(() => {
@@ -46,7 +46,7 @@ describe("Create Post", () => {
         await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
 
         expect(router.replace).toHaveBeenCalledWith(url);
-        expect(saveStoragePost).toHaveBeenCalledOnce();
+        expect(saveCreateStoragePost).toHaveBeenCalledOnce();
         expect(screen.getByRole("button", mocks.draftBtn)).toBeDisabled();
         expect(screen.getByRole("button", mocks.metadataNext)).toBeDisabled();
       });
