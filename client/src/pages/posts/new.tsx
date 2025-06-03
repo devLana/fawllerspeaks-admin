@@ -11,7 +11,7 @@ import RootLayout from "@layouts/RootLayout";
 import CreatePostMetadata from "@features/posts/CreatePost/components/CreatePostMetadata";
 import { LazyCreatePostContent } from "@features/posts/CreatePost/components/CreatePostContent/LazyCreatePostContent";
 import { LazyCreatePostPreview } from "@features/posts/CreatePost/components/CreatePostPreview/LazyCreatePostPreview";
-import StorageAlertActions from "@features/posts/CreatePost/components/StorageAlertActions";
+import CreateStorageAlertActions from "@features/posts/CreatePost/components/CreateStorageAlertActions";
 import * as post from "@reducers/createPost";
 import uiLayout from "@utils/layouts/uiLayout";
 import type { NextPageWithLayout } from "@types";
@@ -75,7 +75,7 @@ const CreatePostPage: NextPageWithLayout = () => {
       <Snackbar
         open={state.showStoragePostAlert}
         message="It seems you have an unfinished post. Would you like to continue from where you stopped? Doing so will overwrite your current progress"
-        action={<StorageAlertActions dispatch={dispatch} />}
+        action={<CreateStorageAlertActions dispatch={dispatch} />}
         ContentProps={{
           sx: { "&>.MuiSnackbarContent-action": { columnGap: 0.5 } },
         }}

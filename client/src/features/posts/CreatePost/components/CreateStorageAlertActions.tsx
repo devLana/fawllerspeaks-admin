@@ -8,7 +8,7 @@ import type { CreatePostAction } from "types/posts/createPost";
 
 type Dispatch = React.Dispatch<CreatePostAction>;
 
-const StorageAlertActions = ({ dispatch }: { dispatch: Dispatch }) => {
+const CreateStorageAlertActions = ({ dispatch }: { dispatch: Dispatch }) => {
   const deleteImages = useDeletePostContentImages();
 
   const handleContinue = () => {
@@ -52,4 +52,4 @@ const StorageAlertActions = ({ dispatch }: { dispatch: Dispatch }) => {
   );
 };
 
-export default StorageAlertActions;
+export default CreateStorageAlertActions;
