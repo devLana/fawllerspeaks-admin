@@ -9,3 +9,4 @@ vi.mock("next/server");
 
 globalThis.URL.createObjectURL = vi.fn(() => "data:blob-image-url");
 globalThis.URL.revokeObjectURL = vi.fn(() => undefined);
+globalThis.scrollTo = vi.fn(() => undefined);
