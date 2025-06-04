@@ -32,10 +32,11 @@ describe("LocalStorage Create Post Data", () => {
         CREATE_STORAGE_POST,
         JSON.stringify({ name: "John Doe" })
       );
+
       expect(getCreateStoragePost()).toBeNull();
     });
 
-    it("Saved post has expected & unexpected properties, Expect the returned posts to contain only the expected properties", () => {
+    it("The saved post has both expected & unexpected properties, Expect the returned post to contain only the expected properties", () => {
       localStorage.setItem(
         CREATE_STORAGE_POST,
         JSON.stringify({
@@ -82,6 +83,18 @@ describe("LocalStorage Create Post Data", () => {
       const savedPost = JSON.parse(postString) as object;
 
       expect(savedPost).toStrictEqual(postData);
+    });
+
+    it("Should remove content from storage post if an empty content string is passed", () => {
+      const { content: _, ...data } = postData;
+
+      localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify(postData));
+      saveCreateStoragePost({ content: "" });
+
+      const postString = localStorage.getItem(CREATE_STORAGE_POST) as string;
+      const savedPost = JSON.parse(postString) as object;
+
+      expect(savedPost).toStrictEqual(data);
     });
   });
 });

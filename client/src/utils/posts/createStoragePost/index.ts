@@ -45,7 +45,14 @@ export const saveCreateStoragePost = (post: CreateStoragePostData) => {
   };
 
   if (savedPost) {
-    postToSave = JSON.stringify({ ...savedPost, ...postDraft });
+    let postData = { ...savedPost, ...postDraft };
+
+    if (post.content === "") {
+      const { content: _, ...rest } = postData;
+      postData = rest;
+    }
+
+    postToSave = JSON.stringify(postData);
   } else {
     postToSave = JSON.stringify(postDraft);
   }

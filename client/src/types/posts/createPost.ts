@@ -1,4 +1,5 @@
 import type { Mutation } from "@apiTypes";
+import type { StateSetterFn } from "@types";
 import type {
   PostDataMapper,
   PostView,
@@ -6,8 +7,8 @@ import type {
   PostInputData,
   PostActionStatus,
   PostMetadataFields,
+  PostContentEditorProps,
 } from ".";
-import type { StateSetterFn } from "@types";
 
 export type CreatePostGQLData = PostDataMapper<Pick<Mutation, "createPost">>;
 export type DraftPostData = PostDataMapper<Pick<Mutation, "draftPost">>;
@@ -55,4 +56,8 @@ export interface CreateHookReturnData extends HookReturnData {
   isOpen: boolean;
   handleCreatePost: () => Promise<void>;
   setIsOpen: StateSetterFn<boolean>;
+}
+
+export interface CreatePostContentEditorProps extends PostContentEditorProps {
+  dispatch: React.Dispatch<CreatePostAction>;
 }

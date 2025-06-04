@@ -12,7 +12,7 @@ import CreatePostPage from "@pages/posts/new";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./mocks/createPostCreateAPI.mocks";
 
-vi.mock("@features/posts/components/CKEditorComponent");
+vi.mock("../components/CreatePostContent/CreatePostContentEditor");
 vi.mock("@utils/posts/createStoragePost");
 
 describe("Create Post", () => {

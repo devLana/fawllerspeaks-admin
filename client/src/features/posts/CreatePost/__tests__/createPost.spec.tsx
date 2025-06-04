@@ -12,7 +12,7 @@ import type { CreateStoragePostData } from "types/posts/createPost";
 
 type MockFn = ReturnType<typeof vi.fn<never, CreateStoragePostData | null>>;
 
-vi.mock("@features/posts/components/CKEditorComponent");
+vi.mock("../components/CreatePostContent/CreatePostContentEditor");
 vi.mock("@utils/posts/createStoragePost");
 
 describe("Create Post", () => {

@@ -102,21 +102,14 @@ describe("Create Post - State Reducer", () => {
   });
 
   describe("StoragePost state", () => {
-    const post = {
-      title: "Blog Post Title",
-      description: "Post Description",
-      excerpt: "Post Excerpt",
-      tagIds: ["id-1", "id-2"],
-      content: "<p>paragraph</p>",
-    };
-
-    it("Should set 'storagePost' state", () => {
+    it("Should set 'storagePost' alert state to true", () => {
       const result = reducer(state, { type: "SHOW_CREATE_STORAGE_POST_ALERT" });
       expect(result).toStrictEqual({ ...state, showStoragePostAlert: true });
     });
 
-    it("Should unset 'storagePost' state", () => {
+    it("Should set 'storagePost' alert state to false", () => {
       const initState = { ...state, showStoragePostAlert: true };
+
       const result = reducer(initState, {
         type: "HIDE_CREATE_STORAGE_POST_ALERT",
       });
@@ -124,8 +117,16 @@ describe("Create Post - State Reducer", () => {
       expect(result).toStrictEqual(state);
     });
 
-    it("Should load 'storagePost' state into 'postData' state", () => {
+    it("Should load storage post data into 'postData' state", () => {
       const initState = { ...state, showStoragePostAlert: true };
+
+      const post = {
+        title: "Blog Post Title",
+        description: "Post Description",
+        excerpt: "Post Excerpt",
+        tagIds: ["id-1", "id-2"],
+        content: "<p>paragraph</p>",
+      };
 
       const result = reducer(initState, {
         type: "LOAD_CREATE_STORAGE_POST",

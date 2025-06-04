@@ -3,8 +3,8 @@ import * as React from "react";
 import FormHelperText from "@mui/material/FormHelperText";
 
 import CreatePostSectionHeader from "../CreatePostSectionHeader";
+import CreatePostContentEditor from "./CreatePostContentEditor";
 import CreatePostActionButtons from "@features/posts/CreatePost/components/CreatePostActionButtons";
-import CKEditorComponent from "@features/posts/components/CKEditorComponent";
 import PostErrorsAlert from "@features/posts/components/PostErrorsAlert";
 import type { PostActionStatus, PostMetadataFields } from "types/posts";
 import type * as types from "types/posts/createPost";
@@ -39,10 +39,6 @@ const CreatePostContent = ({
     }
   };
 
-  const dispatchFn = (editorContent: string) => {
-    dispatch({ type: "ADD_POST_CONTENT", payload: { content: editorContent } });
-  };
-
   return (
     <section
       aria-live="polite"
@@ -55,14 +51,13 @@ const CreatePostContent = ({
         buttonLabel="Go back to provide post metadata section"
         heading="Provide post content"
       />
-      <CKEditorComponent
+      <CreatePostContentEditor
         id="post-content-helper-text"
-        data={content}
-        shouldSaveToStorage
+        content={content}
         contentHasError={contentIsEmpty || !!contentError}
-        dispatchFn={dispatchFn}
         onBlur={value => setContentIsEmpty(value)}
         onFocus={() => setContentIsEmpty(false)}
+        dispatch={dispatch}
       />
       {(contentIsEmpty || contentError) && (
         <FormHelperText id="post-content-helper-text" error>

@@ -1,6 +1,7 @@
 import type { Post, PostStatus } from "@apiTypes";
 import type { Status } from "@types";
 import type { PostTagData } from "types/postTags";
+import type CustomEditor from "ckeditor5-custom-build";
 
 export type PostData = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
 
@@ -35,10 +36,18 @@ export interface CKEditorComponentProps {
   id: string;
   data: string;
   contentHasError: boolean;
-  shouldSaveToStorage: boolean;
+  savedImageUrlsRef: React.MutableRefObject<Set<string>>;
+  handleChange: (editorRef: CustomEditor) => void;
   onFocus: VoidFunction;
   onBlur: (value: boolean) => void;
   dispatchFn: (content: string) => void;
+}
+
+type EditorKeys = "id" | "contentHasError" | "onFocus" | "onBlur";
+
+export interface PostContentEditorProps
+  extends Pick<CKEditorComponentProps, EditorKeys> {
+  content: string;
 }
 
 export interface PostViewHeaderProps {

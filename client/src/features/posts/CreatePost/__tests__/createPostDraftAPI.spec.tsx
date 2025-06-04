@@ -13,7 +13,7 @@ import { saveCreateStoragePost } from "@utils/posts/createStoragePost";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./mocks/createPostDraftAPI.mocks";
 
-vi.mock("@features/posts/components/CKEditorComponent");
+vi.mock("../components/CreatePostContent/CreatePostContentEditor");
 vi.mock("@utils/posts/createStoragePost");
 
 describe("Create Post", () => {
