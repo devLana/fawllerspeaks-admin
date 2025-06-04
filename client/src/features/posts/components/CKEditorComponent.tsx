@@ -5,7 +5,6 @@ import Box from "@mui/material/Box";
 
 import { useAuth } from "@context/Auth";
 import useCKEditor from "@hooks/CKEditor/useCKEditor";
-import useCKEditorHandlers from "@hooks/CKEditor/useCKEditorHandlers";
 import CustomEditor from "ckeditor5-custom-build";
 import type { CKEditorComponentProps } from "types/posts";
 
@@ -13,20 +12,38 @@ const CKEditorComponent = ({
   id,
   data,
   contentHasError,
-  shouldSaveToStorage,
-  dispatchFn,
-  onBlur,
+  savedImageUrlsRef,
+  handleChange,
   onFocus,
+  onBlur,
+  dispatchFn,
 }: CKEditorComponentProps) => {
   const { jwt } = useAuth();
   const { ckEditorRef, topOffset } = useCKEditor(id, contentHasError);
 
-  const { handleChange, handleLoadstorageImages } =
-    useCKEditorHandlers(shouldSaveToStorage);
+  const handleLoadstorageImages = (editorRef: CustomEditor) => {
+    const root = editorRef.model.document.getRoot();
+
+    if (root) {
+      const range = editorRef.model.createRangeIn(root);
+      const items = Array.from(range.getItems());
+
+      items.forEach(item => {
+        if (
+          item.is("element", "imageBlock") ||
+          item.is("element", "imageInline")
+        ) {
+          const src = item.getAttribute("src");
+          if (src && typeof src === "string")
+            savedImageUrlsRef.current.add(src);
+        }
+      });
+    }
+  };
 
   const handleContent = (content: string) => {
     dispatchFn(content);
-    onBlur(!content.replace(/<p>(?:<br>)*&nbsp;<\/p>/g, ""));
+    onBlur(!content.replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "").trim());
   };
 
   const uploadUrl = process.env.NEXT_PUBLIC_API_URL ?? "";

@@ -1,8 +1,15 @@
 import type { CKEditorComponentProps } from "types/posts";
 
-const CKEditorComponent = (props: CKEditorComponentProps) => {
-  const { id, data, contentHasError, dispatchFn, onBlur, onFocus } = props;
-
+const CKEditorComponent = ({
+  id,
+  data,
+  contentHasError,
+  dispatchFn,
+  onBlur,
+  onFocus,
+  savedImageUrlsRef: _,
+  handleChange: __,
+}: CKEditorComponentProps) => {
   return (
     <textarea
       aria-label="Editor editing area"
@@ -14,7 +21,7 @@ const CKEditorComponent = (props: CKEditorComponentProps) => {
       onBlur={e => {
         const { value: content } = e.target;
         dispatchFn(content);
-        onBlur(!content.trim());
+        onBlur(!content.replace(/<p>(?:<br>)*&nbsp;<\/p>/g, ""));
       }}
     />
   );
