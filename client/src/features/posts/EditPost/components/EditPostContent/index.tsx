@@ -4,9 +4,9 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FormHelperText from "@mui/material/FormHelperText";
 
-import CKEditorComponent from "@features/posts/components/CKEditorComponent";
 import PostsPageBackButton from "@features/posts/components/PostsPageBackButton";
 import EditPostErrorsAlert from "../EditPostErrorsAlert";
+import EditPostContentEditor from "./EditPostContentEditor";
 import type { EditPostAction, EditPostFieldErrors } from "types/posts/editPost";
 import type { PostActionStatus } from "types/posts";
 
@@ -36,10 +36,6 @@ const EditPostContent = ({
     }
   };
 
-  const dispatchFn = (editorContent: string) => {
-    dispatch({ type: "ADD_POST_CONTENT", payload: { content: editorContent } });
-  };
-
   return (
     <section
       aria-live="polite"
@@ -52,14 +48,13 @@ const EditPostContent = ({
           onClick={() => dispatch({ type: "GO_BACK_TO_METADATA" })}
         />
       </Box>
-      <CKEditorComponent
+      <EditPostContentEditor
         id="post-content-helper-text"
-        data={content}
-        shouldSaveToStorage={false}
+        content={content}
         contentHasError={!!contentErrorMsg || !!contentError}
         onBlur={value => setContentErrorMsg(value ? "Enter post content" : "")}
         onFocus={() => setContentErrorMsg("")}
-        dispatchFn={dispatchFn}
+        dispatch={dispatch}
       />
       {(contentErrorMsg || contentError) && (
         <FormHelperText id="post-content-helper-text" error>

@@ -4,7 +4,7 @@ import EditPostContent from "..";
 import * as mocks from "./EditPostContent.mocks";
 import { renderUI } from "@utils/tests/renderUI";
 
-vi.mock("@features/posts/components/CKEditorComponent");
+vi.mock("../EditPostContentEditor");
 
 describe("Edit Post - Content", () => {
   const mockDispatch = vi.fn().mockName("dispatch");
