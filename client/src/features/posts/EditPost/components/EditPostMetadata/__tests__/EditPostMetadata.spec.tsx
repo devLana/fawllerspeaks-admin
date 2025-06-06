@@ -1,15 +1,31 @@
 import { screen, within } from "@testing-library/react";
+import type { Mock } from "vitest";
 
 import EditPostMetadata from "..";
 import * as mocks from "./EditPostMetadata.mocks";
+import {
+  getEditStoragePost,
+  saveEditStoragePost,
+} from "@utils/posts/editStoragePost";
 import { renderUI } from "@utils/tests/renderUI";
+import type { EditStoragePostData } from "types/posts/editPost";
+
+type MockGetStoragePost = Mock<[], EditStoragePostData | null>;
+type MockSaveStoragePost = Mock<[EditStoragePostData], undefined>;
+
+vi.mock("@utils/posts/editStoragePost");
 
 describe("Edit Post - Metadata", () => {
+  const mockGetStoragePost = getEditStoragePost as MockGetStoragePost;
+  const mockSaveStoragePost = saveEditStoragePost as MockSaveStoragePost;
   const mockDispatch = vi.fn().mockName("dispatch");
   const mockOnCloseEditError = vi.fn().mockName("onCloseEditError");
 
   const UI = (props: mocks.Props) => (
     <EditPostMetadata
+      postId={mocks.storagePost.id}
+      postSlug={mocks.storagePost.slug}
+      storagePostIsNotLoaded={false}
       postData={props.postData}
       editErrors={props.errors}
       editStatus={props.editStatus}
@@ -171,7 +187,7 @@ describe("Edit Post - Metadata", () => {
       });
     });
 
-    describe.skip("Post tags select field validation", () => {
+    describe("Post tags select field validation", () => {
       it("More than 5 post tags selected, Expect the post tags select box to have an error message", async () => {
         const { user } = renderUI(<UI {...mocks.props} />, {
           writeQuery: mocks.writeTags,
@@ -185,6 +201,7 @@ describe("Edit Post - Metadata", () => {
         await user.click(screen.getByRole("option", mocks.tagName(4)));
         await user.click(screen.getByRole("option", mocks.tagName(5)));
         await user.keyboard("{Escape}");
+        await user.click(screen.getByRole("button", mocks.next));
 
         expect(
           screen.queryByRole("combobox", mocks.postTags)
@@ -266,11 +283,15 @@ describe("Edit Post - Metadata", () => {
 
   describe("Edit post section change", () => {
     it("User fills in the required metadata information, Expect the page to change to the content section", async () => {
+      mockGetStoragePost.mockReturnValueOnce(mocks.storagePost);
+
       const { user } = renderUI(<UI {...mocks.textBoxProps} />);
 
       await user.click(screen.getByRole("button", mocks.next));
 
       expect(mockDispatch).toHaveBeenCalledOnce();
+      expect(mockGetStoragePost).toHaveBeenCalledOnce();
+      expect(mockSaveStoragePost).toHaveBeenCalledOnce();
     });
   });
 });

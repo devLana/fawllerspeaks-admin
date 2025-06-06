@@ -1,25 +1,126 @@
 import { useRouter } from "next/router";
 
+import { http } from "msw";
 import {
   screen,
   waitFor,
   waitForElementToBeRemoved,
   within,
 } from "@testing-library/react";
-import { http } from "msw";
 
 import Post from "..";
 import { renderUI } from "@utils/tests/renderUI";
+import * as storage from "@utils/posts/editStoragePost";
 import * as mocks from "./Post.mocks";
+import type { EditStoragePostData } from "types/posts/editPost";
 
-vi.mock("@features/posts/components/CKEditorComponent");
+type MockFn = ReturnType<typeof vi.fn<never, EditStoragePostData | null>>;
+
+vi.mock("../../EditPostContent/EditPostContentEditor");
+vi.mock("@utils/posts/editStoragePost");
 
 describe("Edit Post", () => {
-  describe.skip("Edit post page sections", () => {
+  const mockGetStoragePost = storage.getEditStoragePost as MockFn;
+  const mockOnRendered = vi.fn().mockName("onRendered");
+
+  beforeAll(() => {
+    mockGetStoragePost.mockReturnValue(null);
+  });
+
+  describe("Read post from localStorage on initial render", () => {
+    it("Expect no UI updates if no saved post found in localStorage", () => {
+      renderUI(<Post {...mocks.props} onRendered={mockOnRendered} />);
+
+      expect(storage.getEditStoragePost).toHaveBeenCalled();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("button", mocks.loadSavedPost)
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("button", mocks.deleteSavedPost)
+      ).not.toBeInTheDocument();
+
+      expect(mockOnRendered).toHaveBeenCalledOnce();
+    });
+
+    it("Expect the alert to be removed from view if the cancel button is clicked on the storage alert", async () => {
+      mockGetStoragePost.mockReturnValue(mocks.storagePost1);
+
+      const { user } = renderUI(
+        <Post {...mocks.props} onRendered={mockOnRendered} />
+      );
+
+      expect(storage.getEditStoragePost).toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent(mocks.storageMsg1);
+
+      await user.click(screen.getByRole("button", mocks.deleteSavedPost));
+      await waitForElementToBeRemoved(() => screen.queryByRole("alert"));
+
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(mockOnRendered).toHaveBeenCalledOnce();
+    });
+
+    it("A post is saved in storage, Expect a redirect to the post page if the user was trying to edit another post", async () => {
+      mockGetStoragePost.mockReturnValue(mocks.storagePost2);
+
+      const { push } = useRouter();
+
+      const { user } = renderUI(
+        <Post {...mocks.props} onRendered={mockOnRendered} />
+      );
+
+      expect(storage.getEditStoragePost).toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent(mocks.storageMsg2);
+      expect(mockOnRendered).toHaveBeenCalledOnce();
+
+      await user.click(screen.getByRole("button", mocks.loadSavedPost));
+      await waitFor(() => expect(push).toHaveBeenCalledOnce());
+
+      expect(push).toHaveBeenCalledWith(
+        `/posts/edit/${mocks.storagePost2.slug}`
+      );
+    });
+
+    it("Expect the content editor to be initialized with storage post content if the user already tried editing the post before", async () => {
+      mockGetStoragePost.mockReturnValue(mocks.storagePost1);
+
+      const { user } = renderUI(
+        <Post
+          {...mocks.props}
+          onRendered={mockOnRendered}
+          hasRenderedBeforeRef
+        />
+      );
+
+      expect(storage.getEditStoragePost).toHaveBeenCalled();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", mocks.metadataNext));
+
+      expect(
+        screen.queryByRole("region", mocks.metadata)
+      ).not.toBeInTheDocument();
+
+      expect(screen.getByRole("region", mocks.content)).toBeInTheDocument();
+
+      await expect(
+        screen.findByRole("button", mocks.contentNext)
+      ).resolves.toBeInTheDocument();
+
+      expect(screen.getByRole("textbox", mocks.contentBox)).toHaveDisplayValue(
+        mocks.storagePost1.content
+      );
+    });
+  });
+
+  describe("Edit post page sections", () => {
     it("Should be able to switch between the different page sections", async () => {
-      const { user } = renderUI(<Post {...mocks.props} />, {
-        writeQuery: mocks.writeTags,
-      });
+      const { user } = renderUI(
+        <Post {...mocks.props} onRendered={mockOnRendered} />,
+        { writeQuery: mocks.writeTags }
+      );
 
       await mocks.setup(user, mocks.props.post.title);
       await user.click(screen.getByRole("button", mocks.previewBack));
@@ -59,9 +160,10 @@ describe("Edit Post", () => {
         const router = useRouter();
         router.asPath = asPath;
 
-        const { user } = renderUI(<Post {...props} />, {
-          writeQuery: mocks.writeTags,
-        });
+        const { user } = renderUI(
+          <Post {...props} onRendered={mockOnRendered} />,
+          { writeQuery: mocks.writeTags }
+        );
 
         await mocks.setup(user, props.post.title);
         await user.click(screen.getAllByRole("button", mocks.previewBtn)[0]);
@@ -83,9 +185,10 @@ describe("Edit Post", () => {
 
     describe("API response is an error/unsupported object type", () => {
       it.each(mocks.alerts)("%s", async (_, { props, message }) => {
-        const { user } = renderUI(<Post {...props} />, {
-          writeQuery: mocks.writeTags,
-        });
+        const { user } = renderUI(
+          <Post {...props} onRendered={mockOnRendered} />,
+          { writeQuery: mocks.writeTags }
+        );
 
         await mocks.setup(user, props.post.title);
         await user.click(screen.getAllByRole("button", mocks.previewBtn)[1]);
@@ -105,9 +208,10 @@ describe("Edit Post", () => {
 
     describe("Verify post title", () => {
       it.each(mocks.verifyTitle)("%s", async (_, { props, message }) => {
-        const { user } = renderUI(<Post {...props} />, {
-          writeQuery: mocks.writeTags,
-        });
+        const { user } = renderUI(
+          <Post {...props} onRendered={mockOnRendered} />,
+          { writeQuery: mocks.writeTags }
+        );
 
         await mocks.setup(user, props.post.title);
         await user.click(screen.getAllByRole("button", mocks.previewBtn)[1]);
@@ -130,9 +234,10 @@ describe("Edit Post", () => {
 
     describe("API responds with an input validation error", () => {
       it("Expect an alert with a list of all relevant error messages", async () => {
-        const { user } = renderUI(<Post {...mocks.validate.props} />, {
-          writeQuery: mocks.writeTags,
-        });
+        const { user } = renderUI(
+          <Post {...mocks.validate.props} onRendered={mockOnRendered} />,
+          { writeQuery: mocks.writeTags }
+        );
 
         await mocks.setup(user, mocks.validate.props.post.title);
         await user.click(screen.getAllByRole("button", mocks.previewBtn)[0]);
@@ -190,9 +295,10 @@ describe("Edit Post", () => {
       it("The blog post does not exist, Expect a redirect to the posts page", async () => {
         const { replace } = useRouter();
 
-        const { user } = renderUI(<Post {...mocks.unknown.props} />, {
-          writeQuery: mocks.writeTags,
-        });
+        const { user } = renderUI(
+          <Post {...mocks.unknown.props} onRendered={mockOnRendered} />,
+          { writeQuery: mocks.writeTags }
+        );
 
         await mocks.setup(user, mocks.unknown.props.post.title);
         await user.click(screen.getAllByRole("button", mocks.previewBtn)[1]);
@@ -222,9 +328,10 @@ describe("Edit Post", () => {
 
         const { push } = useRouter();
 
-        const { user } = renderUI(<Post {...mocks.edited1.props} />, {
-          writeQuery: mocks.writeTags,
-        });
+        const { user } = renderUI(
+          <Post {...mocks.edited1.props} onRendered={mockOnRendered} />,
+          { writeQuery: mocks.writeTags }
+        );
 
         await user.upload(screen.getByLabelText(mocks.image), mocks.file);
         await mocks.setup(user, mocks.edited1.props.post.title);
@@ -253,9 +360,10 @@ describe("Edit Post", () => {
 
         const { replace } = useRouter();
 
-        const { user } = renderUI(<Post {...mocks.edited2.props} />, {
-          writeQuery: mocks.writeTags,
-        });
+        const { user } = renderUI(
+          <Post {...mocks.edited2.props} onRendered={mockOnRendered} />,
+          { writeQuery: mocks.writeTags }
+        );
 
         await user.upload(screen.getByLabelText(mocks.image), mocks.file);
         await mocks.setup(user, mocks.edited2.props.post.title);

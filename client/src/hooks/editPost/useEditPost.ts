@@ -5,6 +5,7 @@ import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
 import { EDIT_POST } from "@mutations/editPost/EDIT_POST";
+import { EDIT_STORAGE_POST } from "@utils/posts/editStoragePost";
 import { SESSION_ID } from "@utils/constants";
 import type { EditPostInput, PostStatus } from "@apiTypes";
 import type { PostActionStatus } from "types/posts";
@@ -129,6 +130,7 @@ const useEditPost = (postData: EditPostStateData, oldPost: OldPost) => {
               });
             }
 
+            localStorage.removeItem(EDIT_STORAGE_POST);
             void redirect({ pathname: `/posts/view/${url.slug}`, query });
             break;
           }

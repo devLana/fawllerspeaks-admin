@@ -173,3 +173,9 @@ export const textBoxProps: Props = {
     excerpt: "Post Excerpt",
   },
 };
+
+export const storagePost = {
+  id: "post-id",
+  slug: "blog-post-slug",
+  content: "<p>Paragraph One</p>",
+};

@@ -8,6 +8,7 @@ import type {
   PostDataMapper,
   PostInputData,
   PostMetadataFields,
+  PostContentEditorProps,
 } from ".";
 
 type EditPostKeys =
@@ -51,10 +52,18 @@ export interface EditPostStateData extends Omit<PostInputData, "imageBanner"> {
 export interface EditPostState {
   view: PostView;
   postData: EditPostStateData;
+  showStoragePostAlert: boolean;
 }
 
 export interface EditPostMetadataFields extends PostMetadataFields {
   editStatus: boolean;
+}
+
+export interface EditStoragePostData {
+  id?: string;
+  slug?: string;
+  content?: string;
+  imgUrls?: string[];
 }
 
 export type EditPostAction =
@@ -66,7 +75,10 @@ export type EditPostAction =
       payload: { metadata: EditPostMetadataFields };
     }
   | { type: "ADD_POST_CONTENT"; payload: { content: string } }
-  | { type: "PREVIEW_POST" };
+  | { type: "PREVIEW_POST" }
+  | { type: "SHOW_EDIT_STORAGE_POST_ALERT" }
+  | { type: "HIDE_EDIT_STORAGE_POST_ALERT" }
+  | { type: "LOAD_EDIT_STORAGE_POST"; payload: { content?: string } };
 
 export type EditPostData = PostDataMapper<Pick<Mutation, "editPost">>;
 
@@ -84,4 +96,10 @@ export interface EditPostProps {
   id: string;
   post: PostToEditData;
   postTagsData: PostTagsFetchData;
+  hasRenderedBeforeRef: boolean;
+  onRendered: () => void;
+}
+
+export interface EditPostContentEditorProps extends PostContentEditorProps {
+  dispatch: React.Dispatch<EditPostAction>;
 }

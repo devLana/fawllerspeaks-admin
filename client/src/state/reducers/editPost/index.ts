@@ -8,6 +8,7 @@ type Reducer = (state: S, action: A) => S;
 
 export const initState = (post: PostToEditData): S => ({
   view: "metadata",
+  showStoragePostAlert: false,
   postData: {
     id: post.id,
     title: post.title,
@@ -36,6 +37,7 @@ export const reducer: Reducer = (state, action) => {
       return {
         ...state,
         view: "content",
+        showStoragePostAlert: false,
         postData: {
           ...state.postData,
           ...metadata,
@@ -61,6 +63,23 @@ export const reducer: Reducer = (state, action) => {
 
     case "PREVIEW_POST": {
       return { ...state, view: "preview" };
+    }
+
+    case "SHOW_EDIT_STORAGE_POST_ALERT": {
+      return { ...state, showStoragePostAlert: true };
+    }
+
+    case "HIDE_EDIT_STORAGE_POST_ALERT": {
+      return { ...state, showStoragePostAlert: false };
+    }
+
+    case "LOAD_EDIT_STORAGE_POST": {
+      return {
+        ...state,
+        view: "metadata",
+        showStoragePostAlert: false,
+        postData: { ...state.postData, content: action.payload.content ?? "" },
+      };
     }
 
     default:

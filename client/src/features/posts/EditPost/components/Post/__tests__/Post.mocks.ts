@@ -12,6 +12,7 @@ import { testPostTag } from "@utils/tests/testPostTag";
 import type { EditPostProps, PostTagsFetchData } from "types/posts/editPost";
 import type { GetPostTagsData } from "types/postTags/getPostTags";
 
+export const contentBox = { name: /^editor editing area/i };
 export const metadata = { name: /^edit post metadata$/i };
 export const content = { name: /^edit post content$/i };
 export const preview = { name: /^preview edited post$/i };
@@ -24,9 +25,12 @@ export const edit = { name: /^edit$/i };
 export const errors = { name: /^input validation errors$/i };
 export const hideErrorsBtn = { name: /^hide input validation errors alert$/i };
 export const image = /^change image$/i;
+export const contentNext = { name: /^preview post$/i };
+export const metadataNext = { name: /^proceed to post content$/i };
+export const loadSavedPost = { name: /^Continue with unfinished post$/i };
+export const deleteSavedPost = { name: /^Delete unfinished post$/i };
+
 export const file = new File(["bar"], "bar.jpg", { type: "image/jpeg" });
-const metadataNext = { name: /^proceed to post content$/i };
-const contentNext = { name: /^preview post$/i };
 const heading = (title: string) => ({ name: new RegExp(title, "i") });
 const html = "<h2>Heading 2</h2><p>paragraph</p>";
 const postTags = ["Tag 1", "Tag 2", "Tag 3"];
@@ -50,7 +54,10 @@ export const writeTags: Cache.WriteQueryOptions<GetPostTagsData, object> = {
   data: { getPostTags: { __typename: "PostTags", tags } },
 };
 
-export const props: EditPostProps = {
+type Props = Omit<EditPostProps, "onRendered">;
+
+export const props: Props = {
+  hasRenderedBeforeRef: false,
   id: "edit-post-page",
   postTagsData,
   post: {
@@ -226,7 +233,8 @@ interface Redirects {
   asPath: string;
   url: { pathname: string; query: Record<string, string> };
 }
-export const redirects: [string, EditPostProps, Redirects][] = [
+
+export const redirects: [string, Props, Redirects][] = [
   [
     "The user is not logged in, Expect a redirect to the login page",
     auth.props,
@@ -303,3 +311,20 @@ export const setup = async (user: UserEvent, title: string) => {
     expect(screen.getByRole("heading", heading(title))).toBeInTheDocument();
   });
 };
+
+export const storagePost1 = {
+  id: props.post.id,
+  slug: "blog-post-slug",
+  content: "<p>Paragraph One</p>",
+};
+
+export const storagePost2 = {
+  ...storagePost1,
+  id: "377fba48-d9e3-4b06-aab6-0b29e2c98413",
+};
+
+export const storageMsg1 =
+  "It seems you have tried editing this post before. Would you like to continue from where you stopped?";
+
+export const storageMsg2 =
+  "It seems you have an unfinished post that you tried editing previously. Would you like to finish editing that post instead?";

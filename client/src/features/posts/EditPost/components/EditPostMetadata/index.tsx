@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { yupResolver } from "@hookform/resolvers/yup";
 
+import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
 import EditPostStatus from "./EditPostStatus";
 import EditPostRequiredMetadataInputs from "./EditPostRequiredMetadataInputs";
 import EditPostFileInput from "./EditPostFileInput";
@@ -10,16 +11,20 @@ import MetadataPostTags from "@features/posts/components/PostMetadataPostTagsInp
 import PostMetadataPostTagsInput from "@features/posts/components/PostMetadataPostTagsInput";
 import EditPostErrorsAlert from "../EditPostErrorsAlert";
 import { edit } from "@validators/editPostMetadataSchema";
+import * as storagePost from "@utils/posts/editStoragePost";
 import type { PostStatus } from "@apiTypes";
 import type { PostActionStatus, RequiredFieldErrors } from "types/posts";
 import type * as types from "types/posts/editPost";
 
 interface EditPostMetadataProps {
+  postId: string;
+  postSlug: string;
   editErrors: types.EditPostFieldErrors;
   editStatus: PostActionStatus;
   postData: Omit<types.EditPostStateData, "id" | "content">;
   postTagsData: types.PostTagsFetchData;
   status: PostStatus;
+  storagePostIsNotLoaded: boolean;
   onCloseEditError: VoidFunction;
   dispatch: React.Dispatch<types.EditPostAction>;
 }
@@ -45,7 +50,17 @@ const EditPostMetadata = (props: EditPostMetadataProps) => {
     },
   });
 
+  const deleteImages = useDeletePostContentImages();
+
   const submitHandler = (metadata: types.EditPostMetadataFields) => {
+    const post = storagePost.getEditStoragePost();
+
+    if (post?.content && props.storagePostIsNotLoaded) {
+      deleteImages(post.content);
+      localStorage.removeItem(storagePost.EDIT_STORAGE_POST);
+    }
+
+    storagePost.saveEditStoragePost({ id: props.postId, slug: props.postSlug });
     window.scrollTo({ top: 0, behavior: "smooth" });
     props.dispatch({ type: "PROCEED_TO_POST_CONTENT", payload: { metadata } });
   };

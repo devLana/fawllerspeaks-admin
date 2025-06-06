@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useRouter } from "next/router";
 
 import { useQuery } from "@apollo/client";
@@ -13,7 +14,12 @@ import type { NextPageWithLayout } from "@types";
 import useGetPostTags from "@hooks/getPostTags/useGetPostTags";
 
 const EditPost: NextPageWithLayout = () => {
+  const hasRenderedBeforeRef = React.useRef(false);
   const { query, isReady, asPath, replace } = useRouter();
+
+  const handleRendered = React.useCallback(() => {
+    hasRenderedBeforeRef.current = true;
+  }, []);
 
   const { data, error, loading, client } = useQuery(GET_POST_TO_EDIT, {
     variables: { slug: query.slug as string },
@@ -71,9 +77,12 @@ const EditPost: NextPageWithLayout = () => {
     case "SinglePost":
       return (
         <Post
+          key={data.getPost.post.id}
           id={id}
           post={data.getPost.post}
           postTagsData={{ error: err, data: tags, loading: load }}
+          hasRenderedBeforeRef={hasRenderedBeforeRef.current}
+          onRendered={handleRendered}
         />
       );
 
