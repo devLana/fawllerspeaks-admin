@@ -13,7 +13,10 @@ export const edit = (status: PostStatus) => {
           is: true,
           then: schema => metadataSchema.description(schema),
           otherwise(schema) {
-            if (status === "Draft") metadataSchema.descriptionDraft(schema);
+            if (status === "Draft") {
+              return metadataSchema.descriptionDraft(schema);
+            }
+
             return metadataSchema.description(schema);
           },
         }),
@@ -24,7 +27,7 @@ export const edit = (status: PostStatus) => {
           is: true,
           then: schema => metadataSchema.excerpt(schema),
           otherwise(schema) {
-            if (status === "Draft") metadataSchema.excerptDraft(schema);
+            if (status === "Draft") return metadataSchema.excerptDraft(schema);
             return metadataSchema.excerpt(schema);
           },
         }),

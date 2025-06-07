@@ -94,12 +94,12 @@ describe("Edit Post - Metadata", () => {
     describe("Post status", () => {
       it("Expect the edit status checkbox to render in an unchecked state", () => {
         renderUI(<UI {...mocks.props} />);
-        expect(screen.getByRole("checkbox", mocks.check)).not.toBeChecked();
+        expect(screen.getByRole("checkbox", mocks.pub)).not.toBeChecked();
       });
 
       it("Expect the edit status checkbox to render in a checked state", () => {
         renderUI(<UI {...mocks.checked} />);
-        expect(screen.getByRole("checkbox", mocks.check)).toBeChecked();
+        expect(screen.getByRole("checkbox", mocks.pub)).toBeChecked();
       });
 
       it.each(mocks.postStatus)("%s", (_, props, mock) => {
@@ -112,9 +112,42 @@ describe("Edit Post - Metadata", () => {
   });
 
   describe("Client side input validations", () => {
-    describe("Textbox input validations when the user tries to proceed to the content section", () => {
-      it("No values entered in the text boxes, Expect the text boxes to have an error message", async () => {
-        const { user } = renderUI(<UI {...mocks.props} />);
+    describe("Textbox input validations", () => {
+      it.each(mocks.updateStatus)("%s", async (_, props, label) => {
+        const { user } = renderUI(<UI {...props} />);
+
+        await user.click(screen.getByRole("checkbox", label));
+        await user.click(screen.getByRole("button", mocks.next));
+
+        expect(
+          screen.getByRole("textbox", mocks.description)
+        ).toHaveAccessibleErrorMessage("Enter post description");
+
+        expect(
+          screen.getByRole("textbox", mocks.excerpt)
+        ).toHaveAccessibleErrorMessage("Enter post excerpt");
+
+        expect(mockDispatch).not.toHaveBeenCalled();
+      });
+
+      it("Expect no error messages for the description and excerpt text boxes when no values are entered into them for a 'Draft' post", async () => {
+        const { user } = renderUI(<UI {...mocks.draftProps} />);
+
+        await user.click(screen.getByRole("button", mocks.next));
+
+        expect(
+          screen.getByRole("textbox", mocks.description)
+        ).not.toHaveAccessibleErrorMessage();
+
+        expect(
+          screen.getByRole("textbox", mocks.excerpt)
+        ).not.toHaveAccessibleErrorMessage();
+
+        expect(mockDispatch).toHaveBeenCalledOnce();
+      });
+
+      it.each(mocks.validate)("%s", async (_, props) => {
+        const { user } = renderUI(<UI {...props} />);
 
         await user.click(screen.getByRole("button", mocks.next));
 
@@ -272,7 +305,7 @@ describe("Edit Post - Metadata", () => {
       ).toHaveAccessibleErrorMessage(mocks.tagsMsg);
 
       expect(
-        screen.queryByRole("checkbox", mocks.check)
+        screen.queryByRole("checkbox", mocks.pub)
       ).toHaveAccessibleErrorMessage(mocks.editStatusMsg);
 
       await user.click(screen.getByRole("button", mocks.alertBtn));

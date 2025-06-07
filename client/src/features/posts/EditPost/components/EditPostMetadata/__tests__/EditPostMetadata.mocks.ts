@@ -21,7 +21,8 @@ const tagIds = [
 const tags = testTags.map((items, index) => testPostTag(items, tagIds[index]));
 
 export const selectedPostTags = { name: /^selected post tags$/i };
-export const check = { name: /^publish post$/i };
+export const pub = { name: /^publish post$/i };
+export const unPub = { name: /^unpublish post$/i };
 export const next = { name: /^proceed to post content$/i };
 export const title = { name: /^post title$/i };
 export const description = { name: /^post description$/i };
@@ -114,6 +115,15 @@ export const checked: Props = {
   postData: { ...props.postData, editStatus: true },
 };
 
+export const draftProps: Props = {
+  ...props,
+  postStatus: "Draft",
+  postData: { ...props.postData, title: "Post Title" },
+};
+
+export const publishProps: Props = { ...props, postStatus: "Published" };
+export const unpublishProps: Props = { ...props, postStatus: "Unpublished" };
+
 interface Name {
   name: RegExp;
 }
@@ -122,17 +132,17 @@ export const postStatus: [string, Props, { text: string; label: Name }][] = [
   [
     "Expect the right post status information to be rendered for a Draft post",
     props,
-    { text: "Post Status: Draft", label: { name: /^Publish Post$/i } },
+    { text: "Post Status: Draft", label: pub },
   ],
   [
     "Expect the right post status information to be rendered for a Published post",
-    { ...props, postStatus: "Published" },
-    { text: "Post Status: Published", label: { name: /^Unpublish Post$/i } },
+    publishProps,
+    { text: "Post Status: Published", label: unPub },
   ],
   [
     "Expect the right post status information to be rendered for an Unpublished post",
-    { ...props, postStatus: "Unpublished" },
-    { text: "Post Status: Unpublished", label: { name: /^Publish Post$/i } },
+    unpublishProps,
+    { text: "Post Status: Unpublished", label: pub },
   ],
 ];
 
@@ -179,3 +189,16 @@ export const storagePost = {
   slug: "blog-post-slug",
   content: "<p>Paragraph One</p>",
 };
+
+const str = `Expect text box error messages when the user tries to edit the status of a`;
+export const updateStatus: [string, Props, Name][] = [
+  [`${str} 'Draft' post`, props, pub],
+  [`${str} 'Published' post`, publishProps, unPub],
+  [`${str} 'Unpublished' post`, unpublishProps, pub],
+];
+
+const label = `Expect the text boxes to have an error message when no values are entered for a`;
+export const validate: [string, Props][] = [
+  [`${label} 'Published' post`, publishProps],
+  [`${label} 'Unpublished' post`, unpublishProps],
+];
