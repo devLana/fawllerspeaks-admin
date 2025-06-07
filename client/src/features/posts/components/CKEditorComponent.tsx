@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Box from "@mui/material/Box";
 

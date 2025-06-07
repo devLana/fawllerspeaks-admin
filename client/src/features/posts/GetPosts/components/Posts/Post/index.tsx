@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import ListItem from "@mui/material/ListItem";
 
 import PostStatus from "./PostStatus";

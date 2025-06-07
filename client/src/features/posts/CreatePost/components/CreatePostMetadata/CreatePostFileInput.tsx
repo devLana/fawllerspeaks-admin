@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import FormHelperText from "@mui/material/FormHelperText";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
