@@ -119,36 +119,32 @@ const draftProps: Props = {
 
 interface Mock {
   paragraph1: string;
-  paragraph2: string;
   buttonLabel: { name: RegExp };
 }
 
 export const dialogUI: [string, Props, Mock][] = [
   [
-    "Should edit a Draft post and Publish it",
+    "Expect a Draft post to be edited and Published",
     draftProps,
     {
-      paragraph1: `You are about to edit this post which will also change the post status from 'Draft' to 'Published'.`,
-      paragraph2: `Publishing this blog post will make it public and available to your readers.`,
+      paragraph1: `You are about to edit and publish this draft post.`,
       buttonLabel: { name: /^publish$/i },
     },
   ],
   [
-    "Should edit a Published post and Unpublish it",
-    publishedProps,
+    "Expect an Unpublished post to be edited and Published",
+    unpublishedProps,
     {
-      paragraph1: `You are about to edit this post which will also change the post status from 'Published' to 'Unpublished'.`,
-      paragraph2: `Un-publishing a blog post will de-list it and make it unavailable to your readers.`,
-      buttonLabel: { name: /^unpublish$/i },
+      paragraph1: `You are about to edit and publish this unpublished post.`,
+      buttonLabel: { name: /^Publish$/i },
     },
   ],
   [
-    "Should edit an Unpublished post and Publish it",
-    unpublishedProps,
+    "Expect a Published post to be edited and Unpublished",
+    publishedProps,
     {
-      paragraph1: `You are about to edit this post which will also change the post status from 'Unpublished' to 'Published'.`,
-      paragraph2: `Publishing this blog post will make it public and available to your readers.`,
-      buttonLabel: { name: /^Publish$/i },
+      paragraph1: `You are about to edit and unpublish this published post. Un-publishing a blog post will de-list it and make it unavailable to your readers.`,
+      buttonLabel: { name: /^unpublish$/i },
     },
   ],
 ];

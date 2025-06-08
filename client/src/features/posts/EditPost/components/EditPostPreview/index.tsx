@@ -28,15 +28,20 @@ interface EditPostProps {
 }
 
 const EditPostPreview = ({ postStatus, post, ...props }: EditPostProps) => {
+  const [statusMap] = React.useState(() => {
+    const dict: Record<PostStatus, Exclude<PostStatus, "Draft">> = {
+      Draft: "Published",
+      Unpublished: "Published",
+      Published: "Unpublished",
+    };
+
+    return {
+      actualStatus: postStatus,
+      previewStatus: post.editStatus ? dict[postStatus] : postStatus,
+    };
+  });
+
   const { fileUrl } = useHandleFileUrl(post.imageBanner.file);
-
-  const statusMap: Record<PostStatus, Exclude<PostStatus, "Draft">> = {
-    Draft: "Published",
-    Unpublished: "Published",
-    Published: "Unpublished",
-  };
-
-  const previewStatus = post.editStatus ? statusMap[postStatus] : postStatus;
   const imgSizes = "(maxWidth: 600px) 450px, 640px";
 
   return (
@@ -46,7 +51,7 @@ const EditPostPreview = ({ postStatus, post, ...props }: EditPostProps) => {
       aria-label="Preview edited post"
     >
       <PostViewHeader
-        status={previewStatus}
+        status={statusMap.previewStatus}
         title={post.title}
         buttonLabel="Go back to edit post content section"
         onClick={() => props.dispatch({ type: "GO_BACK_TO_CONTENT" })}
@@ -85,8 +90,8 @@ const EditPostPreview = ({ postStatus, post, ...props }: EditPostProps) => {
       </PostPreview>
       <EditPostPreviewDialog
         isOpen={props.isOpen}
-        status={postStatus}
-        previewStatus={previewStatus}
+        status={statusMap.actualStatus}
+        previewStatus={statusMap.previewStatus}
         editStatus={post.editStatus}
         editApiStatus={props.editApiStatus}
         onCloseDialog={() => props.setIsOpen(false)}

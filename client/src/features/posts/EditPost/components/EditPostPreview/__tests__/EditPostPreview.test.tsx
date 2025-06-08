@@ -74,7 +74,6 @@ describe("Edit Post - Preview", () => {
   describe("API request input validation errors", () => {
     it("Expect an alert errors list in the UI", async () => {
       const { user } = renderUI(<UI {...mocks.errorsProps} />);
-
       const alert = screen.getByRole("alert");
       const list = within(alert).getByRole("list", mocks.errors);
 
@@ -137,7 +136,6 @@ describe("Edit Post - Preview", () => {
   describe("Edit post API request", () => {
     it("Should edit a post without editing the post status", async () => {
       const { user } = renderUI(<UI {...mocks.apiProps} />);
-
       const dialog = screen.getByRole("dialog", mocks.dialog);
 
       expect(within(dialog).getByRole("paragraph")).toHaveTextContent(
@@ -151,20 +149,15 @@ describe("Edit Post - Preview", () => {
 
     it.each(mocks.dialogUI)("%s", async (_, props, mock) => {
       const { user } = renderUI(<UI {...props} />);
-
       const dialog = screen.getByRole("dialog", mocks.dialog);
 
-      expect(within(dialog).getAllByRole("paragraph")).toHaveLength(3);
+      expect(within(dialog).getAllByRole("paragraph")).toHaveLength(2);
 
       expect(within(dialog).getAllByRole("paragraph")[0]).toHaveTextContent(
         mock.paragraph1
       );
 
       expect(within(dialog).getAllByRole("paragraph")[1]).toHaveTextContent(
-        mock.paragraph2
-      );
-
-      expect(within(dialog).getAllByRole("paragraph")[2]).toHaveTextContent(
         "Are you sure you want to proceed?"
       );
 
