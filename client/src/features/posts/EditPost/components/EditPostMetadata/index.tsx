@@ -55,8 +55,8 @@ const EditPostMetadata = (props: EditPostMetadataProps) => {
   const submitHandler = (metadata: types.EditPostMetadataFields) => {
     const post = storagePost.getEditStoragePost();
 
-    if (post?.content && props.storagePostIsNotLoaded) {
-      deleteImages(post.content);
+    if (post?.imgUrls && props.storagePostIsNotLoaded) {
+      deleteImages(post.imgUrls);
       localStorage.removeItem(storagePost.EDIT_STORAGE_POST);
     }
 

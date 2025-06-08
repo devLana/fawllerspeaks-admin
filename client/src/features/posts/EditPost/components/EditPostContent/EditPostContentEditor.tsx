@@ -1,10 +1,8 @@
 import * as React from "react";
 
-import { useMutation } from "@apollo/client";
-
+import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
 import CKEditorComponent from "@features/posts/components/CKEditorComponent";
 import { saveEditStoragePost as cb } from "@utils/posts/editStoragePost";
-import { DELETE_POST_CONTENT_IMAGES } from "@mutations/deletePostContentImages/DELETE_POST_CONTENT_IMAGES";
 import type CustomEditor from "ckeditor5-custom-build";
 import type { EditPostContentEditorProps } from "types/posts/editPost";
 
@@ -19,7 +17,7 @@ const EditPostContentEditor = (props: EditPostContentEditorProps) => {
     };
   }, []);
 
-  const [deleteImages] = useMutation(DELETE_POST_CONTENT_IMAGES);
+  const deleteImages = useDeletePostContentImages();
 
   const handleChange = (editorRef: CustomEditor) => {
     const root = editorRef.model.document.getRoot();
@@ -52,9 +50,7 @@ const EditPostContentEditor = (props: EditPostContentEditorProps) => {
         return false;
       });
 
-      if (removedImages.length > 0) {
-        void deleteImages({ variables: { images: removedImages } });
-      }
+      if (removedImages.length > 0) deleteImages(removedImages);
 
       savedImageUrls.current = currentImageUrls;
     }
