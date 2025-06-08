@@ -2,7 +2,7 @@ import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 
-import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
+import useDeletePostContentImages from "@hooks/createPost/useDeletePostContentImages";
 import * as storagePost from "@utils/posts/createStoragePost";
 import type { CreatePostAction } from "types/posts/createPost";
 

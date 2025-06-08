@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 import useGetPostTags from "@hooks/getPostTags/useGetPostTags";
-import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
+import useDeletePostContentImages from "@hooks/createPost/useDeletePostContentImages";
 import CreatePostRequiredMetadataInputs from "./CreatePostRequiredMetadataInputs";
 import MetadataPostTags from "@features/posts/components/PostMetadataPostTagsInput/MetadataPostTags";
 import PostMetadataPostTagsInput from "@features/posts/components/PostMetadataPostTagsInput";

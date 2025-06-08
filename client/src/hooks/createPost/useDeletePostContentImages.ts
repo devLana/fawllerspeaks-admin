@@ -1,9 +1,9 @@
-import { useMutation } from "@apollo/client";
+import { useApolloClient } from "@apollo/client";
 
-import { DELETE_POST_CONTENT_IMAGES } from "@mutations/deletePostContentImages/DELETE_POST_CONTENT_IMAGES";
+import { DELETE_POST_CONTENT_IMAGES as MUTATION } from "@mutations/deletePostContentImages/DELETE_POST_CONTENT_IMAGES";
 
 const useDeletePostContentImages = () => {
-  const [deleteImages] = useMutation(DELETE_POST_CONTENT_IMAGES);
+  const client = useApolloClient();
 
   return (content: string) => {
     const domParser = new DOMParser();
@@ -15,7 +15,9 @@ const useDeletePostContentImages = () => {
       return sources;
     }, []);
 
-    if (images.length > 0) void deleteImages({ variables: { images } });
+    if (images.length > 0) {
+      void client.mutate({ mutation: MUTATION, variables: { images } });
+    }
   };
 };
 
