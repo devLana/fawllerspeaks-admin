@@ -78,7 +78,7 @@ export const reducer: Reducer = (state, action) => {
         ...state,
         view: "metadata",
         showStoragePostAlert: false,
-        postData: { ...state.postData, content: action.payload.content ?? "" },
+        postData: { ...state.postData, content: action.payload.content },
       };
     }
 

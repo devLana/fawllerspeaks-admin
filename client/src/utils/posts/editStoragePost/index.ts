@@ -27,11 +27,11 @@ export const getEditStoragePost = (): EditStoragePostData | null => {
   }
 };
 
-export const saveEditStoragePost = (post: EditStoragePostData) => {
+export const saveEditStoragePost = (post: Partial<EditStoragePostData>) => {
   const savedPost = getEditStoragePost();
   let postToSave: string;
 
-  const postDraft: EditStoragePostData = {
+  const postDraft: Partial<EditStoragePostData> = {
     ...(post.id && { id: post.id ?? "" }),
     ...(post.slug && { slug: post.slug ?? "" }),
     ...(post.content && { content: post.content }),

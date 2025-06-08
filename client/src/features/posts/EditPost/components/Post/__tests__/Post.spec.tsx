@@ -10,7 +10,7 @@ import {
 
 import Post from "..";
 import { renderUI } from "@utils/tests/renderUI";
-import * as storage from "@utils/posts/editStoragePost";
+import { getEditStoragePost } from "@utils/posts/editStoragePost";
 import * as mocks from "./Post.mocks";
 import type { EditStoragePostData } from "types/posts/editPost";
 
@@ -20,7 +20,7 @@ vi.mock("../../EditPostContent/EditPostContentEditor");
 vi.mock("@utils/posts/editStoragePost");
 
 describe("Edit Post", () => {
-  const mockGetStoragePost = storage.getEditStoragePost as MockFn;
+  const mockGetStoragePost = getEditStoragePost as MockFn;
   const mockOnRendered = vi.fn().mockName("onRendered");
 
   beforeAll(() => {
@@ -31,7 +31,7 @@ describe("Edit Post", () => {
     it("Expect no UI updates if no saved post found in localStorage", () => {
       renderUI(<Post {...mocks.props} onRendered={mockOnRendered} />);
 
-      expect(storage.getEditStoragePost).toHaveBeenCalled();
+      expect(getEditStoragePost).toHaveBeenCalled();
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 
       expect(
@@ -52,7 +52,7 @@ describe("Edit Post", () => {
         <Post {...mocks.props} onRendered={mockOnRendered} />
       );
 
-      expect(storage.getEditStoragePost).toHaveBeenCalled();
+      expect(getEditStoragePost).toHaveBeenCalled();
       expect(screen.getByRole("alert")).toHaveTextContent(mocks.storageMsg1);
 
       await user.click(screen.getByRole("button", mocks.deleteSavedPost));
@@ -71,7 +71,7 @@ describe("Edit Post", () => {
         <Post {...mocks.props} onRendered={mockOnRendered} />
       );
 
-      expect(storage.getEditStoragePost).toHaveBeenCalled();
+      expect(getEditStoragePost).toHaveBeenCalled();
       expect(screen.getByRole("alert")).toHaveTextContent(mocks.storageMsg2);
       expect(mockOnRendered).toHaveBeenCalledOnce();
 
@@ -94,7 +94,7 @@ describe("Edit Post", () => {
         />
       );
 
-      expect(storage.getEditStoragePost).toHaveBeenCalled();
+      expect(getEditStoragePost).toHaveBeenCalled();
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 
       await user.click(screen.getByRole("button", mocks.metadataNext));

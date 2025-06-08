@@ -60,8 +60,8 @@ export interface EditPostMetadataFields extends PostMetadataFields {
 }
 
 export interface EditStoragePostData {
-  id?: string;
-  slug?: string;
+  id: string;
+  slug: string;
   content?: string;
   imgUrls?: string[];
 }
@@ -78,7 +78,7 @@ export type EditPostAction =
   | { type: "PREVIEW_POST" }
   | { type: "SHOW_EDIT_STORAGE_POST_ALERT" }
   | { type: "HIDE_EDIT_STORAGE_POST_ALERT" }
-  | { type: "LOAD_EDIT_STORAGE_POST"; payload: { content?: string } };
+  | { type: "LOAD_EDIT_STORAGE_POST"; payload: { content: string } };
 
 export type EditPostData = PostDataMapper<Pick<Mutation, "editPost">>;
 

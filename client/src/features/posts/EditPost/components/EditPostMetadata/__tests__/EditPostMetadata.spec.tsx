@@ -11,7 +11,7 @@ import { renderUI } from "@utils/tests/renderUI";
 import type { EditStoragePostData } from "types/posts/editPost";
 
 type MockGetStoragePost = Mock<[], EditStoragePostData | null>;
-type MockSaveStoragePost = Mock<[EditStoragePostData], undefined>;
+type MockSaveStoragePost = Mock<[Partial<EditStoragePostData>], undefined>;
 
 vi.mock("@utils/posts/editStoragePost");
 
