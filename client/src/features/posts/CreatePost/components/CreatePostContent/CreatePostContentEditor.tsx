@@ -49,7 +49,7 @@ const CreatePostContentEditor = (props: CreatePostContentEditorProps) => {
       if (!currentImageUrls.has(url)) removedImages.push(url);
     });
 
-    if (removedImages.length > 0) deleteImages(removedImages);
+    deleteImages(removedImages);
 
     // Update savedImageUrls for next change
     savedImageUrls.current = currentImageUrls;

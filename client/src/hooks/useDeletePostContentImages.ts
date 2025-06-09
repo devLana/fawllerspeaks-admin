@@ -8,7 +8,9 @@ const useDeletePostContentImages = () => {
   const client = useApolloClient();
 
   return React.useCallback((images: string[]) => {
-    void client.mutate({ mutation: MUTATION, variables: { images } });
+    if (images.length > 0) {
+      void client.mutate({ mutation: MUTATION, variables: { images } });
+    }
   }, []);
 };
 
