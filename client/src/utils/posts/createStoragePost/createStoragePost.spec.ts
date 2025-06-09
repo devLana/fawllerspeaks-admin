@@ -64,7 +64,7 @@ describe("LocalStorage Create Post Data", () => {
       localStorage.removeItem(CREATE_STORAGE_POST);
     });
 
-    it("Should save all provided post data to localStorage", () => {
+    it("Expect all provided input post data to be saved to localStorage", () => {
       saveCreateStoragePost(postData);
 
       const postString = localStorage.getItem(CREATE_STORAGE_POST) as string;
@@ -73,7 +73,7 @@ describe("LocalStorage Create Post Data", () => {
       expect(savedPost).toStrictEqual(postData);
     });
 
-    it("Should update an already saved post data in localStorage", () => {
+    it("Expect the provided input post data to be merged with the post saved in localStorage", () => {
       const { content, ...data } = postData;
 
       localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify(data));
@@ -85,16 +85,42 @@ describe("LocalStorage Create Post Data", () => {
       expect(savedPost).toStrictEqual(postData);
     });
 
-    it("Should remove content from storage post if an empty content string is passed", () => {
-      const { content: _, ...data } = postData;
+    it("Expect the provided input post data to overwrite their corresponding fields in the saved post data", () => {
+      const data = {
+        title: "New Blog Post Title",
+        content: "<p>paragraph one</p>",
+        tagIds: ["id-4", "id-5"],
+      };
 
       localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify(postData));
-      saveCreateStoragePost({ content: "" });
+      saveCreateStoragePost(data);
 
       const postString = localStorage.getItem(CREATE_STORAGE_POST) as string;
       const savedPost = JSON.parse(postString) as object;
 
+      expect(savedPost).toStrictEqual({ ...postData, ...data });
+    });
+
+    it("Expect the appropriate fields to be removed from the saved post when empty values are passed for those fields in the input post data", () => {
+      localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify(postData));
+      saveCreateStoragePost({ description: "", content: "", tagIds: [] });
+
+      const { description: _, content: __, tagIds: ___, ...data } = postData;
+      const postString = localStorage.getItem(CREATE_STORAGE_POST) as string;
+      const savedPost = JSON.parse(postString) as object;
+
       expect(savedPost).toStrictEqual(data);
+    });
+
+    it("Expect a saved post to retain its field values when empty values for those fields are passed in the input post data", () => {
+      const obj = { excerpt: undefined, content: undefined, tagIds: undefined };
+      localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify(postData));
+      saveCreateStoragePost(obj);
+
+      const postString = localStorage.getItem(CREATE_STORAGE_POST) as string;
+      const savedPost = JSON.parse(postString) as object;
+
+      expect(savedPost).toStrictEqual(postData);
     });
   });
 });

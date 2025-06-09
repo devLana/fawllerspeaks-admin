@@ -33,29 +33,39 @@ export const getCreateStoragePost = (): CreateStoragePostData | null => {
 };
 
 export const saveCreateStoragePost = (post: CreateStoragePostData) => {
-  const savedPost = getCreateStoragePost();
-  let postToSave: string;
+  const postData = getCreateStoragePost() ?? {};
 
-  const postDraft: CreateStoragePostData = {
-    ...(post.title && { title: post.title }),
-    ...(post.description && { description: post.description }),
-    ...(post.excerpt && { excerpt: post.excerpt }),
-    ...(post.content && { content: post.content }),
-    ...(post.tagIds && Array.isArray(post.tagIds) && { tagIds: post.tagIds }),
-  };
-
-  if (savedPost) {
-    let postData = { ...savedPost, ...postDraft };
-
-    if (post.content === "") {
-      const { content: _, ...rest } = postData;
-      postData = rest;
-    }
-
-    postToSave = JSON.stringify(postData);
-  } else {
-    postToSave = JSON.stringify(postDraft);
+  if (post.title) {
+    postData.title = post.title;
+  } else if (post.title === "") {
+    delete postData.title;
   }
 
-  localStorage.setItem(CREATE_STORAGE_POST, postToSave);
+  if (post.description) {
+    postData.description = post.description;
+  } else if (post.description === "") {
+    delete postData.description;
+  }
+
+  if (post.excerpt) {
+    postData.excerpt = post.excerpt;
+  } else if (post.excerpt === "") {
+    delete postData.excerpt;
+  }
+
+  if (post.content) {
+    postData.content = post.content;
+  } else if (post.content === "") {
+    delete postData.content;
+  }
+
+  if (post.tagIds && Array.isArray(post.tagIds)) {
+    if (post.tagIds.length > 0) {
+      postData.tagIds = post.tagIds;
+    } else {
+      delete postData.tagIds;
+    }
+  }
+
+  localStorage.setItem(CREATE_STORAGE_POST, JSON.stringify(postData));
 };
