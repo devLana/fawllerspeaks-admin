@@ -1,11 +1,10 @@
 import { useRouter } from "next/router";
 
-import { useMutation } from "@apollo/client";
 import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { DELETE_POST_CONTENT_IMAGES } from "@mutations/deletePostContentImages/DELETE_POST_CONTENT_IMAGES";
+import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
 import * as storagePost from "@utils/posts/editStoragePost";
 import type { EditPostAction } from "types/posts/editPost";
 
@@ -18,30 +17,46 @@ const EditStorageAlertActions = (props: EditStorageAlertActionsProps) => {
   const { postId, dispatch } = props;
   const { push } = useRouter();
 
-  const [deleteImages] = useMutation(DELETE_POST_CONTENT_IMAGES);
+  const deleteImages = useDeletePostContentImages();
 
   const handleContinue = () => {
     const post = storagePost.getEditStoragePost();
 
-    if (post) {
-      const { content } = post;
-
-      if (post.id === postId) {
-        dispatch({ type: "LOAD_EDIT_STORAGE_POST", payload: { content } });
-      } else {
-        void push(`/posts/edit/${post.slug}`);
-      }
-    } else {
+    if (!post) {
       dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });
+      return;
     }
+
+    const { id, slug, content, imgUrls } = post;
+
+    if (id !== postId) {
+      if (slug) {
+        void push(`/posts/edit/${slug}`);
+      } else {
+        if (imgUrls) deleteImages(imgUrls);
+
+        void push("/posts");
+        localStorage.removeItem(storagePost.EDIT_STORAGE_POST);
+      }
+
+      return;
+    }
+
+    if (content) {
+      dispatch({ type: "LOAD_EDIT_STORAGE_POST", payload: { content } });
+      return;
+    }
+
+    if (imgUrls) deleteImages(imgUrls);
+
+    localStorage.removeItem(storagePost.EDIT_STORAGE_POST);
+    dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });
   };
 
   const handleCancel = () => {
     const post = storagePost.getEditStoragePost();
 
-    if (post?.imgUrls) {
-      void deleteImages({ variables: { images: post.imgUrls } });
-    }
+    if (post?.imgUrls) deleteImages(post.imgUrls);
 
     localStorage.removeItem(storagePost.EDIT_STORAGE_POST);
     dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });

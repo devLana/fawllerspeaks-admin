@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { getEditStoragePost } from "@utils/posts/editStoragePost";
+import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
+import * as storage from "@utils/posts/editStoragePost";
 import type { EditPostAction } from "types/posts/editPost";
 
 const useEditPostEffects = (
@@ -8,28 +9,40 @@ const useEditPostEffects = (
   onRendered: () => void,
   dispatch: React.Dispatch<EditPostAction>
 ) => {
+  const deleteImages = useDeletePostContentImages();
+
   React.useEffect(() => {
     if (!hasRenderedBeforeRef) {
-      const post = getEditStoragePost();
+      const post = storage.getEditStoragePost();
 
-      if (post) dispatch({ type: "SHOW_EDIT_STORAGE_POST_ALERT" });
+      if (post && post.content) {
+        dispatch({ type: "SHOW_EDIT_STORAGE_POST_ALERT" });
+      } else if (post && post.imgUrls) {
+        deleteImages(post.imgUrls);
+        localStorage.removeItem(storage.EDIT_STORAGE_POST);
+      } else {
+        localStorage.removeItem(storage.EDIT_STORAGE_POST);
+      }
 
       onRendered();
     }
-  }, [hasRenderedBeforeRef, onRendered, dispatch]);
+  }, [hasRenderedBeforeRef, onRendered, dispatch, deleteImages]);
 
   React.useEffect(() => {
     if (hasRenderedBeforeRef) {
-      const post = getEditStoragePost();
+      const post = storage.getEditStoragePost();
 
-      if (post?.content) {
-        dispatch({
-          type: "LOAD_EDIT_STORAGE_POST",
-          payload: { content: post.content },
-        });
+      if (post && post.content) {
+        const { content } = post;
+        dispatch({ type: "LOAD_EDIT_STORAGE_POST", payload: { content } });
+      } else if (post && post.imgUrls) {
+        deleteImages(post.imgUrls);
+        localStorage.removeItem(storage.EDIT_STORAGE_POST);
+      } else {
+        localStorage.removeItem(storage.EDIT_STORAGE_POST);
       }
     }
-  }, [hasRenderedBeforeRef, dispatch]);
+  }, [hasRenderedBeforeRef, dispatch, deleteImages]);
 };
 
 export default useEditPostEffects;

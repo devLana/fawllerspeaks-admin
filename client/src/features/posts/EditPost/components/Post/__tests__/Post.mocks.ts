@@ -318,13 +318,18 @@ export const storagePost1 = {
   content: "<p>Paragraph One</p>",
 };
 
-export const storagePost2 = {
+export const storagePost2 = { id: props.post.id, slug: "blog-post-slug" };
+
+export const storagePost3 = {
   ...storagePost1,
   id: "377fba48-d9e3-4b06-aab6-0b29e2c98413",
 };
 
-export const storageMsg1 =
-  "It seems you have tried editing this post before. Would you like to continue from where you stopped?";
+export const storagePost4 = {
+  id: undefined,
+  slug: undefined,
+  content: "<p>Paragraph One</p>",
+};
 
-export const storageMsg2 =
-  "It seems you have an unfinished post that you tried editing previously. Would you like to finish editing that post instead?";
+export const storageMsg1 = `It seems you have tried editing this post before. Would you like to continue from where you stopped?`;
+export const storageMsg2 = `It seems you have an unfinished post that you tried editing previously. Would you like to finish editing that post instead?`;

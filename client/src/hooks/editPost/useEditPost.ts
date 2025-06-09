@@ -4,15 +4,13 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
+import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
 import { EDIT_POST } from "@mutations/editPost/EDIT_POST";
-import { EDIT_STORAGE_POST } from "@utils/posts/editStoragePost";
 import { SESSION_ID } from "@utils/constants";
+import * as storage from "@utils/posts/editStoragePost";
 import type { EditPostInput, PostStatus } from "@apiTypes";
 import type { PostActionStatus } from "types/posts";
-import type {
-  EditPostFieldErrors,
-  EditPostStateData,
-} from "types/posts/editPost";
+import type * as types from "types/posts/editPost";
 
 interface OldPost {
   title: string;
@@ -20,7 +18,7 @@ interface OldPost {
   slug: string;
 }
 
-const useEditPost = (postData: EditPostStateData, oldPost: OldPost) => {
+const useEditPost = (postData: types.EditPostStateData, oldPost: OldPost) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [editStatus, setEditStatus] = React.useState<PostActionStatus>("idle");
   const { push, replace, asPath } = useRouter();
@@ -28,6 +26,7 @@ const useEditPost = (postData: EditPostStateData, oldPost: OldPost) => {
   const [editPost, { client, data, error }] = useMutation(EDIT_POST);
 
   const upload = useUploadImage();
+  const deleteImages = useDeletePostContentImages();
 
   const handleEditPost = async (previewStatus: PostStatus) => {
     setEditStatus("loading");
@@ -103,9 +102,15 @@ const useEditPost = (postData: EditPostStateData, oldPost: OldPost) => {
             setIsOpen(false);
             break;
 
-          case "UnknownError":
+          case "UnknownError": {
+            const storageData = storage.getEditStoragePost();
+
+            if (storageData?.imgUrls) deleteImages(storageData.imgUrls);
+
+            localStorage.removeItem(storage.EDIT_STORAGE_POST);
             void replace({ pathname: "/posts", query: { status: "unknown" } });
             break;
+          }
 
           case "SinglePost": {
             const { url, title } = editData.editPost.post;
@@ -130,7 +135,7 @@ const useEditPost = (postData: EditPostStateData, oldPost: OldPost) => {
               });
             }
 
-            localStorage.removeItem(EDIT_STORAGE_POST);
+            localStorage.removeItem(storage.EDIT_STORAGE_POST);
             void redirect({ pathname: `/posts/view/${url.slug}`, query });
             break;
           }
@@ -143,7 +148,7 @@ const useEditPost = (postData: EditPostStateData, oldPost: OldPost) => {
     });
   };
 
-  let errors: EditPostFieldErrors = {};
+  let errors: types.EditPostFieldErrors = {};
   let msg = `You are unable to edit this post at the moment. Please try again later`;
 
   if (error?.graphQLErrors?.[0]) {

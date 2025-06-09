@@ -12,9 +12,9 @@ import Post from "..";
 import { renderUI } from "@utils/tests/renderUI";
 import { getEditStoragePost } from "@utils/posts/editStoragePost";
 import * as mocks from "./Post.mocks";
-import type { EditStoragePostData } from "types/posts/editPost";
+import type { EditStoragePostData as Data } from "types/posts/editPost";
 
-type MockFn = ReturnType<typeof vi.fn<never, EditStoragePostData | null>>;
+type MockFn = ReturnType<typeof vi.fn<never, Partial<Data> | null>>;
 
 vi.mock("../../EditPostContent/EditPostContentEditor");
 vi.mock("@utils/posts/editStoragePost");
@@ -45,7 +45,7 @@ describe("Edit Post", () => {
       expect(mockOnRendered).toHaveBeenCalledOnce();
     });
 
-    it("Expect the alert to be removed from view if the cancel button is clicked on the storage alert", async () => {
+    it("Expect an alert to be displayed and removed from view if a post is saved in localStorage and the cancel button on the alert is clicked", async () => {
       mockGetStoragePost.mockReturnValue(mocks.storagePost1);
 
       const { user } = renderUI(
@@ -62,10 +62,28 @@ describe("Edit Post", () => {
       expect(mockOnRendered).toHaveBeenCalledOnce();
     });
 
-    it("A post is saved in storage, Expect a redirect to the post page if the user was trying to edit another post", async () => {
+    it("Expect an alert not to be displayed if the saved post in localStorage does not have content", () => {
       mockGetStoragePost.mockReturnValue(mocks.storagePost2);
 
+      renderUI(<Post {...mocks.props} onRendered={mockOnRendered} />);
+
+      expect(getEditStoragePost).toHaveBeenCalled();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("button", mocks.loadSavedPost)
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("button", mocks.deleteSavedPost)
+      ).not.toBeInTheDocument();
+
+      expect(mockOnRendered).toHaveBeenCalledOnce();
+    });
+
+    it("Expect a redirect to the actual post page if the post saved in storage is not the same as the post the user is trying to edit", async () => {
       const { push } = useRouter();
+      mockGetStoragePost.mockReturnValue(mocks.storagePost3);
 
       const { user } = renderUI(
         <Post {...mocks.props} onRendered={mockOnRendered} />
@@ -79,11 +97,11 @@ describe("Edit Post", () => {
       await waitFor(() => expect(push).toHaveBeenCalledOnce());
 
       expect(push).toHaveBeenCalledWith(
-        `/posts/edit/${mocks.storagePost2.slug}`
+        `/posts/edit/${mocks.storagePost3.slug}`
       );
     });
 
-    it("Expect the content editor to be initialized with storage post content if the user already tried editing the post before", async () => {
+    it("Expect the content editor to be initialized with storage post content", async () => {
       mockGetStoragePost.mockReturnValue(mocks.storagePost1);
 
       const { user } = renderUI(
@@ -112,6 +130,24 @@ describe("Edit Post", () => {
       expect(screen.getByRole("textbox", mocks.contentBox)).toHaveDisplayValue(
         mocks.storagePost1.content
       );
+    });
+
+    it("Expect a redirect to the posts page if the user tries to resume editing a saved post that is without an 'id' or 'slug'", async () => {
+      const { push } = useRouter();
+      mockGetStoragePost.mockReturnValue(mocks.storagePost4);
+
+      const { user } = renderUI(
+        <Post {...mocks.props} onRendered={mockOnRendered} />
+      );
+
+      expect(getEditStoragePost).toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent(mocks.storageMsg2);
+      expect(mockOnRendered).toHaveBeenCalledOnce();
+
+      await user.click(screen.getByRole("button", mocks.loadSavedPost));
+      await waitFor(() => expect(push).toHaveBeenCalledOnce());
+
+      expect(push).toHaveBeenCalledWith("/posts");
     });
   });
 
