@@ -108,7 +108,7 @@ const useEditPost = (postData: types.EditPostStateData, oldPost: OldPost) => {
             if (storageData?.imgUrls) deleteImages(storageData.imgUrls);
 
             localStorage.removeItem(storage.EDIT_STORAGE_POST);
-            void replace({ pathname: "/posts", query: { status: "unknown" } });
+            void replace({ pathname: "/posts", query: { message: "unknown" } });
             break;
           }
 

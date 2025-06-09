@@ -13,9 +13,14 @@ describe("GetPosts page wrapper", () => {
 
   it.each([
     [
-      "Expect an alert message if an an attempt was made to edit an unknown post",
-      { status: "unknown" },
+      "Expect an alert message if an attempt was made to edit an unknown post",
+      { message: "unknown" },
       "It seems the post you tried to edit no longer exists",
+    ],
+    [
+      "Expect an alert message if there was an error trying to recover an edited post from local storage",
+      { message: "edit-load-error" },
+      "There was an error trying to recover your saved post. The saved data appears to be corrupted or incomplete",
     ],
   ])("%s", (_, query, message) => {
     const router = useRouter();

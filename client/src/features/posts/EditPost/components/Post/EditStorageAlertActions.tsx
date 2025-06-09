@@ -35,7 +35,8 @@ const EditStorageAlertActions = (props: EditStorageAlertActionsProps) => {
       } else {
         if (imgUrls) deleteImages(imgUrls);
 
-        void push("/posts");
+        const query = { message: "edit-load-error" };
+        void push({ pathname: "/posts", query });
         localStorage.removeItem(storagePost.EDIT_STORAGE_POST);
       }
 

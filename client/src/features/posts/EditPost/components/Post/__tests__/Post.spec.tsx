@@ -147,7 +147,10 @@ describe("Edit Post", () => {
       await user.click(screen.getByRole("button", mocks.loadSavedPost));
       await waitFor(() => expect(push).toHaveBeenCalledOnce());
 
-      expect(push).toHaveBeenCalledWith("/posts");
+      expect(push).toHaveBeenCalledWith({
+        pathname: "/posts",
+        query: { message: "edit-load-error" },
+      });
     });
   });
 
@@ -350,7 +353,7 @@ describe("Edit Post", () => {
 
         expect(replace).toHaveBeenCalledWith({
           pathname: "/posts",
-          query: { status: "unknown" },
+          query: { message: "unknown" },
         });
 
         expect(within(dialog).getByRole("button", mocks.cancel)).toBeDisabled();

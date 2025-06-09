@@ -8,8 +8,8 @@ const useStatusAlert = () => {
   const { query } = useRouter();
 
   React.useEffect(() => {
-    if (query.status && typeof query.status === "string") {
-      switch (query.status) {
+    if (query.message && typeof query.message === "string") {
+      switch (query.message) {
         case "unknown":
           setAlert({
             open: true,
@@ -17,10 +17,17 @@ const useStatusAlert = () => {
           });
           break;
 
+        case "edit-load-error":
+          setAlert({
+            open: true,
+            message: `There was an error trying to recover your saved post. The saved data appears to be corrupted or incomplete`,
+          });
+          break;
+
         default:
       }
     }
-  }, [query.status]);
+  }, [query.message]);
 
   const onClose = handleCloseAlert({ ...alert, open: false }, setAlert);
 
