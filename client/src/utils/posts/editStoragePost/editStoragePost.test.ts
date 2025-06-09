@@ -64,11 +64,11 @@ describe("LocalStorage Edit Post Data", () => {
       expect(savedPost).toStrictEqual(postData);
     });
 
-    it("Expect an already saved post data in localStorage to be updated properly", () => {
-      const { content, ...data } = postData;
+    it("Expect the provided post data to be merged with the saved post data", () => {
+      const { content, imgUrls, ...data } = postData;
 
       localStorage.setItem(EDIT_STORAGE_POST, JSON.stringify(data));
-      saveEditStoragePost({ content });
+      saveEditStoragePost({ content, imgUrls });
 
       const postString = localStorage.getItem(EDIT_STORAGE_POST) as string;
       const savedPost = JSON.parse(postString) as object;
@@ -76,16 +76,40 @@ describe("LocalStorage Edit Post Data", () => {
       expect(savedPost).toStrictEqual(postData);
     });
 
-    it("Expect 'content' and 'imgUrls' to be removed from storage post if an empty content string and an empty imgUrls array is passed", () => {
-      const { content: _, imgUrls: __, ...data } = postData;
+    it("Expect the 'content' and 'imgUrls' fields of the saved post data to be overwritten by new content and imgUrls data ", () => {
+      const data = {
+        content: "<p>paragraph one</p>",
+        imgUrls: ["img-4", "img-5"],
+      };
 
       localStorage.setItem(EDIT_STORAGE_POST, JSON.stringify(postData));
-      saveEditStoragePost({ content: "", imgUrls: [] });
+      saveEditStoragePost(data);
 
       const postString = localStorage.getItem(EDIT_STORAGE_POST) as string;
       const savedPost = JSON.parse(postString) as object;
 
-      expect(savedPost).toStrictEqual(data);
+      expect(savedPost).toStrictEqual({ ...postData, ...data });
+    });
+
+    it("Expect 'content' and 'imgUrls' to be removed from the saved post when empty values are passed for those fields in the input post data", () => {
+      localStorage.setItem(EDIT_STORAGE_POST, JSON.stringify(postData));
+      saveEditStoragePost({ content: "", imgUrls: [] });
+
+      const { imgUrls: _, content: __, ...rest } = postData;
+      const postString = localStorage.getItem(EDIT_STORAGE_POST) as string;
+      const savedPost = JSON.parse(postString) as object;
+
+      expect(savedPost).toStrictEqual(rest);
+    });
+
+    it("Expect a saved post to retain its 'content' and 'imgUrls' field values when undefined values are passed for the input content and imgUrls data", () => {
+      localStorage.setItem(EDIT_STORAGE_POST, JSON.stringify(postData));
+      saveEditStoragePost({ content: undefined, imgUrls: undefined });
+
+      const postString = localStorage.getItem(EDIT_STORAGE_POST) as string;
+      const savedPost = JSON.parse(postString) as object;
+
+      expect(savedPost).toStrictEqual(postData);
     });
   });
 });

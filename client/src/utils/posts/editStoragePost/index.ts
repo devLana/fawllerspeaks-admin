@@ -28,33 +28,30 @@ export const getEditStoragePost = (): EditStoragePostData | null => {
 };
 
 export const saveEditStoragePost = (post: Partial<EditStoragePostData>) => {
-  const savedPost = getEditStoragePost();
-  let postToSave: string;
+  const savedPost = getEditStoragePost() ?? {};
+  const merged: Partial<EditStoragePostData> = { ...savedPost };
 
-  const postDraft: Partial<EditStoragePostData> = {
-    ...(post.id && { id: post.id ?? "" }),
-    ...(post.slug && { slug: post.slug ?? "" }),
-    ...(post.content && { content: post.content }),
-    ...(post.imgUrls && { imgUrls: post.imgUrls }),
-  };
-
-  if (savedPost) {
-    let postData = { ...savedPost, ...postDraft };
-
-    if (post.content === "") {
-      const { content: _, ...rest } = postData;
-      postData = rest;
-    }
-
-    if (post.imgUrls?.length === 0) {
-      const { imgUrls: _, ...rest } = postData;
-      postData = rest;
-    }
-
-    postToSave = JSON.stringify(postData);
-  } else {
-    postToSave = JSON.stringify(postDraft);
+  if (post.id) {
+    merged.id = post.id;
   }
 
-  localStorage.setItem(EDIT_STORAGE_POST, postToSave);
+  if (post.slug) {
+    merged.slug = post.slug;
+  }
+
+  if (post.content) {
+    merged.content = post.content;
+  } else if (post.content === "") {
+    delete merged.content;
+  }
+
+  if (post.imgUrls && Array.isArray(post.imgUrls)) {
+    if (post.imgUrls.length > 0) {
+      merged.imgUrls = post.imgUrls;
+    } else {
+      delete merged.imgUrls;
+    }
+  }
+
+  localStorage.setItem(EDIT_STORAGE_POST, JSON.stringify(merged));
 };

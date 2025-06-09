@@ -2,7 +2,7 @@ import * as React from "react";
 
 import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
 import CKEditorComponent from "@features/posts/components/CKEditorComponent";
-import * as storage from "@utils/posts/editStoragePost";
+import { saveEditStoragePost } from "@utils/posts/editStoragePost";
 import type CustomEditor from "ckeditor5-custom-build";
 import type { EditPostContentEditorProps } from "types/posts/editPost";
 
@@ -22,8 +22,6 @@ const EditPostContentEditor = (props: EditPostContentEditorProps) => {
   const handleChange = (editorRef: CustomEditor) => {
     const root = editorRef.model.document.getRoot();
     const content = editorRef.getData().replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "");
-    const post = storage.getEditStoragePost();
-    let imgUrls: string[] = [];
 
     if (!root) return;
 
@@ -54,27 +52,16 @@ const EditPostContentEditor = (props: EditPostContentEditorProps) => {
         removedImages.push(url);
       }
     });
-
-    if (removedImages.length > 0) deleteImages(removedImages);
+    deleteImages(removedImages);
 
     // Update savedImageUrls for next change
     savedImageUrls.current = currentImageUrls;
 
-    // Merge URL of images removed from editor with storage post image URLs
-    if (post?.imgUrls && post.imgUrls.length > 0) {
-      const storagePostImages = new Set(post.imgUrls);
-      imageUrls.current.forEach(url => storagePostImages.add(url));
-      imgUrls = Array.from(storagePostImages);
-    } else {
-      imgUrls = Array.from(imageUrls.current);
-    }
-
     // Debounce save to storage
     if (timerId.current) window.clearTimeout(timerId.current);
-
-    timerId.current = window.setTimeout(storage.saveEditStoragePost, 1500, {
+    timerId.current = window.setTimeout(saveEditStoragePost, 1500, {
       content,
-      imgUrls,
+      imgUrls: Array.from(imageUrls.current),
     });
   };
 
