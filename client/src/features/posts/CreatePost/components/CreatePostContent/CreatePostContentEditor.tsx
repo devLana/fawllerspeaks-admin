@@ -23,32 +23,36 @@ const CreatePostContentEditor = (props: CreatePostContentEditorProps) => {
     const regex = /<p>(?:<br>)*&nbsp;<\/p>/g;
     const content = editorRef.getData().replace(regex, "").trim();
 
+    // Debounce save to storage
     if (timerId.current) window.clearTimeout(timerId.current);
     timerId.current = window.setTimeout(cb, 1500, { content });
 
-    if (root) {
-      const range = editorRef.model.createRangeIn(root);
-      const items = Array.from(range.getItems());
-      const currentImageUrls = new Set<string>();
+    if (!root) return;
 
-      items.forEach(item => {
-        if (
-          item.is("element", "imageBlock") ||
-          item.is("element", "imageInline")
-        ) {
-          const src = item.getAttribute("src");
-          if (src && typeof src === "string") currentImageUrls.add(src);
-        }
-      });
+    const range = editorRef.model.createRangeIn(root);
+    const items = Array.from(range.getItems());
+    const currentImageUrls = new Set<string>();
 
-      const removedImages = Array.from(savedImageUrls.current).filter(
-        url => !currentImageUrls.has(url)
-      );
+    items.forEach(item => {
+      if (
+        item.is("element", "imageBlock") ||
+        item.is("element", "imageInline")
+      ) {
+        const src = item.getAttribute("src");
+        if (src && typeof src === "string") currentImageUrls.add(src);
+      }
+    });
 
-      if (removedImages.length > 0) deleteImages(removedImages);
+    // Find the URL of images deleted from the editor
+    const removedImages: string[] = [];
+    savedImageUrls.current.forEach(url => {
+      if (!currentImageUrls.has(url)) removedImages.push(url);
+    });
 
-      savedImageUrls.current = currentImageUrls;
-    }
+    if (removedImages.length > 0) deleteImages(removedImages);
+
+    // Update savedImageUrls for next change
+    savedImageUrls.current = currentImageUrls;
   };
 
   const dispatchFn = (content: string) => {

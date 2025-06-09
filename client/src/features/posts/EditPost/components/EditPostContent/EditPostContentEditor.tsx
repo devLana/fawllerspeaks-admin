@@ -25,47 +25,51 @@ const EditPostContentEditor = (props: EditPostContentEditorProps) => {
     const post = storage.getEditStoragePost();
     let imgUrls: string[] = [];
 
-    if (root) {
-      const range = editorRef.model.createRangeIn(root);
-      const items = Array.from(range.getItems());
-      const currentImageUrls = new Set<string>();
+    if (!root) return;
 
-      items.forEach(item => {
-        if (
-          item.is("element", "imageBlock") ||
-          item.is("element", "imageInline")
-        ) {
-          const src = item.getAttribute("src");
+    const range = editorRef.model.createRangeIn(root);
+    const items = Array.from(range.getItems());
+    const currentImageUrls = new Set<string>();
 
-          if (src && typeof src === "string") {
-            if (!savedImageUrls.current.has(src)) imageUrls.current.add(src);
-            currentImageUrls.add(src);
-          }
+    // Gather all current image URLs in the editor
+    items.forEach(item => {
+      if (
+        item.is("element", "imageBlock") ||
+        item.is("element", "imageInline")
+      ) {
+        const src = item.getAttribute("src");
+
+        if (src && typeof src === "string") {
+          if (!savedImageUrls.current.has(src)) imageUrls.current.add(src);
+          currentImageUrls.add(src);
         }
-      });
+      }
+    });
 
-      const removedImages = Array.from(savedImageUrls.current).filter(url => {
-        if (!currentImageUrls.has(url)) {
-          imageUrls.current.delete(url);
-          return true;
-        }
+    // Find all images deleted from the editor
+    const removedImages: string[] = [];
+    savedImageUrls.current.forEach(url => {
+      if (!currentImageUrls.has(url)) {
+        imageUrls.current.delete(url);
+        removedImages.push(url);
+      }
+    });
 
-        return false;
-      });
+    if (removedImages.length > 0) deleteImages(removedImages);
 
-      if (removedImages.length > 0) deleteImages(removedImages);
+    // Update savedImageUrls for next change
+    savedImageUrls.current = currentImageUrls;
 
-      savedImageUrls.current = currentImageUrls;
-    }
-
+    // Merge URL of images removed from editor with storage post image URLs
     if (post?.imgUrls && post.imgUrls.length > 0) {
-      const merged = new Set(post.imgUrls);
-      imageUrls.current.forEach(url => merged.add(url));
-      imgUrls = Array.from(merged);
+      const storagePostImages = new Set(post.imgUrls);
+      imageUrls.current.forEach(url => storagePostImages.add(url));
+      imgUrls = Array.from(storagePostImages);
     } else {
       imgUrls = Array.from(imageUrls.current);
     }
 
+    // Debounce save to storage
     if (timerId.current) window.clearTimeout(timerId.current);
 
     timerId.current = window.setTimeout(storage.saveEditStoragePost, 1500, {
