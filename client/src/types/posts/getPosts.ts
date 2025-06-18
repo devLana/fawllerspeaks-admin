@@ -1,4 +1,11 @@
-import type { GetPosts, GetPostsData, Post } from "@apiTypes";
+import type {
+  GetPosts,
+  GetPostsData,
+  GetPostsPageType,
+  Post,
+  PostStatus,
+  SortPostsBy,
+} from "@apiTypes";
 import type { PostData } from "types/posts";
 
 type PostsPageDataKeys =
@@ -64,3 +71,18 @@ export type GetPostsListAction =
         posts: PostsPagePostData[];
       };
     };
+
+export interface PostsQueryParams {
+  type?: GetPostsPageType;
+  cursor?: string;
+  status?: Lowercase<PostStatus>;
+  sort?: SortPostsBy;
+}
+
+export type FiltersErrors = Partial<Record<keyof PostsQueryParams, string>> & {
+  errorType: "ValidationError";
+};
+
+export interface RuntimeError {
+  errorType: "RuntimeError";
+}

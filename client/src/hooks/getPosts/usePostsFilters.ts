@@ -1,64 +1,95 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 
-import type {
-  GetPostsPageType,
-  PostStatus,
-  QueryGetPostsArgs,
-  SortPostsBy,
-} from "@apiTypes";
+import * as yup from "yup";
 
-interface PostsQueryParams {
-  type?: GetPostsPageType;
-  cursor?: string;
-  status?: Lowercase<PostStatus>;
-  sort?: SortPostsBy;
-}
+import { getPostsFiltersSchema as schema } from "@validators/getPostsFiltersSchema";
+import type { PostStatus, QueryGetPostsArgs } from "@apiTypes";
+import type {
+  FiltersErrors,
+  PostsQueryParams,
+  RuntimeError,
+} from "types/posts/getPosts";
 
 interface PostsFilters {
-  gqlVariables: QueryGetPostsArgs | undefined;
+  gqlVariables: QueryGetPostsArgs;
   queryParams: PostsQueryParams;
+  paramsErrors: FiltersErrors | RuntimeError | null;
 }
 
 export const usePostsFilters = (): PostsFilters => {
   const { query } = useRouter();
-  const { status, sort, postsPage } = query;
+  const { status, sort, params } = query;
 
-  const parseQuery: PostsFilters = React.useMemo(() => {
-    const queryParams: PostsQueryParams = {};
-    let filters: QueryGetPostsArgs["filters"];
-    let page: QueryGetPostsArgs["page"];
-    let gqlVariables: QueryGetPostsArgs | undefined;
+  const parseQuery = React.useMemo<PostsFilters>(() => {
+    const rawParams: { filters?: object; page?: object } = {};
 
-    if (status && typeof status === "string") {
-      const STATUS = `${status.charAt(0).toUpperCase()}${status.slice(1)}`;
-      filters = { ...filters, status: STATUS as PostStatus };
-      queryParams.status = status as Lowercase<PostStatus>;
+    if (status || sort) {
+      rawParams.filters = { status, sort };
     }
 
-    if (sort && typeof sort === "string") {
-      filters = { ...filters, sort: sort as SortPostsBy };
-      queryParams.sort = sort as SortPostsBy;
+    if (params && Array.isArray(params)) {
+      rawParams.page = params;
     }
 
-    if (Array.isArray(postsPage) && postsPage.length >= 2) {
-      const [type, cursor] = postsPage as [GetPostsPageType, string];
+    try {
+      const parsed = schema.validateSync(rawParams, { abortEarly: false });
+      const queryParams: PostsQueryParams = {};
+      const gqlVariables: QueryGetPostsArgs = {};
 
-      page = { type, cursor };
-      queryParams.type = type;
-      queryParams.cursor = cursor;
+      if (parsed.filters) {
+        const { filters } = parsed;
+
+        gqlVariables.filters = filters;
+
+        if (filters?.status) {
+          const STATUS = filters.status.toLowerCase() as Lowercase<PostStatus>;
+          queryParams.status = STATUS;
+        }
+
+        if (filters?.sort) {
+          queryParams.sort = filters.sort;
+        }
+      }
+
+      if (parsed.page) {
+        const [type, cursor] = parsed.page;
+
+        gqlVariables.page = { type, cursor };
+        queryParams.cursor = cursor;
+        queryParams.type = type;
+      }
+
+      return { gqlVariables, queryParams, paramsErrors: null };
+    } catch (e) {
+      if (e instanceof yup.ValidationError) {
+        const paramsErrors = e.inner.reduce<FiltersErrors>(
+          (validationErrors, { path, params: param }) => {
+            if (!path) return validationErrors;
+
+            if (path === "page[0]") {
+              return {
+                ...validationErrors,
+                type: param?.originalValue as string,
+              };
+            }
+
+            const key = path.split(".")[1] as "sort" | "status";
+            return {
+              ...validationErrors,
+              [key]: param?.originalValue as string,
+            };
+          },
+          { errorType: "ValidationError" }
+        );
+
+        return { gqlVariables: {}, queryParams: {}, paramsErrors };
+      }
+
+      const paramsErrors: RuntimeError = { errorType: "RuntimeError" };
+      return { gqlVariables: {}, queryParams: {}, paramsErrors };
     }
-
-    if (page && filters) {
-      gqlVariables = { page, filters };
-    } else if (page) {
-      gqlVariables = { page };
-    } else if (filters) {
-      gqlVariables = { filters };
-    }
-
-    return { queryParams, gqlVariables };
-  }, [postsPage, sort, status]);
+  }, [params, sort, status]);
 
   return parseQuery;
 };

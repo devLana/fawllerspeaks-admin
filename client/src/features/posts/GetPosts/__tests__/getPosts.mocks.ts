@@ -10,7 +10,8 @@ type Typename = TypeNames<"getPosts">;
 export const server = setupServer();
 export const page = { name: /^$/i };
 export const load = { name: /^loading blog posts$/i };
-const GQL_MSG = "Unable to get posts. Please try again later";
+export const PARAMS_MSG = `It seems some of the search filters provided are invalid`;
+const GQL_MSG = `It appears we could not find what you are looking for. Please try again later`;
 const FORBID_MSG = "Unable to get posts";
 const CURSOR_MSG = "Invalid posts pagination cursor provided";
 
@@ -51,6 +52,7 @@ export const redirects = [
         query: { status: "unauthenticated", redirectTo: asPath },
       },
       asPath,
+      query: {},
     }))("/posts"),
     graphql.query(GET_POSTS, resolver("AuthenticationError")),
   ],
@@ -59,6 +61,7 @@ export const redirects = [
     ((asPath: string) => ({
       params: { pathname: "/login", query: { status: "unauthorized" } },
       asPath,
+      query: {},
     }))("/posts"),
     graphql.query(GET_POSTS, resolver("NotAllowedError")),
   ],
@@ -70,6 +73,7 @@ export const redirects = [
         query: { status: "unregistered", redirectTo: asPath },
       },
       asPath,
+      query: { params: ["before", "post-cursor"] },
     }))("/posts/before/post-cursor"),
     graphql.query(GET_POSTS, resolver("RegistrationError")),
   ],

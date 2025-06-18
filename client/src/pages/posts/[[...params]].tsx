@@ -8,6 +8,7 @@ import Posts from "@features/posts/GetPosts/components/Posts";
 import PostsLoading from "@features/posts/GetPosts/components/PostsLoading";
 import PostsTextContent from "@features/posts/GetPosts/components/PostsTextContent";
 import NoPostsData from "@features/posts/GetPosts/components/NoPostsData";
+import FilterParamsErrors from "@features/posts/GetPosts/components/FilterParamsErrors";
 import { GET_POSTS } from "@queries/getPosts/GET_POSTS";
 import { SESSION_ID } from "@utils/constants";
 import uiLayout from "@utils/layouts/uiLayout";
@@ -15,21 +16,31 @@ import type { NextPageWithLayout } from "@types";
 
 const GetPosts: NextPageWithLayout = () => {
   const { replace, asPath, isReady } = useRouter();
-  const { gqlVariables } = usePostsFilters();
+  const { gqlVariables, paramsErrors } = usePostsFilters();
 
   const { data, error, client, loading, previousData } = useQuery(GET_POSTS, {
     variables: gqlVariables,
-    skip: !isReady,
+    skip: !isReady || !!paramsErrors,
   });
 
   const id = "blog-posts";
-  const msg1 = "Invalid posts search filters provided";
+  const msg1 = `It appears we could not find what you are looking for. Please try again later`;
   const msg2 = `You are unable to get posts at the moment. Please try again later`;
+  const msg3 = "Invalid posts search filters provided";
+
+  if (paramsErrors) {
+    return (
+      <PostsTextContent
+        id={id}
+        node={<FilterParamsErrors paramsErrors={paramsErrors} />}
+      />
+    );
+  }
 
   if ((!isReady || loading) && !previousData) return <PostsLoading id={id} />;
 
   if (error) {
-    const message = error.graphQLErrors?.[0]?.message ?? msg2;
+    const message = error.graphQLErrors?.[0] ? msg1 : msg2;
     return <PostsTextContent severity="error" id={id} node={message} />;
   }
 
@@ -70,7 +81,7 @@ const GetPosts: NextPageWithLayout = () => {
         <PostsTextContent
           severity="error"
           id={id}
-          node={data.getPosts.cursorError || msg1}
+          node={data.getPosts.cursorError || msg3}
         />
       );
 
