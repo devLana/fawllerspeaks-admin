@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import List from "@mui/material/List";
 
 import useControlPlusA from "@hooks/useControlPlusA";
@@ -7,29 +9,20 @@ import PostItemActions from "./Post/PostItemActions";
 import PostsPagination from "./PostsPagination";
 import PostsToolbar from "./PostsToolbar";
 import ToolbarViewButtons from "./PostsToolbar/ToolbarViewButtons";
+import { reducer, initialState } from "@reducers/getPosts";
 import type * as types from "types/posts/getPosts";
 
 interface PostsListProps {
   isLoadingMore: boolean;
-  isNotDeleting: boolean;
-  selectedPosts: Record<string, string>;
-  postsView: types.PostsView;
   postsData: types.PostsPageData;
-  dispatch: React.Dispatch<types.GetPostsListAction>;
 }
 
-const PostsList = ({
-  isLoadingMore,
-  isNotDeleting,
-  selectedPosts,
-  postsView,
-  postsData,
-  dispatch,
-}: PostsListProps) => {
-  const selectedPostsIds = Object.keys(selectedPosts);
+const PostsList = ({ isLoadingMore, postsData }: PostsListProps) => {
+  const [state, dispatch] = React.useReducer(reducer, initialState);
   const shiftClick = useShiftPlusClickPosts(postsData.posts, dispatch);
+  const selectedPostsIds = Object.keys(state.selectedPosts);
 
-  useControlPlusA(isNotDeleting, () => {
+  useControlPlusA(!state.delete.open, () => {
     dispatch({
       type: "SELECT_ALL_POSTS",
       payload: {
@@ -42,12 +35,12 @@ const PostsList = ({
   return (
     <>
       <PostsToolbar
-        selectedPosts={selectedPosts}
+        selectedPosts={state.selectedPosts}
         selectedPostsIds={selectedPostsIds}
         posts={postsData.posts}
         dispatch={dispatch}
         viewButtons={
-          <ToolbarViewButtons postsView={postsView} dispatch={dispatch} />
+          <ToolbarViewButtons postsView={state.postsView} dispatch={dispatch} />
         }
       />
       <List
@@ -55,7 +48,7 @@ const PostsList = ({
         disablePadding
         sx={{
           mb: 6,
-          ...(postsView === "grid" && {
+          ...(state.postsView === "grid" && {
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
             columnGap: 2.5,
@@ -68,8 +61,8 @@ const PostsList = ({
             key={id}
             {...post}
             isLoadingMore={isLoadingMore}
-            isSelected={!!selectedPosts[id]}
-            postsView={postsView}
+            isSelected={!!state.selectedPosts[id]}
+            postsView={state.postsView}
             postActions={
               <PostItemActions
                 id={id}
@@ -77,7 +70,7 @@ const PostsList = ({
                 title={post.title}
                 status={post.status}
                 slug={post.url.slug}
-                isChecked={!!selectedPosts[id]}
+                isChecked={!!state.selectedPosts[id]}
                 isLoadingMore={isLoadingMore}
                 {...shiftClick}
                 dispatch={dispatch}

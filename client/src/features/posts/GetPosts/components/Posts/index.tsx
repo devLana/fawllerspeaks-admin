@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 
@@ -8,7 +6,6 @@ import PostStatusInput from "./PostsMenuInputs/PostStatusInput";
 import SortByInput from "./PostsMenuInputs/SortByInput";
 import Searchbox from "./PostsMenuInputs/Searchbox";
 import PostsList from "./PostsList";
-import { reducer, initialState } from "@reducers/getPosts";
 import type { PostsPageData } from "types/posts/getPosts";
 
 interface PostsProps {
@@ -17,7 +14,6 @@ interface PostsProps {
 }
 
 const Posts = ({ id, postsData }: PostsProps) => {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
   const isLoadingMore = false;
 
   return (
@@ -42,14 +38,7 @@ const Posts = ({ id, postsData }: PostsProps) => {
           No posts found
         </Alert>
       ) : (
-        <PostsList
-          isLoadingMore={isLoadingMore}
-          isNotDeleting={!state.delete.open}
-          selectedPosts={state.selectedPosts}
-          postsData={postsData}
-          postsView={state.postsView}
-          dispatch={dispatch}
-        />
+        <PostsList isLoadingMore={isLoadingMore} postsData={postsData} />
       )}
     </PostsWrapper>
   );
