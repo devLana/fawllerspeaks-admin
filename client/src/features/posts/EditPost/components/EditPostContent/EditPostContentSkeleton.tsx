@@ -8,16 +8,7 @@ const EditPostContentSkeleton = () => (
     </Box>
     <Skeleton variant="rounded" height={45} width="100%" sx={{ mb: 1 }} />
     <Skeleton variant="rounded" height={400} width="100%" sx={{ mb: 2.5 }} />
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        rowGap: 1.5,
-        columnGap: 2,
-      }}
-    >
-      <Skeleton variant="rounded" height={37} width={126} />
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Skeleton variant="rounded" height={37} width={145} />
     </Box>
   </section>

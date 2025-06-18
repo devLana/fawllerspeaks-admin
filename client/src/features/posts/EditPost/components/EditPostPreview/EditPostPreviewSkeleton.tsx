@@ -113,16 +113,7 @@ const EditPostPreviewSkeleton = () => (
         <Skeleton variant="text" />
         <Skeleton variant="text" width={200} />
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          rowGap: 1.5,
-          columnGap: 2,
-        }}
-      >
-        <Skeleton variant="rounded" height={37} width={126} />
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Skeleton variant="rounded" height={37} width={145} />
       </Box>
     </Box>
