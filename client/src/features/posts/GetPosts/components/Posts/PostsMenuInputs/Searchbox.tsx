@@ -7,23 +7,29 @@ import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
 
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
+import type { PostsQueryParams } from "types/posts/getPosts";
+
+type Query = Pick<PostsQueryParams, "sort" | "status"> & { q: string };
 
 const Searchbox = () => {
-  const { queryParams } = usePostsFilters();
-  const [q, setQ] = React.useState("");
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
   const { push } = useRouter();
+  const { queryParams } = usePostsFilters();
 
   const handleSearch = () => {
-    if (q) {
-      void push({
-        pathname: "/posts/search",
-        query: {
-          q,
-          ...(queryParams.status && { status: queryParams.status }),
-          ...(queryParams.sort && { sort: queryParams.sort }),
-        },
-      });
+    if (!inputRef.current || !inputRef.current.value) return;
+
+    const query: Query = { q: inputRef.current.value };
+
+    if (queryParams.status) {
+      query.status = queryParams.status;
     }
+
+    if (queryParams.sort) {
+      query.sort = queryParams.sort;
+    }
+
+    void push({ pathname: "/posts/search", query });
   };
 
   const handleKeyUp: React.KeyboardEventHandler<HTMLInputElement> = e => {
@@ -33,6 +39,7 @@ const Searchbox = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <TextField
+        ref={inputRef}
         id="posts-search"
         type="search"
         label="Search Posts"
@@ -40,8 +47,6 @@ const Searchbox = () => {
         size="small"
         fullWidth
         onKeyUp={handleKeyUp}
-        onChange={e => setQ(e.target.value)}
-        value={q}
         sx={{
           "& .MuiOutlinedInput-notchedOutline": {
             borderTopRightRadius: 0,

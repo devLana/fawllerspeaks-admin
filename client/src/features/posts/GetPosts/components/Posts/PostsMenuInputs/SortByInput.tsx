@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useRouter } from "next/router";
 
 import MenuItem from "@mui/material/MenuItem";
@@ -6,6 +5,9 @@ import TextField from "@mui/material/TextField";
 
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import type { SortPostsBy } from "@apiTypes";
+import type { PostsQueryParams } from "types/posts/getPosts";
+
+type Query = Pick<PostsQueryParams, "sort" | "status">;
 
 const options: { label: string; value: SortPostsBy }[] = [
   { label: "Date", value: "date_asc" },
@@ -17,20 +19,16 @@ const options: { label: string; value: SortPostsBy }[] = [
 const SortByInput = () => {
   const { push } = useRouter();
   const { queryParams } = usePostsFilters();
-  const { sort, status } = queryParams;
-  const [sortOrder, setSortOrder] = React.useState(sort || "");
-
-  React.useEffect(() => {
-    setSortOrder(sort || "");
-  }, [sort]);
 
   const handleChange = (postSortOrder: SortPostsBy) => {
-    setSortOrder(postSortOrder);
+    const query: Query = {};
+    query.sort = postSortOrder;
 
-    void push({
-      pathname: "/posts",
-      query: { ...(status && { status }), sort: postSortOrder },
-    });
+    if (queryParams.status) {
+      query.status = queryParams.status;
+    }
+
+    void push({ pathname: "/posts", query });
   };
 
   return (
@@ -40,7 +38,7 @@ const SortByInput = () => {
       id="sort-by-combobox"
       label="Sort By"
       size="small"
-      value={sortOrder}
+      value={queryParams.sort || "date_desc"}
       SelectProps={{ labelId: "sort-by-input-label" }}
       InputLabelProps={{ id: "sort-by-input-label", htmlFor: "sort-by-input" }}
       InputProps={{ id: "sort-by-input" }}
