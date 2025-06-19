@@ -2,11 +2,9 @@ import Box from "@mui/material/Box";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PaginationLink from "./PaginationLink";
+import type { GetPostsPageData } from "@apiTypes";
 
-interface PostsPaginationLinksProps {
-  after?: string | null;
-  before?: string | null;
-}
+type PostsPaginationLinksProps = Omit<GetPostsPageData, "__typename">;
 
 const PostsPagination = ({ after, before }: PostsPaginationLinksProps) => {
   if (!before && !after) return null;

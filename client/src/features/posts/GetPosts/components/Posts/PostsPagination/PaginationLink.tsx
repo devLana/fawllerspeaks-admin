@@ -1,5 +1,7 @@
-import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import Button from "@mui/material/Button";
+import type { SxProps } from "@mui/material/styles";
+
+import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import NextLink from "@components/ui/NextLink";
 import type { GetPostsPageType } from "@apiTypes";
 
@@ -11,7 +13,13 @@ interface PaginationLinkProps {
 
 const PaginationLink = ({ children, cursor, ml }: PaginationLinkProps) => {
   const { queryParams } = usePostsFilters();
-  const styles = { display: "inline-flex", alignItems: "center", columnGap: 1 };
+
+  const styles: SxProps = {
+    ml,
+    display: "inline-flex",
+    alignItems: "center",
+    columnGap: 1,
+  };
 
   if (cursor) {
     const query = {
@@ -22,7 +30,7 @@ const PaginationLink = ({ children, cursor, ml }: PaginationLinkProps) => {
     return (
       <NextLink
         href={{ pathname: `/posts/${cursor.join("/")}`, query }}
-        sx={{ ml, ...styles }}
+        sx={{ ...styles }}
       >
         {children}
       </NextLink>
@@ -33,7 +41,7 @@ const PaginationLink = ({ children, cursor, ml }: PaginationLinkProps) => {
     <Button
       variant="text"
       disabled
-      sx={{ ml, ...styles, font: "inherit", fontStyle: "oblique" }}
+      sx={{ ...styles, font: "inherit", fontStyle: "oblique" }}
     >
       {children}
     </Button>

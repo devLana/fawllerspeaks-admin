@@ -13,19 +13,15 @@ interface ToolbarViewButtonsProps {
 
 const ToolbarViewButtons = (props: ToolbarViewButtonsProps) => {
   const { postsView, dispatch } = props;
+  const view = postsView === "grid" ? "list" : "grid";
 
   const handleXsView = () => {
-    dispatch({
-      type: "CHANGE_POST_LIST_VIEW",
-      payload: { view: postsView === "grid" ? "list" : "grid" },
-    });
-  };
-
-  const handleSmView = (view: PostsView) => {
     dispatch({ type: "CHANGE_POST_LIST_VIEW", payload: { view } });
   };
 
-  const view = postsView === "grid" ? "list" : "grid";
+  const handleSmView = (nextView: PostsView) => {
+    dispatch({ type: "CHANGE_POST_LIST_VIEW", payload: { view: nextView } });
+  };
 
   return (
     <Box sx={{ ml: "auto" }}>

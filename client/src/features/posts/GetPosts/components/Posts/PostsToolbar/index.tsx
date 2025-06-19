@@ -39,7 +39,7 @@ const PostsToolbar = ({
     postsSelected === posts.length &&
     postsSelected === selectedPostsIds.length
   ) {
-    label = "all posts";
+    label = "all posts on this page";
   } else {
     label = "selected posts";
   }
@@ -73,7 +73,7 @@ const PostsToolbar = ({
         sx={{ ml: 0.75 }}
       />
       {selectedPostsIds.length > 0 && (
-        <Button color="error" onClick={handleDelete}>
+        <Button color="error" onClick={handleDelete} size="small">
           Send {label} to bin
         </Button>
       )}
