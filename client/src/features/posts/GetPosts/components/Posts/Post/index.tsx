@@ -38,16 +38,23 @@ const Post = ({
       flexDirection: "column",
       alignItems: "stretch",
       rowGap: 3,
-      border: "1px solid",
-      borderColor: isSelected && !isLoadingMore ? "inherit" : "divider",
-      ...(isSelected && { bgcolor: "action.selected" }),
       ...(postsView === "grid"
-        ? { borderRadius: 1, boxShadow: ({ shadows }) => shadows[2] }
+        ? {
+            border: "1px solid",
+            borderColor: isSelected && !isLoadingMore ? "inherit" : "divider",
+            borderRadius: 1,
+            boxShadow: ({ shadows }) => shadows[1],
+          }
         : {
-            ...((!isSelected || isLoadingMore) && {
-              "&:not(:last-child)": { borderBottomColor: "transparent" },
-            }),
+            borderTop: "1px solid",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            "&:not(:last-child)": { borderBottomColor: "transparent" },
           }),
+      ...(!isLoadingMore && {
+        bgcolor: isSelected ? "action.selected" : undefined,
+        "&:hover": { bgcolor: isSelected ? "action.selected" : "action.hover" },
+      }),
     }}
   >
     {postActions}

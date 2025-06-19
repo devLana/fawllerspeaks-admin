@@ -45,7 +45,7 @@ export const reducer: Reducer = (state, action) => {
       return { ...state, selectedPosts };
     }
 
-    case "SELECT_POST": {
+    case "TOGGLE_POST_SELECT": {
       const { checked, id, title } = action.payload;
 
       if (checked) {

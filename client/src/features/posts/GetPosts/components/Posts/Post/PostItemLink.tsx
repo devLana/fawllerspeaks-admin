@@ -1,4 +1,6 @@
 import Skeleton from "@mui/material/Skeleton";
+import type { SxProps } from "@mui/material/styles";
+
 import NextLink from "@components/ui/NextLink";
 
 interface PostItemLinkProps {
@@ -7,31 +9,26 @@ interface PostItemLinkProps {
 }
 
 const PostItemLink = ({ isLoadingMore, slug }: PostItemLinkProps) => {
+  const styles: SxProps = {
+    mt: "auto",
+    mx: "auto",
+    width: "90%",
+    maxWidth: 400,
+    borderRadius: 1,
+  };
+
   return isLoadingMore ? (
     <Skeleton
       variant="text"
       height={32}
-      sx={{
-        mt: "auto",
-        mx: "auto",
-        width: "90%",
-        maxWidth: 400,
-        borderRadius: 1,
-        transform: "scale(1)",
-      }}
-    >
-      <NextLink href={`/posts/view/${slug}`}>View Post</NextLink>
-    </Skeleton>
+      sx={{ ...styles, transform: "scale(1)" }}
+    />
   ) : (
     <NextLink
       href={`/posts/view/${slug}`}
       sx={{
-        mt: "auto",
-        mx: "auto",
+        ...styles,
         py: 0.4,
-        width: "90%",
-        maxWidth: 400,
-        borderRadius: 1,
         textAlign: "center",
         color: "background.default",
         bgcolor: "secondary.main",

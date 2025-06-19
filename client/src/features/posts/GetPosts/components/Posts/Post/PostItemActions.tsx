@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import Skeleton from "@mui/material/Skeleton";
+import type { SxProps } from "@mui/material/styles";
 
 import PostMenu from "@features/posts/components/PostMenu";
 import type { PostStatus } from "@apiTypes";
@@ -31,34 +32,20 @@ const PostItemActions = ({
   dispatch,
   onShiftPlusClick,
 }: PostItemActionsProps) => {
-  const skipOnChangeRef = skipOnChange;
+  const styles: SxProps = { position: "absolute", top: "5px", left: "5px" };
 
   const handleChange = (checked: boolean) => {
+    const skipOnChangeRef = skipOnChange;
+
     if (skipOnChangeRef.current) {
       skipOnChangeRef.current = false;
     } else {
-      dispatch({ type: "SELECT_POST", payload: { checked, title, id } });
+      dispatch({ type: "TOGGLE_POST_SELECT", payload: { checked, title, id } });
     }
   };
 
-  return isLoadingMore ? (
-    <Skeleton
-      variant="rounded"
-      width={70}
-      height={30}
-      sx={{ position: "absolute", top: "5px", left: "5px" }}
-    />
-  ) : (
-    <Box
-      sx={{
-        display: "flex",
-        position: "absolute",
-        top: "5px",
-        left: "5px",
-        borderRadius: 1,
-        "&:hover": { bgcolor: "action.hover" },
-      }}
-    >
+  const actions = (
+    <>
       <Checkbox
         id={`${slug}-checkbox`}
         size="small"
@@ -82,6 +69,23 @@ const PostItemActions = ({
           borderBottomRightRadius: `${shape.borderRadius}px`,
         })}
       />
+    </>
+  );
+
+  return isLoadingMore ? (
+    <Skeleton variant="rounded" sx={styles}>
+      {actions}
+    </Skeleton>
+  ) : (
+    <Box
+      sx={{
+        ...styles,
+        display: "flex",
+        borderRadius: 1,
+        "&:hover": { bgcolor: "action.hover" },
+      }}
+    >
+      {actions}
     </Box>
   );
 };

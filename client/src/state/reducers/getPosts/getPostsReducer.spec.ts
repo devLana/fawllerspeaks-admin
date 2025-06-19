@@ -112,7 +112,7 @@ describe("Get Posts List - State Reducer", () => {
     describe("Select/unselect a post", () => {
       it("Should add a post to the 'selectedPosts' state", () => {
         const result = reducer(state, {
-          type: "SELECT_POST",
+          type: "TOGGLE_POST_SELECT",
           payload: { checked: true, title: "Post Title", id: "post-id-1" },
         });
 
@@ -130,7 +130,7 @@ describe("Get Posts List - State Reducer", () => {
         };
 
         const result = reducer(initState, {
-          type: "SELECT_POST",
+          type: "TOGGLE_POST_SELECT",
           payload: { checked: false, title: "Post Title", id: "post-id-1" },
         });
 

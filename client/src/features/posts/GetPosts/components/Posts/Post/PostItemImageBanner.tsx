@@ -8,28 +8,15 @@ interface PostItemImageBannerProps {
 }
 
 const PostItemImageBanner = (props: PostItemImageBannerProps) => {
-  const { isLoadingMore, src, alt } = props;
-
-  return isLoadingMore ? (
-    <Skeleton
-      variant="rectangular"
-      sx={{
-        height: { height: 150, sm: 160 },
-        borderTop: "1px solid",
-        borderBottom: "1px solid",
-        borderColor: "divider",
-      }}
-    />
+  return props.isLoadingMore ? (
+    <Skeleton variant="rectangular" sx={{ height: { height: 150, sm: 160 } }} />
   ) : (
     <PostImageBanner
-      src={src}
-      alt={alt}
+      src={props.src}
+      alt={props.alt}
       sizes="(max-width: 900px) 520px, 385px"
       sx={{
         height: { height: 150, sm: 160 },
-        borderTop: "1px solid",
-        borderBottom: "1px solid",
-        borderColor: "divider",
         bgcolor: "action.disabledBackground",
       }}
     />

@@ -56,7 +56,7 @@ export type GetPostsListAction =
   | { type: "CLOSE_DELETE" }
   | { type: "TOGGLE_ALL_POSTS_SELECT"; payload: { posts: PostsPagePostData[] } }
   | {
-      type: "SELECT_POST";
+      type: "TOGGLE_POST_SELECT";
       payload: { checked: boolean; title: string; id: string };
     }
   | {

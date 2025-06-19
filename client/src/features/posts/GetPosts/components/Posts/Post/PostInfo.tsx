@@ -18,7 +18,10 @@ const PostInfo = ({ title, dateCreated, isLoadingMore }: PostInfoProps) => (
     >
       {isLoadingMore ? <Skeleton /> : title}
     </Typography>
-    <Typography variant="body2" sx={{ textAlign: "center" }}>
+    <Typography
+      variant="body2"
+      sx={{ textAlign: "center", "&>time": { fontWeight: "bold" } }}
+    >
       {isLoadingMore ? (
         <Skeleton />
       ) : (
