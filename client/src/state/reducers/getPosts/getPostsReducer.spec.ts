@@ -145,8 +145,8 @@ describe("Get Posts List - State Reducer", () => {
     describe("Select/unselect all posts", () => {
       it("Should add all posts to 'selectedPosts'", () => {
         const result = reducer(state, {
-          type: "SELECT_ALL_POSTS",
-          payload: { shouldSelectAll: true, posts: posts1 },
+          type: "TOGGLE_ALL_POSTS_SELECT",
+          payload: { posts: posts1 },
         });
 
         expect(result).toStrictEqual({
@@ -171,8 +171,8 @@ describe("Get Posts List - State Reducer", () => {
         };
 
         const result = reducer(initState, {
-          type: "SELECT_ALL_POSTS",
-          payload: { shouldSelectAll: false, posts: posts1 },
+          type: "TOGGLE_ALL_POSTS_SELECT",
+          payload: { posts: posts1 },
         });
 
         expect(result).toStrictEqual({

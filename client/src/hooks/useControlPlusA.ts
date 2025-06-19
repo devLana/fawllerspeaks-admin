@@ -1,9 +1,9 @@
 import * as React from "react";
 
-const useControlPlusA = (shouldNotSelect: boolean, callback: VoidFunction) => {
+const useControlPlusA = (canSelect: boolean, callback: VoidFunction) => {
   React.useEffect(() => {
     const handleControlPlusA = (e: KeyboardEvent) => {
-      if (shouldNotSelect && e.ctrlKey && (e.key === "A" || e.key === "a")) {
+      if (canSelect && e.ctrlKey && (e.key === "A" || e.key === "a")) {
         callback();
       }
     };
@@ -19,7 +19,7 @@ const useControlPlusA = (shouldNotSelect: boolean, callback: VoidFunction) => {
       window.removeEventListener("keyup", handleControlPlusA);
       window.removeEventListener("keydown", handleKeydown);
     };
-  }, [shouldNotSelect, callback]);
+  }, [canSelect, callback]);
 };
 
 export default useControlPlusA;

@@ -24,11 +24,8 @@ const PostsList = ({ isLoadingMore, postsData }: PostsListProps) => {
 
   useControlPlusA(!state.delete.open, () => {
     dispatch({
-      type: "SELECT_ALL_POSTS",
-      payload: {
-        shouldSelectAll: selectedPostsIds.length !== postsData.posts.length,
-        posts: postsData.posts,
-      },
+      type: "TOGGLE_ALL_POSTS_SELECT",
+      payload: { posts: postsData.posts },
     });
   });
 

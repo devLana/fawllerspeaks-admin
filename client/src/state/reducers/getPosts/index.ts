@@ -24,18 +24,23 @@ export const reducer: Reducer = (state, action) => {
     case "CLOSE_DELETE":
       return { ...state, delete: { open: false, ids: [], title: "" } };
 
-    case "SELECT_ALL_POSTS": {
-      const { posts, shouldSelectAll } = action.payload;
+    case "TOGGLE_ALL_POSTS_SELECT": {
+      const { posts } = action.payload;
       let selectedPosts: S["selectedPosts"] = { ...state.selectedPosts };
 
-      posts.forEach(({ id, title }) => {
-        if (shouldSelectAll) {
-          selectedPosts[id] = title;
-        } else {
-          const { [id]: _, ...selected } = selectedPosts;
-          selectedPosts = selected;
-        }
+      const allIsSelected = posts.every(({ id }) => {
+        if (!selectedPosts[id]) return false;
+
+        const { [id]: _, ...selected } = selectedPosts;
+        selectedPosts = selected;
+        return true;
       });
+
+      if (!allIsSelected) {
+        posts.forEach(({ id, title }) => {
+          selectedPosts[id] = title;
+        });
+      }
 
       return { ...state, selectedPosts };
     }

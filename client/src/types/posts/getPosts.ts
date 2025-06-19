@@ -54,10 +54,7 @@ export type GetPostsListAction =
     }
   | { type: "OPEN_DELETE"; payload: { title: string; ids: string[] } }
   | { type: "CLOSE_DELETE" }
-  | {
-      type: "SELECT_ALL_POSTS";
-      payload: { shouldSelectAll: boolean; posts: PostsPagePostData[] };
-    }
+  | { type: "TOGGLE_ALL_POSTS_SELECT"; payload: { posts: PostsPagePostData[] } }
   | {
       type: "SELECT_POST";
       payload: { checked: boolean; title: string; id: string };

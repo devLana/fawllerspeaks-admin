@@ -30,7 +30,7 @@ const PostsToolbar = ({
   });
 
   const checkboxRef = useSelectAllCheckbox(postsSelected, posts.length);
-  const allSelected = postsSelected === posts.length;
+  const allIsSelected = postsSelected === posts.length;
   let label: string;
 
   if (selectedPostsIds.length === 1) {
@@ -39,13 +39,13 @@ const PostsToolbar = ({
     postsSelected === posts.length &&
     postsSelected === selectedPostsIds.length
   ) {
-    label = "all posts on this page";
+    label = "all posts";
   } else {
-    label = "all selected posts";
+    label = "selected posts";
   }
 
-  const handleSelect = (shouldSelectAll: boolean) => {
-    dispatch({ type: "SELECT_ALL_POSTS", payload: { shouldSelectAll, posts } });
+  const handleSelect = () => {
+    dispatch({ type: "TOGGLE_ALL_POSTS_SELECT", payload: { posts } });
   };
 
   const handleDelete = () => {
@@ -65,10 +65,10 @@ const PostsToolbar = ({
         id="all-posts-checkbox"
         size="small"
         inputProps={{
-          "aria-label": `${allSelected ? "Unselect" : "Select"} all posts`,
+          "aria-label": `${allIsSelected ? "Unselect" : "Select"} all posts`,
         }}
-        onChange={e => handleSelect(e.target.checked)}
-        checked={allSelected}
+        onChange={handleSelect}
+        checked={allIsSelected}
         indeterminate={!(postsSelected === 0 || postsSelected === posts.length)}
         sx={{ ml: 0.75 }}
       />

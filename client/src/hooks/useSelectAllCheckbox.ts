@@ -1,15 +1,18 @@
 import * as React from "react";
 
-const useSelectAllCheckbox = (totalSelected: number, totalItems: number) => {
+const useSelectAllCheckbox = (
+  totalItemsSelected: number,
+  totalItems: number
+) => {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   React.useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.indeterminate = !(
-        totalSelected === 0 || totalSelected === totalItems
-      );
-    }
-  }, [totalSelected, totalItems]);
+    if (!inputRef.current) return;
+
+    inputRef.current.indeterminate = !(
+      totalItemsSelected === 0 || totalItemsSelected === totalItems
+    );
+  }, [totalItemsSelected, totalItems]);
 
   return inputRef;
 };
