@@ -38,6 +38,7 @@ const Post = ({
       flexDirection: "column",
       alignItems: "stretch",
       rowGap: 3,
+      bgcolor: isSelected && !isLoadingMore ? "action.selected" : undefined,
       ...(postsView === "grid"
         ? {
             border: "1px solid",
@@ -50,11 +51,10 @@ const Post = ({
             borderBottom: "1px solid",
             borderColor: "divider",
             "&:not(:last-child)": { borderBottomColor: "transparent" },
+            "&:hover": !isLoadingMore
+              ? { bgcolor: isSelected ? "action.selected" : "action.hover" }
+              : undefined,
           }),
-      ...(!isLoadingMore && {
-        bgcolor: isSelected ? "action.selected" : undefined,
-        "&:hover": { bgcolor: isSelected ? "action.selected" : "action.hover" },
-      }),
     }}
   >
     {postActions}
