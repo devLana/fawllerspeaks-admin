@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import PublishIcon from "@mui/icons-material/Publish";
+// import PublishIcon from "@mui/icons-material/Publish";
 import UnpublishedIcon from "@mui/icons-material/Unpublished";
 
 import NextLink from "@components/ui/NextLink";
@@ -52,18 +52,19 @@ const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
             <UnpublishedIcon fontSize="small" /> Unpublish
           </MenuItem>
         )}
-        {status === "Unpublished" && (
+        {/* {status === "Unpublished" && (
           <MenuItem sx={{ columnGap: 3 }}>
             <PublishIcon fontSize="small" /> Publish
           </MenuItem>
-        )}
+        )} */}
         <MenuItem
           component={NextLink}
           // href={{ pathname: "/posts/edit/[slug]", query: { slug } }}
           href={`/posts/edit/${slug}`}
           sx={{
+            fontStyle: "normal",
             columnGap: 3,
-            ...(status !== "Draft" && {
+            ...(status === "Published" && {
               borderTop: "1px solid",
               borderTopColor: "divider",
             }),
