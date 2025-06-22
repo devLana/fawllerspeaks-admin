@@ -29,23 +29,19 @@ const GetPosts: NextPageWithLayout = () => {
   const msg3 = "Invalid posts search filters provided";
 
   if (paramsErrors) {
-    return (
-      <PostsTextContent
-        id={id}
-        node={<FilterParamsErrors paramsErrors={paramsErrors} />}
-      />
-    );
+    const node = <FilterParamsErrors paramsErrors={paramsErrors} />;
+    return <PostsTextContent id={id} node={node} />;
   }
 
   if ((!isReady || loading) && !previousData) return <PostsLoading id={id} />;
 
+  if (loading && previousData?.getPosts.__typename === "GetPostsData") {
+    return <Posts id={id} postsData={previousData.getPosts} isLoadingMore />;
+  }
+
   if (error) {
     const message = error.graphQLErrors?.[0] ? msg1 : msg2;
     return <PostsTextContent severity="error" id={id} node={message} />;
-  }
-
-  if (loading && previousData?.getPosts.__typename === "GetPostsData") {
-    return <Posts id={id} postsData={previousData.getPosts} />;
   }
 
   if (!data) return <PostsTextContent id={id} node={<NoPostsData />} />;

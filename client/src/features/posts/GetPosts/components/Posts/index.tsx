@@ -1,6 +1,7 @@
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 
+// import usePostsLoadingState from "@hooks/getPosts/usePostsLoadingState";
 import PostsWrapper from "../PostsWrapper";
 import PostStatusInput from "./PostsMenuInputs/PostStatusInput";
 import SortByInput from "./PostsMenuInputs/SortByInput";
@@ -10,11 +11,12 @@ import type { PostsPageData } from "types/posts/getPosts";
 
 interface PostsProps {
   id: string;
+  isLoadingMore?: boolean;
   postsData: PostsPageData;
 }
 
-const Posts = ({ id, postsData }: PostsProps) => {
-  const isLoadingMore = false;
+const Posts = ({ id, isLoadingMore = false, postsData }: PostsProps) => {
+  // const isLoading = usePostsLoadingState(isLoadingMore);
 
   return (
     <PostsWrapper id={id} ariaBusy={false}>
