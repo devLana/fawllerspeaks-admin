@@ -1,9 +1,10 @@
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import Skeleton from "@mui/material/Skeleton";
+import Typography from "@mui/material/Typography";
 import type { SxProps } from "@mui/material/styles";
 
-import PostMenu from "@features/posts/components/PostMenu";
+import PostActions from "@features/posts/components/PostActions";
 import type { PostStatus } from "@apiTypes";
 import type { GetPostsListAction } from "types/posts/getPosts";
 
@@ -44,6 +45,14 @@ const PostItemActions = ({
     }
   };
 
+  const toastMessage = (
+    <>
+      Are you sure you want to Unpublish{" "}
+      <Typography component="strong">{title}</Typography>? Un-publishing a post
+      will de-list it from the blog website
+    </>
+  );
+
   const actions = (
     <>
       <Checkbox
@@ -59,11 +68,14 @@ const PostItemActions = ({
           borderBottomLeftRadius: `${shape.borderRadius}px`,
         })}
       />
-      <PostMenu
+      <PostActions
+        id={id}
         title={title}
         status={status}
         slug={slug}
-        sx={({ shape }) => ({
+        showTitleInDialog
+        toastMessage={toastMessage}
+        menuSx={({ shape }) => ({
           borderRadius: 0,
           borderTopRightRadius: `${shape.borderRadius}px`,
           borderBottomRightRadius: `${shape.borderRadius}px`,

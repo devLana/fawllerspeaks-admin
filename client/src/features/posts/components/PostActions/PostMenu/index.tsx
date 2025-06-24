@@ -11,19 +11,27 @@ import UnpublishedIcon from "@mui/icons-material/Unpublished";
 
 import NextLink from "@components/ui/NextLink";
 import type { PostStatus } from "@apiTypes";
-import type { SxPropsArray } from "@types";
+import type { FunctionLike, SxPropsArray } from "@types";
 
 interface PostMenuProps {
   title: string;
   status: PostStatus;
   slug: string;
-  sx?: IconButtonProps["sx"];
+  menuSx?: IconButtonProps["sx"];
+  onUnpublish: () => void;
+  onBinPost: () => void;
 }
 
-const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
+const PostMenu = (props: PostMenuProps) => {
+  const { title, status, slug, menuSx = [], onUnpublish, onBinPost } = props;
   const [anchor, setAnchor] = React.useState<null | HTMLButtonElement>(null);
   const isOpen = !!anchor;
-  const sxProps: SxPropsArray = Array.isArray(sx) ? sx : [sx];
+  const sxProps: SxPropsArray = Array.isArray(menuSx) ? menuSx : [menuSx];
+
+  const handlerFn = (callback: FunctionLike) => {
+    setAnchor(null);
+    void callback();
+  };
 
   return (
     <>
@@ -48,7 +56,10 @@ const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
         onClose={() => setAnchor(null)}
       >
         {status === "Published" && (
-          <MenuItem sx={{ columnGap: 3 }}>
+          <MenuItem
+            sx={{ columnGap: 3 }}
+            onClick={() => handlerFn(onUnpublish)}
+          >
             <UnpublishedIcon fontSize="small" /> Unpublish
           </MenuItem>
         )}
@@ -59,7 +70,6 @@ const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
         )} */}
         <MenuItem
           component={NextLink}
-          // href={{ pathname: "/posts/edit/[slug]", query: { slug } }}
           href={`/posts/edit/${slug}`}
           sx={{
             fontStyle: "normal",
@@ -76,6 +86,7 @@ const PostMenu = ({ title, status, slug, sx = [] }: PostMenuProps) => {
         <MenuItem
           sx={{ columnGap: 3, color: "error.main" }}
           aria-haspopup="dialog"
+          onClick={() => handlerFn(onBinPost)}
         >
           <DeleteIcon color="error" fontSize="small" /> Send to bin
         </MenuItem>

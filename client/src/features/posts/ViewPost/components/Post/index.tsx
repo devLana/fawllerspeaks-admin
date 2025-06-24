@@ -10,7 +10,7 @@ import PostContentHeader from "./PostContentHeader";
 import PostImageBanner from "@features/posts/components/PostImageBanner";
 import PostContentView from "@features/posts/components/PostContentView";
 import PostViewHeader from "@features/posts/components/PostViewHeader";
-import PostMenu from "@features/posts/components/PostMenu";
+import PostActions from "@features/posts/components/PostActions";
 import type { PostData } from "types/posts";
 
 const Post = ({ label, post }: { label: string; post: PostData }) => {
@@ -24,11 +24,13 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
         status={post.status}
         title={post.title}
       >
-        <PostMenu
+        <PostActions
+          id={post.id}
           status={post.status}
           title={post.title}
           slug={post.url.slug}
-          sx={{ bgcolor: "action.selected" }}
+          menuSx={{ bgcolor: "action.selected" }}
+          toastMessage="Are you sure you want to Unpublish this post? Un-publishing a post will de-list it from the blog website"
         />
       </PostViewHeader>
       <Box
