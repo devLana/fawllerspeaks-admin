@@ -1,8 +1,5 @@
-import IconButton from "@mui/material/IconButton";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-
 import useDeletePostContentImages from "@hooks/createPost/useDeletePostContentImages";
+import ToastActionButtons from "@features/posts/components/ToastActionButtons";
 import * as storagePost from "@utils/posts/createStoragePost";
 import type { CreatePostAction } from "types/posts/createPost";
 
@@ -31,24 +28,12 @@ const CreateStorageAlertActions = ({ dispatch }: { dispatch: Dispatch }) => {
   };
 
   return (
-    <>
-      <IconButton
-        aria-label="Continue with unfinished post"
-        size="small"
-        color="inherit"
-        onClick={handleContinue}
-      >
-        <CheckIcon />
-      </IconButton>
-      <IconButton
-        aria-label="Delete unfinished post"
-        size="small"
-        color="inherit"
-        onClick={handleCancel}
-      >
-        <CloseIcon />
-      </IconButton>
-    </>
+    <ToastActionButtons
+      proceedLabel="Continue with unfinished post"
+      cancelLabel="Delete unfinished post"
+      onProceed={handleContinue}
+      onCancel={handleCancel}
+    />
   );
 };
 

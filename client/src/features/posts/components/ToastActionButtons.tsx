@@ -2,23 +2,25 @@ import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 
-interface PostActionsToastButtonsProps {
-  onUnpublish: VoidFunction;
+interface ToastActionButtonsProps {
+  proceedLabel: string;
+  cancelLabel: string;
+  onProceed: VoidFunction;
   onCancel: VoidFunction;
 }
 
-const PostActionsToastButtons = (props: PostActionsToastButtonsProps) => (
+const ToastActionButtons = (props: ToastActionButtonsProps) => (
   <>
     <IconButton
-      aria-label="Yes unpublish post"
+      aria-label={props.proceedLabel}
       size="small"
       color="inherit"
-      onClick={props.onUnpublish}
+      onClick={props.onProceed}
     >
       <CheckIcon />
     </IconButton>
     <IconButton
-      aria-label="Cancel"
+      aria-label={props.cancelLabel}
       size="small"
       color="inherit"
       onClick={props.onCancel}
@@ -28,4 +30,4 @@ const PostActionsToastButtons = (props: PostActionsToastButtonsProps) => (
   </>
 );
 
-export default PostActionsToastButtons;
+export default ToastActionButtons;

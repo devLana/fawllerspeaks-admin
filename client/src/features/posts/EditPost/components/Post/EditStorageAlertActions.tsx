@@ -1,10 +1,7 @@
 import { useRouter } from "next/router";
 
-import IconButton from "@mui/material/IconButton";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-
 import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
+import ToastActionButtons from "@features/posts/components/ToastActionButtons";
 import * as storagePost from "@utils/posts/editStoragePost";
 import type { EditPostAction } from "types/posts/editPost";
 
@@ -14,22 +11,20 @@ interface EditStorageAlertActionsProps {
 }
 
 const EditStorageAlertActions = (props: EditStorageAlertActionsProps) => {
-  const { postId, dispatch } = props;
   const { push } = useRouter();
-
   const deleteImages = useDeletePostContentImages();
 
   const handleContinue = () => {
     const post = storagePost.getEditStoragePost();
 
     if (!post) {
-      dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });
+      props.dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });
       return;
     }
 
     const { id, slug, content, imgUrls } = post;
 
-    if (id !== postId) {
+    if (id !== props.postId) {
       if (slug) {
         void push(`/posts/edit/${slug}`);
       } else {
@@ -44,14 +39,14 @@ const EditStorageAlertActions = (props: EditStorageAlertActionsProps) => {
     }
 
     if (content) {
-      dispatch({ type: "LOAD_EDIT_STORAGE_POST", payload: { content } });
+      props.dispatch({ type: "LOAD_EDIT_STORAGE_POST", payload: { content } });
       return;
     }
 
     if (imgUrls) deleteImages(imgUrls);
 
     localStorage.removeItem(storagePost.EDIT_STORAGE_POST);
-    dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });
+    props.dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });
   };
 
   const handleCancel = () => {
@@ -60,28 +55,16 @@ const EditStorageAlertActions = (props: EditStorageAlertActionsProps) => {
     if (post?.imgUrls) deleteImages(post.imgUrls);
 
     localStorage.removeItem(storagePost.EDIT_STORAGE_POST);
-    dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });
+    props.dispatch({ type: "HIDE_EDIT_STORAGE_POST_ALERT" });
   };
 
   return (
-    <>
-      <IconButton
-        aria-label="Continue with unfinished post"
-        size="small"
-        color="inherit"
-        onClick={handleContinue}
-      >
-        <CheckIcon />
-      </IconButton>
-      <IconButton
-        aria-label="Delete unfinished post"
-        size="small"
-        color="inherit"
-        onClick={handleCancel}
-      >
-        <CloseIcon />
-      </IconButton>
-    </>
+    <ToastActionButtons
+      proceedLabel="Continue with unfinished post"
+      cancelLabel="Delete unfinished post"
+      onProceed={handleContinue}
+      onCancel={handleCancel}
+    />
   );
 };
 

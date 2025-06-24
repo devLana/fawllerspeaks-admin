@@ -13,7 +13,7 @@ import { type IconButtonProps } from "@mui/material/IconButton";
 import useUnpublishPost from "@hooks/unpublishPost/useUnpublishPost";
 import useBinPost from "@hooks/binPost/useBinPost";
 import PostMenu from "./PostMenu";
-import PostActionsToastButtons from "./PostActionsToastButtons";
+import ToastActionButtons from "../ToastActionButtons";
 import type { PostStatus } from "@apiTypes";
 
 interface PostActionsProps {
@@ -55,9 +55,11 @@ const PostActions = (props: PostActionsProps) => {
         open={showToast}
         message={toastMessage}
         action={
-          <PostActionsToastButtons
+          <ToastActionButtons
+            proceedLabel="Yes unpublish post"
+            cancelLabel="Cancel"
+            onProceed={handleUnpublish}
             onCancel={() => setShowToast(false)}
-            onUnpublish={handleUnpublish}
           />
         }
         ContentProps={{
