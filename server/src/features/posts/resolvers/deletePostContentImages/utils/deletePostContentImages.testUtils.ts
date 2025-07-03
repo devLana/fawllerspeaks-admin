@@ -1,8 +1,10 @@
+import supabase from "@lib/supabase/supabaseClient";
+
 export const images = [
-  "https://soeoohvasnrkaxvjduim.supabase.co/storage/v1/object/public/images/path/to/image/file.jpg",
+  `${supabase().storageUrl}path/to/image/file.jpg`,
   "https://www.example.com",
   "https://www.test.com",
-  "https://soeoohvasnrkaxvjduim.supabase.co/storage/v1/object/public/images/storage/path/to/image/avatar/file.png",
+  `${supabase().storageUrl}storage/path/to/image/avatar/file.png`,
   "https://testing.com",
 ];
 
