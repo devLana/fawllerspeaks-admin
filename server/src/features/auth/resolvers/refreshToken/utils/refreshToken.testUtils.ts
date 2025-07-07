@@ -47,6 +47,6 @@ export const validJwt: [string, Record<string, string>[]][] = [
   ["Should return an error response if the session id is unknown", []],
   [
     "Should return an error response if the session was not assigned to the current user",
-    [{ user: "not_the_user" }],
+    [{ userUUID: "not_the_user" }],
   ],
 ];

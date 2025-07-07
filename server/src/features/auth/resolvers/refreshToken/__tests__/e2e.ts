@@ -47,9 +47,9 @@ describe("Refresh Token - E2E", () => {
       { sessionId: registeredSessionId, cookies: registeredCookies },
       { sessionId: unregisteredSessionId, cookies: unregisteredCookies },
     ] = await Promise.all([
-      testSession(db, newRegisteredUser.userId),
-      testSession(db, registeredUser.userId),
-      testSession(db, unregisteredUser.userId, "50"),
+      testSession(db, newRegisteredUser.userId, newRegisteredUser.userUUID),
+      testSession(db, registeredUser.userId, registeredUser.userUUID),
+      testSession(db, unregisteredUser.userId, unregisteredUser.userUUID, "50"),
     ]);
   });
 

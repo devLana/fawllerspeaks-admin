@@ -11,10 +11,14 @@ export const tagIds = [TAG_ID, UUID, randomUUID()];
 export const dateCreated = "2021-05-17 13:22:43.717+01";
 export const tags = ["tag", "tag", "tag"];
 export const url1 = { slug: "blog-post-title", href: "blog-post-title" };
-const slug = "another-blog-post-title";
-export const url2 = { href: "another-blog-post-title", slug };
+
+export const url2 = {
+  href: "another-blog-post-title",
+  slug: "another-blog-post-title",
+};
 
 export const user = {
+  userId: 36,
   isRegistered: true,
   authorName: "Author Name",
   authorImage: "/author/image/path",
@@ -158,13 +162,14 @@ export const validations = (nullOrUndefined?: null): Validations => [
 ];
 
 export const dbPost = {
-  id: "1",
+  id: "post-id-34",
   dateCreated,
   datePublished: dateCreated,
   lastModified: null,
   views: 0,
   isInBin: false,
   isDeleted: false,
+  status: "Published",
 };
 
 export const imageBanner = "post/image/banner";
@@ -182,6 +187,17 @@ export const postContentWithImage: PostContent = {
   __typename: "PostContent",
   html: '<p>post content</p><hr><a href="https://google.com" target="_blank" rel="noopener noreferrer">google link</a><p>hello world</p><p><img src="src"></p>',
   tableOfContents: null,
+};
+
+export const dbPostWithImage = {
+  ...dbPost,
+  slug: url1.slug,
+  title: argsWithImage.title,
+  description: argsWithImage.description,
+  excerpt: argsWithImage.excerpt,
+  content: argsWithImage.content,
+  imageBanner: argsWithImage.imageBanner,
+  tags,
 };
 
 export const argsWithNoImage = {
@@ -209,6 +225,17 @@ export const postContentWithNoImage: PostContent = {
       href: "#closing-heading",
     },
   ],
+};
+
+export const dbPostWithNoImage = {
+  ...dbPost,
+  slug: url2.slug,
+  title: argsWithNoImage.title,
+  description: argsWithNoImage.description,
+  excerpt: argsWithNoImage.excerpt,
+  content: argsWithNoImage.content,
+  imageBanner: argsWithNoImage.imageBanner,
+  tags: null,
 };
 
 export const verifyUser: [string, object[]][] = [

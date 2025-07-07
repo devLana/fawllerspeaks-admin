@@ -25,7 +25,6 @@ type EditPost = PostFieldResolver<ResolverFunc<MutationResolvers["editPost"]>>;
 interface FindById {
   postStatus: PostStatus;
   postImageBanner: string | null;
-  postTags: number[] | null;
 }
 
 interface FindBySlug {
@@ -38,10 +37,6 @@ interface User {
   isRegistered: boolean;
   userName: string;
   userImage: string | null;
-}
-
-interface EditedData extends Omit<PostDBData, "id"> {
-  imageBanner: string | null;
 }
 
 const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
@@ -85,8 +80,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
     const findPostById = db.query<FindById>(
       `SELECT
         status "postStatus",
-        image_banner "postImageBanner",
-        tags "postTags"
+        image_banner "postImageBanner"
       FROM posts
       WHERE post_id = $1`,
       [id]
@@ -112,7 +106,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
       return new UnknownError("Unable to edit post");
     }
 
-    const [{ postImageBanner, postTags }] = foundPost;
+    const [{ postImageBanner }] = foundPost;
     let [{ postStatus }] = foundPost;
     let datePublished = "";
 
@@ -126,10 +120,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
       }
     }
 
-    if (
-      (postStatus === "Published" || postStatus === "Unpublished") &&
-      (!description || !excerpt || !content)
-    ) {
+    if (postStatus !== "Draft" && (!description || !excerpt || !content)) {
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
 
       return new EditPostValidationError({
@@ -156,126 +147,103 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
     }
 
     const image = imageBanner === undefined ? postImageBanner : imageBanner;
-    let query: string;
-    let param: unknown[];
+    const tags = tagIds ? `{${tagIds.join(",")}}` : tagIds;
 
-    if (tagIds) {
-      query = `
-        WITH post_tag_ids AS (
-          SELECT NULLIF(
-            ARRAY(
-              SELECT id
-              FROM post_tags
-              WHERE tag_id = ANY ($1::uuid[])
-            ),
-            ARRAY[]::smallint[]
-          ) AS tag_ids
-        ),
-        edited_post AS (
-          UPDATE posts SET
-            title = $2,
-            description = $3,
-            excerpt = $4,
-            content = $5,
-            slug = $6,
-            image_banner = $7,
-            status = $8,
-            last_modified = CURRENT_TIMESTAMP(3),
-            tags = (SELECT tag_ids FROM post_tag_ids)
-            ${datePublished}
-          WHERE post_id = $9
-          RETURNING
-            image_banner,
-            date_created,
-            date_published,
-            last_modified,
-            views,
-            is_in_bin,
-            is_deleted,
-            tags
-        )
-      `;
-
-      param = [
-        `{${tagIds.join(",")}}`,
-        title,
-        description,
-        excerpt,
-        content,
-        slug,
-        image,
-        postStatus,
-        id,
-      ];
-    } else {
-      query = `
-        WITH edited_post AS (
-          UPDATE posts SET
-            title = $1,
-            description = $2,
-            excerpt = $3,
-            content = $4,
-            slug = $5,
-            image_banner = $6,
-            status = $7,
-            tags = $8,
-            last_modified = CURRENT_TIMESTAMP(3)
-            ${datePublished}
-          WHERE post_id = $9
-          RETURNING
-            image_banner,
-            date_created,
-            date_published,
-            last_modified,
-            views,
-            is_in_bin,
-            is_deleted,
-            tags
-        )
-      `;
-
-      param = [
-        title,
-        description,
-        excerpt,
-        content,
-        slug,
-        image,
-        postStatus,
-        tagIds === undefined ? postTags : tagIds,
-        id,
-      ];
-    }
-
-    const { rows: editedPost } = await db.query<EditedData>(
-      `
-        ${query}
-        SELECT
-          ep.image_banner "imageBanner",
-          ep.date_created "dateCreated",
-          ep.date_published "datePublished",
-          ep.last_modified "lastModified",
-          ep.views,
-          ep.is_in_bin "isInBin",
-          ep.is_deleted "isDeleted",
-          json_agg(json_build_object(
-            'id', pt.tag_id,
-            'name', pt.name,
-            'dateCreated', pt.date_created,
-            'lastModified', pt.last_modified
-          )) FILTER (WHERE pt.tag_id IS NOT NULL) tags
-        FROM edited_post ep LEFT JOIN post_tags pt
-        ON pt.id = ANY (ep.tags)
-        GROUP BY
-          ep.image_banner,
-          ep.date_created,
-          ep.date_published,
-          ep.last_modified,
-          ep.views,
-          ep.is_in_bin,
-          ep.is_deleted
-      `,
-      param
+    const { rows: editedPost } = await db.query<PostDBData>(
+      `WITH edit_post AS (
+        UPDATE posts SET
+          title = $1,
+          description = $2,
+          excerpt = $3,
+          slug = $4,
+          status = $5,
+          image_banner = $6,
+          last_modified = CURRENT_TIMESTAMP(3)
+          ${datePublished}
+        WHERE post_id = $7
+        RETURNING *
+      ),
+      resolved_tags AS (
+        SELECT id, tag_id, name, date_created, last_modified
+        FROM post_tags         
+        WHERE tag_id = ANY ($8::uuid[])
+      ),
+      tags_to_insert AS (
+        SELECT rt.id
+        FROM resolved_tags rt LEFT JOIN post_tags_to_posts ptp
+        ON rt.id = ptp.tag_id AND ptp.post_id = (SELECT id FROM edit_post)
+        WHERE ptp.tag_id IS NULL
+      ),
+      insert_tags AS (
+        INSERT INTO post_tags_to_posts (post_id, tag_id)
+        SELECT ep.id, ti.id
+        FROM edit_post ep CROSS JOIN tags_to_insert ti
+      ),
+      tags_to_delete AS (
+        SELECT ptp.tag_id
+        FROM resolved_tags rt RIGHT JOIN post_tags_to_posts ptp
+        ON ptp.tag_id = rt.id AND ptp.post_id = (SELECT id FROM edit_post)
+        WHERE rt.id IS NULL AND EXISTS (SELECT 1 FROM resolved_tags)
+      ),
+      delete_tags AS (
+        DELETE FROM post_tags_to_posts
+        WHERE post_id = (SELECT id FROM edit_post)
+        AND tag_id IN (SELECT tag_id FROM tags_to_delete)
+      ),
+      delete_content AS (
+        DELETE FROM post_contents
+        WHERE post_id = (SELECT id FROM edit_post)
+        AND $9::text IS NULL
+      ),
+      insert_or_upsert_content AS (
+        INSERT INTO post_contents (post_id, content)
+        SELECT id, $9::text
+        FROM edit_post
+        WHERE $9::text IS NOT NULL
+        ON CONFLICT (post_id)
+        DO UPDATE SET content = EXCLUDED.content
+      )
+      SELECT
+        ep.post_id id,
+        ep.slug,
+        ep.title,
+        ep.description,
+        ep.excerpt,
+        $9::text content,
+        ep.image_banner "imageBanner",
+        ep.status,
+        ep.date_created "dateCreated",
+        ep.date_published "datePublished",
+        ep.last_modified "lastModified",
+        ep.views,
+        ep.is_in_bin "isInBin",
+        ep.is_deleted "isDeleted",
+        json_agg(
+          json_build_object(
+            'id', rt.tag_id,
+            'name', rt.name,
+            'dateCreated', rt.date_created,
+            'lastModified', rt.last_modified
+          )
+        ) FILTER (WHERE rt.id IS NOT NULL) tags
+      FROM edit_post ep
+      LEFT JOIN resolved_tags rt ON TRUE
+      GROUP BY
+        ep.post_id,
+        ep.slug,
+        ep.title,
+        ep.description,
+        ep.excerpt,
+        $9::text,
+        ep.image_banner,
+        ep.status,
+        ep.date_created,
+        ep.date_published,
+        ep.last_modified,
+        ep.views,
+        ep.is_in_bin,
+        ep.is_deleted`,
+      [title, description, excerpt, slug, postStatus, image, id, tags, content]
     );
 
     if (imageBanner !== undefined && postImageBanner) {
@@ -285,14 +253,14 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
     const [edited] = editedPost;
 
     return new SinglePost({
-      id,
-      title,
-      description,
-      excerpt,
-      content,
+      id: edited.id,
+      title: edited.title,
+      description: edited.description,
+      excerpt: edited.excerpt,
+      content: edited.content,
       author: { name: userName, image: userImage },
       status: postStatus,
-      url: { slug, href: slug },
+      url: { slug: edited.slug, href: edited.slug },
       imageBanner: edited.imageBanner,
       dateCreated: edited.dateCreated,
       datePublished: edited.datePublished,

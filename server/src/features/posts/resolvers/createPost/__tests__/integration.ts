@@ -82,7 +82,7 @@ describe("Test createPost resolver", () => {
     it("Should create and publish a new post with an image banner and post tags", async () => {
       spyDb({ rows: [mocks.user] })
         .mockReturnValueOnce({ rows: [] })
-        .mockReturnValueOnce({ rows: [{ ...mocks.dbPost, tags: mocks.tags }] });
+        .mockReturnValueOnce({ rows: [mocks.dbPostWithImage] });
 
       const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
       const result = await createPost({}, { post }, mockContext, info);
@@ -107,14 +107,14 @@ describe("Test createPost resolver", () => {
 
       expect(result).toHaveProperty(
         "post.content",
-        mocks.postContentWithImage.html
+        mocks.argsWithImage.content
       );
     });
 
     it("Should create and publish a new post without an image banner and post tags", async () => {
       spyDb({ rows: [mocks.user] })
         .mockReturnValueOnce({ rows: [] })
-        .mockReturnValueOnce({ rows: [{ ...mocks.dbPost, tags: null }] });
+        .mockReturnValueOnce({ rows: [mocks.dbPostWithNoImage] });
 
       const post = mocks.argsWithNoImage;
       const result = await createPost({}, { post }, mockContext, info);
@@ -124,6 +124,11 @@ describe("Test createPost resolver", () => {
       expect(result).toHaveProperty("post.tags", null);
       expect(result).toHaveProperty("post.url", mocks.url2);
       expect(result).toHaveProperty("status", "SUCCESS");
+
+      expect(result).toHaveProperty(
+        "post.content",
+        mocks.argsWithNoImage.content
+      );
     });
   });
 });

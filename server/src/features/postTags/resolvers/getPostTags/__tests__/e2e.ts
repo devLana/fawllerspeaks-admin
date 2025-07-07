@@ -25,8 +25,8 @@ describe("Get post tags - E2E", () => {
     ({ server, url } = await startServer(0));
     const { registeredUser, unregisteredUser } = await testUsers(db);
 
-    const registered = loginTestUser(registeredUser.userId);
-    const unRegistered = loginTestUser(unregisteredUser.userId);
+    const registered = loginTestUser(registeredUser.userUUID);
+    const unRegistered = loginTestUser(unregisteredUser.userUUID);
     const createPostTags = createTestPostTags(db);
 
     [registeredJwt, unregisteredJwt, postTags] = await Promise.all([

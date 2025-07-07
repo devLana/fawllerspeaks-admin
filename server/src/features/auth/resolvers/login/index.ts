@@ -13,18 +13,19 @@ import { setCookies } from "@features/auth/utils/cookies";
 import signTokens from "@features/auth/utils/signTokens";
 
 import { type MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc, ValidationErrorObject } from "@types";
+import type { ResolverFunc } from "@types";
 import deleteSession from "@utils/deleteSession";
 
 type Login = ResolverFunc<MutationResolvers["login"]>;
 
 interface DBUser {
+  id: string;
+  userId: string;
   firstName: string | null;
   lastName: string | null;
   image: string | null;
   userEmail: string;
   userPassword: string;
-  userId: string;
   isRegistered: boolean;
   dateCreated: string;
 }
@@ -40,12 +41,13 @@ const login: Login = async (_, args, { db, res, req }) => {
     const session = generateBytes(28, "base64url");
     const findUser = db.query<DBUser>(
       `SELECT
+        id,
+        user_id "userId",
         first_name "firstName",
         last_name "lastName",
         image,
         email "userEmail",
         password "userPassword",
-        user_id "userId",
         is_registered "isRegistered",
         date_created "dateCreated"
       FROM users
@@ -61,12 +63,13 @@ const login: Login = async (_, args, { db, res, req }) => {
 
     const [
       {
+        id,
+        userId,
         firstName,
         lastName,
         image,
         userEmail,
         userPassword,
-        userId,
         isRegistered,
         dateCreated,
       },
@@ -83,8 +86,8 @@ const login: Login = async (_, args, { db, res, req }) => {
     if (!match) return new NotAllowedError("Invalid email or password");
 
     await db.query(
-      `INSERT INTO sessions (refresh_token, "user", session_id) VALUES ($1, $2, $3)`,
-      [refreshToken, userId, newSessionId]
+      `INSERT INTO sessions (refresh_token, user_id, session_id) VALUES ($1, $2, $3)`,
+      [refreshToken, id, newSessionId]
     );
 
     setCookies(res, cookies);
@@ -102,10 +105,7 @@ const login: Login = async (_, args, { db, res, req }) => {
     return new LoggedInUser(user, accessToken, newSessionId);
   } catch (err) {
     if (err instanceof ValidationError) {
-      const { emailError, passwordError } = generateErrorsObject(
-        err.details
-      ) as ValidationErrorObject<typeof args>;
-
+      const { emailError, passwordError } = generateErrorsObject(err.details);
       return new LoginValidationError(emailError, passwordError);
     }
 

@@ -43,8 +43,8 @@ describe("Change password - E2E", () => {
     ({ server, url } = await startServer(0));
     const { registeredUser: user, unregisteredUser } = await testUsers(db);
 
-    const registered = loginTestUser(user.userId);
-    const unRegistered = loginTestUser(unregisteredUser.userId);
+    const registered = loginTestUser(user.userUUID);
+    const unRegistered = loginTestUser(unregisteredUser.userUUID);
 
     [registeredJWT, unRegisteredJWT] = await Promise.all([
       registered,

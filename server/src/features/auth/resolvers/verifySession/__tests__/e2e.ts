@@ -42,14 +42,16 @@ describe("Verify Session - E2E", () => {
       db
     ));
 
+    const { userId, userUUID } = newRegisteredUser;
+
     [
       { cookies: newRegisteredCookies, sessionId: newRegisteredSessionId },
       { sessionId: registeredSessionId, cookies: registeredCookies },
       { sessionId: unregisteredSessionId, cookies: unregisteredCookies },
     ] = await Promise.all([
-      testSession(db, newRegisteredUser.userId, "50"),
-      testSession(db, registeredUser.userId),
-      testSession(db, unregisteredUser.userId, "50"),
+      testSession(db, userId, userUUID, "50"),
+      testSession(db, registeredUser.userId, registeredUser.userUUID),
+      testSession(db, unregisteredUser.userId, unregisteredUser.userUUID, "50"),
     ]);
   });
 
@@ -154,7 +156,7 @@ describe("Verify Session - E2E", () => {
           user: {
             __typename: "User",
             email: unRegisteredTestUser.email,
-            id: unregisteredUser.userId,
+            id: unregisteredUser.userUUID,
             firstName: unRegisteredTestUser.firstName,
             lastName: unRegisteredTestUser.lastName,
             image: null,
@@ -236,7 +238,7 @@ describe("Verify Session - E2E", () => {
           user: {
             __typename: "User",
             email: registeredTestUser.email,
-            id: registeredUser.userId,
+            id: registeredUser.userUUID,
             firstName: registeredTestUser.firstName,
             lastName: registeredTestUser.lastName,
             image: `${storageUrl}${registeredTestUser.image}`,

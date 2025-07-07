@@ -3,15 +3,15 @@ import { randomUUID } from "node:crypto";
 import type { InputErrors } from "@types";
 import type { EditPostInput, PostContent, PostStatus } from "@resolverTypes";
 
-export const UUID = randomUUID();
-export const name = "Author Name";
-export const tagIds = [UUID, randomUUID(), randomUUID()];
+const UUID = randomUUID();
+const name = "Author Name";
+const tagIds = [UUID, randomUUID(), randomUUID()];
 const dateCreated = "2021-05-17 13:22:43.717+01";
 const lastModified = "2023-02-14 20:18:59.953+01";
 export const imageBanner = "path/to/post/image/banner.png";
 export const url = { slug: "blog-post-title", href: "blog-post-title" };
 
-const content =
+export const content =
   '<h2 class="heading">heading element</h2><hr /><a href="blog/post/title">blog post link</a><p id="class-name">paragraph text <a href="//weird-link">weird link</a></p><p><img src="src" /></p>';
 
 export const html =
@@ -97,7 +97,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
   ],
   [
     "Should return a post id input validation error if an invalid post id is provided",
-    { id: "invalid-id", title: "title", editStatus: true },
+    { id: "invalid-id", title: "title", content: null, editStatus: true },
     {
       idError: "Invalid post id",
       titleError: nullOrUndefined,
@@ -148,6 +148,7 @@ export const validations = (nullOrUndefined?: null): Validations[] => [
     {
       id: UUID,
       title: "title",
+      content,
       tagIds: [...tagIds, randomUUID(), randomUUID(), randomUUID()],
     },
     {
@@ -242,15 +243,14 @@ export const verifyTitleSlug: [string, string, MockData][] = [
   ],
 ];
 
-export const checkedPost = {
-  postTitle: "Checked Post Title",
-  postSlug: "checked-post-title",
-  id: tagIds[1],
-};
-
 export const mockPost = { postStatus: "Draft", postImageBanner: imageBanner };
 
-export const dbPost = {
+const dbPost = {
+  id: UUID,
+  slug: url.slug,
+  title: input.title,
+  description: "Blog Post Description",
+  excerpt: "Blog Post Excerpt",
   dateCreated,
   lastModified,
   views: 0,
@@ -266,12 +266,26 @@ export const post1: EditPostInput = {
   editStatus: true,
 };
 
-export const post2: EditPostInput = { ...input, content, editStatus: false };
-export const mock2 = { ...dbPost, datePublished: null, tags: null };
+export const post2: EditPostInput = {
+  ...input,
+  content: null,
+  editStatus: false,
+};
 
 export const mock1 = {
   ...dbPost,
-  datePublished: dateCreated,
+  content: null,
   imageBanner,
+  datePublished: dateCreated,
   tags: tagIds,
+  status: "Published",
+};
+
+export const mock2 = {
+  ...dbPost,
+  content: html,
+  imageBanner: null,
+  datePublished: null,
+  tags: null,
+  status: "Draft",
 };

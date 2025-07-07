@@ -27,6 +27,7 @@ type VerifySession = ResolverFunc<MutationResolvers["verifySession"]>;
 
 interface DBResponse {
   userId: string;
+  userUUID: string;
   email: string;
   firstName: string | null;
   lastName: string | null;
@@ -42,15 +43,17 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
 
   const SELECT = `
     SELECT
-      "user" "userId",
-      email,
-      first_name "firstName",
-      last_name "lastName",
-      image,
-      is_Registered "isRegistered",
-      date_created "dateCreated"
-    FROM sessions LEFT JOIN users ON "user" = user_id
-    WHERE session_id = $1
+      u.id "userId",
+      u.user_id "userUUID",
+      u.email,
+      u.first_name "firstName",
+      u.last_name "lastName",
+      u.image,
+      u.is_Registered "isRegistered",
+      u.date_created "dateCreated"
+    FROM sessions s INNER JOIN users u
+    ON s.user_id = u.id
+    WHERE s.session_id = $1
   `;
 
   let validatedSession: string | null = null;
@@ -87,7 +90,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
       - clear cookies
       - send mail
     */
-    if (rows[0].userId !== sub) {
+    if (rows[0].userUUID !== sub) {
       await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
         validatedSession,
       ]);
@@ -102,8 +105,8 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     setCookies(res, cookies);
 
     await db.query(
-      `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND "user" = $3`,
-      [refreshToken, validatedSession, sub]
+      `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND user_id = $3`,
+      [refreshToken, validatedSession, rows[0].userId]
     );
 
     return new VerifiedSession(
@@ -137,7 +140,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
           - clear cookies
           - send mail
         */
-        if (rows[0].userId !== decodedPayload.sub) {
+        if (rows[0].userUUID !== decodedPayload.sub) {
           await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
             validatedSession,
           ]);
@@ -148,20 +151,20 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
         }
 
         const [refreshToken, accessToken, cookies] = await signTokens(
-          rows[0].userId
+          rows[0].userUUID
         );
 
         setCookies(res, cookies);
 
         await db.query(
-          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND "user" = $3`,
+          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND user_id = $3`,
           [refreshToken, validatedSession, rows[0].userId]
         );
 
         return new VerifiedSession(
           {
             email: rows[0].email,
-            id: rows[0].userId,
+            id: rows[0].userUUID,
             firstName: rows[0].firstName,
             lastName: rows[0].lastName,
             image: rows[0].image,

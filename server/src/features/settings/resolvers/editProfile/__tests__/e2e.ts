@@ -32,8 +32,8 @@ describe("Edit user profile - E2E", () => {
 
     user = registeredUser;
 
-    const registered = loginTestUser(registeredUser.userId);
-    const unRegistered = loginTestUser(unregisteredUser.userId);
+    const registered = loginTestUser(registeredUser.userUUID);
+    const unRegistered = loginTestUser(unregisteredUser.userUUID);
 
     [registeredJwt, unregisteredJwt] = await Promise.all([
       registered,
@@ -116,7 +116,7 @@ describe("Edit user profile - E2E", () => {
         __typename: "EditedProfile",
         user: {
           __typename: "User",
-          id: user.userId,
+          id: user.userUUID,
           email: mockUser.email,
           firstName: mocks.args.firstName,
           lastName: mocks.args.lastName,
@@ -143,7 +143,7 @@ describe("Edit user profile - E2E", () => {
         __typename: "EditedProfile",
         user: {
           __typename: "User",
-          id: user.userId,
+          id: user.userUUID,
           email: mockUser.email,
           firstName: mocks.args.firstName,
           lastName: mocks.args.lastName,

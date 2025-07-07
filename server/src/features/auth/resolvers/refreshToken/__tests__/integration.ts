@@ -145,7 +145,7 @@ describe("Test refresh token resolver", () => {
       });
 
       test("Current session was not assigned to the user of the cookie refresh token, Return an error response", async () => {
-        const spy = spyDb({ rows: [{ user: loggedInUserId }] });
+        const spy = spyDb({ rows: [{ userUUID: loggedInUserId }] });
 
         mockContext.req.cookies = authCookies;
         mockVerify.mockImplementation(() => {
@@ -161,14 +161,16 @@ describe("Test refresh token resolver", () => {
         expect(verify).toThrow(TokenExpiredError);
         expect(verify).toThrow("Expired refresh token");
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveReturnedWith({ rows: [{ user: loggedInUserId }] });
+        expect(spy).toHaveReturnedWith({
+          rows: [{ userUUID: loggedInUserId }],
+        });
         expect(result).toHaveProperty("message", "Unable to refresh token");
         expect(result).toHaveProperty("status", "ERROR");
       });
 
       test("Session refresh token does not match cookie refresh token, Return an error response and send a notification mail", async () => {
-        const email = "test@mail.com";
-        const data = [{ refreshToken: token, user: authUserId, email }];
+        const userEmail = "test@mail.com";
+        const data = [{ refreshToken: token, userUUID: authUserId, userEmail }];
         const spy = spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
 
         mockContext.req.cookies = authCookies;
@@ -185,7 +187,7 @@ describe("Test refresh token resolver", () => {
         expect(spy).toHaveNthReturnedWith(1, { rows: data });
         expect(spy).toHaveNthReturnedWith(2, { rows: [] });
         expect(sessionMail).toHaveBeenCalledTimes(1);
-        expect(sessionMail).toHaveBeenCalledWith(email);
+        expect(sessionMail).toHaveBeenCalledWith(userEmail);
         expect(clearCookies).toHaveBeenCalledTimes(1);
         expect(clearCookies).toHaveBeenCalledWith(response);
         expect(setCookies).not.toHaveBeenCalled();
@@ -194,8 +196,8 @@ describe("Test refresh token resolver", () => {
       });
 
       test("Session's refresh token does not match the cookie's refresh token and the session confirmation mail failed to send, Return an error response", async () => {
-        const email = "test@mail.com";
-        const data = [{ refreshToken: token, user: authUserId, email }];
+        const userEmail = "test@mail.com";
+        const data = [{ refreshToken: token, userUUID: authUserId, userEmail }];
         const spy = spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
 
         mockContext.req.cookies = authCookies;
@@ -216,7 +218,7 @@ describe("Test refresh token resolver", () => {
         expect(spy).toHaveNthReturnedWith(1, { rows: data });
         expect(spy).toHaveNthReturnedWith(2, { rows: [] });
         expect(sessionMail).toHaveBeenCalledTimes(1);
-        expect(sessionMail).toHaveBeenCalledWith(email);
+        expect(sessionMail).toHaveBeenCalledWith(userEmail);
         expect(sessionMail).toThrow(MailError);
         expect(clearCookies).toHaveBeenCalledTimes(1);
         expect(clearCookies).toHaveBeenCalledWith(response);
@@ -226,8 +228,10 @@ describe("Test refresh token resolver", () => {
       });
 
       test("Refresh tokens, Renew expired refresh token and send a new access token", async () => {
-        const email = "test@mail.com";
-        const data = [{ refreshToken: authToken, user: authUserId, email }];
+        const userEmail = "test@mail.com";
+        const userUUID = authUserId;
+        const userId = 18;
+        const data = [{ refreshToken: authToken, userId, userUUID, userEmail }];
         const spy = spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
 
         mockContext.req.cookies = authCookies;
@@ -274,8 +278,9 @@ describe("Test refresh token resolver", () => {
       });
 
       test("Session refresh token does not match the cookie refresh token, Return an error response and send a notification mail", async () => {
-        const email = "eample_mail@test.org";
-        const data = [{ refreshToken: token, user: loggedInUserId, email }];
+        const userEmail = "eample_mail@test.org";
+        const userUUID = loggedInUserId;
+        const data = [{ refreshToken: token, userUUID, userEmail }];
         const spy = spyDb({ rows: data }).mockReturnValue({ rows: [] });
 
         mockVerify.mockReturnValue({ sub: loggedInUserId });
@@ -288,7 +293,7 @@ describe("Test refresh token resolver", () => {
         expect(spy).toHaveNthReturnedWith(1, { rows: data });
         expect(spy).toHaveNthReturnedWith(2, { rows: [] });
         expect(sessionMail).toHaveBeenCalledTimes(1);
-        expect(sessionMail).toHaveBeenCalledWith(email);
+        expect(sessionMail).toHaveBeenCalledWith(userEmail);
         expect(clearCookies).toHaveBeenCalledTimes(1);
         expect(clearCookies).toHaveBeenCalledWith(response);
         expect(setCookies).not.toHaveBeenCalled();
@@ -297,8 +302,9 @@ describe("Test refresh token resolver", () => {
       });
 
       test("Session's refresh token does not match the cookie's refresh token and the session confirmation mail failed to send, Return an error response", async () => {
-        const email = "eample_mail@test.org";
-        const data = [{ refreshToken: token, user: loggedInUserId, email }];
+        const userEmail = "eample_mail@test.org";
+        const userUUID = loggedInUserId;
+        const data = [{ refreshToken: token, userUUID, userEmail }];
         const spy = spyDb({ rows: data }).mockReturnValue({ rows: [] });
 
         mockVerify.mockReturnValue({ sub: loggedInUserId });
@@ -315,7 +321,7 @@ describe("Test refresh token resolver", () => {
         expect(spy).toHaveNthReturnedWith(1, { rows: data });
         expect(spy).toHaveNthReturnedWith(2, { rows: [] });
         expect(sessionMail).toHaveBeenCalledTimes(1);
-        expect(sessionMail).toHaveBeenCalledWith(email);
+        expect(sessionMail).toHaveBeenCalledWith(userEmail);
         expect(sessionMail).toThrow(MailError);
         expect(clearCookies).toHaveBeenCalledTimes(1);
         expect(clearCookies).toHaveBeenCalledWith(response);
@@ -325,8 +331,9 @@ describe("Test refresh token resolver", () => {
       });
 
       test("Refresh tokens, Renew refresh token and send a new access token", async () => {
-        const email = "eample_mail@test.org";
-        const data = [{ refreshToken: jwToken, user: loggedInUserId, email }];
+        const userEmail = "eample_mail@test.org";
+        const userUUID = loggedInUserId;
+        const data = [{ refreshToken: jwToken, userUUID, userEmail }];
         const spy = spyDb({ rows: data }).mockReturnValueOnce({ rows: [] });
 
         mockVerify.mockReturnValueOnce({ sub: loggedInUserId });

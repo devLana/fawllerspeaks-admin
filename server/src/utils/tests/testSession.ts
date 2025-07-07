@@ -5,7 +5,12 @@ import type { Pool } from "pg";
 
 import { sign } from "@lib/tokenPromise";
 
-const testSession = async (db: Pool, userId: string, expiresIn = "15m") => {
+const testSession = async (
+  db: Pool,
+  userId: number,
+  userUUID: string,
+  expiresIn = "15m"
+) => {
   if (
     !process.env.REFRESH_TOKEN_SECRET ||
     !process.env.CIPHER_ALGORITHM ||
@@ -16,7 +21,7 @@ const testSession = async (db: Pool, userId: string, expiresIn = "15m") => {
   }
 
   try {
-    const refresh = sign({ sub: userId }, process.env.REFRESH_TOKEN_SECRET, {
+    const refresh = sign({ sub: userUUID }, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn,
     });
 
@@ -26,7 +31,7 @@ const testSession = async (db: Pool, userId: string, expiresIn = "15m") => {
     const sessionId = sessionBuffer.toString("base64url");
 
     await db.query(
-      `INSERT INTO sessions (refresh_token, "user", session_id) VALUES ($1, $2, $3)`,
+      `INSERT INTO sessions (refresh_token, user_id, session_id) VALUES ($1, $2, $3)`,
       [refreshToken, userId, sessionId]
     );
 

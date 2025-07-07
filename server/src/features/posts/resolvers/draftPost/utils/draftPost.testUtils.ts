@@ -10,11 +10,16 @@ export const UUID = randomUUID();
 export const dateCreated = "2021-05-17 13:22:43.717+01";
 export const imageBanner = "post/image/banner";
 export const tagIds = [UUID, USER_ID, randomUUID()];
+export const tags = [{ id: tagIds[0] }, { id: tagIds[1] }, { id: tagIds[2] }];
 export const url1 = { slug: "blog-post-title", href: "blog-post-title" };
-const slug = "another-blog-post-title";
-export const url2 = { href: "another-blog-post-title", slug };
+
+export const url2 = {
+  href: "another-blog-post-title",
+  slug: "another-blog-post-title",
+};
 
 export const user = {
+  userId: 44,
   isRegistered: true,
   authorName: "Author Name",
   authorImage: "/author/image/path",
@@ -57,9 +62,30 @@ export const dbData = {
   views: 0,
   isInBin: false,
   isDeleted: false,
+  status: "Draft",
 };
 
-export const tags = [{ id: tagIds[0] }, { id: tagIds[1] }, { id: tagIds[2] }];
+export const dbPostWithImage = {
+  ...dbData,
+  slug: url1.slug,
+  title: argsWithImage.title,
+  description: null,
+  excerpt: null,
+  content: null,
+  imageBanner: argsWithImage.imageBanner,
+  tags,
+};
+
+export const dbPostWithNoImage = {
+  ...dbData,
+  slug: url2.slug,
+  title: argsWithNoImage.title,
+  description: null,
+  excerpt: null,
+  content: html,
+  imageBanner: null,
+  tags: null,
+};
 
 export const validations = (nullOrUndefined?: null): Validations[] => [
   [

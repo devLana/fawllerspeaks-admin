@@ -19,13 +19,14 @@ import generateErrorsObject from "@utils/generateErrorsObject";
 import deleteSession from "@utils/deleteSession";
 
 import type { MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc, PostDBData, PostFieldResolver } from "@types";
+import type { ResolverFunc, PostFieldResolver, PostDBData } from "@types";
 
 type DraftPost = PostFieldResolver<
   ResolverFunc<MutationResolvers["draftPost"]>
 >;
 
 interface User {
+  userId: string;
   isRegistered: boolean;
   authorName: string;
   authorImage: string | null;
@@ -47,6 +48,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
 
     const { rows: loggedInUser } = await db.query<User>(
       `SELECT
+        id "userId",
         is_registered "isRegistered",
         concat(first_name,' ',last_name) "authorName",
         image "authorImage"
@@ -61,7 +63,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       return new NotAllowedError("Unable to save post to draft");
     }
 
-    const [{ authorImage, authorName, isRegistered }] = loggedInUser;
+    const [{ userId, authorImage, authorName, isRegistered }] = loggedInUser;
 
     if (!isRegistered) {
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
@@ -94,79 +96,82 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
     const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
     const { rows: draftedPost } = await db.query<PostDBData>(
-      `WITH post_tag_ids AS (
-        SELECT NULLIF(
-          ARRAY(
-            SELECT id
-            FROM post_tags
-            WHERE tag_id = ANY ($8::uuid[])
-          ),
-          '{}'
-        ) AS tag_ids
+      `WITH draft_post AS (
+        INSERT INTO posts (title, description, excerpt, slug, author, image_banner, status)
+        VALUES ($1, $2, $3, $4, $5, $6, 'Draft')
+        RETURNING *
       ),
-      drafted_post AS (
-        INSERT INTO posts (
-          title,
-          description,
-          excerpt,
-          content,
-          slug,
-          author,
-          status,
-          image_banner,
-          tags
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, 'Draft', $7, (SELECT tag_ids FROM post_tag_ids))
-        RETURNING
-          post_id,
-          date_created,
-          date_published,
-          last_modified,
-          views,
-          is_in_bin,
-          is_deleted,
-          tags
+      resolved_tags AS (
+        SELECT id, tag_id, name, date_created, last_modified
+        FROM post_tags
+        WHERE tag_id = ANY (CAST($7 AS uuid[]))
+      ),
+      insert_tags AS (
+        INSERT INTO post_tags_to_posts (post_id, tag_id)
+        SELECT dp.id, rt.id
+        FROM draft_post dp, resolved_tags rt
+      ),
+      insert_content AS (
+        INSERT INTO post_contents (post_id, content)
+        SELECT id, CAST($8 AS text)
+        FROM draft_post
+        WHERE CAST($8 AS text) IS NOT NULL
       )
       SELECT
         dp.post_id id,
+        dp.slug,
+        dp.title,
+        dp.description,
+        dp.excerpt,
+        CAST($8 AS text) content,
+        dp.image_banner "imageBanner",
+        dp.status,
         dp.date_created "dateCreated",
         dp.date_published "datePublished",
         dp.last_modified "lastModified",
         dp.views,
         dp.is_in_bin "isInBin",
         dp.is_deleted "isDeleted",
-        json_agg(json_build_object(
-          'id', pt.tag_id,
-          'name', pt.name,
-          'dateCreated', pt.date_created,
-          'lastModified', pt.last_modified
-        )) FILTER (WHERE pt.tag_id IS NOT NULL) tags
-      FROM drafted_post dp
-      LEFT JOIN post_tags pt
-      ON pt.id = ANY (dp.tags)
+        json_agg(
+          json_build_object(
+            'id', rt.tag_id,
+            'name', rt.name,
+            'dateCreated', rt.date_created,
+            'lastModified', rt.last_modified
+          )
+        ) FILTER (WHERE rt.id IS NOT NULL) tags
+      FROM draft_post dp
+      LEFT JOIN resolved_tags rt ON TRUE
       GROUP BY
         dp.post_id,
+        dp.slug,
+        dp.title,
+        dp.description,
+        dp.excerpt,
+        CAST($8 AS text),
+        dp.image_banner,
+        dp.status,
         dp.date_created,
         dp.date_published,
         dp.last_modified,
         dp.views,
         dp.is_in_bin,
         dp.is_deleted`,
-      [title, description, excerpt, content, slug, user, imageBanner, dbTags]
+      [title, description, excerpt, slug, userId, imageBanner, dbTags, content]
     );
 
     const [drafted] = draftedPost;
 
     return new SinglePost({
       id: drafted.id,
-      title,
-      description,
-      excerpt,
-      content,
+      title: drafted.title,
+      description: drafted.description,
+      excerpt: drafted.excerpt,
+      content: drafted.content,
       author: { name: authorName, image: authorImage },
       status: "Draft",
-      url: { slug, href: slug },
-      imageBanner,
+      url: { slug: drafted.slug, href: drafted.slug },
+      imageBanner: drafted.imageBanner,
       dateCreated: drafted.dateCreated,
       datePublished: drafted.datePublished,
       lastModified: drafted.lastModified,

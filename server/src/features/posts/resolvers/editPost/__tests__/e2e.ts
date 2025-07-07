@@ -36,8 +36,8 @@ describe("Edit post - E2E", () => {
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
     const { registeredUser, unregisteredUser } = await testUsers(db);
-    const registered = loginTestUser(registeredUser.userId);
-    const unRegistered = loginTestUser(unregisteredUser.userId);
+    const registered = loginTestUser(registeredUser.userUUID);
+    const unRegistered = loginTestUser(unregisteredUser.userUUID);
     const createPostTags = createTestPostTags(db);
 
     [registeredJwt, unregisteredJwt, postTags] = await Promise.all([
@@ -255,10 +255,10 @@ describe("Edit post - E2E", () => {
   describe("Edit post", () => {
     const { storageUrl } = supabase();
 
-    it("All input fields are passed, Expect the post status and all relevant post fields to be edited", async () => {
+    it("Expect a post to be edited with new data", async () => {
       const { id } = publishedPost;
-      const tagIds = postTags.map(postTag => postTag.id);
-      const postData = { ...mocks.post1, id, tagIds };
+      const tagIds = postTags.map(postTag => postTag.id).slice(1, 4);
+      const postData = { ...mocks.post1, id, tagIds, editStatus: false };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -276,25 +276,23 @@ describe("Edit post - E2E", () => {
           excerpt: postData.excerpt,
           content: mocks.expectedPostContent,
           imageBanner: `${storageUrl}${mocks.imageBanner}`,
-          tags: expect.arrayContaining(postTags),
-          status: "Unpublished",
+          tags: expect.arrayContaining(postTags.slice(1, 4)),
+          status: "Published",
           url: {
             __typename: "PostUrl",
             slug: "blog-post-title",
             href: `${urls.siteUrl}/blog/blog-post-title`,
           },
-          datePublished: null,
+          datePublished: expect.stringMatching(DATE_REGEX),
           lastModified: expect.stringMatching(DATE_REGEX),
         },
         status: "SUCCESS",
       });
     });
 
-    it("Should edit a post with the provided input data without editing the post status", async () => {
+    it("Expect post tags to be deleted and the content of a 'Draft' post to be deleted", async () => {
       const { id } = draftPost;
-      const { editStatus: _, ...rest } = mocks.post2;
-      const title = "Another Draft Blog Post Title";
-      const postData = { ...rest, id, title };
+      const postData = { ...mocks.post2, title: "Testing A Draft Post", id };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -310,44 +308,107 @@ describe("Edit post - E2E", () => {
           title: postData.title,
           description: postData.description,
           excerpt: postData.excerpt,
-          content: mocks.expectedPostContent,
+          content: null,
+          imageBanner: `${storageUrl}post/image/banner/storage/path`,
+          tags: null,
+          status: "Draft",
           url: {
             __typename: "PostUrl",
-            slug: "another-draft-blog-post-title",
-            href: `${urls.siteUrl}/blog/another-draft-blog-post-title`,
+            slug: "testing-a-draft-post",
+            href: `${urls.siteUrl}/blog/testing-a-draft-post`,
           },
+          datePublished: null,
           lastModified: expect.stringMatching(DATE_REGEX),
         },
         status: "SUCCESS",
       });
     });
 
-    it("Input passed has the same title but different metadata, Expect the post title to remain the same but with different metadata", async () => {
-      const { id, title } = unpublishedPost;
-      const { imageBanner = null, tagIds = null } = mocks.post2;
-      const postData = { ...mocks.post2, id, title, tagIds, imageBanner };
-      const payload = { query: EDIT_POST, variables: { post: postData } };
+    it("Expect a 'Draft' post to be updated to a 'Published' post", async () => {
+      const { id, title, description, excerpt } = draftPost;
+      const content = draftPost.content?.html;
       const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const payload = {
+        query: EDIT_POST,
+        variables: {
+          post: { id, title, description, excerpt, content, editStatus: true },
+        },
+      };
 
       const { data } = await post<Edit>(url, payload, options);
 
-      expect(mockEvent).toHaveBeenCalledTimes(1);
+      expect(mockEvent).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.editPost).toStrictEqual({
+        __typename: "SinglePost",
+        post: {
+          ...draftPost,
+          tags: null,
+          status: "Published",
+          datePublished: expect.stringMatching(DATE_REGEX),
+          lastModified: expect.stringMatching(DATE_REGEX),
+        },
+        status: "SUCCESS",
+      });
+    });
+
+    it("Expect a 'Published' post to be updated to an 'Unpublished' post", async () => {
+      const { id, title, description, excerpt } = publishedPost;
+      const content = publishedPost.content?.html;
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const payload = {
+        query: EDIT_POST,
+        variables: {
+          post: { id, title, description, excerpt, content, editStatus: true },
+        },
+      };
+
+      const { data } = await post<Edit>(url, payload, options);
+
+      expect(mockEvent).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.editPost).toStrictEqual({
+        __typename: "SinglePost",
+        post: {
+          ...publishedPost,
+          tags: null,
+          imageBanner: `${storageUrl}${mocks.imageBanner}`,
+          status: "Unpublished",
+          datePublished: null,
+          lastModified: expect.stringMatching(DATE_REGEX),
+        },
+        status: "SUCCESS",
+      });
+    });
+
+    it("Expect a 'Unpublished' post to be updated to a 'Published' post", async () => {
+      const { id, title, description, excerpt } = unpublishedPost;
+      const content = unpublishedPost.content?.html;
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const payload = {
+        query: EDIT_POST,
+        variables: {
+          post: { id, title, description, excerpt, content, editStatus: true },
+        },
+      };
+
+      const { data } = await post<Edit>(url, payload, options);
+
+      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editPost).toStrictEqual({
         __typename: "SinglePost",
         post: {
           ...unpublishedPost,
-          description: postData.description,
-          excerpt: postData.excerpt,
-          content: mocks.expectedPostContent,
-          imageBanner: null,
           tags: null,
-          url: {
-            __typename: "PostUrl",
-            slug: "create-test-post-unpublished-title",
-            href: `${urls.siteUrl}/blog/create-test-post-unpublished-title`,
-          },
+          status: "Published",
+          datePublished: expect.stringMatching(DATE_REGEX),
           lastModified: expect.stringMatching(DATE_REGEX),
         },
         status: "SUCCESS",

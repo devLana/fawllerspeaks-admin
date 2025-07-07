@@ -30,8 +30,8 @@ describe("Register user - E2E", () => {
     const { unregisteredUser, registeredUser } = await testUsers(db);
     user = unregisteredUser;
 
-    const logInRegistered = loginTestUser(registeredUser.userId);
-    const logInUnregistered = loginTestUser(unregisteredUser.userId);
+    const logInRegistered = loginTestUser(registeredUser.userUUID);
+    const logInUnregistered = loginTestUser(unregisteredUser.userUUID);
 
     [registeredJwt, unregisteredJwt] = await Promise.all([
       logInRegistered,
@@ -123,7 +123,7 @@ describe("Register user - E2E", () => {
         __typename: "RegisteredUser",
         user: {
           __typename: "User",
-          id: user.userId,
+          id: user.userUUID,
           email: unRegisteredUser.email,
           firstName: "Bart",
           lastName: "Simpson",

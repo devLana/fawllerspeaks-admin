@@ -29,18 +29,25 @@ type Refresh = ResolverFunc<MutationResolvers["refreshToken"]>;
 
 interface DBResponse {
   refreshToken: string;
-  email: string;
-  user: string;
+  userId: number;
+  userEmail: string;
+  userUUID: string;
 }
 
 const refreshToken: Refresh = async (_, args, { db, req, res }) => {
   if (!process.env.REFRESH_TOKEN_SECRET) throw new GraphQLError("Server Error");
 
   const SELECT = `
-    SELECT refresh_token "refreshToken", "user", email
-    FROM sessions LEFT JOIN users ON "user" = user_id
-    WHERE session_id = $1
+    SELECT
+      s.refresh_token "refreshToken",
+      u.id "userId",
+      u.email "userEmail",
+      u.user_id "userUUID"
+    FROM sessions s INNER JOIN users u
+    ON s.user_id = u.id
+    WHERE s.session_id = $1
   `;
+
   let payload = "";
   let validatedSession: string | null = null;
   let jwt: string | null = null;
@@ -71,7 +78,7 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
     if (rows.length === 0) return new UnknownError("Unable to refresh token");
 
     // Provided session was not assigned to the current user
-    if (rows[0].user !== sub) {
+    if (rows[0].userUUID !== sub) {
       return new UserSessionError("Unable to refresh token");
     }
 
@@ -87,7 +94,7 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
       ]);
 
       clearCookies(res);
-      await sessionMail(rows[0].email);
+      await sessionMail(rows[0].userEmail);
       return new NotAllowedError("Unable to refresh token");
     }
 
@@ -96,8 +103,8 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
     setCookies(res, cookies);
 
     await db.query(
-      `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND "user" = $3`,
-      [newRefreshToken, validatedSession, sub]
+      `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND user_id = $3`,
+      [newRefreshToken, validatedSession, rows[0].userId]
     );
 
     return new AccessToken(accessToken);
@@ -115,7 +122,7 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
         const decodedPayload = JSON.parse(decoded) as { sub: string };
 
         // Provided session was not assigned to the current user
-        if (rows[0].user !== decodedPayload.sub) {
+        if (rows[0].userUUID !== decodedPayload.sub) {
           return new UserSessionError("Unable to refresh token");
         }
 
@@ -131,19 +138,19 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
           ]);
 
           clearCookies(res);
-          await sessionMail(rows[0].email);
+          await sessionMail(rows[0].userEmail);
           return new NotAllowedError("Unable to refresh token");
         }
 
         const [newRefreshToken, accessToken, cookies] = await signTokens(
-          rows[0].user
+          rows[0].userUUID
         );
 
         setCookies(res, cookies);
 
         await db.query(
-          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND "user" = $3`,
-          [newRefreshToken, validatedSession, rows[0].user]
+          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND user_id = $3`,
+          [newRefreshToken, validatedSession, rows[0].userId]
         );
 
         return new AccessToken(accessToken);

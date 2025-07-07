@@ -92,7 +92,7 @@ describe("Login - E2E", () => {
         user: {
           __typename: "User",
           email: registeredUser.email,
-          id: user.userId,
+          id: user.userUUID,
           firstName: registeredUser.firstName,
           lastName: registeredUser.lastName,
           image: `${storageUrl}${registeredUser.image}`,

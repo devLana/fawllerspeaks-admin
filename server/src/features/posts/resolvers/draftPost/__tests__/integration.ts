@@ -83,7 +83,7 @@ describe("Test draft post resolver", () => {
     it("Should save a new post with an image banner and post tags as draft", async () => {
       spyDb({ rows: [mocks.user] })
         .mockReturnValueOnce({ rows: [] })
-        .mockReturnValueOnce({ rows: [{ ...mocks.dbData, tags: mocks.tags }] });
+        .mockReturnValueOnce({ rows: [mocks.dbPostWithImage] });
 
       const post = { ...mocks.argsWithImage, tagIds: mocks.tagIds };
       const result = await draftPost({}, { post }, mockContext, info);
@@ -91,9 +91,9 @@ describe("Test draft post resolver", () => {
       expect(mockEvent).not.toHaveBeenCalled();
       expect(result).toHaveProperty("post.id", mocks.dbData.id);
       expect(result).toHaveProperty("post.title", post.title);
-      expect(result).toHaveProperty("post.description", undefined);
-      expect(result).toHaveProperty("post.excerpt", undefined);
-      expect(result).toHaveProperty("post.content", undefined);
+      expect(result).toHaveProperty("post.description", null);
+      expect(result).toHaveProperty("post.excerpt", null);
+      expect(result).toHaveProperty("post.content", null);
       expect(result).toHaveProperty("post.url", mocks.url1);
       expect(result).toHaveProperty("post.author", mocks.author);
       expect(result).toHaveProperty("post.status", "Draft");
@@ -111,7 +111,7 @@ describe("Test draft post resolver", () => {
     it("Should save a new post with an image banner and post tags as draft", async () => {
       spyDb({ rows: [mocks.user] })
         .mockReturnValueOnce({ rows: [] })
-        .mockReturnValueOnce({ rows: [{ ...mocks.dbData, tags: null }] });
+        .mockReturnValueOnce({ rows: [mocks.dbPostWithNoImage] });
 
       const post = mocks.argsWithNoImage;
       const result = await draftPost({}, { post }, mockContext, info);
@@ -119,8 +119,8 @@ describe("Test draft post resolver", () => {
       expect(mockEvent).not.toHaveBeenCalled();
       expect(result).toHaveProperty("post.id", mocks.dbData.id);
       expect(result).toHaveProperty("post.title", post.title);
-      expect(result).toHaveProperty("post.description", undefined);
-      expect(result).toHaveProperty("post.excerpt", undefined);
+      expect(result).toHaveProperty("post.description", null);
+      expect(result).toHaveProperty("post.excerpt", null);
       expect(result).toHaveProperty("post.content", mocks.html);
       expect(result).toHaveProperty("post.author", mocks.author);
       expect(result).toHaveProperty("post.status", "Draft");

@@ -2,7 +2,6 @@ import type { Pool } from "pg";
 
 import supabase from "@lib/supabase/supabaseClient";
 import { getPostContentResponse } from "@features/posts/utils/getPostContentResponse";
-import getPostSlug from "@features/posts/utils/getPostSlug";
 import { urls } from "@utils/ClientUrls";
 import dateToISOString from "@utils/dateToISOString";
 
@@ -21,7 +20,8 @@ interface Options {
   postData: TestPostData;
 }
 
-type OmitKeys = "author" | "url" | "tags" | "postId";
+type OmitKeys = "author" | "url" | "postId";
+type DBPost = Omit<GetPostDBData, OmitKeys> & { slug: string };
 
 const createTestPost = async (params: Options): Promise<Post> => {
   const { db, postTags, postAuthor, postData } = params;
@@ -29,53 +29,85 @@ const createTestPost = async (params: Options): Promise<Post> => {
   const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
   try {
-    const { rows } = await db.query<Omit<GetPostDBData, OmitKeys>>(
-      `WITH post_tag_ids AS (
-        SELECT NULLIF(
-          ARRAY(
-            SELECT id
-            FROM post_tags
-            WHERE tag_id = ANY ($13::uuid[])
-          ),
-          ARRAY[]::smallint[]
-        ) AS tag_ids
+    const { rows } = await db.query<DBPost>(
+      `WITH create_post AS (
+        INSERT INTO posts (
+          title,
+          slug,
+          description,
+          excerpt,
+          author,
+          status,
+          image_banner,
+          date_published,
+          last_modified,
+          is_in_bin,
+          is_deleted
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        RETURNING *
+      ),
+      resolved_tags AS (
+        SELECT id, tag_id, name, date_created, last_modified
+        FROM post_tags
+        WHERE tag_id = ANY ($12::uuid[])
+      ),
+      insert_tags AS (
+        INSERT INTO post_tags_to_posts (post_id, tag_id)
+        SELECT cp.id, rt.id
+        FROM create_post cp CROSS JOIN resolved_tags rt
+      ),
+      insert_content AS (
+        INSERT INTO post_contents (post_id, content)
+        SELECT id, $13::text
+        FROM create_post
+        WHERE $13::text IS NOT NULL
       )
-      INSERT INTO posts (
-        title,
-        slug,
-        description,
-        excerpt,
-        content,
-        author,
-        status,
-        image_banner,
-        date_published,
-        last_modified,
-        is_in_bin,
-        is_deleted,
-        tags
-      ) VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, (SELECT tag_ids FROM post_tag_ids))
-      RETURNING
-        post_id id,
-        title,
-        description,
-        excerpt,
-        content,
-        status,
-        image_banner "imageBanner",
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
-        views,
-        is_in_bin "isInBin",
-        is_deleted "isDeleted";`,
+      SELECT
+        cp.post_id id,
+        cp.slug,
+        cp.title,
+        cp.description,
+        cp.excerpt,
+        $13::text content,
+        cp.status,
+        cp.image_banner "imageBanner",
+        cp.date_created "dateCreated",
+        cp.date_published "datePublished",
+        cp.last_modified "lastModified",
+        cp.views,
+        cp.is_in_bin "isInBin",
+        cp.is_deleted "isDeleted",
+        json_agg(
+          json_build_object(
+            'id', rt.tag_id,
+            'name', rt.name,
+            'dateCreated', rt.date_created,
+            'lastModified', rt.last_modified
+          )
+        ) FILTER (WHERE rt.id IS NOT NULL) tags
+      FROM create_post cp
+      LEFT JOIN resolved_tags rt ON TRUE
+      GROUP BY
+        cp.post_id,
+        cp.slug,
+        cp.title,
+        cp.description,
+        cp.excerpt,
+        cp.status,
+        cp.image_banner,
+        cp.date_created,
+        cp.date_published,
+        cp.last_modified,
+        cp.views,
+        cp.is_in_bin,
+        cp.is_deleted,
+        $13::text`,
       [
         postData.title,
         postData.slug,
         postData.description,
         postData.excerpt,
-        postData.content,
         postAuthor.userId,
         postData.status,
         postData.imageBanner,
@@ -84,12 +116,12 @@ const createTestPost = async (params: Options): Promise<Post> => {
         postData.isInBin,
         postData.isDeleted,
         dbTags,
+        postData.content,
       ]
     );
 
     const [post] = rows;
     const { storageUrl } = supabase();
-    const slug = getPostSlug(post.title);
     let content: PostContent | null = null;
 
     const datePublished = post.datePublished
@@ -133,8 +165,8 @@ const createTestPost = async (params: Options): Promise<Post> => {
       status: post.status,
       url: {
         __typename: "PostUrl",
-        slug,
-        href: `${urls.siteUrl}/blog/${slug}`,
+        slug: post.slug,
+        href: `${urls.siteUrl}/blog/${post.slug}`,
       },
       imageBanner: post.imageBanner ? `${storageUrl}${post.imageBanner}` : null,
       dateCreated: dateToISOString(post.dateCreated),

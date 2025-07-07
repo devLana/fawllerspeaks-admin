@@ -1,13 +1,13 @@
 import { sign } from "@lib/tokenPromise";
 
-const loginTestUser = async (userId: string, expiresIn = "10m") => {
+const loginTestUser = async (userUUID: string, expiresIn = "10m") => {
   if (!process.env.ACCESS_TOKEN_SECRET) {
     throw new Error("No secret in environment");
   }
 
   try {
     const accessToken = await sign(
-      { sub: userId },
+      { sub: userUUID },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn }
     );

@@ -26,8 +26,8 @@ describe("Get post - E2E", () => {
     ({ server, url } = await startServer(0));
     const { registeredUser, unregisteredUser } = await testUsers(db);
 
-    const registered = loginTestUser(registeredUser.userId);
-    const unRegistered = loginTestUser(unregisteredUser.userId);
+    const registered = loginTestUser(registeredUser.userUUID);
+    const unRegistered = loginTestUser(unregisteredUser.userUUID);
     const createPostTags = createTestPostTags(db);
 
     [registeredJwt, unregisteredJwt, postTags] = await Promise.all([
@@ -145,7 +145,7 @@ describe("Get post - E2E", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.getPost).toStrictEqual({
         __typename: "SinglePost",
-        post: post1,
+        post: { ...post1, tags: expect.arrayContaining(postTags) },
         status: "SUCCESS",
       });
     });

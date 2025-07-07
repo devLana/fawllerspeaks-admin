@@ -30,7 +30,10 @@ const logout: Logout = async (_, { sessionId }, { db, user, req, res }) => {
 
     if (!auth && !sig && !token) {
       const { rows } = await db.query<{ user: string }>(
-        `SELECT "user" FROM sessions WHERE session_id = $1`,
+        `SELECT u.user_id "user"
+        FROM sessions s INNER JOIN users u
+        ON s.user_id = u.id
+        WHERE s.session_id = $1`,
         [validatedSession]
       );
 
@@ -51,17 +54,19 @@ const logout: Logout = async (_, { sessionId }, { db, user, req, res }) => {
 
     const jwToken = `${sig}.${auth}.${token}`;
 
-    const { rows: session } = await db.query(
-      `SELECT id FROM sessions
-      WHERE "user" = $1 AND session_id = $2 AND refresh_token = $3`,
+    const { rows: session } = await db.query<{ user: string }>(
+      `SELECT u.id "user"
+      FROM sessions s INNER JOIN users u
+      ON s.user_id = u.id
+      WHERE u.user_id = $1 AND s.session_id = $2 AND s.refresh_token = $3`,
       [user, validatedSession, jwToken]
     );
 
     if (session.length === 0) return new UnknownError("Unable to logout");
 
     await db.query(
-      `DELETE FROM sessions WHERE "user" = $1 AND session_id = $2 AND refresh_token = $3`,
-      [user, validatedSession, jwToken]
+      `DELETE FROM sessions WHERE user_id = $1 AND session_id = $2 AND refresh_token = $3`,
+      [session[0].user, validatedSession, jwToken]
     );
 
     clearCookies(res);

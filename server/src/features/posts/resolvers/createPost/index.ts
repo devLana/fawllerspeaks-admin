@@ -17,13 +17,14 @@ import generateErrorsObject from "@utils/generateErrorsObject";
 import deleteSession from "@utils/deleteSession";
 
 import type { MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc, PostDBData, PostFieldResolver } from "@types";
+import type { ResolverFunc, PostFieldResolver, PostDBData } from "@types";
 
 type CreatePost = PostFieldResolver<
   ResolverFunc<MutationResolvers["createPost"]>
 >;
 
 interface User {
+  userId: string;
   isRegistered: boolean;
   authorName: string;
   authorImage: string | null;
@@ -45,6 +46,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
 
     const { rows: loggedInUser } = await db.query<User>(
       `SELECT
+        id "userId",
         is_registered "isRegistered",
         concat(first_name,' ',last_name) "authorName",
         image "authorImage"
@@ -59,7 +61,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       return new NotAllowedError("Unable to create post");
     }
 
-    const [{ authorName, authorImage, isRegistered }] = loggedInUser;
+    const [{ userId, authorName, authorImage, isRegistered }] = loggedInUser;
 
     if (!isRegistered) {
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
@@ -92,80 +94,82 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
     const { rows: savedPost } = await db.query<PostDBData>(
-      `WITH post_tag_ids AS (
-        SELECT NULLIF(
-          ARRAY(
-            SELECT id
-            FROM post_tags
-            WHERE tag_id = ANY ($8::uuid[])
-          ),
-          '{}'
-        ) AS tag_ids
+      `WITH create_post AS (
+        INSERT INTO posts (title, description, excerpt, slug, author, image_banner, status, date_published)
+        VALUES ($1, $2, $3, $4, $5, $6, 'Published', CURRENT_TIMESTAMP(3))
+        RETURNING *
       ),
-      created_post AS (
-        INSERT INTO posts (
-          title,
-          description,
-          excerpt,
-          content,
-          slug,
-          author,
-          status,
-          image_banner,
-          date_published,
-          tags
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, 'Published', $7, CURRENT_TIMESTAMP(3), (SELECT tag_ids FROM post_tag_ids))
-        RETURNING
-          post_id,
-          date_created,
-          date_published,
-          last_modified,
-          views,
-          is_in_bin,
-          is_deleted,
-          tags
+      resolved_tags AS (
+        SELECT id, tag_id, name, date_created, last_modified
+        FROM post_tags
+        WHERE tag_id = ANY ($7::uuid[])
+      ),
+      insert_tags AS (
+        INSERT INTO post_tags_to_posts (post_id, tag_id)
+        SELECT cp.id, rt.id
+        FROM create_post cp, resolved_tags rt
+        WHERE EXISTS (SELECT 1 FROM resolved_tags)
+      ),
+      insert_content AS (
+        INSERT INTO post_contents (post_id, content)
+        SELECT id, $8::text
+        FROM create_post
       )
       SELECT
         cp.post_id id,
+        cp.slug,
+        cp.title,
+        cp.description,
+        cp.excerpt,
+        $8::text content,
+        cp.status,
+        cp.image_banner "imageBanner",
         cp.date_created "dateCreated",
         cp.date_published "datePublished",
         cp.last_modified "lastModified",
         cp.views,
         cp.is_in_bin "isInBin",
         cp.is_deleted "isDeleted",
-        json_agg(json_build_object(
-          'id', pt.tag_id,
-          'name', pt.name,
-          'dateCreated', pt.date_created,
-          'lastModified', pt.last_modified
-        )) FILTER (WHERE pt.tag_id IS NOT NULL) tags
-      FROM created_post cp
-      LEFT JOIN post_tags pt
-      ON pt.id = ANY (cp.tags)
+        json_agg(
+          json_build_object(
+            'id', rt.tag_id,
+            'name', rt.name,
+            'dateCreated', rt.date_created,
+            'lastModified', rt.last_modified
+          )
+        ) FILTER (WHERE rt.id IS NOT NULL) tags
+      FROM create_post cp
+      LEFT JOIN resolved_tags rt ON TRUE
       GROUP BY
         cp.post_id,
+        cp.slug,
+        cp.title,
+        cp.description,
+        cp.excerpt,
+        $8::text,
+        cp.status,
+        cp.image_banner,
         cp.date_created,
         cp.date_published,
         cp.last_modified,
         cp.views,
         cp.is_in_bin,
         cp.is_deleted`,
-      [title, description, excerpt, content, slug, user, imageBanner, dbTags]
+      [title, description, excerpt, slug, userId, imageBanner, dbTags, content]
     );
 
     const [saved] = savedPost;
 
     return new SinglePost({
       id: saved.id,
-      title,
-      description,
-      excerpt,
-      content,
+      title: saved.title,
+      description: saved.description,
+      excerpt: saved.excerpt,
+      content: saved.content,
       author: { name: authorName, image: authorImage },
-      status: "Published",
-      url: { slug, href: slug },
-      imageBanner,
+      status: saved.status,
+      url: { slug: saved.slug, href: saved.slug },
+      imageBanner: saved.imageBanner,
       dateCreated: saved.dateCreated,
       datePublished: saved.datePublished,
       lastModified: saved.lastModified,

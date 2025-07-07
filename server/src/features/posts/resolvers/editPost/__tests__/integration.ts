@@ -123,19 +123,19 @@ describe("Test editPost resolver", () => {
       const data = await editPost({}, { post: mocks.post1 }, mockContext, info);
 
       expect(mockEvent).toHaveBeenCalledTimes(1);
-      expect(data).toHaveProperty("post.id", mocks.post1.id);
-      expect(data).toHaveProperty("post.title", mocks.post1.title);
-      expect(data).toHaveProperty("post.description", mocks.post1.description);
-      expect(data).toHaveProperty("post.excerpt", mocks.post1.excerpt);
-      expect(data).toHaveProperty("post.content", mocks.html);
+      expect(data).toHaveProperty("post.id", mocks.mock1.id);
+      expect(data).toHaveProperty("post.title", mocks.mock1.title);
+      expect(data).toHaveProperty("post.description", mocks.mock1.description);
+      expect(data).toHaveProperty("post.excerpt", mocks.mock1.excerpt);
+      expect(data).toHaveProperty("post.content", mocks.mock1.content);
       expect(data).toHaveProperty("post.url", mocks.url);
       expect(data).toHaveProperty("post.author", mocks.author);
-      expect(data).toHaveProperty("post.status", "Published");
-      expect(data).toHaveProperty("post.imageBanner", mocks.post1.imageBanner);
+      expect(data).toHaveProperty("post.status", mocks.mock1.status);
+      expect(data).toHaveProperty("post.imageBanner", mocks.mock1.imageBanner);
       expect(data).toHaveProperty("post.dateCreated", mocks.mock1.dateCreated);
       expect(data).toHaveProperty("post.views", mocks.mock1.views);
-      expect(data).toHaveProperty("post.isInBin", false);
-      expect(data).toHaveProperty("post.isDeleted", false);
+      expect(data).toHaveProperty("post.isInBin", mocks.mock1.isInBin);
+      expect(data).toHaveProperty("post.isDeleted", mocks.mock1.isDeleted);
       expect(data).toHaveProperty("post.tags", mocks.mock1.tags);
       expect(data).toHaveProperty("status", "SUCCESS");
 
@@ -152,26 +152,26 @@ describe("Test editPost resolver", () => {
 
     test("Should edit a blog post with no post tags and no image banner", async () => {
       const spy = spyDb({ rows: [mocks.user] });
-      spy.mockReturnValueOnce({ rows: [{ postStatus: "Published" }] });
+      spy.mockReturnValueOnce({ rows: [mocks.mockPost] });
       spy.mockReturnValueOnce({ rows: [] });
       spy.mockReturnValueOnce({ rows: [mocks.mock2] });
 
       const data = await editPost({}, { post: mocks.post2 }, mockContext, info);
 
       expect(mockEvent).not.toHaveBeenCalled();
-      expect(data).toHaveProperty("post.id", mocks.post.id);
-      expect(data).toHaveProperty("post.title", mocks.post.title);
-      expect(data).toHaveProperty("post.description", mocks.post.description);
-      expect(data).toHaveProperty("post.excerpt", mocks.post.excerpt);
-      expect(data).toHaveProperty("post.content", mocks.html);
+      expect(data).toHaveProperty("post.id", mocks.mock2.id);
+      expect(data).toHaveProperty("post.title", mocks.mock2.title);
+      expect(data).toHaveProperty("post.description", mocks.mock2.description);
+      expect(data).toHaveProperty("post.excerpt", mocks.mock2.excerpt);
+      expect(data).toHaveProperty("post.content", mocks.mock2.content);
       expect(data).toHaveProperty("post.url", mocks.url);
       expect(data).toHaveProperty("post.author", mocks.author);
-      expect(data).toHaveProperty("post.status", "Published");
-      expect(data).toHaveProperty("post.imageBanner", mocks.post.imageBanner);
+      expect(data).toHaveProperty("post.status", mocks.mock2.status);
+      expect(data).toHaveProperty("post.imageBanner", mocks.mock2.imageBanner);
       expect(data).toHaveProperty("post.dateCreated", mocks.mock2.dateCreated);
       expect(data).toHaveProperty("post.views", mocks.mock2.views);
-      expect(data).toHaveProperty("post.isInBin", false);
-      expect(data).toHaveProperty("post.isDeleted", false);
+      expect(data).toHaveProperty("post.isInBin", mocks.mock2.isInBin);
+      expect(data).toHaveProperty("post.isDeleted", mocks.mock2.isDeleted);
       expect(data).toHaveProperty("post.tags", mocks.mock2.tags);
       expect(data).toHaveProperty("status", "SUCCESS");
 

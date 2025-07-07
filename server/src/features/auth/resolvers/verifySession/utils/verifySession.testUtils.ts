@@ -37,13 +37,15 @@ export const validations: [string, string][] = [
 
 export const obj = {
   ...data,
-  userId: authUserId,
+  userId: 95,
+  userUUID: authUserId,
   isRegistered: false,
 };
 
 export const mockObj = {
   ...data,
-  userId: loggedInUserId,
+  userId: 47,
+  userUUID: loggedInUserId,
   isRegistered: true,
 };
 

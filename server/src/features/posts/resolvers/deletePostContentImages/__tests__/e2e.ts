@@ -27,8 +27,8 @@ describe("Delete Post Content Images - e2e", () => {
     ({ server, url } = await startServer(0));
 
     const { registeredUser, unregisteredUser } = await testUsers(db);
-    const registered = loginTestUser(registeredUser.userId);
-    const unregistered = loginTestUser(unregisteredUser.userId);
+    const registered = loginTestUser(registeredUser.userUUID);
+    const unregistered = loginTestUser(unregisteredUser.userUUID);
 
     [registeredJwt, unregisteredJwt] = await Promise.all([
       registered,

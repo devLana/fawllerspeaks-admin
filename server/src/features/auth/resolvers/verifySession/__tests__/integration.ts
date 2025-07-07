@@ -134,7 +134,7 @@ describe("Test verify session resolver", () => {
       });
 
       test("The provided session was not assigned to the user of the cookie refresh token, Return an error response and send a mail notification", async () => {
-        const mockData = [{ userId: "loggedInUserId", email }];
+        const mockData = [{ userUUID: "loggedInUserId", email }];
         const spy = spyDb({ rows: mockData }).mockReturnValueOnce({ rows: [] });
 
         mockContext.req.cookies = authCookies;
@@ -158,7 +158,7 @@ describe("Test verify session resolver", () => {
       });
 
       test("Should return an error response if the provided session was not assigned to the user of the cookie refresh token and the mail notification failed to send", async () => {
-        const mockData = [{ userId: "loggedInUserId", email }];
+        const mockData = [{ userUUID: "loggedInUserId", email }];
         const spy = spyDb({ rows: mockData }).mockReturnValueOnce({ rows: [] });
 
         mockContext.req.cookies = authCookies;
@@ -187,8 +187,7 @@ describe("Test verify session resolver", () => {
       });
 
       test("Verify user session, Sign new access token and send user details ", async () => {
-        const mockData = [{ ...obj }];
-        const spy = spyDb({ rows: mockData }).mockReturnValue({ rows: [] });
+        const spy = spyDb({ rows: [obj] }).mockReturnValue({ rows: [] });
 
         mockContext.req.cookies = authCookies;
         verifyMock.mockImplementation(() => {
@@ -203,11 +202,11 @@ describe("Test verify session resolver", () => {
         expect(clearCookies).not.toHaveBeenCalled();
         expect(sessionMail).not.toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(2);
-        expect(spy).toHaveNthReturnedWith(1, { rows: mockData });
+        expect(spy).toHaveNthReturnedWith(1, { rows: [obj] });
         expect(spy).toHaveNthReturnedWith(2, { rows: [] });
         expect(result).toHaveProperty("user");
         expect(result).toHaveProperty("user.email", data.email);
-        expect(result).toHaveProperty("user.id", obj.userId);
+        expect(result).toHaveProperty("user.id", obj.userUUID);
         expect(result).toHaveProperty("user.firstName", data.firstName);
         expect(result).toHaveProperty("user.lastName", data.lastName);
         expect(result).toHaveProperty("user.image", data.image);
@@ -241,7 +240,7 @@ describe("Test verify session resolver", () => {
       test("The provided session was not assigned to the user of the cookie refresh token, Return an error response and send a mail notification", async () => {
         verifyMock.mockReturnValue({ sub: loggedInUserId });
 
-        const mock = [{ userId: "loggedInUserId", email }];
+        const mock = [{ userUUID: "loggedInUserId", email }];
         const spy = spyDb({ rows: mock }).mockReturnValueOnce({ rows: [] });
 
         const result = await resolver({}, { sessionId }, mockContext, info);
@@ -266,7 +265,7 @@ describe("Test verify session resolver", () => {
           throw new MailError("Unable to send session mail");
         });
 
-        const mock = [{ userId: "loggedInUserId", email }];
+        const mock = [{ userUUID: "loggedInUserId", email }];
         const spy = spyDb({ rows: mock }).mockReturnValueOnce({ rows: [] });
 
         const result = await resolver({}, { sessionId }, mockContext, info);

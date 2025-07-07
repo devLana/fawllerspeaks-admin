@@ -25,10 +25,20 @@ describe("Logout - E2E", () => {
     ({ server, url } = await startServer(0));
     const { unregisteredUser, registeredUser } = await testUsers(db);
 
-    const unregisteredToken = loginTestUser(unregisteredUser.userId);
-    const registeredToken = loginTestUser(registeredUser.userId);
-    const unregisteredSession = testSession(db, unregisteredUser.userId);
-    const registeredSession = testSession(db, registeredUser.userId);
+    const unregisteredToken = loginTestUser(unregisteredUser.userUUID);
+    const registeredToken = loginTestUser(registeredUser.userUUID);
+
+    const unregisteredSession = testSession(
+      db,
+      unregisteredUser.userId,
+      unregisteredUser.userUUID
+    );
+
+    const registeredSession = testSession(
+      db,
+      registeredUser.userId,
+      registeredUser.userUUID
+    );
 
     [
       unregisteredJwt,

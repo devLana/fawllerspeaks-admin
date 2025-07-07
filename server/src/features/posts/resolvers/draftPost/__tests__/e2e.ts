@@ -36,13 +36,13 @@ describe("Draft post - E2E", () => {
     ({ server, url } = await startServer(0));
     const { registeredUser, unregisteredUser } = await testUsers(db);
 
-    const registered = loginTestUser(registeredUser.userId);
-    const unRegistered = loginTestUser(unregisteredUser.userId);
+    const registered = loginTestUser(registeredUser.userUUID);
+    const unregistered = loginTestUser(unregisteredUser.userUUID);
     const createPostTags = createTestPostTags(db);
 
     [registeredJwt, unRegisteredJwt, postTags] = await Promise.all([
       registered,
-      unRegistered,
+      unregistered,
       createPostTags,
     ]);
 
@@ -65,9 +65,10 @@ describe("Draft post - E2E", () => {
   });
 
   afterAll(async () => {
-    await db.query(
-      "TRUNCATE TABLE posts, post_tags, users RESTART IDENTITY CASCADE"
-    );
+    await db.query(`
+      Truncate TABLE post_contents, post_tags_to_posts, posts, post_tags, users
+      RESTART IDENTITY CASCADE
+    `);
 
     await Promise.all([server.stop(), db.end()]);
   });

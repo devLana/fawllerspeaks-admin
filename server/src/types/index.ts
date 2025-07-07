@@ -44,12 +44,20 @@ export interface TestUser {
 }
 
 export interface DbTestUser {
-  readonly userId: string;
+  readonly userId: number;
+  readonly userUUID: string;
   readonly dateCreated: string;
 }
 
 export interface PostDBData {
   readonly id: string;
+  readonly slug: string;
+  readonly title: string;
+  readonly description: string | null;
+  readonly excerpt: string | null;
+  readonly imageBanner: string | null;
+  readonly content: string | null;
+  readonly status: PostStatus;
   readonly dateCreated: string;
   readonly datePublished: string | null;
   readonly lastModified: string | null;
@@ -59,8 +67,9 @@ export interface PostDBData {
   readonly tags: PostTag[] | null;
 }
 
-export interface GetPostDBData extends PostDBData {
+export interface GetPostDBData {
   readonly postId: number;
+  readonly id: string;
   readonly title: string;
   readonly description: string | null;
   readonly excerpt: string | null;
@@ -69,6 +78,13 @@ export interface GetPostDBData extends PostDBData {
   readonly status: PostStatus;
   readonly url: PostUrl;
   readonly imageBanner: string | null;
+  readonly dateCreated: string;
+  readonly datePublished: string | null;
+  readonly lastModified: string | null;
+  readonly views: number;
+  readonly isInBin: boolean;
+  readonly isDeleted: boolean;
+  readonly tags: PostTag[] | null;
 }
 
 export type TestPostData = Omit<
@@ -77,7 +93,7 @@ export type TestPostData = Omit<
 > & { slug: string };
 
 export interface TestPostAuthor {
-  readonly userId: string;
+  readonly userId: number;
   readonly firstName: string;
   readonly lastName: string;
   readonly image: string | null;

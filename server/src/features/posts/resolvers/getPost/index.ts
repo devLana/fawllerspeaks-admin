@@ -47,7 +47,7 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.title,
         p.description,
         p.excerpt,
-        p.content,
+        pc.content,
         json_build_object(
           'image', u.image,
           'name', u.first_name||' '||u.last_name
@@ -64,16 +64,37 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.views,
         p.is_in_bin "isInBin",
         p.is_deleted "isDeleted",
-        json_agg(json_build_object(
-          'id', pt.tag_id,
-          'name', pt.name,
-          'dateCreated', pt.date_created,
-          'lastModified', pt.last_modified
-        )) FILTER (WHERE pt.tag_id IS NOT NULL) tags
-      FROM posts p JOIN users u ON p.author = u.user_id
-      LEFT JOIN post_tags pt ON pt.id = ANY (p.tags)
+        json_agg(
+          json_build_object(
+            'id', pt.tag_id,
+            'name', pt.name,
+            'dateCreated', pt.date_created,
+            'lastModified', pt.last_modified
+          )
+        ) FILTER (WHERE pt.id IS NOT NULL) tags
+      FROM posts p JOIN users u ON p.author = u.id
+      LEFT JOIN post_contents pc ON p.id = pc.post_id
+      LEFT JOIN post_tags_to_posts ptp ON p.id = ptp.post_id
+      LEFT JOIN post_tags pt ON ptp.tag_id = pt.id
       WHERE p.slug = $1
-      GROUP BY p.id, p.post_id, u.first_name, u.last_name, u.image`,
+      GROUP BY
+        p.post_id,
+        p.title,
+        p.description,
+        p.excerpt,
+        pc.content,
+        u.image,
+        u.first_name,
+        u.last_name,
+        p.status,
+        p.slug,
+        p.image_banner,
+        p.date_created,
+        p.date_published,
+        p.last_modified,
+        p.views,
+        p.is_in_bin,
+        p.is_deleted`,
       [postSlug]
     );
 

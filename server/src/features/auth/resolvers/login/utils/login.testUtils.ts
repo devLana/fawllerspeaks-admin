@@ -70,6 +70,7 @@ export const verifyInputs: [string, { email: string; password: string }][] = [
 ];
 
 export const mockUser = {
+  id: 12,
   userEmail: "test_mail@example.com",
   firstName: null,
   lastName: null,

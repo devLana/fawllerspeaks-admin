@@ -37,9 +37,9 @@ describe("Upload image - E2E", () => {
     ({ server, url } = await startServer(0));
     const { unregisteredUser, registeredUser } = await testUsers(db);
 
-    const logInRegistered = loginTestUser(registeredUser.userId);
-    const logInUnregistered = loginTestUser(unregisteredUser.userId);
-    const loginExpiredJwtUser = loginTestUser(unregisteredUser.userId, "50");
+    const logInRegistered = loginTestUser(registeredUser.userUUID);
+    const logInUnregistered = loginTestUser(unregisteredUser.userUUID);
+    const loginExpiredJwtUser = loginTestUser(unregisteredUser.userUUID, "50");
     const loginUnknownUser = loginTestUser(unknownUserId);
 
     [registeredJwt, unregisteredJwt, expiredJwtUser, unknownJwt] =
