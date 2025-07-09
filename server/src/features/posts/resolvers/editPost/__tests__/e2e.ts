@@ -99,9 +99,10 @@ describe("Edit post - E2E", () => {
   });
 
   afterAll(async () => {
-    await db.query(
-      "Truncate TABLE posts, post_tags, users RESTART IDENTITY CASCADE"
-    );
+    await db.query(`
+      Truncate TABLE post_contents, post_tags_to_posts, posts, post_tags, users
+      RESTART IDENTITY CASCADE
+    `);
 
     await Promise.all([server.stop(), db.end()]);
   });

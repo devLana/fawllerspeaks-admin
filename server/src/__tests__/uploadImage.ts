@@ -52,10 +52,8 @@ describe("Upload image - E2E", () => {
   });
 
   afterAll(async () => {
-    const clearUsers = db.query(`DELETE FROM users`);
-    const stop = server.stop();
-    await Promise.all([clearUsers, stop]);
-    await db.end();
+    await db.query("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
+    await Promise.all([server.stop(), db.end()]);
   });
 
   const imageName = "profile-image.jpg";
