@@ -1,139 +1,132 @@
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
 import { NotAllowedPostActionError } from "../types/NotAllowedPostActionError";
 import { PostIdValidationError } from "../types/PostIdValidationError";
 import { SinglePost } from "../types/SinglePost";
-import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
-// import  getPostTags from "@features/posts/utils/mapPostTags";
-import getPostSlug from "@features/posts/utils/getPostSlug";
-import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
-import dateToISOString from "@utils/dateToISOString";
+import {
+  AuthenticationError,
+  NotAllowedError,
+  RegistrationError,
+  UnknownError,
+} from "@utils/ObjectTypes";
+import deleteSession from "@utils/deleteSession";
+import { unpublishPostValidator as schema } from "./utils/unpublishPost.validator";
 
-import type { MutationResolvers, PostStatus } from "@resolverTypes";
-import type { GetPostDBData, ResolverFunc } from "@types";
+import type { MutationResolvers as Resolvers } from "@resolverTypes";
+import type { GetPostDBData, PostFieldResolver, ResolverFunc } from "@types";
 
-type UnpublishPost = ResolverFunc<MutationResolvers["unpublishPost"]>;
-type Keys = "status" | "author" | "datePublished" | "postId";
+type Resolver = PostFieldResolver<ResolverFunc<Resolvers["unpublishPost"]>>;
+type PostDBData = Omit<GetPostDBData, "postId"> & { isDraft: boolean };
 
-interface DbPost {
-  authorId: string;
-  authorName: string;
-  status: PostStatus;
-  authorImage: string | null;
-}
-
-const unpublishPost: UnpublishPost = async (_, { postId }, { user, db }) => {
-  const schema = Joi.string()
-    .required()
-    .trim()
-    .guid({ version: "uuidv4", separator: "-" })
-    .messages({
-      "string.empty": "Provide post id",
-      "string.guid": "Invalid post id",
-    });
-
+const unpublishPost: Resolver = async (_, { postId }, ctx) => {
   try {
-    if (!user) return new NotAllowedError("Unable to unpublish post");
+    const { db, req, res, user } = ctx;
+
+    if (!user) {
+      void deleteSession(db, req, res);
+      return new AuthenticationError("Unable to unpublish post");
+    }
 
     const post = await schema.validateAsync(postId);
 
-    const findUser = db.query<{ isRegistered: boolean }>(
+    const { rows: foundUser } = await db.query<{ isRegistered: boolean }>(
       `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
       [user]
     );
 
-    const findPost = db.query<DbPost>(
-      `SELECT
-        author "authorId",
-        first_name || ' ' || last_name "authorName",
-        status,
-        image "authorImage"
-      FROM posts LEFT JOIN users ON author = user_id
-      WHERE post_id = $1`,
-      [post]
-    );
-
-    const [{ rows: foundUser }, { rows: foundPost }] = await Promise.all([
-      findUser,
-      findPost,
-    ]);
-
-    if (foundUser.length === 0 || !foundUser[0].isRegistered) {
+    if (foundUser.length === 0) {
+      void deleteSession(db, req, res);
       return new NotAllowedError("Unable to unpublish post");
     }
 
-    if (foundPost.length === 0) {
+    if (!foundUser[0].isRegistered) {
+      return new RegistrationError("Unable to unpublish post");
+    }
+
+    const { rows: updatePost } = await db.query<PostDBData>(
+      `WITH update_status AS (
+        UPDATE posts
+        SET
+          status = 'Unpublished',
+          date_published = NULL,
+          last_modified = CURRENT_TIMESTAMP(3)
+        WHERE post_id = $1 AND status <> 'Draft'
+        RETURNING id, status, date_published, last_modified
+      )
+      SELECT
+        us.id IS NULL "isDraft",
+        p.post_id id,
+        p.title,
+        p.description,
+        p.excerpt,
+        pc.content,
+        json_build_object(
+          'image', u.image,
+          'name', u.first_name||' '||u.last_name
+        ) author,
+        us.status,
+        json_build_object(
+          'slug', p.slug,
+          'href', p.slug
+        ) url,
+        p.image_banner "imageBanner",
+        p.date_created "dateCreated",
+        us.date_published "datePublished",
+        us.last_modified "lastModified",
+        p.views,
+        p.is_in_bin "isInBin",
+        p.is_deleted "isDeleted",
+        json_agg(
+          json_build_object(
+            'id', pt.tag_id,
+            'name', pt.name,
+            'dateCreated', pt.date_created,
+            'lastModified', pt.last_modified
+          )
+        ) FILTER (WHERE pt.id IS NOT NULL) tags
+      FROM posts p
+      JOIN users u ON p.author = u.id
+      LEFT JOIN update_status us ON p.id = us.id
+      LEFT JOIN post_contents pc ON p.id = pc.post_id
+      LEFT JOIN post_tags_to_posts ptp ON p.id = ptp.post_id
+      LEFT JOIN post_tags pt ON ptp.tag_id = pt.id
+      WHERE p.post_id = $1
+      GROUP BY
+        us.id,
+        p.post_id,
+        p.title,
+        p.description,
+        p.excerpt,
+        pc.content,
+        u.image,
+        u.first_name,
+        u.last_name,
+        us.status,
+        p.slug,
+        p.image_banner,
+        p.date_created,
+        us.date_published,
+        us.last_modified,
+        p.views,
+        p.is_in_bin,
+        p.is_deleted`,
+      [post]
+    );
+
+    if (updatePost.length === 0) {
       return new UnknownError("Unable to unpublish post");
     }
 
-    if (foundPost[0].authorId !== user) {
-      return new UnauthorizedAuthorError(
-        "Cannot unpublish another author's post"
-      );
-    }
+    const [{ isDraft, ...updated }] = updatePost;
 
-    if (foundPost[0].status === "Unpublished") {
-      return new NotAllowedPostActionError("Post is currently unpublished");
-    }
-
-    if (foundPost[0].status !== "Published") {
+    if (isDraft) {
       return new NotAllowedPostActionError(
-        "Only published posts can be unpublished"
+        "A Draft post cannot be unpublished"
       );
     }
 
-    const { rows: updatePost } = await db.query<Omit<GetPostDBData, Keys>>(
-      `UPDATE posts SET
-        status = $1,
-        date_published = $2
-      WHERE post_id = $3
-      RETURNING
-        title,
-        description,
-        content,
-        slug,
-        image_banner "imageBanner",
-        date_created "dateCreated",
-        last_modified "lastModified",
-        views,
-        likes,
-        is_in_bin "isInBin",
-        is_deleted "isDeleted",
-        tags`,
-      ["Unpublished", null, post]
-    );
-
-    const [updated] = updatePost;
-
-    const slug = getPostSlug(updated.title);
-    // const tags = updated.tags ? await getPostTags(db, updated.tags) : null;
-
-    return new NotAllowedPostActionError(
-      "Only published posts can be unpublished"
-    );
-    // return new SinglePost({
-    //   id: post,
-    //   title: updated.title,
-    //   description: updated.description,
-    //   content: updated.content,
-    //   author: {
-    //     name: foundPost[0].authorName,
-    //     image: foundPost[0].authorImage,
-    //   },
-    //   status: "Unpublished",
-    //   url: { href, slug },
-    //   imageBanner: updated.imageBanner,
-    //   dateCreated: dateToISOString(updated.dateCreated),
-    //   datePublished: null,
-    //   lastModified: updated.lastModified
-    //     ? dateToISOString(updated.lastModified)
-    //     : updated.lastModified,
-    //   views: updated.views,
-    //   isInBin: updated.isInBin,
-    //   isDeleted: updated.isDeleted,
-    //   tags: null,
-    // });
+    return new SinglePost(updated);
   } catch (err) {
     if (err instanceof ValidationError) {
       return new PostIdValidationError(err.message);

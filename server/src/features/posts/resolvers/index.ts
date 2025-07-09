@@ -6,7 +6,7 @@ import draftPost from "./draftPost";
 import deletePostContentImages from "./deletePostContentImages";
 import editPost from "./editPost";
 // import publishPost from "./publishPost";
-// import unpublishPost from "./unpublishPost";
+import unpublishPost from "./unpublishPost";
 // import binPosts from "./binPosts";
 // import unBinPosts from "./unBinPosts";
 // import deletePostsFromBin from "./deletePostsFromBin";
@@ -18,15 +18,15 @@ import { PostUrlResolvers } from "./types/PostUrl";
 import { SinglePostResolver } from "./types/SinglePost";
 import { PostsResolver } from "./types/Posts";
 import { GetPostWarningResolvers } from "./getPost/types/GetPostWarning";
-import { PostsWarningResolver } from "./types/PostsWarning";
+// import { PostsWarningResolver } from "./types/PostsWarning";
 import { DuplicatePostTitleErrorResolver } from "./types/DuplicatePostTitleError";
 import { NotAllowedPostActionErrorResolver } from "./types/NotAllowedPostActionError";
-import { UnauthorizedAuthorErrorResolver } from "./types/UnauthorizedAuthorError";
+// import { UnauthorizedAuthorErrorResolver } from "./types/UnauthorizedAuthorError";
 import { PostValidationErrorResolver } from "./types/PostValidationError";
 import { PostIdValidationErrorResolver } from "./types/PostIdValidationError";
-import { PostIdsValidationErrorResolver } from "./types/PostIdsValidationError";
+// import { PostIdsValidationErrorResolver } from "./types/PostIdsValidationError";
 
-import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
+// import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
 import { EditPostValidationErrorResolver } from "./editPost/types/EditPostValidationError";
 import { GetPostsDataResolvers } from "./getPosts/types/GetPostsData";
 import { GetPostsValidationErrorResolvers } from "./getPosts/types/GetPostsValidationError";
@@ -42,7 +42,7 @@ export const postsResolvers = {
     deletePostContentImages,
     editPost,
     // publishPost,
-    // unpublishPost,
+    unpublishPost,
     // binPosts,
     // unBinPosts,
     // deletePostsFromBin,
@@ -57,14 +57,14 @@ export const postsResolvers = {
     Posts: PostsResolver,
     GetPostsData: GetPostsDataResolvers,
     GetPostWarning: GetPostWarningResolvers,
-    PostsWarning: PostsWarningResolver,
-    EmptyBinWarning: EmptyBinWarningResolver,
+    // PostsWarning: PostsWarningResolver,
+    // EmptyBinWarning: EmptyBinWarningResolver,
     DuplicatePostTitleError: DuplicatePostTitleErrorResolver,
     NotAllowedPostActionError: NotAllowedPostActionErrorResolver,
-    UnauthorizedAuthorError: UnauthorizedAuthorErrorResolver,
+    // UnauthorizedAuthorError: UnauthorizedAuthorErrorResolver,
     PostValidationError: PostValidationErrorResolver,
     PostIdValidationError: PostIdValidationErrorResolver,
-    PostIdsValidationError: PostIdsValidationErrorResolver,
+    // PostIdsValidationError: PostIdsValidationErrorResolver,
     EditPostValidationError: EditPostValidationErrorResolver,
     GetPostsValidationError: GetPostsValidationErrorResolvers,
     GetPostValidationError: GetPostValidationErrorResolvers,

@@ -1,107 +1,85 @@
-import { beforeEach, describe, expect, test, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 import unpublishPost from "..";
-import {
-  type MockPostTags,
-  UUID,
-  data,
-  mockPostTags,
-  post,
-  returnData,
-  mockTags,
-  testsTable1,
-  testsTable2,
-  testsTable3,
-  userId,
-} from "../unpublishPost.testUtils";
-import getPostTags from "@features/posts/utils/getPostTags";
+import * as mocks from "../utils/unpublishPost.testUtils";
+import deleteSession from "@utils/deleteSession";
 
 import { mockContext, info } from "@tests/resolverArguments";
 import spyDb from "@tests/spyDb";
 
-type MockType = jest.MockedFunction<() => MockPostTags | null>;
-
-jest.mock("@features/posts/utils/getPostTags", () => {
-  return jest.fn().mockName("getPostTags");
-});
-
-beforeEach(() => {
-  mockContext.user = userId;
+jest.mock("@utils/deleteSession", () => {
+  return jest.fn().mockName("deleteSession");
 });
 
 describe("Test unpublish post resolver", () => {
-  test("Should return error on logged out user", async () => {
-    mockContext.user = null;
-
-    const result = await unpublishPost({}, { postId: "" }, mockContext, info);
-
-    expect(getPostTags).not.toHaveBeenCalled();
-    expect(result).toHaveProperty("message", "Unable to unpublish post");
-    expect(result).toHaveProperty("status", "ERROR");
+  beforeEach(() => {
+    mockContext.user = mocks.userId;
   });
 
-  test.each(testsTable1)(
-    "Returns error for %s post id",
-    async (_, postId, expected) => {
-      const result = await unpublishPost({}, { postId }, mockContext, info);
+  describe("Verify user authentication", () => {
+    it("Expect an error object if the user is logged out", async () => {
+      mockContext.user = null;
 
-      expect(getPostTags).not.toHaveBeenCalled();
-      expect(result).toHaveProperty("postIdError", expected);
-      expect(result).toHaveProperty("status", "ERROR");
-    }
-  );
+      const data = await unpublishPost({}, { postId: "" }, mockContext, info);
 
-  test.each(testsTable2)("Returns error for %s", async (_, expected) => {
-    const spy = spyDb(expected).mockReturnValueOnce({ rows: [] });
-
-    const result = await unpublishPost({}, { postId: UUID }, mockContext, info);
-
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveNthReturnedWith(1, expected);
-    expect(spy).toHaveNthReturnedWith(2, { rows: [] });
-
-    expect(getPostTags).not.toHaveBeenCalled();
-
-    expect(result).toHaveProperty("message", "Unable to unpublish post");
-    expect(result).toHaveProperty("status", "ERROR");
+      expect(deleteSession).toHaveBeenCalledTimes(1);
+      expect(data).toHaveProperty("message", "Unable to unpublish post");
+      expect(data).toHaveProperty("status", "ERROR");
+    });
   });
 
-  test.each(testsTable3)("Returns an error if %s", async (_, mockData, msg) => {
-    const spy = spyDb({ rows: [{ isRegistered: true }] });
-    spy.mockReturnValueOnce({ rows: [mockData] });
+  describe("Validate user input", () => {
+    it.each(mocks.validations)("%s", async (_, postId, errorMsg) => {
+      const data = await unpublishPost({}, { postId }, mockContext, info);
 
-    const result = await unpublishPost({}, { postId: UUID }, mockContext, info);
-
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-    expect(spy).toHaveNthReturnedWith(2, { rows: [mockData] });
-
-    expect(getPostTags).not.toHaveBeenCalled();
-
-    expect(result).toHaveProperty("message", msg);
-    expect(result).toHaveProperty("status", "ERROR");
+      expect(data).toHaveProperty("postIdError", errorMsg);
+      expect(data).toHaveProperty("status", "ERROR");
+    });
   });
 
-  test("Should unpublish a published post", async () => {
-    const mocked = getPostTags as unknown as MockType;
-    mocked.mockReturnValue(mockPostTags);
-    const spyData = [{ ...data, slug: "SL.UG", tags: mockTags }];
-    const spy = spyDb({ rows: [{ isRegistered: true }] });
-    spy.mockReturnValueOnce({ rows: [post] });
-    spy.mockReturnValueOnce({ rows: spyData });
+  describe("Verify user", () => {
+    it.each(mocks.verify)("%s", async (_, mock) => {
+      const spy = spyDb({ rows: mock });
+      const postId = mocks.UUID;
 
-    const result = await unpublishPost({}, { postId: UUID }, mockContext, info);
+      const data = await unpublishPost({}, { postId }, mockContext, info);
 
-    expect(spy).toHaveBeenCalledTimes(3);
-    expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-    expect(spy).toHaveNthReturnedWith(2, { rows: [post] });
-    expect(spy).toHaveNthReturnedWith(3, { rows: spyData });
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveNthReturnedWith(1, { rows: mock });
+      expect(data).toHaveProperty("message", "Unable to unpublish post");
+      expect(data).toHaveProperty("status", "ERROR");
+    });
+  });
 
-    expect(getPostTags).toHaveBeenCalledTimes(1);
-    expect(getPostTags).toHaveBeenCalledWith(mockContext.db, mockTags);
-    expect(getPostTags).toHaveReturnedWith(mockPostTags);
+  describe.each(mocks.verifyPost)("%s", (_, [testLabel, mock, errorMsg]) => {
+    it(testLabel, async () => {
+      const postId = mocks.UUID;
+      const spy = spyDb({ rows: [{ isRegistered: true }] });
+      spy.mockReturnValueOnce({ rows: mock });
 
-    expect(result).toHaveProperty("post", returnData);
-    expect(result).toHaveProperty("status", "SUCCESS");
+      const data = await unpublishPost({}, { postId }, mockContext, info);
+
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
+      expect(spy).toHaveNthReturnedWith(2, { rows: mock });
+      expect(data).toHaveProperty("message", errorMsg);
+      expect(data).toHaveProperty("status", "ERROR");
+    });
+  });
+
+  describe("Update post status and Unpublish a post", () => {
+    it("Expect an Unpublished post to remain unpublished", async () => {
+      const postId = mocks.UUID;
+      const spy = spyDb({ rows: [{ isRegistered: true }] });
+      spy.mockReturnValueOnce({ rows: [mocks.dbPost] });
+
+      const data = await unpublishPost({}, { postId }, mockContext, info);
+
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
+      expect(spy).toHaveNthReturnedWith(2, { rows: [mocks.dbPost] });
+      expect(data).toHaveProperty("status", "SUCCESS");
+      expect(data).toHaveProperty("post", mocks.post);
+    });
   });
 });
