@@ -203,10 +203,10 @@ export const GET_POSTS = `#graphql
   }
 `;
 
-export const PUBLISH_POST = `#graphql
+export const UNPUBLISH_POST = `#graphql
   ${POST_FIELDS}
-  mutation PublishPost($postId: ID!) {
-    publishPost(postId: $postId) {
+  mutation UnpublishPost($postId: ID!) {
+    unpublishPost(postId: $postId) {
       ... on BaseResponse {
         __typename
         message
@@ -230,10 +230,10 @@ export const PUBLISH_POST = `#graphql
   }
 `;
 
-export const UNPUBLISH_POST = `#graphql
+export const UNDO_UNPUBLISH_POST = `#graphql
   ${POST_FIELDS}
-  mutation UnpublishPost($postId: ID!) {
-    unpublishPost(postId: $postId) {
+  mutation UndoUnpublishPost($postId: ID!) {
+    undoUnpublishPost(postId: $postId) {
       ... on BaseResponse {
         __typename
         message

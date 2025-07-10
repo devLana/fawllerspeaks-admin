@@ -153,9 +153,7 @@ export const postsTypeDefs = `#graphql
 
   union GetPosts = GetPostsData | GetPostsValidationError | AuthenticationError | NotAllowedError | RegistrationError | ForbiddenError
 
-  union UnpublishPost = SinglePost | PostIdValidationError | NotAllowedPostActionError | UnknownError | RegistrationError | NotAllowedError | AuthenticationError
-
-  union Publish_Unpublish = SinglePost | PostIdValidationError | UnauthorizedAuthorError | NotAllowedPostActionError | NotAllowedError | UnknownError
+  union UnpublishUndoUnpublishPost = SinglePost | PostIdValidationError | NotAllowedPostActionError | UnknownError | RegistrationError | NotAllowedError | AuthenticationError
 
   union DeletePostContentImages = Response | DeletePostContentImagesValidationError | AuthenticationError | ForbiddenError | RegistrationError | ServerError | UnknownError
 

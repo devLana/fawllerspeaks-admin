@@ -60,10 +60,10 @@ const types = `#graphql
     draftPost(post: DraftPostInput!): CreateDraftPost!
     "Edit a post"
     editPost(post: EditPostInput!): EditPost!
-    "Publish a post"
-    publishPost(postId: ID!): Publish_Unpublish!
     "Unpublish a post"
-    unpublishPost(postId: ID!): UnpublishPost!
+    unpublishPost(postId: ID!): UnpublishUndoUnpublishPost!
+    "Undo Unpublish post"
+    undoUnpublishPost(postId: ID!): UnpublishUndoUnpublishPost!
     "Move posts to bin"
     binPosts(postIds: [ID!]!): Bin_UnBin_Delete!
     "Un-bin posts from bin"
