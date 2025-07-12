@@ -1,138 +1,125 @@
 import { randomUUID } from "node:crypto";
-import { Worker } from "node:worker_threads";
-
-import {
-  describe,
-  test,
-  expect,
-  beforeAll,
-  afterAll,
-  jest,
-} from "@jest/globals";
+import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 
 import type { ApolloServer } from "@apollo/server";
 
 import { db } from "@lib/db";
 import { startServer } from "@server";
 
-// import binPostsWorker from "../binPostsWorker";
-
-import { validationsTable } from "../binPosts.testUtils";
-import { BIN_POSTS } from "@tests/gqlQueries/postsTestQueries";
+import * as mocks from "../utils/binPosts.testUtils";
 import post from "@tests/post";
 import loginTestUser from "@tests/loginTestUser";
+import testUsers from "@tests/createTestUsers/testUsers";
 import createTestPostTags from "@tests/createTestPostTags";
-// import postAuthor from "@tests/post";
-// import postsUsers from "@tests/cre";
-// import createBinnedTestPosts from "@tests/cre";
+import createTestPost from "@tests/createTestPost";
+import { BIN_POSTS } from "@tests/gqlQueries/postsTestQueries";
+import { registeredUser as user, testPostData } from "@tests/mocks";
+import { DATE_REGEX } from "@tests/constants";
 
 import type { APIContext, TestData } from "@types";
 import type { PostTag, Post } from "@resolverTypes";
 
 type BinPosts = TestData<{ binPosts: Record<string, unknown> }>;
 
-jest.mock("node:worker_threads");
-// jest.mock("../binPostsWorker");
-
 describe("Bin posts - E2E", () => {
-  const UUID = randomUUID();
-
   let server: ApolloServer<APIContext>, url: string;
-  let registeredUserAccessToken = "";
-  let unRegisteredUserAccessToken = "";
-  let postAuthorAccessToken = "";
-  let publishedPosts: Post[], unpublishedPosts: Post[];
-  let draftPosts: Post[], postTags: PostTag[];
+  let published: Post, unpublished: Post, drafted: Post;
+  let registeredJwt: string, unregisteredJwt: string, postTags: PostTag[];
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
-    const {
-      postAuthor: user,
-      registeredUser,
-      unregisteredUser,
-    } = await postsUsers(db);
+    const { registeredUser, unregisteredUser } = await testUsers(db);
 
-    const registered = loginTestUser(registeredUser.userId);
-    const unRegistered = loginTestUser(unregisteredUser.userId);
-    const author = loginTestUser(user.userId);
+    const registered = loginTestUser(registeredUser.userUUID);
+    const unRegistered = loginTestUser(unregisteredUser.userUUID);
     const createPostTags = createTestPostTags(db);
 
-    [
-      registeredUserAccessToken,
-      unRegisteredUserAccessToken,
-      postAuthorAccessToken,
-      postTags,
-    ] = await Promise.all([registered, unRegistered, author, createPostTags]);
+    [registeredJwt, unregisteredJwt, postTags] = await Promise.all([
+      registered,
+      unRegistered,
+      createPostTags,
+    ]);
 
-    ({ draftPosts, unpublishedPosts, publishedPosts } =
-      await createBinnedTestPosts({
-        db,
-        postTags,
-        author: {
-          userId: user.userId,
-          firstName: postAuthor.firstName,
-          lastName: postAuthor.lastName,
-        },
-        isInBin: true,
-      }));
+    const draftPost = createTestPost({
+      db,
+      postTags,
+      postData: testPostData({ title: "Test Post Title - 1" }),
+      postAuthor: {
+        userId: registeredUser.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+      },
+    });
+
+    const publishedPost = createTestPost({
+      db,
+      postTags,
+      postData: testPostData({
+        title: "Test Post Title - 2",
+        datePublished: new Date().toISOString(),
+      }),
+      postAuthor: {
+        userId: registeredUser.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+      },
+    });
+
+    const unpublishedPost = createTestPost({
+      db,
+      postTags,
+      postData: testPostData({
+        title: "Test Post Title - 3",
+        status: "Unpublished",
+      }),
+      postAuthor: {
+        userId: registeredUser.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+      },
+    });
+
+    [published, unpublished, drafted] = await Promise.all([
+      publishedPost,
+      unpublishedPost,
+      draftPost,
+    ]);
   });
 
   afterAll(async () => {
-    const clearPosts = db.query(`DELETE FROM posts`);
-    const clearPostTags = db.query(`DELETE FROM post_tags`);
-    const stop = server.stop();
-    await Promise.all([clearPosts, clearPostTags, stop]);
-    await db.query(`DELETE FROM users`);
-    await db.end();
+    await db.query(`
+      Truncate TABLE post_contents, post_tags_to_posts, posts, post_tags, users
+      RESTART IDENTITY CASCADE
+    `);
+
+    await Promise.all([server.stop(), db.end()]);
   });
 
-  test("Should return error on logged out user", async () => {
-    const payload = { query: BIN_POSTS, variables: { postIds: [] } };
+  describe("Verify user authentication", () => {
+    it("Expect an error object response if the user is not logged in", async () => {
+      const payload = { query: BIN_POSTS, variables: { postIds: [] } };
 
-    const { data } = await post<BinPosts>(url, payload);
+      const { data } = await post<BinPosts>(url, payload);
 
-    expect(Worker).not.toHaveBeenCalled();
-    // expect(binPostsWorker).not.toHaveBeenCalled();
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.binPosts).toStrictEqual({
-      __typename: "NotAllowedError",
-      message: "Unable to move post to bin",
-      status: "ERROR",
-    });
-  });
-
-  test.each([
-    ["null input", null],
-    ["undefined input", undefined],
-    ["boolean input", true],
-    ["array with invalid inputs", [false, 90, {}, []]],
-  ])("Should throw graphql validation error for %s", async (_, posts) => {
-    const payload = { query: BIN_POSTS, variables: { posts } };
-
-    const { data } = await post<BinPosts>(url, payload, {
-      authorization: `Bearer ${registeredUserAccessToken}`,
-    });
-
-    expect(Worker).not.toHaveBeenCalled();
-    // expect(binPostsWorker).not.toHaveBeenCalled();
-
-    expect(data.errors).toBeDefined();
-    expect(data.data).toBeUndefined();
-  });
-
-  test.each(validationsTable)(
-    "Returns error for %s",
-    async (_, postIds, errorMsg) => {
-      const payload = { query: BIN_POSTS, variables: { postIds } };
-
-      const { data } = await post<BinPosts>(url, payload, {
-        authorization: `Bearer ${registeredUserAccessToken}`,
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.binPosts).toStrictEqual({
+        __typename: "AuthenticationError",
+        message: "Unable to move post to bin",
+        status: "ERROR",
       });
+    });
+  });
 
-      expect(Worker).not.toHaveBeenCalled();
-      // expect(binPostsWorker).not.toHaveBeenCalled();
+  describe("Validate user input", () => {
+    it.each(mocks.validations)("%s", async (_, postIds, errorMsg) => {
+      const payload = { query: BIN_POSTS, variables: { postIds } };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<BinPosts>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -141,123 +128,97 @@ describe("Bin posts - E2E", () => {
         postIdsError: errorMsg,
         status: "ERROR",
       });
-    }
-  );
-
-  test("Should return error on unregistered user", async () => {
-    const payload = { query: BIN_POSTS, variables: { postIds: [UUID] } };
-
-    const { data } = await post<BinPosts>(url, payload, {
-      authorization: `Bearer ${unRegisteredUserAccessToken}`,
-    });
-
-    expect(Worker).not.toHaveBeenCalled();
-    // expect(binPostsWorker).not.toHaveBeenCalled();
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.binPosts).toStrictEqual({
-      __typename: "NotAllowedError",
-      message: "Unable to move post to bin",
-      status: "ERROR",
     });
   });
 
-  test("Returns error if user tries to move another author's posts to bin", async () => {
-    const [post1, post2] = draftPosts;
+  describe("Verify logged in user", () => {
+    it("Expect an error response if the logged in user is unregistered", async () => {
+      const postIds = [randomUUID(), randomUUID()];
+      const payload = { query: BIN_POSTS, variables: { postIds } };
+      const options = { authorization: `Bearer ${unregisteredJwt}` };
 
-    const payload = {
-      query: BIN_POSTS,
-      variables: { postIds: [post1.id, post2.id] },
-    };
+      const { data } = await post<BinPosts>(url, payload, options);
 
-    const { data } = await post<BinPosts>(url, payload, {
-      authorization: `Bearer ${registeredUserAccessToken}`,
-    });
-
-    expect(Worker).not.toHaveBeenCalled();
-    // expect(binPostsWorker).not.toHaveBeenCalled();
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.binPosts).toStrictEqual({
-      __typename: "UnauthorizedAuthorError",
-      message: "Cannot move another author's posts to bin",
-      status: "ERROR",
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.binPosts).toStrictEqual({
+        __typename: "RegistrationError",
+        message: "Unable to move posts to bin",
+        status: "ERROR",
+      });
     });
   });
 
-  test("Moves all provided posts in the input array to bin", async () => {
-    const [post1, post2] = draftPosts;
+  describe("Verify post ids", () => {
+    it("Expect an error response if no post could be moved to bin", async () => {
+      const postIds = [randomUUID(), randomUUID(), randomUUID()];
+      const payload = { query: BIN_POSTS, variables: { postIds } };
+      const options = { authorization: `Bearer ${registeredJwt}` };
 
-    const payload = {
-      query: BIN_POSTS,
-      variables: { postIds: [post1.id, post2.id] },
-    };
+      const { data } = await post<BinPosts>(url, payload, options);
 
-    const { data } = await post<BinPosts>(url, payload, {
-      authorization: `Bearer ${postAuthorAccessToken}`,
-    });
-
-    expect(Worker).toHaveBeenCalledTimes(1);
-    // expect(binPostsWorker).toHaveBeenCalled();
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.binPosts).toStrictEqual({
-      __typename: "Posts",
-      posts: expect.arrayContaining([post1, post2]),
-      status: "SUCCESS",
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.binPosts).toStrictEqual({
+        __typename: "UnknownError",
+        message: "None of the selected posts could be moved to bin",
+        status: "ERROR",
+      });
     });
   });
 
-  test("Returns warning if at least one post could not be moved to bin", async () => {
-    const [post1, post2] = publishedPosts;
-    const [post3] = unpublishedPosts;
+  describe("Bin posts", () => {
+    it("Expect all selected posts to be moved to bin", async () => {
+      const postIds = [drafted.id, published.id];
+      const payload = { query: BIN_POSTS, variables: { postIds } };
+      const options = { authorization: `Bearer ${registeredJwt}` };
 
-    const payload = {
-      query: BIN_POSTS,
-      variables: {
-        postIds: [post1.id, post2.id, post3.id, UUID, randomUUID()],
-      },
-    };
+      const { data } = await post<BinPosts>(url, payload, options);
 
-    const { data } = await post<BinPosts>(url, payload, {
-      authorization: `Bearer ${postAuthorAccessToken}`,
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.binPosts).toMatchObject({
+        __typename: "Posts",
+        posts: expect.arrayContaining([
+          {
+            ...drafted,
+            isInBin: true,
+            binnedAt: expect.stringMatching(DATE_REGEX),
+            tags: expect.arrayContaining(drafted.tags as unknown[]),
+          },
+          {
+            ...published,
+            isInBin: true,
+            binnedAt: expect.stringMatching(DATE_REGEX),
+            tags: expect.arrayContaining(published.tags as unknown[]),
+          },
+        ]),
+        status: "SUCCESS",
+      });
     });
 
-    expect(Worker).toHaveBeenCalledTimes(1);
-    // expect(binPostsWorker).toHaveBeenCalled();
+    it("Expect some of the provided posts to be moved to bin with a warning message", async () => {
+      const postIds = [drafted.id, published.id, randomUUID(), unpublished.id];
+      const payload = { query: BIN_POSTS, variables: { postIds } };
+      const options = { authorization: `Bearer ${registeredJwt}` };
 
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.binPosts).toStrictEqual({
-      __typename: "PostsWarning",
-      posts: expect.arrayContaining([post3, post1, post2]),
-      message: "3 posts moved to bin. 2 other posts could not be moved to bin",
-      status: "WARN",
-    });
-  });
+      const { data } = await post<BinPosts>(url, payload, options);
 
-  test("Should return error if no post could be moved to bin", async () => {
-    const payload = {
-      query: BIN_POSTS,
-      variables: { postIds: [UUID, randomUUID(), randomUUID(), randomUUID()] },
-    };
-
-    const { data } = await post<BinPosts>(url, payload, {
-      authorization: `Bearer ${postAuthorAccessToken}`,
-    });
-
-    expect(Worker).not.toHaveBeenCalled();
-    // expect(binPostsWorker).not.toHaveBeenCalled();
-
-    expect(data.errors).toBeUndefined();
-    expect(data.data).toBeDefined();
-    expect(data.data?.binPosts).toStrictEqual({
-      __typename: "UnknownError",
-      message: "The selected posts could not be moved to bin",
-      status: "ERROR",
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.binPosts).toMatchObject({
+        __typename: "PostsWarning",
+        posts: [
+          {
+            ...unpublished,
+            isInBin: true,
+            binnedAt: expect.stringMatching(DATE_REGEX),
+            tags: expect.arrayContaining(unpublished.tags as unknown[]),
+          },
+        ],
+        message: "1 out of 4 posts moved to bin",
+        status: "WARN",
+      });
     });
   });
 });

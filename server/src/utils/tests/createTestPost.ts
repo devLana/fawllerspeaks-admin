@@ -77,6 +77,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         cp.last_modified "lastModified",
         cp.views,
         cp.is_in_bin "isInBin",
+        cp.binned_at "binnedAt",
         cp.is_deleted "isDeleted",
         json_agg(
           json_build_object(
@@ -101,6 +102,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         cp.last_modified,
         cp.views,
         cp.is_in_bin,
+        cp.binned_at,
         cp.is_deleted,
         $13::text`,
       [
@@ -131,6 +133,10 @@ const createTestPost = async (params: Options): Promise<Post> => {
     const lastModified = post.lastModified
       ? dateToISOString(post.lastModified)
       : post.lastModified;
+
+    const binnedAt = post.binnedAt
+      ? dateToISOString(post.binnedAt)
+      : post.binnedAt;
 
     if (post.content) {
       const { html, tableOfContents } = getPostContentResponse(post.content);
@@ -174,6 +180,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
       lastModified,
       views: post.views,
       isInBin: post.isInBin,
+      binnedAt,
       isDeleted: post.isDeleted,
       tags: postTags ?? null,
     };

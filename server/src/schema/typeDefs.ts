@@ -65,7 +65,7 @@ const types = `#graphql
     "Undo Unpublish post"
     undoUnpublishPost(postId: ID!): UnpublishUndoUnpublishPost!
     "Move posts to bin"
-    binPosts(postIds: [ID!]!): Bin_UnBin_Delete!
+    binPosts(postIds: [ID!]!): BinPosts!
     "Un-bin posts from bin"
     unBinPosts(postIds: [ID!]!): Bin_UnBin_Delete!
     "Delete posts from bin"

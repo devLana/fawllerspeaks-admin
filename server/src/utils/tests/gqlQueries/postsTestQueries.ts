@@ -32,6 +32,7 @@ const POST_FIELDS = `#graphql
     lastModified
     views
     isInBin
+    binnedAt
     isDeleted
     tags {
       __typename

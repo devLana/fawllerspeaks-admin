@@ -1,213 +1,126 @@
-import { Worker } from "node:worker_threads";
-import path from "node:path";
-
 import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
+import { ValidationError } from "joi";
 
-import getPostSlug from "@features/posts/utils/getPostSlug";
-// import  mapPostTags from "@features/posts/utils/mapPostTags";
 import { Posts } from "../types/Posts";
 import { PostIdsValidationError } from "../types/PostIdsValidationError";
 import { PostsWarning } from "../types/PostsWarning";
-import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
-import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
-import dateToISOString from "@utils/dateToISOString";
-// import binPostsWorker from "./binPostsWorker";
-
 import {
-  type MutationResolvers,
-  type PostTag,
-  type Post,
-} from "@resolverTypes";
-import type { GetPostDBData, PostData, ResolverFunc } from "@types";
+  AuthenticationError,
+  NotAllowedError,
+  RegistrationError,
+  UnknownError,
+} from "@utils/ObjectTypes";
+import { binPostValidator as schema } from "./utils/binPost.validator";
+import deleteSession from "@utils/deleteSession";
 
-type BinPosts = ResolverFunc<MutationResolvers["binPosts"]>;
-type DbPost = Omit<GetPostDBData, "author" | "isInBin">;
+import type { MutationResolvers as Resolvers } from "@resolverTypes";
+import type { GetPostDBData, PostFieldResolver, ResolverFunc } from "@types";
 
-interface User {
-  isRegistered: boolean;
-  name: string;
-  image: string | null;
-}
+type BinPosts = PostFieldResolver<ResolverFunc<Resolvers["binPosts"]>>;
 
-const binPosts: BinPosts = async (_, { postIds }, { db, user }) => {
-  const schema = Joi.array<typeof postIds>()
-    .required()
-    .items(
-      Joi.string().trim().guid({ version: "uuidv4", separator: "-" }).messages({
-        "string.empty": "Input post ids cannot be empty values",
-        "string.guid": "Invalid post id",
-      })
-    )
-    .min(1)
-    .max(10)
-    .unique()
-    .messages({
-      "array.max": "Input post ids can only contain at most {{#limit}} ids",
-      "array.min": "No post ids provided",
-      "array.unique": "Input post ids can only contain unique ids",
-      "array.base": "Post id input must be an array",
-    });
-
+const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
   const postOrPosts = postIds.length > 1 ? "posts" : "post";
 
   try {
     if (!user) {
-      return new NotAllowedError(`Unable to move ${postOrPosts} to bin`);
+      void deleteSession(db, req, res);
+      return new AuthenticationError(`Unable to move ${postOrPosts} to bin`);
     }
 
-    const validatedPostIds = await schema.validateAsync(postIds, {
-      abortEarly: false,
-    });
+    const ids = await schema.validateAsync(postIds, { abortEarly: false });
 
-    const findUser = db.query<User>(
-      `SELECT
-        is_registered "isRegistered",
-        first_name || ' ' || last_name name,
-        image
-      FROM users WHERE user_id = $1`,
+    const { rows: foundUser } = await db.query<{ isRegistered: boolean }>(
+      `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
       [user]
     );
 
-    const checkPostIds = db.query(
-      `SELECT id FROM posts WHERE post_id = ANY ($1) AND NOT author = $2`,
-      [validatedPostIds, user]
-    );
-
-    const allPostTags = db.query<PostTag>(
-      `SELECT
-        tag_id id,
-        name,
-        date_created "dateCreated",
-        last_modified "lastModified"
-      FROM post_tags`
-    );
-
-    const [foundUser, checkedPosts, postTags] = await Promise.all([
-      findUser,
-      checkPostIds,
-      allPostTags,
-    ]);
-
-    if (foundUser.rows.length === 0 || !foundUser.rows[0].isRegistered) {
+    if (foundUser.length === 0) {
+      void deleteSession(db, req, res);
       return new NotAllowedError(`Unable to move ${postOrPosts} to bin`);
     }
 
-    const [{ image, name }] = foundUser.rows;
+    if (!foundUser[0].isRegistered) {
+      return new RegistrationError(`Unable to move ${postOrPosts} to bin`);
+    }
 
-    if (checkedPosts.rows.length > 0) {
-      return new UnauthorizedAuthorError(
-        `Cannot move another author's ${postOrPosts} to bin`
+    const { rows: binnedPosts } = await db.query<Omit<GetPostDBData, "postId">>(
+      `WITH bin_posts AS (
+        UPDATE posts SET
+          is_in_bin = TRUE,
+          binned_at = CURRENT_TIMESTAMP(3)
+        WHERE post_id = ANY ($1) AND is_in_bin = FALSE
+        RETURNING *
+      )
+      SELECT
+        bp.post_id id,
+        bp.title,
+        bp.description,
+        bp.excerpt,
+        pc.content,
+        json_build_object(
+          'image', u.image,
+          'name', u.first_name||' '||u.last_name
+        ) author,
+        bp.status,
+        json_build_object(
+          'slug', bp.slug,
+          'href', bp.slug
+        ) url,
+        bp.image_banner "imageBanner",
+        bp.date_created "dateCreated",
+        bp.date_published "datePublished",
+        bp.last_modified "lastModified",
+        bp.views,
+        bp.is_in_bin "isInBin",
+        bp.binned_at "binnedAt",
+        bp.is_deleted "isDeleted",
+        json_agg(
+          json_build_object(
+            'id', pt.tag_id,
+            'name', pt.name,
+            'dateCreated', pt.date_created,
+            'lastModified', pt.last_modified
+          )
+        ) FILTER (WHERE pt.tag_id IS NOT NULL) tags
+      FROM bin_posts bp
+      JOIN users u ON bp.author = u.id
+      LEFT JOIN post_contents pc ON bp.id = pc.post_id
+      LEFT JOIN post_tags_to_posts ptp ON bp.id = ptp.post_id
+      LEFT JOIN post_tags pt ON ptp.tag_id = pt.id
+      GROUP BY
+        bp.post_id,
+        bp.title,
+        bp.description,
+        bp.excerpt,
+        pc.content,
+        u.image,
+        u.first_name,
+        u.last_name,
+        bp.status,
+        bp.slug,
+        bp.image_banner,
+        bp.date_created,
+        bp.date_published,
+        bp.last_modified,
+        bp.views,
+        bp.is_in_bin,
+        bp.binned_at,
+        bp.is_deleted`,
+      [ids]
+    );
+
+    if (binnedPosts.length === 0) {
+      return new UnknownError(
+        `None of the selected ${postOrPosts} could be moved to bin`
       );
     }
 
-    const map = new Map<string, PostTag>();
-
-    postTags.rows.forEach(postTag => {
-      const tag = {
-        ...postTag,
-        dateCreated: dateToISOString(postTag.dateCreated),
-        lastModified: postTag.lastModified
-          ? dateToISOString(postTag.lastModified)
-          : postTag.lastModified,
-      };
-
-      map.set(tag.id, tag);
-    });
-
-    const { rows: binnedPosts } = await db.query<DbPost>(
-      `UPDATE posts SET
-        is_in_bin = $1
-      WHERE
-        post_id = ANY ($2)
-      AND
-        author = $3
-      RETURNING
-        post_id "postId",
-        title,
-        description,
-        content,
-        status,
-        image_banner "imageBanner",
-        date_created "dateCreated",
-        date_published "datePublished",
-        last_modified "lastModified",
-        views,
-        is_deleted "isDeleted"`,
-      [true, validatedPostIds, user]
-    );
-
-    const set = new Set<string>();
-    const binnedPostIds: string[] = [];
-
-    const mappedBinnedPosts = binnedPosts.map(binnedPost => {
-      const slug = getPostSlug(binnedPost.title);
-      // const tags = binnedPost.tags ? mapPostTags(binnedPost.tags, map) : null;
-
-      // set.add(binnedPost.postId);
-      // binnedPostIds.push(binnedPost.postId);
-
-      return {
-        id: binnedPost.postId,
-        title: binnedPost.title,
-        description: binnedPost.description,
-        content: null,
-        author: { name, image },
-        status: binnedPost.status,
-        url: slug,
-        imageBanner: binnedPost.imageBanner,
-        dateCreated: dateToISOString(binnedPost.dateCreated),
-        datePublished: binnedPost.datePublished
-          ? dateToISOString(binnedPost.datePublished)
-          : binnedPost.datePublished,
-        lastModified: binnedPost.lastModified
-          ? dateToISOString(binnedPost.lastModified)
-          : binnedPost.lastModified,
-        views: binnedPost.views,
-        isInBin: true,
-        isDeleted: binnedPost.isDeleted,
-        tags: null,
-      };
-    });
-
-    if (binnedPostIds.length > 0) {
-      const worker = new Worker(path.join(__dirname, "binPostsWorker.ts"));
-      worker.postMessage(binnedPostIds);
-
-      worker.on("error", err => {
-        console.error("Bin posts worker error - ", err);
-      });
-      // binPostsWorker(binnedPostIds);
+    if (binnedPosts.length < ids.length) {
+      const message = `${binnedPosts.length} out of ${ids.length} posts moved to bin`;
+      return new PostsWarning(binnedPosts, message);
     }
 
-    const notBinnedPosts: string[] = [];
-
-    for (const validatedPostId of validatedPostIds) {
-      if (set.has(validatedPostId)) continue;
-
-      notBinnedPosts.push(validatedPostId);
-    }
-
-    if (notBinnedPosts.length > 0) {
-      const notBinnedPostOrPosts = notBinnedPosts.length > 1 ? "posts" : "post";
-
-      if (binnedPosts.length === 0) {
-        return new UnknownError(
-          `The selected ${notBinnedPostOrPosts} could not be moved to bin`
-        );
-      }
-
-      const msg =
-        binnedPosts.length === 1
-          ? "1 post moved to bin"
-          : `${binnedPosts.length} posts moved to bin`;
-
-      const message = `${msg}. ${notBinnedPosts.length} other ${notBinnedPostOrPosts} could not be moved to bin`;
-
-      return new PostsWarning([], message);
-    }
-
-    return new Posts([]);
+    return new Posts(binnedPosts);
   } catch (err) {
     if (err instanceof ValidationError) {
       return new PostIdsValidationError(err.message);

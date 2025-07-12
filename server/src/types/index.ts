@@ -63,6 +63,7 @@ export interface PostDBData {
   readonly lastModified: string | null;
   readonly views: number;
   readonly isInBin: boolean;
+  readonly binnedAt: string | null;
   readonly isDeleted: boolean;
   readonly tags: PostTag[] | null;
 }
@@ -83,6 +84,7 @@ export interface GetPostDBData {
   readonly lastModified: string | null;
   readonly views: number;
   readonly isInBin: boolean;
+  readonly binnedAt: string | null;
   readonly isDeleted: boolean;
   readonly tags: PostTag[] | null;
 }

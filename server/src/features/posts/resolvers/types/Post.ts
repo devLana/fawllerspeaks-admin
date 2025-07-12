@@ -24,4 +24,8 @@ export const PostResolvers: Resolvers = {
   lastModified: parent => {
     return parent.lastModified ? dateToISOString(parent.lastModified) : null;
   },
+
+  binnedAt: parent => {
+    return parent.binnedAt ? dateToISOString(parent.binnedAt) : null;
+  },
 };

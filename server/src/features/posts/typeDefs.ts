@@ -40,6 +40,7 @@ export const postsTypeDefs = `#graphql
     lastModified: String
     views: Int!
     isInBin: Boolean!
+    binnedAt: String
     isDeleted: Boolean!
     tags: [PostTag!]
   }
@@ -140,6 +141,8 @@ export const postsTypeDefs = `#graphql
     imagesError: String!
     status: Status!
   }
+
+  union BinPosts = Posts | PostsWarning | PostIdsValidationError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
 
   union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
 

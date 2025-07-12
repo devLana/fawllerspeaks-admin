@@ -7,7 +7,7 @@ import deletePostContentImages from "./deletePostContentImages";
 import editPost from "./editPost";
 import unpublishPost from "./unpublishPost";
 import undoUnpublishPost from "./undoUnpublishPost";
-// import binPosts from "./binPosts";
+import binPosts from "./binPosts";
 // import unBinPosts from "./unBinPosts";
 // import deletePostsFromBin from "./deletePostsFromBin";
 // import emptyBin from "./emptyBin";
@@ -18,13 +18,13 @@ import { PostUrlResolvers } from "./types/PostUrl";
 import { SinglePostResolver } from "./types/SinglePost";
 import { PostsResolver } from "./types/Posts";
 import { GetPostWarningResolvers } from "./getPost/types/GetPostWarning";
-// import { PostsWarningResolver } from "./types/PostsWarning";
+import { PostsWarningResolver } from "./types/PostsWarning";
 import { DuplicatePostTitleErrorResolver } from "./types/DuplicatePostTitleError";
 import { NotAllowedPostActionErrorResolver } from "./types/NotAllowedPostActionError";
 // import { UnauthorizedAuthorErrorResolver } from "./types/UnauthorizedAuthorError";
 import { PostValidationErrorResolver } from "./types/PostValidationError";
 import { PostIdValidationErrorResolver } from "./types/PostIdValidationError";
-// import { PostIdsValidationErrorResolver } from "./types/PostIdsValidationError";
+import { PostIdsValidationErrorResolver } from "./types/PostIdsValidationError";
 
 // import { EmptyBinWarningResolver } from "./emptyBin/EmptyBinWarning";
 import { EditPostValidationErrorResolver } from "./editPost/types/EditPostValidationError";
@@ -43,7 +43,7 @@ export const postsResolvers = {
     editPost,
     unpublishPost,
     undoUnpublishPost,
-    // binPosts,
+    binPosts,
     // unBinPosts,
     // deletePostsFromBin,
     // emptyBin,
@@ -57,14 +57,14 @@ export const postsResolvers = {
     Posts: PostsResolver,
     GetPostsData: GetPostsDataResolvers,
     GetPostWarning: GetPostWarningResolvers,
-    // PostsWarning: PostsWarningResolver,
+    PostsWarning: PostsWarningResolver,
     // EmptyBinWarning: EmptyBinWarningResolver,
     DuplicatePostTitleError: DuplicatePostTitleErrorResolver,
     NotAllowedPostActionError: NotAllowedPostActionErrorResolver,
     // UnauthorizedAuthorError: UnauthorizedAuthorErrorResolver,
     PostValidationError: PostValidationErrorResolver,
     PostIdValidationError: PostIdValidationErrorResolver,
-    // PostIdsValidationError: PostIdsValidationErrorResolver,
+    PostIdsValidationError: PostIdsValidationErrorResolver,
     EditPostValidationError: EditPostValidationErrorResolver,
     GetPostsValidationError: GetPostsValidationErrorResolvers,
     GetPostValidationError: GetPostValidationErrorResolvers,

@@ -1,14 +1,15 @@
 import type {
   PostsWarning as BlogPostsWarning,
   PostsWarningResolvers,
-  Post,
   Status,
 } from "@resolverTypes";
 
-export class PostsWarning implements BlogPostsWarning {
+import type { PostData, PostDataMapper } from "@types";
+
+export class PostsWarning implements PostDataMapper<BlogPostsWarning> {
   readonly status: Status;
 
-  constructor(public readonly posts: Post[], public readonly message: string) {
+  constructor(readonly posts: PostData[], readonly message: string) {
     this.status = "WARN";
   }
 }
