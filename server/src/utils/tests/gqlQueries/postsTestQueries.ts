@@ -31,9 +31,7 @@ const POST_FIELDS = `#graphql
     datePublished
     lastModified
     views
-    isInBin
     binnedAt
-    isDeleted
     tags {
       __typename
       id

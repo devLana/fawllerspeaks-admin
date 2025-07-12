@@ -67,9 +67,9 @@ const types = `#graphql
     "Move posts to bin"
     binPosts(postIds: [ID!]!): BinPosts!
     "Un-bin posts from bin"
-    unBinPosts(postIds: [ID!]!): Bin_UnBin_Delete!
+    unBinPosts(postIds: [ID!]!): UnBin_Delete!
     "Delete posts from bin"
-    deletePostsFromBin(postIds: [ID!]!): Bin_UnBin_Delete!
+    deletePostsFromBin(postIds: [ID!]!): UnBin_Delete!
     "Empty bin(Delete all posts from bin)"
     emptyBin: EmptyBin!
     "Delete post content images from storage bucket"

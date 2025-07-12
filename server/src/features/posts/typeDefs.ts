@@ -39,9 +39,7 @@ export const postsTypeDefs = `#graphql
     datePublished: String
     lastModified: String
     views: Int!
-    isInBin: Boolean!
     binnedAt: String
-    isDeleted: Boolean!
     tags: [PostTag!]
   }
 
@@ -58,11 +56,6 @@ export const postsTypeDefs = `#graphql
   type GetPostsData {
     posts: [Post!]!
     pageData: GetPostsPageData!
-    status: Status!
-  }
-
-  type GetPostWarning implements BaseResponse {
-    message: String!
     status: Status!
   }
 
@@ -83,11 +76,6 @@ export const postsTypeDefs = `#graphql
   }
 
   type NotAllowedPostActionError implements BaseResponse {
-    message: String!
-    status: Status!
-  }
-
-  type UnauthorizedAuthorError implements BaseResponse {
     message: String!
     status: Status!
   }
@@ -144,15 +132,15 @@ export const postsTypeDefs = `#graphql
 
   union BinPosts = Posts | PostsWarning | PostIdsValidationError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
 
-  union Bin_UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | UnauthorizedAuthorError | NotAllowedError | UnknownError
+  union UnBin_Delete = Posts | PostsWarning | PostIdsValidationError | NotAllowedError | UnknownError
+  
+  union EmptyBin = Posts | EmptyBinWarning | NotAllowedError
 
   union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError
 
   union EditPost = SinglePost | EditPostValidationError | AuthenticationError |  NotAllowedError | UnknownError | RegistrationError | ForbiddenError | DuplicatePostTitleError
 
-  union EmptyBin = Posts | EmptyBinWarning | NotAllowedError
-
-  union GetPost = SinglePost | GetPostWarning | GetPostValidationError | AuthenticationError | NotAllowedError | RegistrationError
+  union GetPost = SinglePost | GetPostValidationError | AuthenticationError | NotAllowedError | RegistrationError | UnknownError
 
   union GetPosts = GetPostsData | GetPostsValidationError | AuthenticationError | NotAllowedError | RegistrationError | ForbiddenError
 
