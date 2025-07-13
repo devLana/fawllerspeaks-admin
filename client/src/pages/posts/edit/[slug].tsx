@@ -71,7 +71,7 @@ const EditPost: NextPageWithLayout = () => {
         />
       );
 
-    case "GetPostWarning":
+    case "UnknownError":
       return <EditPostTextContent id={id} message={data.getPost.message} />;
 
     case "SinglePost":

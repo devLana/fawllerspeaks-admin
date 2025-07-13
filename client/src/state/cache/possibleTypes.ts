@@ -7,7 +7,6 @@ export const BaseResponse = [
   "DuplicatePostTitleError",
   "EditedPostTagWarning",
   "ForbiddenError",
-  "GetPostWarning",
   "NotAllowedError",
   "RegistrationError",
   "Response",

@@ -119,8 +119,6 @@ export const server = setupServer(
           datePublished: null,
           lastModified: null,
           views: 0,
-          isInBin: false,
-          isDeleted: false,
           tags: null,
         },
       });

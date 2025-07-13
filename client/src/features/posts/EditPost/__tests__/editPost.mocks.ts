@@ -62,8 +62,6 @@ const post: PostData = {
   datePublished: null,
   lastModified: null,
   views: 0,
-  isInBin: false,
-  isDeleted: false,
   tags: null,
 };
 
@@ -100,7 +98,7 @@ export const server = setupServer(
     }
 
     if (slug === testSlug("get-post-warning")) {
-      return mswData("getPost", "GetPostWarning", { message: warningMsg });
+      return mswData("getPost", "UnknownError", { message: warningMsg });
     }
 
     if (slug === testSlug("blog-post")) {

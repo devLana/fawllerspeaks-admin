@@ -30,8 +30,6 @@ export const POST_FIELDS = gql`
     datePublished
     lastModified
     views
-    isInBin
-    isDeleted
     tags {
       ...PostTagFields
     }

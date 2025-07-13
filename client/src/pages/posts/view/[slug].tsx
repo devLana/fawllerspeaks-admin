@@ -62,7 +62,7 @@ const ViewPost: NextPageWithLayout = () => {
         />
       );
 
-    case "GetPostWarning":
+    case "UnknownError":
       return <ViewPostTextContent label={label} text={data.getPost.message} />;
 
     case "SinglePost":

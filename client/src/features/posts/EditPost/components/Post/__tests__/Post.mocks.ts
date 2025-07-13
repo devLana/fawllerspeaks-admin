@@ -153,8 +153,6 @@ export const server = setupServer(
           datePublished: new Date(Date.now() + 1_000_000_000_000).toISOString(),
           lastModified: new Date(Date.now() + 5_000_000_000_000).toISOString(),
           views: 0,
-          isInBin: false,
-          isDeleted: false,
           tags,
         },
       });
@@ -185,8 +183,6 @@ export const server = setupServer(
           datePublished: new Date(Date.now() + 1_000_000_000_000).toISOString(),
           lastModified: new Date(Date.now() + 5_000_000_000_000).toISOString(),
           views: 10,
-          isInBin: false,
-          isDeleted: false,
           tags,
         },
       });

@@ -13,7 +13,7 @@ export const GET_POST_TO_EDIT: GetPostToEdit = gql`
       ... on BaseResponse {
         __typename
       }
-      ... on GetPostWarning {
+      ... on UnknownError {
         message
       }
       ... on GetPostValidationError {

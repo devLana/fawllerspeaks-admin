@@ -13,7 +13,7 @@ export const GET_POST: GetPost = gql`
       ... on BaseResponse {
         __typename
       }
-      ... on GetPostWarning {
+      ... on UnknownError {
         message
       }
       ... on GetPostValidationError {

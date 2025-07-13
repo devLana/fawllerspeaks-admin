@@ -19,7 +19,7 @@ type Post = {
   [Prop in keyof PostData]-?: NonNullable<PostData[Prop]>;
 };
 
-export const post: Post = {
+export const post: Omit<Post, "binnedAt"> = {
   __typename: "Post",
   id: "id-1",
   title: "Test Blog Post",
@@ -59,7 +59,5 @@ export const post: Post = {
   datePublished: new Date().toISOString(),
   lastModified: new Date().toISOString(),
   views: 1500,
-  isInBin: false,
-  isDeleted: false,
   tags,
 };
