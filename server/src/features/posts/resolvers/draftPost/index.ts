@@ -130,8 +130,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
         dp.date_published "datePublished",
         dp.last_modified "lastModified",
         dp.views,
-        dp.is_in_bin "isInBin",
-        dp.is_deleted "isDeleted",
+        dp.binned_at "binnedAt",
         json_agg(
           json_build_object(
             'id', rt.tag_id,
@@ -155,8 +154,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
         dp.date_published,
         dp.last_modified,
         dp.views,
-        dp.is_in_bin,
-        dp.is_deleted`,
+        dp.binned_at`,
       [title, description, excerpt, slug, userId, imageBanner, dbTags, content]
     );
 
@@ -176,8 +174,7 @@ const draftPost: DraftPost = async (_, { post }, { db, user, req, res }) => {
       datePublished: drafted.datePublished,
       lastModified: drafted.lastModified,
       views: drafted.views,
-      isInBin: drafted.isInBin,
-      isDeleted: drafted.isDeleted,
+      binnedAt: drafted.binnedAt,
       tags: drafted.tags,
     });
   } catch (err) {

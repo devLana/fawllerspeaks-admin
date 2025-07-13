@@ -100,8 +100,7 @@ describe("Test createPost resolver", () => {
       expect(result).toHaveProperty("post.datePublished", mocks.dateCreated);
       expect(result).toHaveProperty("post.lastModified", null);
       expect(result).toHaveProperty("post.views", 0);
-      expect(result).toHaveProperty("post.isInBin", false);
-      expect(result).toHaveProperty("post.isDeleted", false);
+      expect(result).toHaveProperty("post.binnedAt", null);
       expect(result).toHaveProperty("post.tags", mocks.tags);
       expect(result).toHaveProperty("status", "SUCCESS");
 

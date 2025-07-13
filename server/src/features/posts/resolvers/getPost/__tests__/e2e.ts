@@ -121,7 +121,7 @@ describe("Get post - E2E", () => {
   });
 
   describe("Retrieve post", () => {
-    test("Expect a warning response if no post with the provided post slug was found", async () => {
+    test("Expect an error response if no post with the provided post slug could be found", async () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload = { query: GET_POST, variables: { slug: "slug" } };
 
@@ -130,9 +130,9 @@ describe("Get post - E2E", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.getPost).toStrictEqual({
-        __typename: "GetPostWarning",
+        __typename: "UnknownError",
         message: "Unable to retrieve post",
-        status: "WARN",
+        status: "ERROR",
       });
     });
 

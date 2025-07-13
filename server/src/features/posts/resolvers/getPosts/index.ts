@@ -54,7 +54,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
     const sqlArgs: (string | number)[] = [];
     const sort: Sort = { column: "p.date_created", order: "DESC" };
     let orderBy = "p.date_created DESC, p.id DESC";
-    let where = "";
+    let where = "WHERE is_in_bin = FALSE";
     let count = 0;
 
     if (filters?.sort) {
@@ -89,20 +89,17 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         }
 
         orderBy = `p.date_created ${order}, p.id ${order}`;
-        where = ` WHERE p.date_created ${operator}= $${++count} AND p.id ${operator} $${++count}`;
+        where = `${where} AND p.date_created ${operator}= $${++count} AND p.id ${operator} $${++count}`;
         sqlArgs.push(...cursor.split("_"));
       } else {
         orderBy = `title ${order}`;
-        where = ` WHERE p.title ${operator} $${++count}`;
+        where = `${where} AND p.title ${operator} $${++count}`;
         sqlArgs.push(cursor);
       }
     }
 
     if (filters?.status) {
-      where = where
-        ? `${where} AND p.status = $${++count}`
-        : ` WHERE p.status = $${++count}`;
-
+      where = `${where} AND p.status = $${++count}`;
       sqlArgs.push(filters.status);
     }
 
@@ -128,8 +125,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         p.date_published "datePublished",
         p.last_modified "lastModified",
         p.views,
-        p.is_in_bin "isInBin",
-        p.is_deleted "isDeleted",
+        p.binned_at "binnedAt",
         json_agg(
           json_build_object(
             'id', pt.tag_id,
@@ -141,7 +137,8 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
       FROM posts p JOIN users u ON p.author = u.id
       LEFT JOIN post_contents pc ON p.id = pc.post_id
       LEFT JOIN post_tags_to_posts ptp ON p.id = ptp.post_id
-      LEFT JOIN post_tags pt ON ptp.tag_id = pt.id${where}
+      LEFT JOIN post_tags pt ON ptp.tag_id = pt.id
+      ${where}
       GROUP BY
         p.id,
         p.post_id,
@@ -159,8 +156,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         p.date_published,
         p.last_modified,
         p.views,
-        p.is_in_bin,
-        p.is_deleted
+        p.binned_at
       ORDER BY ${orderBy}
       LIMIT 12`,
       sqlArgs
@@ -192,8 +188,8 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         if (sort.column === "p.title") {
           const { title } = type === "before" ? firstPost : lastPost;
 
-          sortBy = `p.title ${order}`;
-          sqlStr = `SELECT id FROM posts AS p WHERE p.title ${operator} $${++paramsCount}`;
+          sortBy = `title ${order}`;
+          sqlStr = `SELECT 1 FROM posts WHERE title ${operator} $${++paramsCount}`;
           sqlParams.push(title);
           bufStr = Buffer.from(title).toString("base64url");
         } else {
@@ -209,8 +205,8 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
             ({ postId } = lastPost);
           }
 
-          sortBy = `p.date_created ${order}, p.id ${order}`;
-          sqlStr = `SELECT p.id FROM posts AS p WHERE p.date_created ${operator}= $${++paramsCount} AND p.id ${operator} $${++paramsCount}`;
+          sortBy = `date_created ${order}, id ${order}`;
+          sqlStr = `SELECT 1 FROM posts WHERE date_created ${operator}= $${++paramsCount} AND id ${operator} $${++paramsCount}`;
           sqlParams.push(dateString, postId);
           bufStr = Buffer.from(bufferString).toString("base64url");
         }

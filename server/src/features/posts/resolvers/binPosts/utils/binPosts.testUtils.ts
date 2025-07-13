@@ -47,11 +47,11 @@ const tags = [
 
 export const postIds = [UUID, randomUUID(), randomUUID(), randomUUID()];
 const post = {
+  content: "<h2>HTML Heading</h2><p>html string</p>",
   author: { image: "/path/to/user/avatar/image.jpg", name: "Author Name" },
   imageBanner: "path/to/post/image/banner/image.jpeg",
-  isInBin: true,
   binnedAt,
-  isDeleted: false,
+  tags,
 };
 
 export const post1 = {
@@ -66,7 +66,6 @@ export const post1 = {
   datePublished,
   lastModified: null,
   views: 10,
-  tags,
 };
 
 export const post2 = {
@@ -94,7 +93,6 @@ export const post3 = {
   datePublished,
   lastModified,
   views: 1000,
-  tags,
 };
 
 export const post4 = {
@@ -102,6 +100,7 @@ export const post4 = {
   title: "Post Title 4",
   description: "Post Title 4 Description",
   excerpt: "Post Title 4 Excerpt",
+  content: null,
   status: "Draft",
   url: { slug: "post-title-4", href: "post-title-4" },
   dateCreated,

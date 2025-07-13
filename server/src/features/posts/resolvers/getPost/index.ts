@@ -2,12 +2,12 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 
 import { GetPostValidationError } from "./types/GetPostValidationError";
-import { GetPostWarning } from "./types/GetPostWarning";
 import { SinglePost } from "../types/SinglePost";
 import {
   AuthenticationError,
   NotAllowedError,
   RegistrationError,
+  UnknownError,
 } from "@utils/ObjectTypes";
 
 import { getPostSchema as schema } from "./utils/getPost.validator";
@@ -62,8 +62,7 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.date_published "datePublished",
         p.last_modified "lastModified",
         p.views,
-        p.is_in_bin "isInBin",
-        p.is_deleted "isDeleted",
+        p.binned_at "binnedAt",
         json_agg(
           json_build_object(
             'id', pt.tag_id,
@@ -93,13 +92,12 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.date_published,
         p.last_modified,
         p.views,
-        p.is_in_bin,
-        p.is_deleted`,
+        p.binned_at`,
       [postSlug]
     );
 
     if (foundPost.length === 0) {
-      return new GetPostWarning("Unable to retrieve post");
+      return new UnknownError("Unable to retrieve post");
     }
 
     return new SinglePost(foundPost[0]);

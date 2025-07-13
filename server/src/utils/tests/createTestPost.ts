@@ -5,13 +5,13 @@ import { getPostContentResponse } from "@features/posts/utils/getPostContentResp
 import { urls } from "@utils/ClientUrls";
 import dateToISOString from "@utils/dateToISOString";
 
-import type { GetPostDBData, TestPostAuthor, TestPostData } from "@types";
 import type {
   Post,
   PostContent,
   PostTableOfContents,
   PostTag,
 } from "@resolverTypes";
+import type { PostDBData, TestPostAuthor, TestPostData } from "@types";
 
 interface Options {
   db: Pool;
@@ -20,16 +20,13 @@ interface Options {
   postData: TestPostData;
 }
 
-type OmitKeys = "author" | "url" | "postId";
-type DBPost = Omit<GetPostDBData, OmitKeys> & { slug: string };
-
 const createTestPost = async (params: Options): Promise<Post> => {
   const { db, postTags, postAuthor, postData } = params;
   const tagIds = postTags?.map(postTag => postTag.id);
   const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
 
   try {
-    const { rows } = await db.query<DBPost>(
+    const { rows } = await db.query<PostDBData>(
       `WITH create_post AS (
         INSERT INTO posts (
           title,
@@ -76,9 +73,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         cp.date_published "datePublished",
         cp.last_modified "lastModified",
         cp.views,
-        cp.is_in_bin "isInBin",
         cp.binned_at "binnedAt",
-        cp.is_deleted "isDeleted",
         json_agg(
           json_build_object(
             'id', rt.tag_id,
@@ -101,9 +96,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         cp.date_published,
         cp.last_modified,
         cp.views,
-        cp.is_in_bin,
         cp.binned_at,
-        cp.is_deleted,
         $13::text`,
       [
         postData.title,
@@ -179,9 +172,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
       datePublished,
       lastModified,
       views: post.views,
-      isInBin: post.isInBin,
       binnedAt,
-      isDeleted: post.isDeleted,
       tags: postTags ?? null,
     };
   } catch (err) {

@@ -11,7 +11,7 @@ import {
   UnknownError,
 } from "@utils/ObjectTypes";
 import deleteSession from "@utils/deleteSession";
-import { undoUnpublishPost as schema } from "./utils/undoUnpublishPost";
+import { undoUnpublishPost as schema } from "./utils/undoUnpublishPost.validator";
 
 import type { MutationResolvers as Resolvers } from "@resolverTypes";
 import type { GetPostDBData, PostFieldResolver, ResolverFunc } from "@types";
@@ -75,8 +75,7 @@ const undoUnpublishPost: Resolver = async (_, { postId }, ctx) => {
         us.date_published "datePublished",
         us.last_modified "lastModified",
         p.views,
-        p.is_in_bin "isInBin",
-        p.is_deleted "isDeleted",
+        p.binned_at "binnedAt",
         json_agg(
           json_build_object(
             'id', pt.tag_id,
@@ -109,8 +108,7 @@ const undoUnpublishPost: Resolver = async (_, { postId }, ctx) => {
         us.date_published,
         us.last_modified,
         p.views,
-        p.is_in_bin,
-        p.is_deleted`,
+        p.binned_at`,
       [post]
     );
 

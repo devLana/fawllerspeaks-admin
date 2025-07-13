@@ -64,6 +64,7 @@ export const testPostData = (params?: Params): TestPostData => {
     datePublished: params?.datePublished ?? null,
     lastModified: params?.lastModified ?? null,
     isInBin: params?.isInBin ?? false,
+    binnedAt: params?.binnedAt ?? null,
     isDeleted: params?.isDeleted ?? false,
   };
 };

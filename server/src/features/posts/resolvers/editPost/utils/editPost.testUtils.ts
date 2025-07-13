@@ -254,8 +254,7 @@ const dbPost = {
   dateCreated,
   lastModified,
   views: 0,
-  isInBin: false,
-  isDeleted: false,
+  binnedAt: null,
 };
 
 export const post1: EditPostInput = {

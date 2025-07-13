@@ -128,8 +128,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
         cp.date_published "datePublished",
         cp.last_modified "lastModified",
         cp.views,
-        cp.is_in_bin "isInBin",
-        cp.is_deleted "isDeleted",
+        cp.binned_at "binnedAt",
         json_agg(
           json_build_object(
             'id', rt.tag_id,
@@ -153,8 +152,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
         cp.date_published,
         cp.last_modified,
         cp.views,
-        cp.is_in_bin,
-        cp.is_deleted`,
+        cp.binned_at`,
       [title, description, excerpt, slug, userId, imageBanner, dbTags, content]
     );
 
@@ -174,8 +172,7 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
       datePublished: saved.datePublished,
       lastModified: saved.lastModified,
       views: saved.views,
-      isInBin: saved.isInBin,
-      isDeleted: saved.isDeleted,
+      binnedAt: saved.binnedAt,
       tags: saved.tags,
     });
   } catch (err) {

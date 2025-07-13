@@ -61,7 +61,7 @@ describe("Test get post resolver", () => {
   });
 
   describe("Retrieve post", () => {
-    test("A post with the provided slug could not be found, Expect a warning response object", async () => {
+    test("A post with the provided slug could not be found, Expect an error response object", async () => {
       const spy = spyDb({ rows: [{ isRegistered: true }] });
       spy.mockReturnValueOnce({ rows: [] });
 
@@ -71,7 +71,7 @@ describe("Test get post resolver", () => {
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
       expect(spy).toHaveNthReturnedWith(2, { rows: [] });
       expect(result).toHaveProperty("message", "Unable to retrieve post");
-      expect(result).toHaveProperty("status", "WARN");
+      expect(result).toHaveProperty("status", "ERROR");
     });
 
     test("A post is found, Expect a response object with all relevant post fields", async () => {

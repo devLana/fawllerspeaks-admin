@@ -4,7 +4,6 @@ import Joi, { ValidationError } from "joi";
 import { PostIdsValidationError } from "../types/PostIdsValidationError";
 import { Posts } from "../types/Posts";
 import { PostsWarning } from "../types/PostsWarning";
-import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
 import getPostSlug from "@features/posts/utils/getPostSlug";
 // import  mapPostTags from "@features/posts/utils/mapPostTags";
 import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
@@ -87,7 +86,7 @@ const unBinPosts: UnBinPosts = async (_, { postIds }, { db, user }) => {
     const [{ name, image }] = foundUser.rows;
 
     if (checkedPost.rows.length > 0) {
-      return new UnauthorizedAuthorError(
+      return new NotAllowedError(
         `Cannot remove another author's ${postOrPosts} from bin`
       );
     }

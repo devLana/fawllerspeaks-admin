@@ -43,18 +43,11 @@ export const gqlValidations: GQL[] = [
   ],
 ];
 
-export const postId = randomUUID();
-export const dateCreated = "2021-05-17T12:22:43.717Z";
-export const lastModified = "2021-05-27T12:22:43.717Z";
-
-export const tags = [
-  { id: "1", name: "tag1", dateCreated, lastModified },
-  { id: "2", name: "tag2", dateCreated, lastModified },
-  { id: "3", name: "tag3", dateCreated, lastModified },
-];
+const dateCreated = "2021-05-17T12:22:43.717Z";
+const lastModified = "2021-05-27T12:22:43.717Z";
 
 export const data = {
-  id: postId,
+  id: randomUUID(),
   title: "post title",
   description: "post description",
   excerpt: "post excerpt",
@@ -67,7 +60,10 @@ export const data = {
   datePublished: null,
   lastModified,
   views: 10,
-  isInBin: false,
-  isDeleted: false,
-  tags,
+  binnedAt: null,
+  tags: [
+    { id: "1", name: "tag1", dateCreated, lastModified },
+    { id: "2", name: "tag2", dateCreated, lastModified },
+    { id: "3", name: "tag3", dateCreated, lastModified },
+  ],
 };

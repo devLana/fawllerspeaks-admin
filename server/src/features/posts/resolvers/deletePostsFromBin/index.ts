@@ -6,7 +6,6 @@ import getPostSlug from "@features/posts/utils/getPostSlug";
 import { Posts } from "../types/Posts";
 import { PostIdsValidationError } from "../types/PostIdsValidationError";
 import { PostsWarning } from "../types/PostsWarning";
-import { UnauthorizedAuthorError } from "../types/UnauthorizedAuthorError";
 import { NotAllowedError, UnknownError } from "@utils/ObjectTypes";
 import dateToISOString from "@utils/dateToISOString";
 
@@ -87,7 +86,7 @@ const deletePostsFromBin: DeletePosts = async (_, args, { user, db }) => {
     const [{ image, name }] = foundUser.rows;
 
     if (checkedPost.rows.length > 0) {
-      return new UnauthorizedAuthorError(
+      return new NotAllowedError(
         `Cannot delete another author's ${postOrPosts} from bin`
       );
     }

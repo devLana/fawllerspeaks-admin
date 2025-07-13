@@ -62,8 +62,7 @@ export const post = {
   datePublished: null,
   lastModified: "2022-01-23 04:16:37.424+01",
   views: 10,
-  isInBin: false,
-  isDeleted: false,
+  binnedAt: null,
   tags: [
     { id: "1", name: "tag1" },
     { id: "2", name: "tag2" },

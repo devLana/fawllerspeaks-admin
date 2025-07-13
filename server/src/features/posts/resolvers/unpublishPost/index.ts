@@ -75,8 +75,7 @@ const unpublishPost: Resolver = async (_, { postId }, ctx) => {
         us.date_published "datePublished",
         us.last_modified "lastModified",
         p.views,
-        p.is_in_bin "isInBin",
-        p.is_deleted "isDeleted",
+        p.binned_at "binnedAt",
         json_agg(
           json_build_object(
             'id', pt.tag_id,
@@ -109,8 +108,7 @@ const unpublishPost: Resolver = async (_, { postId }, ctx) => {
         us.date_published,
         us.last_modified,
         p.views,
-        p.is_in_bin,
-        p.is_deleted`,
+        p.binned_at`,
       [post]
     );
 

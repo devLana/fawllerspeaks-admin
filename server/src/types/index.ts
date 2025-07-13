@@ -49,50 +49,36 @@ export interface DbTestUser {
   readonly dateCreated: string;
 }
 
-export interface PostDBData {
+interface DBPostData {
   readonly id: string;
-  readonly slug: string;
   readonly title: string;
   readonly description: string | null;
   readonly excerpt: string | null;
-  readonly imageBanner: string | null;
   readonly content: string | null;
   readonly status: PostStatus;
+  readonly imageBanner: string | null;
   readonly dateCreated: string;
   readonly datePublished: string | null;
   readonly lastModified: string | null;
   readonly views: number;
-  readonly isInBin: boolean;
   readonly binnedAt: string | null;
-  readonly isDeleted: boolean;
   readonly tags: PostTag[] | null;
 }
 
-export interface GetPostDBData {
+export interface PostDBData extends DBPostData {
+  readonly slug: string;
+}
+
+export interface GetPostDBData extends DBPostData {
   readonly postId: number;
-  readonly id: string;
-  readonly title: string;
-  readonly description: string | null;
-  readonly excerpt: string | null;
-  readonly content: string | null;
   readonly author: PostAuthor;
-  readonly status: PostStatus;
   readonly url: PostUrl;
-  readonly imageBanner: string | null;
-  readonly dateCreated: string;
-  readonly datePublished: string | null;
-  readonly lastModified: string | null;
-  readonly views: number;
-  readonly isInBin: boolean;
-  readonly binnedAt: string | null;
-  readonly isDeleted: boolean;
-  readonly tags: PostTag[] | null;
 }
 
 export type TestPostData = Omit<
-  GetPostDBData,
-  "id" | "postId" | "dateCreated" | "views" | "url" | "author" | "tags"
-> & { slug: string };
+  PostDBData,
+  "id" | "dateCreated" | "views" | "url" | "author" | "tags"
+> & { isInBin: boolean; isDeleted: boolean };
 
 export interface TestPostAuthor {
   readonly userId: number;

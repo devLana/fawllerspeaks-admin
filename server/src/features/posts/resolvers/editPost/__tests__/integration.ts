@@ -134,8 +134,7 @@ describe("Test editPost resolver", () => {
       expect(data).toHaveProperty("post.imageBanner", mocks.mock1.imageBanner);
       expect(data).toHaveProperty("post.dateCreated", mocks.mock1.dateCreated);
       expect(data).toHaveProperty("post.views", mocks.mock1.views);
-      expect(data).toHaveProperty("post.isInBin", mocks.mock1.isInBin);
-      expect(data).toHaveProperty("post.isDeleted", mocks.mock1.isDeleted);
+      expect(data).toHaveProperty("post.binnedAt", mocks.mock1.binnedAt);
       expect(data).toHaveProperty("post.tags", mocks.mock1.tags);
       expect(data).toHaveProperty("status", "SUCCESS");
 
@@ -170,8 +169,7 @@ describe("Test editPost resolver", () => {
       expect(data).toHaveProperty("post.imageBanner", mocks.mock2.imageBanner);
       expect(data).toHaveProperty("post.dateCreated", mocks.mock2.dateCreated);
       expect(data).toHaveProperty("post.views", mocks.mock2.views);
-      expect(data).toHaveProperty("post.isInBin", mocks.mock2.isInBin);
-      expect(data).toHaveProperty("post.isDeleted", mocks.mock2.isDeleted);
+      expect(data).toHaveProperty("post.binnedAt", mocks.mock2.binnedAt);
       expect(data).toHaveProperty("post.tags", mocks.mock2.tags);
       expect(data).toHaveProperty("status", "SUCCESS");
 

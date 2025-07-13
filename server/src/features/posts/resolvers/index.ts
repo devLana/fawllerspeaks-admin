@@ -17,11 +17,9 @@ import { PostAuthorResolvers } from "./types/PostAuthor";
 import { PostUrlResolvers } from "./types/PostUrl";
 import { SinglePostResolver } from "./types/SinglePost";
 import { PostsResolver } from "./types/Posts";
-import { GetPostWarningResolvers } from "./getPost/types/GetPostWarning";
 import { PostsWarningResolver } from "./types/PostsWarning";
 import { DuplicatePostTitleErrorResolver } from "./types/DuplicatePostTitleError";
 import { NotAllowedPostActionErrorResolver } from "./types/NotAllowedPostActionError";
-// import { UnauthorizedAuthorErrorResolver } from "./types/UnauthorizedAuthorError";
 import { PostValidationErrorResolver } from "./types/PostValidationError";
 import { PostIdValidationErrorResolver } from "./types/PostIdValidationError";
 import { PostIdsValidationErrorResolver } from "./types/PostIdsValidationError";
@@ -56,12 +54,10 @@ export const postsResolvers = {
     SinglePost: SinglePostResolver,
     Posts: PostsResolver,
     GetPostsData: GetPostsDataResolvers,
-    GetPostWarning: GetPostWarningResolvers,
     PostsWarning: PostsWarningResolver,
     // EmptyBinWarning: EmptyBinWarningResolver,
     DuplicatePostTitleError: DuplicatePostTitleErrorResolver,
     NotAllowedPostActionError: NotAllowedPostActionErrorResolver,
-    // UnauthorizedAuthorError: UnauthorizedAuthorErrorResolver,
     PostValidationError: PostValidationErrorResolver,
     PostIdValidationError: PostIdValidationErrorResolver,
     PostIdsValidationError: PostIdsValidationErrorResolver,

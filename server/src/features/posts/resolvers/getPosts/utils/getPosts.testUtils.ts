@@ -85,12 +85,6 @@ const dateCreated = "2021-05-17 13:22:43.717+01";
 const datePublished = "2021-06-11 09:44:02.213+01";
 const lastModified = "2023-02-14 20:18:59.953+01";
 
-export const tags = [
-  { id: "id-1", name: "tag1", dateCreated, lastModified: null },
-  { id: "id-2", name: "tag2", dateCreated, lastModified },
-  { id: "id-3", name: "tag3", dateCreated, lastModified: null },
-];
-
 export const dbPosts = [
   {
     postId: "post-id-1",
@@ -107,8 +101,7 @@ export const dbPosts = [
     datePublished: null,
     lastModified,
     views: 0,
-    isInBin: false,
-    isDeleted: false,
+    binnedAt: null,
     tags: null,
   },
   {
@@ -126,9 +119,12 @@ export const dbPosts = [
     datePublished,
     lastModified,
     views: 10,
-    isInBin: false,
-    isDeleted: false,
-    tags,
+    binnedAt: null,
+    tags: [
+      { id: "id-1", name: "tag1", dateCreated, lastModified: null },
+      { id: "id-2", name: "tag2", dateCreated, lastModified },
+      { id: "id-3", name: "tag3", dateCreated, lastModified: null },
+    ],
   },
 ];
 

@@ -216,8 +216,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
         ep.date_published "datePublished",
         ep.last_modified "lastModified",
         ep.views,
-        ep.is_in_bin "isInBin",
-        ep.is_deleted "isDeleted",
+        ep.binned_at "binnedAt",
         json_agg(
           json_build_object(
             'id', rt.tag_id,
@@ -241,8 +240,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
         ep.date_published,
         ep.last_modified,
         ep.views,
-        ep.is_in_bin,
-        ep.is_deleted`,
+        ep.binned_at`,
       [title, description, excerpt, slug, postStatus, image, id, tags, content]
     );
 
@@ -266,8 +264,7 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
       datePublished: edited.datePublished,
       lastModified: edited.lastModified,
       views: edited.views,
-      isInBin: edited.isInBin,
-      isDeleted: edited.isDeleted,
+      binnedAt: edited.binnedAt,
       tags: edited.tags,
     });
   } catch (err) {
