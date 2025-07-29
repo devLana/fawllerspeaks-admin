@@ -212,7 +212,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         }
 
         if (filters?.status) {
-          sqlStr = `${sqlStr} AND p.status = $${++paramsCount}`;
+          sqlStr = `${sqlStr} AND status = $${++paramsCount}`;
           sqlParams.push(filters.status);
         }
 
