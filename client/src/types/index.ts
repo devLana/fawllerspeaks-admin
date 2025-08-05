@@ -42,6 +42,11 @@ export type RefetchQueriesFn<T extends object> = Extract<
   FunctionLike
 >;
 
+export type OptimisticResponseFn<T extends object, U extends object> = Extract<
+  MutationBaseOptions<T, U>["optimisticResponse"],
+  FunctionLike
+>;
+
 export type OnCompleted<T extends object> = MutationOptions<T>["onCompleted"];
 export type OnError = MutationOptions["onError"];
 

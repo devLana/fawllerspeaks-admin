@@ -3,27 +3,25 @@ import { useRouter } from "next/router";
 
 import { useMutation } from "@apollo/client";
 
-import { optimisticResponse } from "@cache/optimisticResponse/posts/unpublishPost";
+import { optimisticResponse } from "@cache/optimisticResponse/posts/undoUnpublishPost";
 import { POST_STATUS } from "@fragments/POST_STATUS";
-import { UNPUBLISH_POST } from "@mutations/unpublishPost/UNPUBLISH_POST";
+import { UNDO_UNPUBLISH_POST } from "@mutations/undoUnpublishPost/UNDO_UNPUBLISH_POST";
 import { SESSION_ID } from "@utils/constants";
 import type { StateSetterFn, Status } from "@types";
 
-const useUnpublishPost = (
+const useUndoUnpublishPost = (
   postId: string,
   slug: string,
   setMessage: StateSetterFn<string | React.ReactElement>
 ) => {
-  const [status, setStatus] = React.useState<Status | "success">("idle");
+  const [status, setStatus] = React.useState<Status>("idle");
   const { replace, pathname } = useRouter();
 
-  const [unpublishPost, { client }] = useMutation(UNPUBLISH_POST);
+  const [unpublishPost, { client }] = useMutation(UNDO_UNPUBLISH_POST);
 
-  const unpublishFn = () => {
-    const msg = `You are unable to unpublish a post right now. Please try again later`;
-
+  const undoUnpublishFn = () => {
+    const msg = `An unexpected error occurred and you cannot undo the unpublish right now. Please try again later`;
     setStatus("loading");
-    setMessage("Unpublishing post...");
 
     void unpublishPost({
       variables: { postId },
@@ -32,8 +30,8 @@ const useUnpublishPost = (
         setStatus("error");
         setMessage(msg);
       },
-      onCompleted(unpublishData) {
-        switch (unpublishData.unpublishPost.__typename) {
+      onCompleted(data) {
+        switch (data.undoUnpublishPost.__typename) {
           case "AuthenticationError": {
             const query = { status: "unauthenticated", redirectTo: pathname };
 
@@ -64,7 +62,7 @@ const useUnpublishPost = (
             client.writeFragment({
               id: client.cache.identify({ __typename: "Post", url: { slug } }),
               fragment: POST_STATUS,
-              data: { __typename: "Post", status: "Published" },
+              data: { __typename: "Post", status: "Unpublished" },
             });
 
             setStatus("error");
@@ -75,26 +73,26 @@ const useUnpublishPost = (
             client.cache.evict({
               id: "ROOT_QUERY",
               fieldName: "getPosts",
-              args: { filters: { status: "Published" } },
+              args: { filters: { status: "Unpublished" } },
             });
 
-            setStatus("success");
-            setMessage("Post unpublished");
+            setStatus("idle");
             break;
 
           default:
-            setStatus("error");
             setMessage(msg);
+            setStatus("error");
         }
       },
     });
   };
 
   return {
-    status,
-    unpublished: () => setStatus("idle"),
-    unpublishFn,
+    hasError: status === "error",
+    isLoading: status === "loading",
+    undoneUnpublish: () => setStatus("idle"),
+    undoUnpublishFn,
   };
 };
 
-export default useUnpublishPost;
+export default useUndoUnpublishPost;

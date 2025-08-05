@@ -47,9 +47,11 @@ const PostItemActions = ({
 
   const toastMessage = (
     <>
-      Are you sure you want to Unpublish{" "}
-      <Typography component="strong">{title}</Typography>? Un-publishing a post
-      will de-list it from the blog website
+      Are you sure you want to unpublish{" "}
+      <Typography component="span" sx={{ fontWeight: "bold" }}>
+        {title}
+      </Typography>
+      ? Unpublishing this post will de-list it from the blog website
     </>
   );
 

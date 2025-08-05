@@ -1,19 +1,12 @@
 import * as React from "react";
 
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Snackbar from "@mui/material/Snackbar";
-import LoadingButton from "@mui/lab/LoadingButton";
 import { type IconButtonProps } from "@mui/material/IconButton";
 
 import useUnpublishPost from "@hooks/unpublishPost/useUnpublishPost";
-import useBinPost from "@hooks/binPost/useBinPost";
+import useUndoUnpublishPost from "@hooks/undoUnpublishPost/useUndoUnpublishPost";
+import useBinPosts from "@hooks/binPosts/useBinPosts";
 import PostMenu from "./PostMenu";
-import ToastActionButtons from "../ToastActionButtons";
+import UnpublishPost from "./UnpublishPost";
 import type { PostStatus } from "@apiTypes";
 
 interface PostActionsProps {
@@ -28,81 +21,41 @@ interface PostActionsProps {
 
 const PostActions = (props: PostActionsProps) => {
   const { id, toastMessage, showTitleInDialog = false, ...menuProps } = props;
+  const [message, setMessage] = React.useState<string | React.ReactElement>("");
   const [showToast, setShowToast] = React.useState(false);
   const [showDialog, setShowDialog] = React.useState(false);
 
-  const unpublishFn = useUnpublishPost();
-  const binPostFn = useBinPost();
+  const unpublish = useUnpublishPost(id, menuProps.slug, setMessage);
+  const undoUnpublish = useUndoUnpublishPost(id, menuProps.slug, setMessage);
+  const binPosts = useBinPosts([id], menuProps.slug);
 
   const handleUnpublish = () => {
-    unpublishFn(id);
-    setShowToast(false);
-  };
-
-  const handleBinPost = () => {
-    binPostFn(id);
-    setShowToast(false);
+    setMessage(toastMessage);
+    setShowToast(true);
   };
 
   return (
     <>
       <PostMenu
-        onUnpublish={() => setShowToast(true)}
+        onUnpublish={handleUnpublish}
         onBinPost={() => setShowDialog(true)}
+        isBinning={binPosts.status === "loading"}
+        disableUnpublish={
+          unpublish.status === "loading" || undoUnpublish.isLoading
+        }
         {...menuProps}
       />
-      <Snackbar
-        open={showToast}
-        message={toastMessage}
-        action={
-          <ToastActionButtons
-            proceedLabel="Yes unpublish post"
-            cancelLabel="Cancel"
-            onProceed={handleUnpublish}
-            onCancel={() => setShowToast(false)}
-          />
-        }
-        ContentProps={{
-          sx: { "&>.MuiSnackbarContent-action": { columnGap: 0.5 } },
-        }}
-        sx={{
-          maxWidth: 600,
-          // "&>.MuiSnackbarContent-root": {
-          //   columnGap: 2,
-          //   justifyContent: "center",
-          //   "&>.MuiSnackbarContent-action": { m: 0, p: 0 },
-          // },
-        }}
+      <UnpublishPost
+        message={message}
+        showToast={showToast}
+        unpublishStatus={unpublish.status}
+        undoUnpublishHasError={undoUnpublish.hasError}
+        onCloseToast={() => setShowToast(false)}
+        onUnpublish={unpublish.unpublishFn}
+        onUndoUnpublish={undoUnpublish.undoUnpublishFn}
+        onUnpublished={unpublish.unpublished}
+        onUndoneUnpublish={undoUnpublish.undoneUnpublish}
       />
-      <Dialog
-        open={showDialog}
-        aria-labelledby="bin-post-dialog-title"
-        onClose={() => setShowDialog(false)}
-      >
-        <DialogTitle id="bin-post-dialog-title">Bin post</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to send this post to bin?
-          </DialogContentText>
-          {showTitleInDialog && (
-            <DialogContentText component="strong">
-              {menuProps.title}
-            </DialogContentText>
-          )}
-          {menuProps.status === "Published" && (
-            <DialogContentText>
-              Sending a Published post to bin will Unpublish it and de-list it
-              on the blog website.
-            </DialogContentText>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowDialog(false)}>Cancel</Button>
-          <LoadingButton onClick={handleBinPost} variant="contained">
-            <span>Send post to bin</span>
-          </LoadingButton>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };

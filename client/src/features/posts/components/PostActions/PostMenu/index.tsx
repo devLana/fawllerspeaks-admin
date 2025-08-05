@@ -6,7 +6,6 @@ import MenuItem from "@mui/material/MenuItem";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-// import PublishIcon from "@mui/icons-material/Publish";
 import UnpublishedIcon from "@mui/icons-material/Unpublished";
 
 import NextLink from "@components/ui/NextLink";
@@ -17,6 +16,7 @@ interface PostMenuProps {
   title: string;
   status: PostStatus;
   slug: string;
+  disableUnpublish: boolean;
   menuSx?: IconButtonProps["sx"];
   onUnpublish: () => void;
   onBinPost: () => void;
@@ -57,17 +57,13 @@ const PostMenu = (props: PostMenuProps) => {
       >
         {status === "Published" && (
           <MenuItem
+            disabled={props.disableUnpublish}
             sx={{ columnGap: 3 }}
             onClick={() => handlerFn(onUnpublish)}
           >
             <UnpublishedIcon fontSize="small" /> Unpublish
           </MenuItem>
         )}
-        {/* {status === "Unpublished" && (
-          <MenuItem sx={{ columnGap: 3 }}>
-            <PublishIcon fontSize="small" /> Publish
-          </MenuItem>
-        )} */}
         <MenuItem
           component={NextLink}
           href={`/posts/edit/${slug}`}
