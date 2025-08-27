@@ -75,6 +75,7 @@ const undoUnpublishPost: Resolver = async (_, { postId }, ctx) => {
         us.date_published "datePublished",
         us.last_modified "lastModified",
         p.views,
+        p.is_in_bin "isBinned",
         p.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -108,6 +109,7 @@ const undoUnpublishPost: Resolver = async (_, { postId }, ctx) => {
         us.date_published,
         us.last_modified,
         p.views,
+        p.is_in_bin,
         p.binned_at`,
       [post]
     );

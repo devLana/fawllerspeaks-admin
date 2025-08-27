@@ -62,6 +62,7 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.date_published "datePublished",
         p.last_modified "lastModified",
         p.views,
+        p.is_in_bin "isBinned",
         p.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -92,6 +93,7 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.date_published,
         p.last_modified,
         p.views,
+        p.is_in_bin,
         p.binned_at`,
       [postSlug]
     );

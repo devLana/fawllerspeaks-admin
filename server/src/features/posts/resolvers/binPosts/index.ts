@@ -71,6 +71,7 @@ const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
         bp.date_published "datePublished",
         bp.last_modified "lastModified",
         bp.views,
+        bp.is_in_bin "isBinned",
         bp.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -101,6 +102,7 @@ const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
         bp.date_published,
         bp.last_modified,
         bp.views,
+        bp.is_in_bin,
         bp.binned_at`,
       [ids]
     );

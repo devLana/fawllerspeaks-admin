@@ -60,6 +60,7 @@ export const data = {
   datePublished: null,
   lastModified,
   views: 10,
+  isBinned: false,
   binnedAt: null,
   tags: [
     { id: "1", name: "tag1", dateCreated, lastModified },

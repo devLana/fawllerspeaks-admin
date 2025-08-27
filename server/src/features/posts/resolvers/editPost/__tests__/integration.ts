@@ -113,7 +113,7 @@ describe("Test editPost resolver", () => {
     });
   });
 
-  describe("Edit post", () => {
+  describe("Post edited", () => {
     test("Should edit a blog post with post tags and an image banner", async () => {
       const spy = spyDb({ rows: [mocks.user] });
       spy.mockReturnValueOnce({ rows: [mocks.mockPost] });
@@ -134,6 +134,7 @@ describe("Test editPost resolver", () => {
       expect(data).toHaveProperty("post.imageBanner", mocks.mock1.imageBanner);
       expect(data).toHaveProperty("post.dateCreated", mocks.mock1.dateCreated);
       expect(data).toHaveProperty("post.views", mocks.mock1.views);
+      expect(data).toHaveProperty("post.isBinned", mocks.mock1.isBinned);
       expect(data).toHaveProperty("post.binnedAt", mocks.mock1.binnedAt);
       expect(data).toHaveProperty("post.tags", mocks.mock1.tags);
       expect(data).toHaveProperty("status", "SUCCESS");
@@ -169,6 +170,7 @@ describe("Test editPost resolver", () => {
       expect(data).toHaveProperty("post.imageBanner", mocks.mock2.imageBanner);
       expect(data).toHaveProperty("post.dateCreated", mocks.mock2.dateCreated);
       expect(data).toHaveProperty("post.views", mocks.mock2.views);
+      expect(data).toHaveProperty("post.isBinned", mocks.mock2.isBinned);
       expect(data).toHaveProperty("post.binnedAt", mocks.mock2.binnedAt);
       expect(data).toHaveProperty("post.tags", mocks.mock2.tags);
       expect(data).toHaveProperty("status", "SUCCESS");

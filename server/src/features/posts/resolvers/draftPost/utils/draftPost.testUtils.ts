@@ -60,6 +60,7 @@ export const dbData = {
   datePublished: null,
   lastModified: null,
   views: 0,
+  isBinned: false,
   binnedAt: null,
   status: "Draft",
 };

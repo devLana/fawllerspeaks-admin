@@ -13,7 +13,8 @@ type PostsPageDataKeys =
   | "title"
   | "imageBanner"
   | "status"
-  | "dateCreated";
+  | "dateCreated"
+  | "isBinned";
 
 type ValidationErrorKeys =
   | "qError"

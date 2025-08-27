@@ -253,7 +253,7 @@ describe("Edit post - E2E", () => {
     });
   });
 
-  describe("Edit post", () => {
+  describe("Post edited", () => {
     const { storageUrl } = supabase();
 
     it("Expect a post to be edited with new data", async () => {

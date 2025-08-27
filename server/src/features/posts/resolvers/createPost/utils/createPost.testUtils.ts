@@ -167,6 +167,7 @@ export const dbPost = {
   datePublished: dateCreated,
   lastModified: null,
   views: 0,
+  isBinned: false,
   binnedAt: null,
   status: "Published",
 };

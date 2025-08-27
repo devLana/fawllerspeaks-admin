@@ -62,6 +62,7 @@ interface DBPostData {
   readonly lastModified: string | null;
   readonly views: number;
   readonly binnedAt: string | null;
+  readonly isBinned: boolean;
   readonly tags: PostTag[] | null;
 }
 

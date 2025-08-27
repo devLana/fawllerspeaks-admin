@@ -254,6 +254,7 @@ const dbPost = {
   dateCreated,
   lastModified,
   views: 0,
+  isBinned: false,
   binnedAt: null,
 };
 

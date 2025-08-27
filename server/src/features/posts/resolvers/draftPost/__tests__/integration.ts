@@ -102,6 +102,7 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.datePublished", null);
       expect(result).toHaveProperty("post.lastModified", null);
       expect(result).toHaveProperty("post.views", 0);
+      expect(result).toHaveProperty("post.isBinned", false);
       expect(result).toHaveProperty("post.binnedAt", null);
       expect(result).toHaveProperty("post.tags", mocks.tags);
       expect(result).toHaveProperty("status", "SUCCESS");
@@ -129,6 +130,7 @@ describe("Test draft post resolver", () => {
       expect(result).toHaveProperty("post.lastModified", null);
       expect(result).toHaveProperty("post.url", mocks.url2);
       expect(result).toHaveProperty("post.views", 0);
+      expect(result).toHaveProperty("post.isBinned", false);
       expect(result).toHaveProperty("post.binnedAt", null);
       expect(result).toHaveProperty("post.tags", null);
       expect(result).toHaveProperty("status", "SUCCESS");

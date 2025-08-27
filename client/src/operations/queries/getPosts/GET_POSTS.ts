@@ -27,6 +27,7 @@ export const GET_POSTS: GetPostsData = gql`
           url {
             slug
           }
+          isBinned
         }
         pageData {
           after

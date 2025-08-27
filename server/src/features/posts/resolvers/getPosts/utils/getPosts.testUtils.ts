@@ -101,6 +101,7 @@ export const dbPosts = [
     datePublished: null,
     lastModified,
     views: 0,
+    isBinned: false,
     binnedAt: null,
     tags: null,
   },
@@ -119,6 +120,7 @@ export const dbPosts = [
     datePublished,
     lastModified,
     views: 10,
+    isBinned: false,
     binnedAt: null,
     tags: [
       { id: "id-1", name: "tag1", dateCreated, lastModified: null },

@@ -39,6 +39,7 @@ export const postsTypeDefs = `#graphql
     datePublished: String
     lastModified: String
     views: Int!
+    isBinned: Boolean!
     binnedAt: String
     tags: [PostTag!]
   }

@@ -66,6 +66,7 @@ export const post1 = {
   datePublished,
   lastModified: null,
   views: 10,
+  isBinned: true,
 };
 
 export const post2 = {
@@ -80,6 +81,7 @@ export const post2 = {
   lastModified,
   views: 22,
   tags: null,
+  isBinned: true,
 };
 
 export const post3 = {
@@ -93,6 +95,7 @@ export const post3 = {
   datePublished,
   lastModified,
   views: 1000,
+  isBinned: true,
 };
 
 export const post4 = {
@@ -108,4 +111,5 @@ export const post4 = {
   lastModified: null,
   views: 0,
   tags: null,
+  isBinned: true,
 };

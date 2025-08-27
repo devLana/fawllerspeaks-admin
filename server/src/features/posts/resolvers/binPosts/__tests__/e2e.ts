@@ -182,11 +182,13 @@ describe("Bin posts - E2E", () => {
         posts: expect.arrayContaining([
           {
             ...drafted,
+            isBinned: true,
             binnedAt: expect.stringMatching(DATE_REGEX),
             tags: expect.arrayContaining(drafted.tags as unknown[]),
           },
           {
             ...published,
+            isBinned: true,
             binnedAt: expect.stringMatching(DATE_REGEX),
             tags: expect.arrayContaining(published.tags as unknown[]),
           },
@@ -209,6 +211,7 @@ describe("Bin posts - E2E", () => {
         posts: [
           {
             ...unpublished,
+            isBinned: true,
             binnedAt: expect.stringMatching(DATE_REGEX),
             tags: expect.arrayContaining(unpublished.tags as unknown[]),
           },

@@ -73,6 +73,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         cp.date_published "datePublished",
         cp.last_modified "lastModified",
         cp.views,
+        cp.is_in_bin "isBinned",
         cp.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -96,6 +97,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         cp.date_published,
         cp.last_modified,
         cp.views,
+        cp.is_in_bin,
         cp.binned_at,
         $13::text`,
       [
@@ -172,6 +174,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
       datePublished,
       lastModified,
       views: post.views,
+      isBinned: post.isBinned,
       binnedAt,
       tags: postTags ?? null,
     };
