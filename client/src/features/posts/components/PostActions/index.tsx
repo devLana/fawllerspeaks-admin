@@ -4,9 +4,10 @@ import { type IconButtonProps } from "@mui/material/IconButton";
 
 import useUnpublishPost from "@hooks/unpublishPost/useUnpublishPost";
 import useUndoUnpublishPost from "@hooks/undoUnpublishPost/useUndoUnpublishPost";
-import useBinPosts from "@hooks/binPosts/useBinPosts";
+import useBinPost from "@hooks/binPosts/useBinPost";
 import PostMenu from "./PostMenu";
 import UnpublishPost from "./UnpublishPost";
+import BinPost from "./BinPost";
 import type { PostStatus } from "@apiTypes";
 
 interface PostActionsProps {
@@ -27,7 +28,7 @@ const PostActions = (props: PostActionsProps) => {
 
   const unpublish = useUnpublishPost(id, menuProps.slug, setMessage);
   const undoUnpublish = useUndoUnpublishPost(id, menuProps.slug, setMessage);
-  const binPosts = useBinPosts([id], menuProps.slug);
+  const binPost = useBinPost(id, () => setShowDialog(false));
 
   const handleUnpublish = () => {
     setMessage(toastMessage);
@@ -39,7 +40,6 @@ const PostActions = (props: PostActionsProps) => {
       <PostMenu
         onUnpublish={handleUnpublish}
         onBinPost={() => setShowDialog(true)}
-        isBinning={binPosts.status === "loading"}
         disableUnpublish={
           unpublish.status === "loading" || undoUnpublish.isLoading
         }
@@ -55,6 +55,17 @@ const PostActions = (props: PostActionsProps) => {
         onUndoUnpublish={undoUnpublish.undoUnpublishFn}
         onUnpublished={unpublish.unpublished}
         onUndoneUnpublish={undoUnpublish.undoneUnpublish}
+      />
+      <BinPost
+        showDialog={showDialog}
+        toast={binPost.toast}
+        title={menuProps.title}
+        isBinning={binPost.isBinning}
+        isPublished={menuProps.status === "Published"}
+        showTitleInDialog={showTitleInDialog}
+        onBinPosts={binPost.binPostsFn}
+        onCloseDialog={() => setShowDialog(false)}
+        onCloseToast={binPost.handleCloseToast}
       />
     </>
   );
