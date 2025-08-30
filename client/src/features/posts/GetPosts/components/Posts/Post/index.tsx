@@ -5,7 +5,8 @@ import PostItemImageBanner from "./PostItemImageBanner";
 import PostInfo from "./PostInfo";
 import PostItemLink from "./PostItemLink";
 import type { PostStatus as Status } from "@apiTypes";
-import type { PostItemSlug, PostsView } from "types/posts/getPosts";
+import type { PostsView } from "types/posts/getPosts";
+import type { PostItemSlug } from "types/posts";
 
 interface PostProps {
   isLoadingMore: boolean;

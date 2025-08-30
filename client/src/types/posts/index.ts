@@ -63,3 +63,17 @@ type RequiredFieldErrorKeys = `${keyof RequiredPostMetadataFields}Error`;
 export type RequiredFieldErrors = {
   [Key in RequiredFieldErrorKeys]?: string;
 };
+
+export type PostItemSlug = Pick<PostData["url"], "slug">;
+
+type UnpublishedPostData = Pick<PostData, "id" | "status"> & {
+  url: PostItemSlug;
+};
+
+type UnpublishedPostDataHelper<T extends object> = T extends { post: Post }
+  ? Omit<T, "post" | "status"> & { post: UnpublishedPostData }
+  : Omit<T, "status">;
+
+export type UnpublishedPostDataMapper<T extends Record<string, object>> = {
+  [Key in keyof T]: UnpublishedPostDataHelper<T[Key]>;
+};

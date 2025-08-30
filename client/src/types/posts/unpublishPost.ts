@@ -1,4 +1,6 @@
 import type { Mutation } from "@apiTypes";
-import type { PostDataMapper } from ".";
+import type { UnpublishedPostDataMapper } from ".";
 
-export type UnpublishPostData = PostDataMapper<Pick<Mutation, "unpublishPost">>;
+export type UnpublishPostData = UnpublishedPostDataMapper<
+  Pick<Mutation, "unpublishPost">
+>;

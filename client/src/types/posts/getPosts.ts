@@ -6,7 +6,7 @@ import type {
   PostStatus,
   SortPostsBy,
 } from "@apiTypes";
-import type { PostData } from "types/posts";
+import type { PostData, PostItemSlug } from "types/posts";
 
 type PostsPageDataKeys =
   | "id"
@@ -24,7 +24,6 @@ type ValidationErrorKeys =
   | "postTagError";
 
 export type PostsView = "list" | "grid";
-export type PostItemSlug = Pick<PostData["url"], "slug">;
 
 export type PostsPagePostData = Pick<PostData, PostsPageDataKeys> & {
   url: PostItemSlug;
