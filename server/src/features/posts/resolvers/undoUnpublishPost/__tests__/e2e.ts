@@ -22,7 +22,7 @@ type Data = TestData<{ undoUnpublishPost: Record<string, unknown> }>;
 
 describe("Undo Unpublish post - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
-  let published: Post, unpublished: Post, draft: Post;
+  let published: Post, unpublished: Post, draft: Post, binned: Post;
   let registeredJwt: string, unregisteredJwt: string, postTags: PostTag[];
 
   beforeAll(async () => {
@@ -42,7 +42,7 @@ describe("Undo Unpublish post - E2E", () => {
     const draftPost = createTestPost({
       db,
       postTags,
-      postData: testPostData({ title: "Test Post Title - 1" }),
+      postData: testPostData({ title: "Test Draft Post Title - 1" }),
       postAuthor: {
         userId: registeredUser.userId,
         firstName: user.firstName,
@@ -55,7 +55,7 @@ describe("Undo Unpublish post - E2E", () => {
       db,
       postTags,
       postData: testPostData({
-        title: "Test Post Title - 2",
+        title: "Test Published Post Title - 2",
         datePublished: new Date().toISOString(),
       }),
       postAuthor: {
@@ -70,7 +70,7 @@ describe("Undo Unpublish post - E2E", () => {
       db,
       postTags,
       postData: testPostData({
-        title: "Test Post Title - 3",
+        title: "Test Unpublished Post Title - 3",
         status: "Unpublished",
       }),
       postAuthor: {
@@ -81,10 +81,27 @@ describe("Undo Unpublish post - E2E", () => {
       },
     });
 
-    [published, unpublished, draft] = await Promise.all([
+    const binnedPost = createTestPost({
+      db,
+      postTags,
+      postData: testPostData({
+        title: "Test Binned Post Title - 3",
+        status: "Draft",
+        isBinned: true,
+      }),
+      postAuthor: {
+        userId: registeredUser.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+      },
+    });
+
+    [published, unpublished, draft, binned] = await Promise.all([
       publishedPost,
       unpublishedPost,
       draftPost,
+      binnedPost,
     ]);
   });
 
@@ -147,7 +164,7 @@ describe("Undo Unpublish post - E2E", () => {
     });
   });
 
-  describe("Verify post id", () => {
+  describe("Verify post", () => {
     it("Expect an error object response if the provided post id does not exist", async () => {
       const payload = { query: GQL, variables: { postId: mocks.UUID } };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -159,6 +176,22 @@ describe("Undo Unpublish post - E2E", () => {
       expect(data.data?.undoUnpublishPost).toStrictEqual({
         __typename: "UnknownError",
         message: "Unable to undo unpublish post",
+        status: "ERROR",
+      });
+    });
+
+    it("Expect an error object response if the post is a binned post", async () => {
+      const { id } = binned;
+      const payload = { query: GQL, variables: { postId: id } };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<Data>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.undoUnpublishPost).toStrictEqual({
+        __typename: "NotAllowedPostActionError",
+        message: "This blog post cannot be undone back to Published",
         status: "ERROR",
       });
     });
@@ -176,12 +209,12 @@ describe("Undo Unpublish post - E2E", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.undoUnpublishPost).toStrictEqual({
         __typename: "NotAllowedPostActionError",
-        message: "Can only undo a recently Unpublished post back to Published",
+        message: "Only an Unpublished post can be undone back to Published",
         status: "ERROR",
       });
     });
 
-    it("Expect an error object response if the user tries to undo a Published post", async () => {
+    it("Expect an warning object response if the user tries to undo a Published post", async () => {
       const { id } = published;
       const payload = { query: GQL, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -191,15 +224,15 @@ describe("Undo Unpublish post - E2E", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.undoUnpublishPost).toStrictEqual({
-        __typename: "NotAllowedPostActionError",
-        message: "Can only undo a recently Unpublished post back to Published",
-        status: "ERROR",
+        __typename: "Response",
+        message: "This blog post is already a Published post",
+        status: "WARN",
       });
     });
   });
 
-  describe("Update post status and undo an Unpublished post", () => {
-    it("Expect to be able to undo an Unpublished post to Published", async () => {
+  describe("Update post status and undo an Unpublished post status", () => {
+    it("Expect to be able to undo an Unpublished post back to Published", async () => {
       const { id } = unpublished;
       const payload = { query: GQL, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };

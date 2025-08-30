@@ -29,21 +29,39 @@ export const verify: [string, Record<string, unknown>[]][] = [
   ],
 ];
 
-export const verifyPost: [string, [string, object[], string]][] = [
+export const verifyPost: [string, [string, object[], string, string][]][] = [
   [
-    "Verify post id",
+    "Verify post",
     [
-      "Expect an error object if the post id is unknown",
-      [],
-      "Unable to undo unpublish post",
+      [
+        "Expect an error object if the post id is unknown",
+        [],
+        "Unable to undo unpublish post",
+        "ERROR",
+      ],
+      [
+        "Expect an error object if the post is a binned post",
+        [{ is_in_bin: true }],
+        "This blog post cannot be undone back to Published",
+        "ERROR",
+      ],
     ],
   ],
   [
     "Verify post status",
     [
-      "Expect an error object if the user tries to undo a post that is not an Unpublished post",
-      [{ isNotUnpublished: true }],
-      "Can only undo a recently Unpublished post back to Published",
+      [
+        "Expect an error object if the user tries to undo a Draft post",
+        [{ is_in_bin: false, status: "Draft" }],
+        "Only an Unpublished post can be undone back to Published",
+        "ERROR",
+      ],
+      [
+        "Expect a warning object if the user tries to undo a Published post",
+        [{ is_in_bin: false, status: "Published" }],
+        "This blog post is already a Published post",
+        "WARN",
+      ],
     ],
   ],
 ];
@@ -71,5 +89,3 @@ export const post = {
     { id: "4", name: "tag4" },
   ],
 };
-
-export const dbPost = { ...post, isNotUnpublished: false };

@@ -29,21 +29,39 @@ export const verify: [string, Record<string, unknown>[]][] = [
   ],
 ];
 
-export const verifyPost: [string, [string, object[], string]][] = [
+export const verifyPost: [string, [string, object[], string, string][]][] = [
   [
-    "Verify post id",
+    "Verify post",
     [
-      "Expect an error object if the post id is unknown",
-      [],
-      "Unable to unpublish post",
+      [
+        "Expect an error object if the post id is unknown",
+        [],
+        "Unable to unpublish post",
+        "ERROR",
+      ],
+      [
+        "Expect an error object if the post has been binned",
+        [{ is_in_bin: true }],
+        "This blog post cannot be unpublished",
+        "ERROR",
+      ],
     ],
   ],
   [
     "Verify post status",
     [
-      "Expect an error object if the user tries to unpublish a Draft post",
-      [{ isDraft: true }],
-      "A Draft post cannot be unpublished",
+      [
+        "Expect an error object if the user tries to unpublish a Draft post",
+        [{ is_in_bin: false, status: "Draft" }],
+        "A Draft post cannot be unpublished",
+        "ERROR",
+      ],
+      [
+        "Expect a warning object if the post is already Unpublished",
+        [{ is_in_bin: false, status: "Unpublished" }],
+        "This blog post is already Unpublished",
+        "WARN",
+      ],
     ],
   ],
 ];
@@ -71,5 +89,3 @@ export const post = {
     { id: "4", name: "tag4" },
   ],
 };
-
-export const dbPost = { ...post, isDraft: false };

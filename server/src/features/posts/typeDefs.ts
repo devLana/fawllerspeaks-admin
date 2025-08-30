@@ -139,13 +139,13 @@ export const postsTypeDefs = `#graphql
 
   union CreateDraftPost = SinglePost | PostValidationError | DuplicatePostTitleError | ForbiddenError | AuthenticationError | RegistrationError | NotAllowedError
 
-  union EditPost = SinglePost | EditPostValidationError | AuthenticationError |  NotAllowedError | UnknownError | RegistrationError | ForbiddenError | DuplicatePostTitleError
+  union EditPost = SinglePost | EditPostValidationError | AuthenticationError |  NotAllowedError | NotAllowedPostActionError | UnknownError | RegistrationError | ForbiddenError | DuplicatePostTitleError
 
   union GetPost = SinglePost | GetPostValidationError | AuthenticationError | NotAllowedError | RegistrationError | UnknownError
 
   union GetPosts = GetPostsData | GetPostsValidationError | AuthenticationError | NotAllowedError | RegistrationError | ForbiddenError
 
-  union UnpublishUndoUnpublishPost = SinglePost | PostIdValidationError | NotAllowedPostActionError | UnknownError | RegistrationError | NotAllowedError | AuthenticationError
+  union UnpublishUndoUnpublishPost = SinglePost | Response | PostIdValidationError | NotAllowedPostActionError | UnknownError | RegistrationError | NotAllowedError | AuthenticationError
 
   union DeletePostContentImages = Response | DeletePostContentImagesValidationError | AuthenticationError | ForbiddenError | RegistrationError | ServerError | UnknownError
 

@@ -65,24 +65,24 @@ describe("Test editPost resolver", () => {
     });
   });
 
-  describe("Verify post id", () => {
-    test("Post id does not exist, Expect an error response", async () => {
+  describe("Verify post", () => {
+    test.each(mocks.verifyPost)("%s", async (_, rows, errorMsg) => {
       const spy = spyDb({ rows: [{ isRegistered: true }] });
-      spy.mockReturnValueOnce({ rows: [] }).mockReturnValueOnce({ rows: [] });
+      spy.mockReturnValueOnce({ rows }).mockReturnValueOnce({ rows: [] });
 
       const post = { ...mocks.post, imageBanner: mocks.imageBanner };
       const data = await editPost({}, { post }, mockContext, info);
 
       expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(data).toHaveProperty("status", "ERROR");
-      expect(data).toHaveProperty("message", "Unable to edit post");
+      expect(data).toHaveProperty("message", errorMsg);
     });
   });
 
   describe("Validate input for non Draft posts", () => {
     test.each(mocks.metadata)("%s", async (_, post, postStatus, errors) => {
       const spy = spyDb({ rows: [mocks.user] });
-      spy.mockReturnValueOnce({ rows: [{ postStatus }] });
+      spy.mockReturnValueOnce({ rows: [{ postStatus, isBinned: false }] });
       spy.mockReturnValueOnce({ rows: [] });
 
       const data = await editPost({}, { post }, mockContext, info);
@@ -97,8 +97,9 @@ describe("Test editPost resolver", () => {
 
   describe("Verify post title and post url slug", () => {
     test.each(mocks.verifyTitleSlug)("%s", async (_, msg, mock) => {
+      const rows = [{ postStatus: "Draft", isBinned: false }];
       const spy = spyDb({ rows: [mocks.user] });
-      spy.mockReturnValueOnce({ rows: [{ postStatus: "Draft" }] });
+      spy.mockReturnValueOnce({ rows });
       spy.mockReturnValueOnce({ rows: [mock] });
 
       const data = await editPost({}, { post: mocks.post }, mockContext, info);
@@ -106,7 +107,7 @@ describe("Test editPost resolver", () => {
       expect(mockEvent).not.toHaveBeenCalled();
       expect(spy).toHaveBeenCalledTimes(3);
       expect(spy).toHaveNthReturnedWith(1, { rows: [mocks.user] });
-      expect(spy).toHaveNthReturnedWith(2, { rows: [{ postStatus: "Draft" }] });
+      expect(spy).toHaveNthReturnedWith(2, { rows });
       expect(spy).toHaveNthReturnedWith(3, { rows: [mock] });
       expect(data).toHaveProperty("message", msg);
       expect(data).toHaveProperty("status", "ERROR");

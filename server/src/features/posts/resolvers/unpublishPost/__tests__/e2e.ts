@@ -22,7 +22,7 @@ type UnpublishPost = TestData<{ unpublishPost: Record<string, unknown> }>;
 
 describe("Unpublish post - E2E", () => {
   let server: ApolloServer<APIContext>, url: string;
-  let published: Post, unpublished: Post, draft: Post;
+  let published: Post, unpublished: Post, draft: Post, binned: Post;
   let registeredJwt: string, unregisteredJwt: string, postTags: PostTag[];
 
   beforeAll(async () => {
@@ -42,7 +42,7 @@ describe("Unpublish post - E2E", () => {
     const draftPost = createTestPost({
       db,
       postTags,
-      postData: testPostData({ title: "Test Post Title - 1" }),
+      postData: testPostData({ title: "Test Draft Post Title - 1" }),
       postAuthor: {
         userId: registeredUser.userId,
         firstName: user.firstName,
@@ -55,7 +55,7 @@ describe("Unpublish post - E2E", () => {
       db,
       postTags,
       postData: testPostData({
-        title: "Test Post Title - 2",
+        title: "Test Published Post Title - 2",
         datePublished: new Date().toISOString(),
       }),
       postAuthor: {
@@ -70,7 +70,7 @@ describe("Unpublish post - E2E", () => {
       db,
       postTags,
       postData: testPostData({
-        title: "Test Post Title - 3",
+        title: "Test Unpublished Post Title - 3",
         status: "Unpublished",
       }),
       postAuthor: {
@@ -81,10 +81,27 @@ describe("Unpublish post - E2E", () => {
       },
     });
 
-    [published, unpublished, draft] = await Promise.all([
+    const binnedPost = createTestPost({
+      db,
+      postTags,
+      postData: testPostData({
+        title: "Test Binned Unpublished Post Title - 4",
+        status: "Unpublished",
+        isBinned: true,
+      }),
+      postAuthor: {
+        userId: registeredUser.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+      },
+    });
+
+    [published, unpublished, draft, binned] = await Promise.all([
       publishedPost,
       unpublishedPost,
       draftPost,
+      binnedPost,
     ]);
   });
 
@@ -147,7 +164,7 @@ describe("Unpublish post - E2E", () => {
     });
   });
 
-  describe("Verify post id", () => {
+  describe("Verify post", () => {
     it("Expect an error object response if the provided post id does not exist", async () => {
       const payload = { query: GQL, variables: { postId: mocks.UUID } };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -159,6 +176,22 @@ describe("Unpublish post - E2E", () => {
       expect(data.data?.unpublishPost).toStrictEqual({
         __typename: "UnknownError",
         message: "Unable to unpublish post",
+        status: "ERROR",
+      });
+    });
+
+    it("Expect an error object response if the blog post has been binned", async () => {
+      const { id } = binned;
+      const payload = { query: GQL, variables: { postId: id } };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<UnpublishPost>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.unpublishPost).toStrictEqual({
+        __typename: "NotAllowedPostActionError",
+        message: "This blog post cannot be unpublished",
         status: "ERROR",
       });
     });
@@ -180,10 +213,8 @@ describe("Unpublish post - E2E", () => {
         status: "ERROR",
       });
     });
-  });
 
-  describe("Update post status and Unpublish a post", () => {
-    it("Expect an Unpublished post to remain unpublished", async () => {
+    it("Expect a warning object response if the post is already Unpublished", async () => {
       const { id } = unpublished;
       const payload = { query: GQL, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -193,19 +224,15 @@ describe("Unpublish post - E2E", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.unpublishPost).toStrictEqual({
-        __typename: "SinglePost",
-        post: {
-          ...unpublished,
-          status: "Unpublished",
-          lastModified: expect.stringMatching(DATE_REGEX),
-          datePublished: null,
-          tags: expect.arrayContaining(postTags),
-        },
-        status: "SUCCESS",
+        __typename: "Response",
+        message: "This blog post is already Unpublished",
+        status: "WARN",
       });
     });
+  });
 
-    it("Expect a Published post to be unpublished", async () => {
+  describe("Update post status and Unpublish a post", () => {
+    it("Expect a Published post to be Unpublished", async () => {
       const { id } = published;
       const payload = { query: GQL, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };

@@ -243,7 +243,11 @@ export const verifyTitleSlug: [string, string, MockData][] = [
   ],
 ];
 
-export const mockPost = { postStatus: "Draft", postImageBanner: imageBanner };
+export const mockPost = {
+  postStatus: "Draft",
+  postImageBanner: imageBanner,
+  isBinned: false,
+};
 
 const dbPost = {
   id: UUID,
@@ -289,3 +293,16 @@ export const mock2 = {
   tags: null,
   status: "Draft",
 };
+
+export const verifyPost: [string, object[], string][] = [
+  [
+    "Post id does not exist, Expect an error response",
+    [],
+    "Unable to edit post",
+  ],
+  [
+    "Post is a binned post, Expect an error response",
+    [{ isBinned: true }],
+    "This blog post cannot be edited",
+  ],
+];

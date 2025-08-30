@@ -38,20 +38,21 @@ describe("Test undoUnpublish post resolver", () => {
 
   describe("Verify user", () => {
     it.each(mocks.verify)("%s", async (_, mock) => {
-      const spy = spyDb({ rows: mock });
+      const spy = spyDb({ rows: mock }).mockReturnValueOnce({ rows: [] });
       const postId = mocks.UUID;
 
       const data = await resolverFn({}, { postId }, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveNthReturnedWith(1, { rows: mock });
+      expect(spy).toHaveNthReturnedWith(2, { rows: [] });
       expect(data).toHaveProperty("message", "Unable to undo unpublish post");
       expect(data).toHaveProperty("status", "ERROR");
     });
   });
 
-  describe.each(mocks.verifyPost)("%s", (_, [testLabel, mock, errorMsg]) => {
-    it(testLabel, async () => {
+  describe.each(mocks.verifyPost)("%s", (_, testCases) => {
+    it.each(testCases)("%s", async (__, mock, errorMsg, status) => {
       const postId = mocks.UUID;
       const spy = spyDb({ rows: [{ isRegistered: true }] });
       spy.mockReturnValueOnce({ rows: mock });
@@ -62,21 +63,24 @@ describe("Test undoUnpublish post resolver", () => {
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
       expect(spy).toHaveNthReturnedWith(2, { rows: mock });
       expect(data).toHaveProperty("message", errorMsg);
-      expect(data).toHaveProperty("status", "ERROR");
+      expect(data).toHaveProperty("status", status);
     });
   });
 
   describe("Undo post status and update post status", () => {
     it("Expect to be able to undo an Unpublished post to Published", async () => {
       const postId = mocks.UUID;
+      const mock = [{ is_in_bin: false, status: "Unpublished" }];
       const spy = spyDb({ rows: [{ isRegistered: true }] });
-      spy.mockReturnValueOnce({ rows: [mocks.dbPost] });
+      spy.mockReturnValueOnce({ rows: mock });
+      spy.mockReturnValueOnce({ rows: [mocks.post] });
 
       const data = await resolverFn({}, { postId }, mockContext, info);
 
-      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy).toHaveBeenCalledTimes(3);
       expect(spy).toHaveNthReturnedWith(1, { rows: [{ isRegistered: true }] });
-      expect(spy).toHaveNthReturnedWith(2, { rows: [mocks.dbPost] });
+      expect(spy).toHaveNthReturnedWith(2, { rows: mock });
+      expect(spy).toHaveNthReturnedWith(3, { rows: [mocks.post] });
       expect(data).toHaveProperty("status", "SUCCESS");
       expect(data).toHaveProperty("post", mocks.post);
     });

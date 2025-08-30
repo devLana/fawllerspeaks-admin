@@ -6,6 +6,7 @@ import getPostSlug from "@features/posts/utils/getPostSlug";
 import { editPostValidator as schema } from "./utils/editPost.validator";
 import { EditPostValidationError } from "./types/EditPostValidationError";
 import { DuplicatePostTitleError } from "../types/DuplicatePostTitleError";
+import { NotAllowedPostActionError } from "../types/NotAllowedPostActionError";
 import { SinglePost } from "../types/SinglePost";
 import {
   AuthenticationError,
@@ -25,6 +26,7 @@ type EditPost = PostFieldResolver<ResolverFunc<MutationResolvers["editPost"]>>;
 interface FindById {
   postStatus: PostStatus;
   postImageBanner: string | null;
+  isBinned: boolean;
 }
 
 interface FindBySlug {
@@ -80,7 +82,8 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
     const findPostById = db.query<FindById>(
       `SELECT
         status "postStatus",
-        image_banner "postImageBanner"
+        image_banner "postImageBanner",
+        is_in_bin "isBinned"
       FROM posts
       WHERE post_id = $1`,
       [id]
@@ -106,7 +109,13 @@ const editPost: EditPost = async (_, { post }, { user, db, req, res }) => {
       return new UnknownError("Unable to edit post");
     }
 
-    const [{ postImageBanner }] = foundPost;
+    const [{ postImageBanner, isBinned }] = foundPost;
+
+    if (isBinned) {
+      if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
+      return new NotAllowedPostActionError("This blog post cannot be edited");
+    }
+
     let [{ postStatus }] = foundPost;
     let datePublished = "";
 

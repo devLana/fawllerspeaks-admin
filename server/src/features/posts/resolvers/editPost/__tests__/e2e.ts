@@ -29,7 +29,7 @@ const mockEvent = jest.spyOn(supabaseEvent, "emit");
 mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
 describe("Edit post - E2E", () => {
-  let server: ApolloServer<APIContext>, url: string;
+  let server: ApolloServer<APIContext>, url: string, binnedPost: Post;
   let registeredJwt: string, unregisteredJwt: string, postTags: PostTag[];
   let publishedPost: Post, unpublishedPost: Post, draftPost: Post;
 
@@ -55,7 +55,7 @@ describe("Edit post - E2E", () => {
         image: user.image,
       },
       postData: testPostData({
-        title: "Create Test Published Post Title",
+        title: "Edit Test Post Published Title",
         status: "Published",
         datePublished: new Date().toISOString(),
       }),
@@ -71,7 +71,7 @@ describe("Edit post - E2E", () => {
         image: user.image,
       },
       postData: testPostData({
-        title: "Create Test Post Unpublished Title",
+        title: "Edit Test Post Unpublished Title",
         status: "Unpublished",
       }),
     });
@@ -86,16 +86,31 @@ describe("Edit post - E2E", () => {
         image: user.image,
       },
       postData: testPostData({
-        title: "Create Test Post Draft Title",
+        title: "Edit Test Post Draft Title",
         status: "Draft",
       }),
     });
 
-    [publishedPost, unpublishedPost, draftPost] = await Promise.all([
-      published,
-      unpublished,
-      draft,
-    ]);
+    const binned = createTestPost({
+      db,
+      postTags,
+      postAuthor: {
+        userId: registeredUser.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+      },
+      postData: testPostData({
+        title: "Edit Test Post Binned Title",
+        status: "Draft",
+        isBinned: true,
+        binnedAt: new Date().toISOString(),
+      }),
+    });
+
+    [publishedPost, unpublishedPost, draftPost, binnedPost] = await Promise.all(
+      [published, unpublished, draft, binned]
+    );
   });
 
   afterAll(async () => {
@@ -161,7 +176,7 @@ describe("Edit post - E2E", () => {
     });
   });
 
-  describe("Verify post id", () => {
+  describe("Verify post", () => {
     it("Post id does not exist, Expect an error response", async () => {
       const postData = { ...mocks.post, imageBanner: mocks.imageBanner };
       const payload = { query: EDIT_POST, variables: { post: postData } };
@@ -175,6 +190,24 @@ describe("Edit post - E2E", () => {
       expect(data.data?.editPost).toStrictEqual({
         __typename: "UnknownError",
         message: "Unable to edit post",
+        status: "ERROR",
+      });
+    });
+
+    it("Post is a binned post, Expect an error response", async () => {
+      const { id } = binnedPost;
+      const postData = { id, title: "New Binned Edit Post Title" };
+      const payload = { query: EDIT_POST, variables: { post: postData } };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<Edit>(url, payload, options);
+
+      expect(mockEvent).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.editPost).toStrictEqual({
+        __typename: "NotAllowedPostActionError",
+        message: "This blog post cannot be edited",
         status: "ERROR",
       });
     });
@@ -233,9 +266,9 @@ describe("Edit post - E2E", () => {
   });
 
   describe("Verify post title and post url slug", () => {
-    it("Returns error if post title is used on another post in db", async () => {
+    it("Expect an error if the new post title is used on another post in db", async () => {
       const { id } = publishedPost;
-      const title = "Create Test.Post Unpublished#Title";
+      const title = "Edit Test.Post Unpublished#Title";
       const postData = { ...mocks.post, id, title, editStatus: true };
       const payload = { query: EDIT_POST, variables: { post: postData } };
       const options = { authorization: `Bearer ${registeredJwt}` };

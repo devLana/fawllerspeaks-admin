@@ -8,16 +8,19 @@ import {
   AuthenticationError,
   NotAllowedError,
   RegistrationError,
+  Response,
   UnknownError,
 } from "@utils/ObjectTypes";
 import deleteSession from "@utils/deleteSession";
 import { unpublishPostValidator as schema } from "./utils/unpublishPost.validator";
 
-import type { MutationResolvers as Resolvers } from "@resolverTypes";
+import type {
+  PostStatus,
+  MutationResolvers as Resolvers,
+} from "@resolverTypes";
 import type { GetPostDBData, PostFieldResolver, ResolverFunc } from "@types";
 
 type Resolver = PostFieldResolver<ResolverFunc<Resolvers["unpublishPost"]>>;
-type PostDBData = Omit<GetPostDBData, "postId"> & { isDraft: boolean };
 
 const unpublishPost: Resolver = async (_, { postId }, ctx) => {
   try {
@@ -30,10 +33,20 @@ const unpublishPost: Resolver = async (_, { postId }, ctx) => {
 
     const post = await schema.validateAsync(postId);
 
-    const { rows: foundUser } = await db.query<{ isRegistered: boolean }>(
+    const findUser = db.query<{ isRegistered: boolean }>(
       `SELECT is_registered "isRegistered" FROM users WHERE user_id = $1`,
       [user]
     );
+
+    const findPost = db.query<{ status: PostStatus; is_in_bin: boolean }>(
+      `SELECT status, is_in_bin FROM posts WHERE post_id = $1`,
+      [post]
+    );
+
+    const [{ rows: foundUser }, { rows: foundPost }] = await Promise.all([
+      findUser,
+      findPost,
+    ]);
 
     if (foundUser.length === 0) {
       void deleteSession(db, req, res);
@@ -44,18 +57,37 @@ const unpublishPost: Resolver = async (_, { postId }, ctx) => {
       return new RegistrationError("Unable to unpublish post");
     }
 
-    const { rows: updatePost } = await db.query<PostDBData>(
+    if (foundPost.length === 0) {
+      return new UnknownError("Unable to unpublish post");
+    }
+
+    if (foundPost[0].is_in_bin) {
+      return new NotAllowedPostActionError(
+        "This blog post cannot be unpublished"
+      );
+    }
+
+    if (foundPost[0].status === "Draft") {
+      return new NotAllowedPostActionError(
+        "A Draft post cannot be unpublished"
+      );
+    }
+
+    if (foundPost[0].status === "Unpublished") {
+      return new Response("This blog post is already Unpublished", "WARN");
+    }
+
+    const { rows: updatePost } = await db.query<Omit<GetPostDBData, "postId">>(
       `WITH update_status AS (
         UPDATE posts
         SET
           status = 'Unpublished',
           date_published = NULL,
           last_modified = CURRENT_TIMESTAMP(3)
-        WHERE post_id = $1 AND status <> 'Draft'
+        WHERE post_id = $1
         RETURNING id, status, date_published, last_modified
       )
       SELECT
-        us.id IS NULL "isDraft",
         p.post_id id,
         p.title,
         p.description,
@@ -93,7 +125,6 @@ const unpublishPost: Resolver = async (_, { postId }, ctx) => {
       LEFT JOIN post_tags pt ON ptp.tag_id = pt.id
       WHERE p.post_id = $1
       GROUP BY
-        us.id,
         p.post_id,
         p.title,
         p.description,
@@ -114,17 +145,7 @@ const unpublishPost: Resolver = async (_, { postId }, ctx) => {
       [post]
     );
 
-    if (updatePost.length === 0) {
-      return new UnknownError("Unable to unpublish post");
-    }
-
-    const [{ isDraft, ...updated }] = updatePost;
-
-    if (isDraft) {
-      return new NotAllowedPostActionError(
-        "A Draft post cannot be unpublished"
-      );
-    }
+    const [updated] = updatePost;
 
     return new SinglePost(updated);
   } catch (err) {
