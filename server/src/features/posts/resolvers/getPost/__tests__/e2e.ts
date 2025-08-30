@@ -42,6 +42,7 @@ describe("Get post - E2E", () => {
       postData: testPostData({
         title: "Test Post Title - 1",
         datePublished: new Date().toISOString(),
+        isBinned: true,
       }),
       postAuthor: {
         userId: registeredUser.userId,

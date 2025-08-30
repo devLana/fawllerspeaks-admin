@@ -104,7 +104,6 @@ describe("Edit post - E2E", () => {
         title: "Edit Test Post Binned Title",
         status: "Draft",
         isBinned: true,
-        binnedAt: new Date().toISOString(),
       }),
     });
 

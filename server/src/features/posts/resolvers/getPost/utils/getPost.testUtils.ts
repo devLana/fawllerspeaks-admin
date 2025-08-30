@@ -48,13 +48,13 @@ const lastModified = "2021-05-27T12:22:43.717Z";
 
 export const data = {
   id: randomUUID(),
-  title: "post title",
+  title: "blog post title",
   description: "post description",
   excerpt: "post excerpt",
-  content: "post content",
-  author: "Author Name image/url/string",
+  content: "<p>post content</p>",
+  author: { name: "Author Name", image: "image/url/string" },
   status: "Unpublished",
-  url: "blog-post-slug",
+  url: { href: "blog-post-title", slug: "blog-post-title" },
   imageBanner: null,
   dateCreated,
   datePublished: null,

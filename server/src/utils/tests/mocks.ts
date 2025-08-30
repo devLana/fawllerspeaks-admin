@@ -40,6 +40,7 @@ const html =
 export const testPostData = (params?: Params): TestPostData => {
   let status: Params["status"];
   let postContent: Params["content"];
+  let binnedAt: Params["binnedAt"];
 
   if (params?.content === null) {
     postContent = null;
@@ -53,6 +54,12 @@ export const testPostData = (params?: Params): TestPostData => {
     status = params?.status ?? "Draft";
   }
 
+  if (params?.isBinned) {
+    binnedAt = new Date().toISOString();
+  } else {
+    binnedAt = params?.binnedAt ?? null;
+  }
+
   return {
     title: params?.title ?? "Test post default title",
     slug: getPostSlug(params?.title ?? "Test post default title"),
@@ -64,7 +71,7 @@ export const testPostData = (params?: Params): TestPostData => {
     datePublished: params?.datePublished ?? null,
     lastModified: params?.lastModified ?? null,
     isBinned: params?.isBinned ?? false,
-    binnedAt: params?.binnedAt ?? null,
+    binnedAt,
     isDeleted: params?.isDeleted ?? false,
   };
 };

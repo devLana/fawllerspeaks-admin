@@ -70,6 +70,7 @@ export const post1 = {
 };
 
 export const post2 = {
+  ...post,
   id: postIds[1],
   title: "Post Title 2",
   description: "Post Title 2 Description",
@@ -85,6 +86,7 @@ export const post2 = {
 };
 
 export const post3 = {
+  ...post,
   id: postIds[2],
   title: "Post Title 3",
   description: "Post Title 3 Description",
@@ -99,6 +101,7 @@ export const post3 = {
 };
 
 export const post4 = {
+  ...post,
   id: postIds[3],
   title: "Post Title 4",
   description: "Post Title 4 Description",
