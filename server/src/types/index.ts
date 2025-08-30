@@ -79,7 +79,7 @@ export interface GetPostDBData extends DBPostData {
 export type TestPostData = Omit<
   PostDBData,
   "id" | "dateCreated" | "views" | "url" | "author" | "tags"
-> & { isInBin: boolean; isDeleted: boolean };
+> & { isDeleted: boolean };
 
 export interface TestPostAuthor {
   readonly userId: number;

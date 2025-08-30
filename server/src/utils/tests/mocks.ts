@@ -63,7 +63,7 @@ export const testPostData = (params?: Params): TestPostData => {
     imageBanner: "post/image/banner/storage/path",
     datePublished: params?.datePublished ?? null,
     lastModified: params?.lastModified ?? null,
-    isInBin: params?.isInBin ?? false,
+    isBinned: params?.isBinned ?? false,
     binnedAt: params?.binnedAt ?? null,
     isDeleted: params?.isDeleted ?? false,
   };

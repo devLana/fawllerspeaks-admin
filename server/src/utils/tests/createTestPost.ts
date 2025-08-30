@@ -110,7 +110,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         postData.imageBanner,
         postData.datePublished,
         postData.lastModified,
-        postData.isInBin,
+        postData.isBinned,
         postData.isDeleted,
         dbTags,
         postData.content,
