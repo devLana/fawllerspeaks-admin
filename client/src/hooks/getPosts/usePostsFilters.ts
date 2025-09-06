@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 import * as yup from "yup";
 
-import { getPostsFiltersSchema as schema } from "@validators/getPostsFiltersSchema";
+import { getPostsSchema as schema } from "@validators/getPostsSchema";
 import type { PostStatus, QueryGetPostsArgs } from "@apiTypes";
 import type {
   FiltersErrors,
@@ -19,45 +19,42 @@ interface PostsFilters {
 
 export const usePostsFilters = (): PostsFilters => {
   const { query } = useRouter();
-  const { status, sort, params } = query;
+  const { params, size, sort, status } = query;
 
   const parseQuery = React.useMemo<PostsFilters>(() => {
-    const rawParams: { filters?: object; page?: object } = {};
+    const rawParams: Record<string, unknown> = {};
 
-    if (status || sort) {
-      rawParams.filters = { status, sort };
+    if (size) {
+      rawParams.size = size;
+    }
+
+    if (status) {
+      rawParams.status = status;
+    }
+
+    if (sort) {
+      rawParams.sort = sort;
     }
 
     if (params && Array.isArray(params)) {
-      rawParams.page = params;
+      const [after, cursor] = params;
+      rawParams[after] = cursor;
     }
 
     try {
       const parsed = schema.validateSync(rawParams, { abortEarly: false });
-      const queryParams: PostsQueryParams = {};
-      const gqlVariables: QueryGetPostsArgs = {};
+      const gqlVariables: QueryGetPostsArgs = parsed;
 
-      if (parsed.filters) {
-        const { filters } = parsed;
+      const queryParams: PostsQueryParams = {
+        after: parsed.after,
+        size: parsed.size,
+        sort: parsed.sort,
+      };
 
-        gqlVariables.filters = filters;
-
-        if (filters?.status) {
-          const STATUS = filters.status.toLowerCase() as Lowercase<PostStatus>;
-          queryParams.status = STATUS;
-        }
-
-        if (filters?.sort) {
-          queryParams.sort = filters.sort;
-        }
-      }
-
-      if (parsed.page) {
-        const [type, cursor] = parsed.page;
-
-        gqlVariables.page = { type, cursor };
-        queryParams.cursor = cursor;
-        queryParams.type = type;
+      if (parsed.status) {
+        const STATUS = parsed.status.toLowerCase() as Lowercase<PostStatus>;
+        queryParams.status = STATUS;
+        gqlVariables.status = parsed.status;
       }
 
       return { gqlVariables, queryParams, paramsErrors: null };
@@ -67,17 +64,9 @@ export const usePostsFilters = (): PostsFilters => {
           (validationErrors, { path, params: param }) => {
             if (!path) return validationErrors;
 
-            if (path === "page[0]") {
-              return {
-                ...validationErrors,
-                type: param?.originalValue as string,
-              };
-            }
-
-            const key = path.split(".")[1] as "sort" | "status";
             return {
               ...validationErrors,
-              [key]: param?.originalValue as string,
+              [path]: param?.originalValue as string,
             };
           },
           { errorType: "ValidationError" }
@@ -89,7 +78,7 @@ export const usePostsFilters = (): PostsFilters => {
       const paramsErrors: RuntimeError = { errorType: "RuntimeError" };
       return { gqlVariables: {}, queryParams: {}, paramsErrors };
     }
-  }, [params, sort, status]);
+  }, [params, size, sort, status]);
 
   return parseQuery;
 };

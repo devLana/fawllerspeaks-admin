@@ -7,7 +7,7 @@ import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import type { SortPostsBy } from "@apiTypes";
 import type { PostsQueryParams } from "types/posts/getPosts";
 
-type Query = Pick<PostsQueryParams, "sort" | "status">;
+type Query = Pick<PostsQueryParams, "size" | "sort" | "status">;
 
 const options: { label: string; value: SortPostsBy }[] = [
   { label: "Date", value: "date_asc" },
@@ -23,6 +23,10 @@ const SortByInput = () => {
   const handleChange = (postSortOrder: SortPostsBy) => {
     const query: Query = {};
     query.sort = postSortOrder;
+
+    if (queryParams.size) {
+      query.size = queryParams.size;
+    }
 
     if (queryParams.status) {
       query.status = queryParams.status;

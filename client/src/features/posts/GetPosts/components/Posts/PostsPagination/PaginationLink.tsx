@@ -3,10 +3,9 @@ import type { SxProps } from "@mui/material/styles";
 
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import NextLink from "@components/ui/NextLink";
-import type { GetPostsPageType } from "@apiTypes";
 
 interface PaginationLinkProps {
-  cursor: [GetPostsPageType, string] | undefined;
+  cursor: string | undefined;
   children: React.ReactNode;
   ml?: string;
 }
@@ -21,17 +20,17 @@ const PaginationLink = ({ children, cursor, ml }: PaginationLinkProps) => {
     columnGap: 1,
   };
 
-  if (cursor) {
+  if (typeof cursor === "string") {
     const query = {
-      ...(queryParams.status && { status: queryParams.status }),
+      ...(queryParams.size && { size: queryParams.size }),
       ...(queryParams.sort && { sort: queryParams.sort }),
+      ...(queryParams.status && { status: queryParams.status }),
     };
 
+    const pathname = cursor ? `/posts/after/${cursor}` : "/posts";
+
     return (
-      <NextLink
-        href={{ pathname: `/posts/${cursor.join("/")}`, query }}
-        sx={{ ...styles }}
-      >
+      <NextLink href={{ pathname, query }} sx={{ ...styles }}>
         {children}
       </NextLink>
     );

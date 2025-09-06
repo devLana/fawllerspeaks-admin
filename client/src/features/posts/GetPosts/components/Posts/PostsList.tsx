@@ -76,37 +76,6 @@ const PostsList = ({ isLoadingMore, postsData }: PostsListProps) => {
             }
           />
         ))}
-        {/* {postsData.posts.reduce<React.ReactElement[]>(
-          (posts, { id, isBinned, ...post }, index) => {
-            if (isBinned) return posts;
-
-            posts.push(
-              <Post
-                key={id}
-                {...post}
-                isLoadingMore={isLoadingMore}
-                isSelected={!!state.selectedPosts[id]}
-                postsView={state.postsView}
-                postActions={
-                  <PostItemActions
-                    id={id}
-                    index={index}
-                    title={post.title}
-                    status={post.status}
-                    slug={post.url.slug}
-                    isChecked={!!state.selectedPosts[id]}
-                    isLoadingMore={isLoadingMore}
-                    {...shiftClick}
-                    dispatch={dispatch}
-                  />
-                }
-              />
-            );
-
-            return posts;
-          },
-          []
-        )} */}
       </List>
       <PostsPagination {...postsData.pageData} />
       <BinPosts

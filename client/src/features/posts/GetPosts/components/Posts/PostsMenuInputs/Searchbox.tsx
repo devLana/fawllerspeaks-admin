@@ -9,7 +9,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import type { PostsQueryParams } from "types/posts/getPosts";
 
-type Query = Pick<PostsQueryParams, "sort" | "status"> & { q: string };
+type Query = Pick<PostsQueryParams, "size" | "sort" | "status"> & { q: string };
 
 const Searchbox = () => {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -21,12 +21,16 @@ const Searchbox = () => {
 
     const query: Query = { q: inputRef.current.value };
 
-    if (queryParams.status) {
-      query.status = queryParams.status;
+    if (queryParams.size) {
+      query.size = queryParams.size;
     }
 
     if (queryParams.sort) {
       query.sort = queryParams.sort;
+    }
+
+    if (queryParams.status) {
+      query.status = queryParams.status;
     }
 
     void push({ pathname: "/posts/search", query });

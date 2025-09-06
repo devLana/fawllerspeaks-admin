@@ -6,8 +6,13 @@ import type { GetPostsPageData } from "types/posts/getPosts";
 type GetPostsData = TypedDocumentNode<GetPostsPageData, QueryGetPostsArgs>;
 
 export const GET_POSTS: GetPostsData = gql`
-  query GetPosts($page: GetPostsPageInput, $filters: GetPostsFiltersInput) {
-    getPosts(page: $page, filters: $filters) {
+  query GetPosts(
+    $after: ID
+    $size: Int
+    $sort: SortPostsBy
+    $status: PostStatus
+  ) {
+    getPosts(after: $after, size: $size, sort: $sort, status: $status) {
       ... on BaseResponse {
         __typename
       }
@@ -15,7 +20,8 @@ export const GET_POSTS: GetPostsData = gql`
         message
       }
       ... on GetPostsValidationError {
-        cursorError
+        afterError
+        sizeError
       }
       ... on GetPostsData {
         posts {
@@ -27,11 +33,10 @@ export const GET_POSTS: GetPostsData = gql`
           url {
             slug
           }
-          isBinned
         }
         pageData {
-          after
-          before
+          previous
+          next
         }
       }
     }

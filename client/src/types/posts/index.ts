@@ -64,7 +64,7 @@ export type RequiredFieldErrors = {
   [Key in RequiredFieldErrorKeys]?: string;
 };
 
-export type PostItemSlug = Pick<PostData["url"], "slug">;
+export type PostItemSlug = Pick<PostData["url"], "slug" | "__typename">;
 
 type UnpublishedPostData = Pick<PostData, "id" | "status"> & {
   url: PostItemSlug;

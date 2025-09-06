@@ -14,7 +14,7 @@ const FilterParamsErrors = ({ paramsErrors }: FilterParamsErrorsProps) => {
     return `There was an error validating the provided search parameters. Please try again later`;
   }
 
-  const { sort, status } = paramsErrors;
+  const { after, size, sort, status } = paramsErrors;
 
   return (
     <>
@@ -22,6 +22,16 @@ const FilterParamsErrors = ({ paramsErrors }: FilterParamsErrorsProps) => {
         It seems some of the search filters provided are invalid
       </AlertTitle>
       <List disablePadding sx={{ ml: 2.5 }}>
+        {after && (
+          <ListItem disableGutters disablePadding>
+            <ListItemText primary={`cursor: ${after}`} />
+          </ListItem>
+        )}
+        {size && (
+          <ListItem disableGutters disablePadding>
+            <ListItemText primary={`size: ${size}`} />
+          </ListItem>
+        )}
         {sort && (
           <ListItem disableGutters disablePadding>
             <ListItemText primary={`sort: ${sort}`} />

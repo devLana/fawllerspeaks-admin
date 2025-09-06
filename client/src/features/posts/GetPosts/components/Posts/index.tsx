@@ -6,6 +6,7 @@ import PostsWrapper from "../PostsWrapper";
 import PostStatusInput from "./PostsMenuInputs/PostStatusInput";
 import SortByInput from "./PostsMenuInputs/SortByInput";
 import Searchbox from "./PostsMenuInputs/Searchbox";
+import PageSizeInput from "./PostsMenuInputs/PageSizeInput";
 import PostsList from "./PostsList";
 import type { PostsPageData } from "types/posts/getPosts";
 
@@ -31,6 +32,7 @@ const Posts = ({ id, isLoadingMore = false, postsData }: PostsProps) => {
           },
         }}
       >
+        <PageSizeInput />
         <PostStatusInput />
         <SortByInput />
         <Searchbox />

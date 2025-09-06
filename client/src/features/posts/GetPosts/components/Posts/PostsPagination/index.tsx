@@ -6,8 +6,8 @@ import type { GetPostsPageData } from "@apiTypes";
 
 type PostsPaginationLinksProps = Omit<GetPostsPageData, "__typename">;
 
-const PostsPagination = ({ after, before }: PostsPaginationLinksProps) => {
-  if (!before && !after) return null;
+const PostsPagination = ({ next, previous }: PostsPaginationLinksProps) => {
+  if (typeof next !== "string" && typeof previous !== "string") return null;
 
   return (
     <Box
@@ -19,11 +19,11 @@ const PostsPagination = ({ after, before }: PostsPaginationLinksProps) => {
         flexWrap: "wrap",
       }}
     >
-      <PaginationLink cursor={before ? ["before", before] : undefined}>
+      <PaginationLink cursor={previous ?? undefined}>
         <ArrowBackIcon fontSize="small" />
         Previous Page
       </PaginationLink>
-      <PaginationLink cursor={after ? ["after", after] : undefined} ml="auto">
+      <PaginationLink cursor={next ?? undefined} ml="auto">
         Next Page <ArrowForwardIcon fontSize="small" />
       </PaginationLink>
     </Box>

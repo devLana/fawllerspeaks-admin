@@ -9,7 +9,7 @@ import type { PostsQueryParams } from "types/posts/getPosts";
 
 type Statuses = "All" | PostStatus;
 type LowerStatus = Lowercase<Statuses>;
-type Query = Pick<PostsQueryParams, "sort" | "status">;
+type Query = Pick<PostsQueryParams, "size" | "sort" | "status">;
 
 const options: Statuses[] = ["All", "Draft", "Published", "Unpublished"];
 
@@ -20,12 +20,16 @@ const PostStatusInput = () => {
   const handleChange = (statusValue: LowerStatus) => {
     const query: Query = {};
 
-    if (statusValue !== "all") {
-      query.status = statusValue;
+    if (queryParams.size) {
+      query.size = queryParams.size;
     }
 
     if (queryParams.sort) {
       query.sort = queryParams.sort;
+    }
+
+    if (statusValue !== "all") {
+      query.status = statusValue;
     }
 
     void push({ pathname: "/posts", query });

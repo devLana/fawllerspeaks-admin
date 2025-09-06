@@ -8,6 +8,7 @@ import Posts from "@features/posts/GetPosts/components/Posts";
 import PostsLoading from "@features/posts/GetPosts/components/PostsLoading";
 import PostsTextContent from "@features/posts/GetPosts/components/PostsTextContent";
 import NoPostsData from "@features/posts/GetPosts/components/NoPostsData";
+import GetPostsApiValidationErrors from "@features/posts/GetPosts/components/GetPostsAPIValidationErrors";
 import FilterParamsErrors from "@features/posts/GetPosts/components/FilterParamsErrors";
 import { GET_POSTS } from "@queries/getPosts/GET_POSTS";
 import { SESSION_ID } from "@utils/constants";
@@ -26,7 +27,6 @@ const GetPosts: NextPageWithLayout = () => {
   const id = "blog-posts";
   const msg1 = `It appears we could not find what you are looking for. Please try again later`;
   const msg2 = `You are unable to get posts at the moment. Please try again later`;
-  const msg3 = "Invalid posts search filters provided";
 
   if (paramsErrors) {
     const node = <FilterParamsErrors paramsErrors={paramsErrors} />;
@@ -64,7 +64,6 @@ const GetPosts: NextPageWithLayout = () => {
 
     case "RegistrationError": {
       const query = { status: "unregistered", redirectTo: asPath };
-
       void replace({ pathname: "/register", query });
       return <PostsLoading id={id} />;
     }
@@ -72,14 +71,11 @@ const GetPosts: NextPageWithLayout = () => {
     case "ForbiddenError":
       return <PostsTextContent id={id} node={data.getPosts.message} />;
 
-    case "GetPostsValidationError":
-      return (
-        <PostsTextContent
-          severity="error"
-          id={id}
-          node={data.getPosts.cursorError || msg3}
-        />
-      );
+    case "GetPostsValidationError": {
+      const { __typename, ...errors } = data.getPosts;
+      const node = <GetPostsApiValidationErrors {...errors} />;
+      return <PostsTextContent severity="error" id={id} node={node} />;
+    }
 
     case "GetPostsData":
       return <Posts id={id} postsData={data.getPosts} />;

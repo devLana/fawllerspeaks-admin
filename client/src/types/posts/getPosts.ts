@@ -1,7 +1,6 @@
 import type {
   GetPosts,
   GetPostsData,
-  GetPostsPageType,
   Post,
   PostStatus,
   SortPostsBy,
@@ -9,19 +8,12 @@ import type {
 import type { PostData, PostItemSlug } from "types/posts";
 
 type PostsPageDataKeys =
+  | "__typename"
   | "id"
   | "title"
   | "imageBanner"
   | "status"
-  | "dateCreated"
-  | "isBinned";
-
-type ValidationErrorKeys =
-  | "qError"
-  | "sortError"
-  | "typeError"
-  | "statusError"
-  | "postTagError";
+  | "dateCreated";
 
 export type PostsView = "list" | "grid";
 
@@ -32,7 +24,7 @@ export type PostsPagePostData = Pick<PostData, PostsPageDataKeys> & {
 type PostsPageDataMapper<T extends object> = T extends { posts: Post[] }
   ? Omit<T, "posts" | "status"> & { posts: PostsPagePostData[] }
   : T extends { __typename?: "GetPostsValidationError" }
-  ? Omit<T, ValidationErrorKeys | "status">
+  ? Omit<T, "sortError" | "statusError" | "status">
   : Omit<T, "status">;
 
 export interface GetPostsPageData {
@@ -70,10 +62,10 @@ export type GetPostsListAction =
     };
 
 export interface PostsQueryParams {
-  type?: GetPostsPageType;
-  cursor?: string;
-  status?: Lowercase<PostStatus>;
+  after?: string;
+  size?: number;
   sort?: SortPostsBy;
+  status?: Lowercase<PostStatus>;
 }
 
 export type FiltersErrors = Partial<Record<keyof PostsQueryParams, string>> & {
