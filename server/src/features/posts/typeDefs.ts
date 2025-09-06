@@ -21,8 +21,8 @@ export const postsTypeDefs = `#graphql
   }
 
   type GetPostsPageData {
-    after: ID
-    before: ID
+    previous: ID
+    next: ID
   }
 
   type Post {
@@ -114,8 +114,8 @@ export const postsTypeDefs = `#graphql
   }
 
   type GetPostsValidationError {
-    cursorError: String
-    typeError: String
+    afterError: String
+    sizeError: String
     statusError: String
     sortError: String
     status: Status! 
@@ -155,11 +155,6 @@ export const postsTypeDefs = `#graphql
     Unpublished
   }
 
-  enum GetPostsPageType {
-    after
-    before
-  }
-
   enum SortPostsBy {
     date_asc
     title_asc
@@ -183,16 +178,6 @@ export const postsTypeDefs = `#graphql
     content: String
     tagIds: [ID!]
     imageBanner: String
-  }
-
-  input GetPostsPageInput {
-    type: GetPostsPageType!
-    cursor: ID!
-  }
-
-  input GetPostsFiltersInput {
-    status: PostStatus
-    sort: SortPostsBy
   }
 
   input EditPostInput {

@@ -170,8 +170,8 @@ export const GET_POST = `#graphql
 
 export const GET_POSTS = `#graphql
   ${POST_FIELDS}
-  query GetPosts($page: GetPostsPageInput, $filters: GetPostsFiltersInput) {
-    getPosts(page: $page, filters: $filters) {
+  query GetPosts($after: ID, $size: Int, $sort: SortPostsBy, $status: PostStatus) {
+    getPosts(after: $after, size: $size, sort: $sort, status: $status) {
       ... on GetPostsData {
         __typename
         posts {
@@ -179,18 +179,18 @@ export const GET_POSTS = `#graphql
         }
         pageData {
           __typename
-          after
-          before
+          previous
+          next
         }
         status
       }
 
       ... on GetPostsValidationError {
         __typename
-        cursorError
-        typeError
-        statusError
+        afterError
+        sizeError
         sortError
+        statusError
         status
       }
 

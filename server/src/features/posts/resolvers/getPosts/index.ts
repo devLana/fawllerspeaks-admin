@@ -16,11 +16,16 @@ import { getPostsSchema as schema } from "./utils/getPosts.validator";
 import deleteSession from "@utils/deleteSession";
 import generateErrorsObject from "@utils/generateErrorsObject";
 
-import type { QueryResolvers, GetPostsPageType } from "@resolverTypes";
+import type { QueryResolvers } from "@resolverTypes";
 import type { GetPostDBData, PostFieldResolver, ResolverFunc } from "@types";
 
 type GetPosts = PostFieldResolver<ResolverFunc<QueryResolvers["getPosts"]>>;
-type CursorDataTuple = [string, (number | string)[], string];
+
+interface PreviousPost {
+  id: number;
+  title: string;
+  date_created: string;
+}
 
 interface Sort {
   column: "p.date_created" | "p.title";
@@ -50,16 +55,19 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
       return new RegistrationError("Unable to retrieve posts");
     }
 
-    const { filters, page } = input;
-    const sqlArgs: (string | number)[] = [];
+    const { after, size, sort: sortFilter, status } = input;
+    const LIMIT = size ?? 12;
     const sort: Sort = { column: "p.date_created", order: "DESC" };
-    let orderBy = "p.date_created DESC, p.id DESC";
+    const sqlArgs: (string | number)[] = [];
     let where = "WHERE is_in_bin = FALSE";
+    let orderBy = "p.date_created DESC, p.id DESC";
+    let operator: "<" | ">" = "<";
     let count = 0;
 
-    if (filters?.sort) {
-      const [column, order] = filters.sort.split("_");
+    if (sortFilter) {
+      const [column, order] = sortFilter.split("_");
       sort.order = order.toUpperCase() as Sort["order"];
+      operator = sort.order === "DESC" ? "<" : ">";
 
       if (column === "title") {
         orderBy = `p.title ${sort.order}`;
@@ -70,37 +78,26 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
       }
     }
 
-    if (page) {
-      const { cursor: cursorQueryStr, type } = page;
-      const cursor = Buffer.from(cursorQueryStr, "base64url").toString();
-      let operator: string;
-      let { order } = sort;
+    if (after) {
+      const cursor = Buffer.from(after, "base64url").toString();
+      const { column } = sort;
 
-      if (type === "before") {
-        order = sort.order === "ASC" ? "DESC" : "ASC";
-        operator = sort.order === "DESC" ? ">" : "<";
-      } else {
-        operator = sort.order === "DESC" ? "<" : ">";
-      }
-
-      if (sort.column === "p.date_created") {
+      if (column === "p.date_created") {
         if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z_\d+$/.test(cursor)) {
           return new ForbiddenError("Unable to retrieve posts");
         }
 
-        orderBy = `p.date_created ${order}, p.id ${order}`;
-        where = `${where} AND p.date_created ${operator}= $${++count} AND p.id ${operator} $${++count}`;
+        where = `${where} AND ${column} ${operator}= $${++count} AND p.id ${operator} $${++count}`;
         sqlArgs.push(...cursor.split("_"));
       } else {
-        orderBy = `title ${order}`;
-        where = `${where} AND p.title ${operator} $${++count}`;
+        where = `${where} AND ${column} ${operator} $${++count}`;
         sqlArgs.push(cursor);
       }
     }
 
-    if (filters?.status) {
+    if (status) {
       where = `${where} AND p.status = $${++count}`;
-      sqlArgs.push(filters.status);
+      sqlArgs.push(status);
     }
 
     const { rows: savedPosts } = await db.query<GetPostDBData>(
@@ -160,78 +157,74 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         p.is_in_bin,
         p.binned_at
       ORDER BY ${orderBy}
-      LIMIT 12`,
+      LIMIT ${LIMIT + 1}`,
       sqlArgs
     );
 
-    if (page?.type === "before") savedPosts.reverse();
+    const pageData: { next?: string | null; previous?: string | null } = {};
 
-    const pageData: { after?: string; before?: string } = {};
+    if (savedPosts.length > LIMIT) {
+      savedPosts.pop();
 
-    if (savedPosts.length > 0) {
-      const cursorData = (type: GetPostsPageType): CursorDataTuple => {
-        const [firstPost] = savedPosts;
-        const lastPost = savedPosts.at(-1) as GetPostDBData;
-        const sqlParams: (number | string)[] = [];
-        let { order } = sort;
-        let paramsCount = 0;
-        let operator: string;
-        let sortBy: string;
-        let sqlStr: string;
-        let bufStr: string;
+      const { dateCreated, title, postId } = savedPosts[LIMIT - 1];
 
-        if (type === "before") {
-          order = order === "ASC" ? "DESC" : "ASC";
-          operator = sort.order === "DESC" ? ">" : "<";
-        } else {
-          operator = sort.order === "DESC" ? "<" : ">";
-        }
+      if (sort.column === "p.date_created") {
+        const dateString = new Date(dateCreated).toISOString();
+        const dateId = `${dateString}_${postId}`;
+        pageData.next = Buffer.from(dateId).toString("base64url");
+      } else {
+        pageData.next = Buffer.from(title).toString("base64url");
+      }
+    }
 
-        if (sort.column === "p.title") {
-          const { title } = type === "before" ? firstPost : lastPost;
+    if (after && savedPosts.length > 0) {
+      const { column, order } = sort;
+      const cursor = Buffer.from(after, "base64url").toString();
+      const prevOperator = operator === ">" ? "<=" : ">=";
+      const prevArgs: (number | string)[] = [];
+      const prevOrder = order === "DESC" ? "ASC" : "DESC";
+      let prevWhere = "WHERE is_in_bin = FALSE";
+      let prevOrderBy: string;
+      let prevCount = 0;
 
-          sortBy = `title ${order}`;
-          sqlStr = `SELECT 1 FROM posts WHERE title ${operator} $${++paramsCount}`;
-          sqlParams.push(title);
-          bufStr = Buffer.from(title).toString("base64url");
-        } else {
-          let dateString: string, postId: number, bufferString: string;
-
-          if (type === "before") {
-            dateString = new Date(firstPost.dateCreated).toISOString();
-            bufferString = `${dateString}_${firstPost.postId}`;
-            ({ postId } = firstPost);
-          } else {
-            dateString = new Date(lastPost.dateCreated).toISOString();
-            bufferString = `${dateString}_${lastPost.postId}`;
-            ({ postId } = lastPost);
-          }
-
-          sortBy = `date_created ${order}, id ${order}`;
-          sqlStr = `SELECT 1 FROM posts WHERE date_created ${operator}= $${++paramsCount} AND id ${operator} $${++paramsCount}`;
-          sqlParams.push(dateString, postId);
-          bufStr = Buffer.from(bufferString).toString("base64url");
-        }
-
-        if (filters?.status) {
-          sqlStr = `${sqlStr} AND status = $${++paramsCount}`;
-          sqlParams.push(filters.status);
-        }
-
-        return [`${sqlStr} ORDER BY ${sortBy} LIMIT 1`, sqlParams, bufStr];
-      };
-
-      const [checkedBefore, checkedAfter] = await Promise.all([
-        db.query(cursorData("before")[0], cursorData("before")[1]),
-        db.query(cursorData("after")[0], cursorData("after")[1]),
-      ]);
-
-      if (checkedBefore.rows.length > 0) {
-        [, , pageData.before] = cursorData("before");
+      if (column === "p.title") {
+        prevOrderBy = `p.title ${prevOrder}`;
+        prevWhere = `${prevWhere} AND ${column} ${prevOperator} $${++prevCount}`;
+        prevArgs.push(cursor);
+      } else {
+        prevOrderBy = `p.date_created ${prevOrder}, p.id ${prevOrder}`;
+        prevWhere = `${prevWhere} AND ${column} ${prevOperator} $${++prevCount} AND p.id ${prevOperator} $${++prevCount}`;
+        prevArgs.push(...cursor.split("_"));
       }
 
-      if (checkedAfter.rows.length > 0) {
-        [, , pageData.after] = cursorData("after");
+      if (status) {
+        prevWhere = `${prevWhere} AND status = $${++prevCount}`;
+        prevArgs.push(status);
+      }
+
+      const { rows: foundPrevious } = await db.query<PreviousPost>(
+        `SELECT id, title, date_created
+        FROM posts p
+        ${prevWhere}
+        ORDER BY ${prevOrderBy}
+        LIMIT ${LIMIT + 1}`,
+        prevArgs
+      );
+
+      if (foundPrevious.length < LIMIT + 1) {
+        pageData.previous = "";
+      } else {
+        const { id, date_created, title } = foundPrevious[LIMIT];
+
+        if (sort.column === "p.date_created") {
+          const dateString = new Date(date_created).toISOString();
+          const dateId = `${dateString}_${id}`;
+          const cursorStr = Buffer.from(dateId).toString("base64url");
+          pageData.previous = cursorStr;
+        } else {
+          const cursorStr = Buffer.from(title).toString("base64url");
+          pageData.previous = cursorStr;
+        }
       }
     }
 

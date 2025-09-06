@@ -8,17 +8,17 @@ import type { RemoveNull } from "@types";
 type ValidationErrors = RemoveNull<Omit<Errors, "status">>;
 
 export class GetPostsValidationError implements Errors {
-  readonly cursorError?: string;
-  readonly typeError?: string;
-  readonly statusError?: string;
+  readonly afterError?: string;
+  readonly sizeError?: string;
   readonly sortError?: string;
+  readonly statusError?: string;
   readonly status: Status;
 
   constructor(errors: ValidationErrors) {
-    this.cursorError = errors.cursorError;
-    this.typeError = errors.typeError;
-    this.statusError = errors.statusError;
+    this.afterError = errors.afterError;
+    this.sizeError = errors.sizeError;
     this.sortError = errors.sortError;
+    this.statusError = errors.statusError;
     this.status = "ERROR";
   }
 }

@@ -1,33 +1,34 @@
 import Joi from "joi";
-import type {
-  QueryGetPostsArgs,
-  GetPostsPageInput,
-  GetPostsFiltersInput,
-} from "@resolverTypes";
+import type { QueryGetPostsArgs } from "@resolverTypes";
 
 export const getPostsSchema = Joi.object<QueryGetPostsArgs>({
-  page: Joi.object<GetPostsPageInput>({
-    cursor: Joi.string().required().trim().messages({
-      "string.empty": "Posts pagination cursor is required",
+  after: Joi.string().trim().allow(null).messages({
+    "string.empty": "Posts pagination after cursor cannot be an empty string",
+  }),
+  size: Joi.number()
+    .min(6)
+    .max(30)
+    .default(12)
+    .custom((value: number, _) => {
+      const num = Math.floor(value);
+      const remainder = num % 6;
+      return remainder === 0 ? num : num - remainder;
+    }, "Multiple of 6 transformation")
+    .allow(null)
+    .messages({
+      "number.base": "Invalid page size provided. Only numbers allowed",
+      "number.min": "Posts pagination page size must be at least 6",
+      "number.max": "Posts pagination page size is too large. Maximum is 30",
     }),
-
-    type: Joi.string().required().trim().valid("after", "before").messages({
-      "string.empty": "Posts pagination type is required",
-      "any.only": "Invalid posts pagination type provided",
-    }),
-  }).allow(null),
-
-  filters: Joi.object<GetPostsFiltersInput>({
-    status: Joi.string()
-      .allow(null)
-      .trim()
-      .valid("Draft", "Published", "Unpublished")
-      .messages({ "any.only": "Invalid post status filter provided" }),
-
-    sort: Joi.string()
-      .allow(null)
-      .trim()
-      .valid("date_desc", "date_asc", "title_desc", "title_asc")
-      .messages({ "any.only": "Invalid post sort filter provided" }),
-  }).allow(null),
+  sort: Joi.string()
+    .trim()
+    .valid("date_desc", "date_asc", "title_desc", "title_asc")
+    .default("date_desc")
+    .allow(null)
+    .messages({ "any.only": "Invalid post sort filter provided" }),
+  status: Joi.string()
+    .trim()
+    .valid("Draft", "Published", "Unpublished")
+    .allow(null)
+    .messages({ "any.only": "Invalid post status filter provided" }),
 });

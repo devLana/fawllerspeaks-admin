@@ -11,7 +11,7 @@ const types = `#graphql
 
     ####POSTS####
     "Get posts"
-    getPosts(page: GetPostsPageInput, filters: GetPostsFiltersInput): GetPosts!
+    getPosts(after: ID, size: Int, sort: SortPostsBy, status: PostStatus): GetPosts!
     "Get post by slug"
     getPost(slug: String!): GetPost!
   }
