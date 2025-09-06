@@ -121,8 +121,8 @@ describe("Middleware Service", () => {
         "/posts",
       ],
       [
-        "When the user requests for a posts page with a supported pagination type and cursor, Allow the request",
-        "/posts/before/djfy73tvby633246",
+        "When the user requests for a posts page with supported pagination, Allow the request",
+        "/posts/after/djfy73tvby633246",
       ],
     ])("%s", (_, pathname) => {
       middlewareService(validCookies, `${pathname}`, url);
@@ -160,27 +160,11 @@ describe("Middleware Service", () => {
       expect(NextResponse.next).not.toHaveBeenCalled();
     });
 
-    it("When the user requests for the posts page with only the pagination type and no cursor, Redirect to the not found page", () => {
-      middlewareService(validCookies, "/posts/before/", url);
+    it("When the user requests for the posts page with no pagination cursor, Redirect to the not found page", () => {
+      middlewareService(validCookies, "/posts/after/", url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledOnce();
       expect(NextResponse.rewrite).toHaveBeenCalledWith(new URL("/404", url));
-      expect(NextResponse.next).not.toHaveBeenCalled();
-
-      middlewareService(validCookies, "/posts/after", url);
-
-      expect(NextResponse.rewrite).toHaveBeenCalledTimes(2);
-
-      expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
-        1,
-        new URL("/404", url)
-      );
-
-      expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
-        2,
-        new URL("/404", url)
-      );
-
       expect(NextResponse.next).not.toHaveBeenCalled();
     });
 
@@ -205,31 +189,15 @@ describe("Middleware Service", () => {
       expect(NextResponse.next).not.toHaveBeenCalled();
     });
 
-    it("When the user requests for the posts page with the wrong pagination type, Redirect to the not found page", () => {
+    it("When the user requests for the posts page with the wrong pagination cursor type, Redirect to the not found page", () => {
       middlewareService(validCookies, "/posts/afters/cursor", url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledOnce();
       expect(NextResponse.rewrite).toHaveBeenCalledWith(new URL("/404", url));
       expect(NextResponse.next).not.toHaveBeenCalled();
-
-      middlewareService(validCookies, "/posts/not-before/cursor/", url);
-
-      expect(NextResponse.rewrite).toHaveBeenCalledTimes(2);
-
-      expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
-        1,
-        new URL("/404", url)
-      );
-
-      expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
-        2,
-        new URL("/404", url)
-      );
-
-      expect(NextResponse.next).not.toHaveBeenCalled();
     });
 
-    it("When the user requests for the posts page with a pagination type and cursor and also with unsupported pathnames, Redirect to the not found page", () => {
+    it("When the user requests for the posts page with a pagination cursor and also with unsupported pathnames, Redirect to the not found page", () => {
       const pathname1 = "/posts/after/cursor/unsupported/path/names";
 
       middlewareService(validCookies, pathname1, url);
