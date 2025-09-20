@@ -16,7 +16,6 @@ const Post = (props: EditPostProps) => {
   const [state, dispatch] = useReducer(reducer, props.post, initState);
 
   const edit = useEditPost(state.postData, {
-    title: props.post.title,
     status: props.post.status,
     slug: props.post.url.slug,
   });

@@ -5,15 +5,15 @@ import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
 import useDeletePostContentImages from "@hooks/useDeletePostContentImages";
+import { update } from "@cache/update/posts/editPost";
 import { EDIT_POST } from "@mutations/editPost/EDIT_POST";
 import { SESSION_ID } from "@utils/constants";
 import * as storage from "@utils/posts/editStoragePost";
-import type { EditPostInput, PostStatus } from "@apiTypes";
 import type { PostActionStatus } from "types/posts";
 import type * as types from "types/posts/editPost";
+import type { EditPostInput, PostStatus } from "@apiTypes";
 
 interface OldPost {
-  title: string;
   status: PostStatus;
   slug: string;
 }
@@ -65,6 +65,7 @@ const useEditPost = (postData: types.EditPostStateData, oldPost: OldPost) => {
 
     void editPost({
       variables: { post },
+      update: update(oldPost.slug, oldPost.status),
       onError: () => {
         setEditStatus("error");
         setIsOpen(false);
@@ -113,30 +114,28 @@ const useEditPost = (postData: types.EditPostStateData, oldPost: OldPost) => {
           }
 
           case "SinglePost": {
-            const { url, title } = editData.editPost.post;
+            const { url } = editData.editPost.post;
             const query = { edit: uploadHasError };
+            const pathname = `/posts/view/${url.slug}`;
             const redirect = oldPost.slug !== url.slug ? replace : push;
 
-            client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
-
-            if (oldPost.title !== title && oldPost.slug !== url.slug) {
-              client.cache.evict({
-                id: "ROOT_QUERY",
-                fieldName: "getPost",
-                args: { slug: oldPost.slug },
-              });
-
-              client.cache.evict({
-                id: client.cache.identify({
-                  __typename: "Post",
-                  url: { slug: oldPost.slug },
-                }),
-                broadcast: false,
-              });
-            }
-
             localStorage.removeItem(storage.EDIT_STORAGE_POST);
-            void redirect({ pathname: `/posts/view/${url.slug}`, query });
+
+            void redirect({ pathname, query }).then(() => {
+              if (url.slug !== oldPost.slug) {
+                client.cache.evict({
+                  fieldName: "getPost",
+                  args: { slug: oldPost.slug },
+                });
+
+                client.cache.evict({
+                  id: client.cache.identify({
+                    __typename: "Post",
+                    url: { slug: oldPost.slug },
+                  }),
+                });
+              }
+            });
             break;
           }
 
