@@ -1,8 +1,10 @@
+import { type Reference } from "@apollo/client";
 import type {
   GetPosts,
   GetPostsData,
   Post,
   PostStatus,
+  QueryGetPostsArgs,
   SortPostsBy,
 } from "@apiTypes";
 import type { PostData, PostItemSlug } from "types/posts";
@@ -74,4 +76,9 @@ export type FiltersErrors = Partial<Record<keyof PostsQueryParams, string>> & {
 
 export interface RuntimeError {
   errorType: "RuntimeError";
+}
+
+export interface GetPostsFieldsMapData {
+  args: QueryGetPostsArgs;
+  fieldData: Omit<PostsPageData, "posts"> & { posts: Reference[] };
 }

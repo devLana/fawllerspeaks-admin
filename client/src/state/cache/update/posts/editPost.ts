@@ -2,15 +2,11 @@ import { type ApolloCache, type Reference } from "@apollo/client";
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
 import { GET_CACHED_POSTS_NEXT_PAGE_DATA } from "@queries/getPosts/GET_CACHED_POSTS_NEXT_PAGE_DATA";
-import type { EditPostData } from "types/posts/editPost";
-import type { PostsPageData } from "types/posts/getPosts";
-import type { PostStatus, QueryGetPostsArgs } from "@apiTypes";
+import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
 import type { PostData } from "types/posts";
-
-interface MapData {
-  args: QueryGetPostsArgs;
-  fieldData: Omit<PostsPageData, "posts"> & { posts: Reference[] };
-}
+import type { GetPostsFieldsMapData } from "types/posts/getPosts";
+import type { EditPostData } from "types/posts/editPost";
+import type { PostStatus, QueryGetPostsArgs } from "@apiTypes";
 
 type Update = (
   oldSlug: string,
@@ -22,38 +18,12 @@ interface GetPostsRef {
   posts: Reference[];
 }
 
-type RootQuery = [string, object][];
-
-interface EvictGetPostsFields extends MapData {
+interface EvictGetPostsFields extends GetPostsFieldsMapData {
   cache: ApolloCache<unknown>;
-  getPostsMap: Map<string, MapData>;
+  getPostsMap: Map<string, GetPostsFieldsMapData>;
   editedPost: PostData;
   oldSlug: string;
   oldStatus: PostStatus;
-}
-
-function buildGetPostsMap(cache: ApolloCache<unknown>): Map<string, MapData> {
-  const store = cache.extract() as Record<string, object>;
-  const getPostsMap = new Map<string, MapData>();
-  const ROOT_QUERY = Object.entries(store.ROOT_QUERY || {}) as RootQuery;
-
-  for (const [field, _fieldData] of ROOT_QUERY) {
-    const fieldMatch = field.match(/^getPosts\((.*?)\)$/);
-
-    if (!fieldMatch) continue;
-
-    const [, key] = fieldMatch;
-    const fieldData = _fieldData as MapData["fieldData"];
-
-    try {
-      const args = JSON.parse(key) as QueryGetPostsArgs;
-      getPostsMap.set(key, { fieldData, args });
-    } catch {
-      continue;
-    }
-  }
-
-  return getPostsMap;
 }
 
 function evictGetPostsFields({
@@ -109,6 +79,8 @@ export const update: Update = (oldSlug: string, oldStatus) => {
     if (editedPost.url.slug !== oldSlug) {
       const getPostsMap = buildGetPostsMap(cache);
 
+      if (getPostsMap.size === 0) return;
+
       getPostsMap.forEach(({ args, fieldData }) => {
         if (args.sort === "title_asc" || args.sort === "title_desc") {
           cache.evict({ fieldName: "getPosts", args, broadcast: false });
@@ -147,6 +119,8 @@ export const update: Update = (oldSlug: string, oldStatus) => {
       });
     } else if (editedPost.status !== oldStatus) {
       const getPostsMap = buildGetPostsMap(cache);
+
+      if (getPostsMap.size === 0) return;
 
       getPostsMap.forEach(({ args, fieldData }) => {
         evictGetPostsFields({
