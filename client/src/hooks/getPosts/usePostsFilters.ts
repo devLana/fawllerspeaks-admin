@@ -43,13 +43,15 @@ export const usePostsFilters = (): PostsFilters => {
 
     try {
       const parsed = schema.validateSync(rawParams, { abortEarly: false });
-      const gqlVariables: QueryGetPostsArgs = parsed;
 
-      const queryParams: PostsQueryParams = {
-        after: parsed.after,
-        size: parsed.size,
-        sort: parsed.sort,
+      const parsedFilters = {
+        ...(parsed.after && { after: parsed.after }),
+        ...(parsed.size && { size: parsed.size }),
+        ...(parsed.sort && { sort: parsed.sort }),
       };
+
+      const queryParams: PostsQueryParams = { ...parsedFilters };
+      const gqlVariables: QueryGetPostsArgs = { ...parsedFilters };
 
       if (parsed.status) {
         const STATUS = parsed.status.toLowerCase() as Lowercase<PostStatus>;
