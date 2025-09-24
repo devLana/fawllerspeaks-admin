@@ -7,10 +7,10 @@ import ViewPostWrapper from "../ViewPostWrapper";
 import PostMetadataList from "./PostMetadataList";
 import PostTableOfContents from "./PostTableOfContents";
 import PostContentHeader from "./PostContentHeader";
+import PostActions from "./PostActions";
 import PostImageBanner from "@features/posts/components/PostImageBanner";
 import PostContentView from "@features/posts/components/PostContentView";
 import PostViewHeader from "@features/posts/components/PostViewHeader";
-import PostActions from "@features/posts/components/PostActions";
 import type { PostData } from "types/posts";
 
 const Post = ({ label, post }: { label: string; post: PostData }) => {
@@ -26,11 +26,10 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
       >
         <PostActions
           id={post.id}
-          status={post.status}
           title={post.title}
+          status={post.status}
           slug={post.url.slug}
           menuSx={{ bgcolor: "action.selected" }}
-          toastMessage="Are you sure you want to Unpublish this post? Un-publishing a post will de-list it from the blog website"
         />
       </PostViewHeader>
       <Box

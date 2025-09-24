@@ -6,7 +6,7 @@ import useControlPlusA from "@hooks/useControlPlusA";
 import useShiftPlusClickPosts from "@hooks/getPosts/useShiftPlusClickPosts";
 import BinPosts from "@features/posts/BinPosts";
 import Post from "./Post";
-import PostItemActions from "./Post/PostItemActions";
+import PostActions from "./Post/PostActions";
 import PostsPagination from "./PostsPagination";
 import PostsToolbar from "./PostsToolbar";
 import ToolbarViewButtons from "./PostsToolbar/ToolbarViewButtons";
@@ -62,7 +62,7 @@ const PostsList = ({ isLoadingMore, postsData }: PostsListProps) => {
             isSelected={!!state.selectedPosts[id]}
             postsView={state.postsView}
             postActions={
-              <PostItemActions
+              <PostActions
                 id={id}
                 index={index}
                 title={post.title}

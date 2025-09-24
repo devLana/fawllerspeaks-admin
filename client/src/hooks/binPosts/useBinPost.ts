@@ -2,10 +2,12 @@ import * as React from "react";
 import { useRouter } from "next/router";
 
 import { useMutation } from "@apollo/client";
+import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
-import { update } from "@cache/update/posts/binPost";
 import { BIN_POSTS } from "@mutations/binPosts/BIN_POSTS";
 import { SESSION_ID } from "@utils/constants";
+import type { BinPostsData } from "types/posts/binPosts";
+import type { RefetchQueriesFn } from "@types";
 
 const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
   const [isBinning, setIsBinning] = React.useState(false);
@@ -14,25 +16,24 @@ const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
 
   const [binPosts, { client }] = useMutation(BIN_POSTS);
 
-  const handleResponse = (msg: string, shouldClearCache = false) => {
+  const handleResponse = (msg: string) => {
     onCloseDialog();
     setIsBinning(false);
     setToast({ open: true, msg });
-
-    if (shouldClearCache) {
-      client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
-    }
   };
 
-  const binPostsFn = () => {
-    const MSG = `You are unable to bin posts right now. Please try again later`;
+  const binPostsFn = (
+    update: MutationBaseOptions<BinPostsData>["update"],
+    refetchQueries: RefetchQueriesFn<BinPostsData> | undefined = undefined
+  ) => {
+    const MSG = `You are unable to bin that post right now. Please try again later`;
 
     setIsBinning(true);
 
     void binPosts({
       variables: { postIds: [postId] },
       update,
-      // refetchQueries
+      refetchQueries,
       onError: err => handleResponse(err.graphQLErrors?.[0].message ?? MSG),
       onCompleted(binData) {
         switch (binData.binPosts.__typename) {
@@ -65,15 +66,12 @@ const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
             break;
 
           case "UnknownError":
+          case "PostsWarning":
             handleResponse(binData.binPosts.message);
             break;
 
-          case "PostsWarning":
-            handleResponse(binData.binPosts.message, true);
-            break;
-
           case "Posts":
-            handleResponse("Post binned", true);
+            handleResponse("Post binned");
             break;
 
           default:

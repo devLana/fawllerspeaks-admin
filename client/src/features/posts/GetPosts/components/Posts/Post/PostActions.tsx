@@ -1,14 +1,13 @@
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import Skeleton from "@mui/material/Skeleton";
-import Typography from "@mui/material/Typography";
 import type { SxProps } from "@mui/material/styles";
 
-import PostActions from "@features/posts/components/PostActions";
+import PostMenuActions from "./PostMenuActions";
 import type { PostStatus } from "@apiTypes";
 import type { GetPostsListAction } from "types/posts/getPosts";
 
-interface PostItemActionsProps {
+interface PostActionsProps {
   id: string;
   index: number;
   title: string;
@@ -21,7 +20,7 @@ interface PostItemActionsProps {
   onShiftPlusClick: (shiftKey: boolean, index: number, id: string) => void;
 }
 
-const PostItemActions = ({
+const PostActions = ({
   id,
   index,
   title,
@@ -32,7 +31,7 @@ const PostItemActions = ({
   skipOnChange,
   dispatch,
   onShiftPlusClick,
-}: PostItemActionsProps) => {
+}: PostActionsProps) => {
   const styles: SxProps = { position: "absolute", top: "5px", left: "5px" };
 
   const handleChange = (checked: boolean) => {
@@ -44,16 +43,6 @@ const PostItemActions = ({
       dispatch({ type: "TOGGLE_POST_SELECT", payload: { checked, title, id } });
     }
   };
-
-  const toastMessage = (
-    <>
-      Are you sure you want to unpublish{" "}
-      <Typography component="span" sx={{ fontWeight: "bold" }}>
-        {title}
-      </Typography>
-      ? Unpublishing this post will de-list it from the blog website
-    </>
-  );
 
   const actions = (
     <>
@@ -70,13 +59,11 @@ const PostItemActions = ({
           borderBottomLeftRadius: `${shape.borderRadius}px`,
         })}
       />
-      <PostActions
+      <PostMenuActions
         id={id}
         title={title}
         status={status}
         slug={slug}
-        showTitleInDialog
-        toastMessage={toastMessage}
         menuSx={({ shape }) => ({
           borderRadius: 0,
           borderTopRightRadius: `${shape.borderRadius}px`,
@@ -104,4 +91,4 @@ const PostItemActions = ({
   );
 };
 
-export default PostItemActions;
+export default PostActions;

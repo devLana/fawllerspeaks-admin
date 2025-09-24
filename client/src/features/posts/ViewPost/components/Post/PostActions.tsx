@@ -5,9 +5,10 @@ import { type IconButtonProps } from "@mui/material/IconButton";
 import useUnpublishPost from "@hooks/unpublishPost/useUnpublishPost";
 import useUndoUnpublishPost from "@hooks/undoUnpublishPost/useUndoUnpublishPost";
 import useBinPost from "@hooks/binPosts/useBinPost";
-import PostMenu from "./PostMenu";
-import UnpublishPost from "./UnpublishPost";
-import BinPost from "./BinPost";
+import PostMenu from "@features/posts/components/PostMenu";
+import UnpublishPost from "@features/posts/UnpublishPost";
+import BinPost from "@features/posts/BinPost";
+import { update } from "@cache/update/posts/binPostOnView";
 import type { PostStatus } from "@apiTypes";
 
 interface PostActionsProps {
@@ -15,13 +16,10 @@ interface PostActionsProps {
   title: string;
   status: PostStatus;
   slug: string;
-  showTitleInDialog?: boolean;
-  toastMessage: string | React.ReactElement;
   menuSx?: IconButtonProps["sx"];
 }
 
-const PostActions = (props: PostActionsProps) => {
-  const { id, toastMessage, showTitleInDialog = false, ...menuProps } = props;
+const PostActions = ({ id, ...menuProps }: PostActionsProps) => {
   const [message, setMessage] = React.useState<string | React.ReactElement>("");
   const [showToast, setShowToast] = React.useState(false);
   const [showDialog, setShowDialog] = React.useState(false);
@@ -31,19 +29,21 @@ const PostActions = (props: PostActionsProps) => {
   const binPost = useBinPost(id, () => setShowDialog(false));
 
   const handleUnpublish = () => {
-    setMessage(toastMessage);
     setShowToast(true);
+    setMessage(
+      "Are you sure you want to Unpublish this post? Un-publishing a post will de-list it from the blog website"
+    );
   };
 
   return (
     <>
       <PostMenu
+        {...menuProps}
         onUnpublish={handleUnpublish}
         onBinPost={() => setShowDialog(true)}
         disableUnpublish={
           unpublish.status === "loading" || undoUnpublish.isLoading
         }
-        {...menuProps}
       />
       <UnpublishPost
         message={message}
@@ -62,8 +62,7 @@ const PostActions = (props: PostActionsProps) => {
         title={menuProps.title}
         isBinning={binPost.isBinning}
         isPublished={menuProps.status === "Published"}
-        showTitleInDialog={showTitleInDialog}
-        onBinPosts={binPost.binPostsFn}
+        onBinPosts={() => binPost.binPostsFn(update)}
         onCloseDialog={() => setShowDialog(false)}
         onCloseToast={binPost.handleCloseToast}
       />

@@ -13,7 +13,7 @@ interface BinPostsProps {
   title: string;
   isPublished: boolean;
   isBinning: boolean;
-  showTitleInDialog: boolean;
+  showTitleInDialog?: boolean;
   onBinPosts: VoidFunction;
   onCloseDialog: VoidFunction;
   onCloseToast: VoidFunction;
@@ -25,7 +25,7 @@ const BinPost = ({
   title,
   isPublished,
   isBinning,
-  showTitleInDialog,
+  showTitleInDialog = false,
   onBinPosts,
   onCloseDialog,
   onCloseToast,
@@ -46,7 +46,8 @@ const BinPost = ({
         )}
         {isPublished && (
           <DialogContentText>
-            Sending a Published post to bin will de-list it on the blog website.
+            NB: Sending a Published post to bin will de-list it on the blog
+            website.
           </DialogContentText>
         )}
       </DialogContent>
@@ -57,7 +58,7 @@ const BinPost = ({
         <LoadingButton
           color="error"
           loading={isBinning}
-          onClick={() => onBinPosts()}
+          onClick={onBinPosts}
           variant="contained"
         >
           <span>Send post to bin</span>

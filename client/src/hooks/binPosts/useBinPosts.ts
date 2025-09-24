@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 
 import { useMutation } from "@apollo/client";
 
+import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
+import { refetchQueries } from "@cache/refetchQueries/posts/binPostOnPosts";
 import { BIN_POSTS } from "@mutations/binPosts/BIN_POSTS";
 import { SESSION_ID } from "@utils/constants";
 
@@ -16,6 +18,7 @@ const useBinPosts = (
   const { replace, push, pathname } = useRouter();
 
   const [binPosts, { client }] = useMutation(BIN_POSTS);
+  const { queryParams, gqlVariables } = usePostsFilters();
 
   const handleResponse = (msg: string, shouldPush = false) => {
     onCloseDialog();
@@ -23,10 +26,16 @@ const useBinPosts = (
     setToast({ open: true, msg });
 
     if (shouldPush) {
+      const query = { ...queryParams };
+
       client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
-      void push("/posts");
+      delete query.after;
+      void push({ pathname: "/posts", query });
     }
   };
+
+  const gqlVariablesCopy = { ...gqlVariables };
+  delete gqlVariablesCopy.after;
 
   const binPostsFn = () => {
     const MSG = `You are unable to bin posts right now. Please try again later`;
@@ -35,6 +44,7 @@ const useBinPosts = (
 
     void binPosts({
       variables: { postIds },
+      refetchQueries: refetchQueries(gqlVariablesCopy),
       onError: err => handleResponse(err.graphQLErrors?.[0].message ?? MSG),
       onCompleted(binData) {
         switch (binData.binPosts.__typename) {
