@@ -17,8 +17,6 @@ export const update: Update = gqlVariables => {
     const [{ url }] = data.binPosts.posts;
     const getPostsMap = buildGetPostsMap(cache);
 
-    if (getPostsMap.size === 0) return;
-
     getPostsMap.forEach(({ args, fieldData }) => {
       const hasPost = fieldData.posts.some(postRef => {
         return postRef.__ref === `Post:{"url":{"slug":"${url.slug}"}}`;
