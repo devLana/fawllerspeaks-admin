@@ -1,7 +1,7 @@
-import type { Post, PostStatus } from "@apiTypes";
+import type CustomEditor from "ckeditor5-custom-build";
 import type { Status } from "@types";
 import type { PostTagData } from "types/postTags";
-import type CustomEditor from "ckeditor5-custom-build";
+import type { Post, PostStatus } from "@apiTypes";
 
 export type PostData = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
 
@@ -66,7 +66,7 @@ export type RequiredFieldErrors = {
 
 export type PostItemSlug = Pick<PostData["url"], "slug" | "__typename">;
 
-type UnpublishedPostData = Pick<PostData, "id" | "status"> & {
+type UnpublishedPostData = Pick<PostData, "__typename" | "id" | "status"> & {
   url: PostItemSlug;
 };
 

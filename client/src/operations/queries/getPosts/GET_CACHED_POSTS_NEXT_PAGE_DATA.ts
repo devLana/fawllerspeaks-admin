@@ -14,8 +14,8 @@ type CachedPostsNextPageData = Node<{ getPosts: PageData }, Args>;
 export const GET_CACHED_POSTS_NEXT_PAGE_DATA: CachedPostsNextPageData = gql`
   query CachedPostsNextPageData(
     $after: ID
-    $size: Int
-    $sort: SortPostsBy
+    $size: Int = 12
+    $sort: SortPostsBy = date_desc
     $status: PostStatus
   ) {
     getPosts(after: $after, size: $size, sort: $sort, status: $status) {

@@ -16,6 +16,9 @@ export const UNPUBLISH_POST: UnpublishPost = gql`
       ... on BaseResponse {
         __typename
       }
+      ... on Response {
+        message
+      }
       ... on SinglePost {
         post {
           ...UnpublishPostFields

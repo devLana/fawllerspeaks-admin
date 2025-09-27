@@ -2,24 +2,35 @@ import * as React from "react";
 import { useRouter } from "next/router";
 
 import { useMutation } from "@apollo/client";
+import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
 import { optimisticResponse } from "@cache/optimisticResponse/posts/unpublishPost";
-import { POST_STATUS } from "@fragments/POST_STATUS";
 import { UNPUBLISH_POST } from "@mutations/unpublishPost/UNPUBLISH_POST";
 import { SESSION_ID } from "@utils/constants";
-import type { StateSetterFn, Status } from "@types";
+import type { RefetchQueriesFn, StateSetterFn, Status } from "@types";
+import type { UnpublishPostData } from "types/posts/unpublishPost";
+
+type ResponseStatus = Status | "success";
 
 const useUnpublishPost = (
   postId: string,
   slug: string,
   setMessage: StateSetterFn<string | React.ReactElement>
 ) => {
-  const [status, setStatus] = React.useState<Status | "success">("idle");
+  const [status, setStatus] = React.useState<ResponseStatus>("idle");
   const { replace, pathname } = useRouter();
 
   const [unpublishPost, { client }] = useMutation(UNPUBLISH_POST);
 
-  const unpublishFn = () => {
+  const handleResponse = (msg: string, responseStatus: ResponseStatus) => {
+    setStatus(responseStatus);
+    setMessage(msg);
+  };
+
+  const unpublishFn = (
+    update: MutationBaseOptions<UnpublishPostData>["update"],
+    refetchQueries?: RefetchQueriesFn<UnpublishPostData>
+  ) => {
     const msg = `You are unable to unpublish a post right now. Please try again later`;
 
     setStatus("loading");
@@ -27,11 +38,10 @@ const useUnpublishPost = (
 
     void unpublishPost({
       variables: { postId },
-      optimisticResponse,
-      onError() {
-        setStatus("error");
-        setMessage(msg);
-      },
+      optimisticResponse: optimisticResponse(slug),
+      update,
+      refetchQueries,
+      onError: () => handleResponse(msg, "error"),
       onCompleted(unpublishData) {
         switch (unpublishData.unpublishPost.__typename) {
           case "AuthenticationError": {
@@ -59,32 +69,21 @@ const useUnpublishPost = (
           }
 
           case "PostIdValidationError":
+            handleResponse(unpublishData.unpublishPost.postIdError, "error");
+            break;
+
           case "UnknownError":
           case "NotAllowedPostActionError":
-            client.writeFragment({
-              id: client.cache.identify({ __typename: "Post", url: { slug } }),
-              fragment: POST_STATUS,
-              data: { __typename: "Post", status: "Published" },
-            });
-
-            setStatus("error");
-            setMessage(msg);
+          case "Response":
+            handleResponse(unpublishData.unpublishPost.message, "error");
             break;
 
           case "SinglePost":
-            client.cache.evict({
-              id: "ROOT_QUERY",
-              fieldName: "getPosts",
-              args: { filters: { status: "Published" } },
-            });
-
-            setStatus("success");
-            setMessage("Post unpublished");
+            handleResponse("Post unpublished", "success");
             break;
 
           default:
-            setStatus("error");
-            setMessage(msg);
+            handleResponse(msg, "error");
         }
       },
     });

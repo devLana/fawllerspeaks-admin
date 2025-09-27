@@ -8,7 +8,8 @@ import useBinPost from "@hooks/binPosts/useBinPost";
 import PostMenu from "@features/posts/components/PostMenu";
 import UnpublishPost from "@features/posts/UnpublishPost";
 import BinPost from "@features/posts/BinPost";
-import { update } from "@cache/update/posts/binPostOnView";
+import { update as binPostUpdate } from "@cache/update/posts/binPostOnView";
+import { update as unPubUpdate } from "@cache/update/posts/unpublishPostOnView";
 import type { PostStatus } from "@apiTypes";
 
 interface PostActionsProps {
@@ -35,6 +36,8 @@ const PostActions = ({ id, ...menuProps }: PostActionsProps) => {
     );
   };
 
+  const unpublishUpdate = unPubUpdate(menuProps.slug);
+
   return (
     <>
       <PostMenu
@@ -51,7 +54,7 @@ const PostActions = ({ id, ...menuProps }: PostActionsProps) => {
         unpublishStatus={unpublish.status}
         undoUnpublishHasError={undoUnpublish.hasError}
         onCloseToast={() => setShowToast(false)}
-        onUnpublish={unpublish.unpublishFn}
+        onUnpublish={() => unpublish.unpublishFn(unpublishUpdate)}
         onUndoUnpublish={undoUnpublish.undoUnpublishFn}
         onUnpublished={unpublish.unpublished}
         onUndoneUnpublish={undoUnpublish.undoneUnpublish}
@@ -62,7 +65,7 @@ const PostActions = ({ id, ...menuProps }: PostActionsProps) => {
         title={menuProps.title}
         isBinning={binPost.isBinning}
         isPublished={menuProps.status === "Published"}
-        onBinPosts={() => binPost.binPostsFn(update)}
+        onBinPosts={() => binPost.binPostsFn(binPostUpdate)}
         onCloseDialog={() => setShowDialog(false)}
         onCloseToast={binPost.handleCloseToast}
       />

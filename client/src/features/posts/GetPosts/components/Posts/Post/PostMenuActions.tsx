@@ -10,8 +10,10 @@ import useBinPost from "@hooks/binPosts/useBinPost";
 import PostMenu from "@features/posts/components/PostMenu";
 import UnpublishPost from "@features/posts/UnpublishPost";
 import BinPost from "@features/posts/BinPost";
-import { update } from "@cache/update/posts/binPostOnPosts";
-import { refetchQueries } from "@cache/refetchQueries/posts/binPostOnPosts";
+import { update as binPostUpdate } from "@cache/update/posts/binPostOnPosts";
+import { refetchQueries as binPostRefetch } from "@cache/refetchQueries/posts/binPostOnPosts";
+import { update as unPubUpdate } from "@cache/update/posts/unpublishPostOnPosts";
+import { refetchQueries as unPubRefetch } from "@cache/refetchQueries/posts/unpublishPostOnPosts";
 import type { PostStatus } from "@apiTypes";
 
 interface PostMenuActionsProps {
@@ -32,8 +34,10 @@ const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
   const undoUnpublish = useUndoUnpublishPost(id, menuProps.slug, setMessage);
   const binPost = useBinPost(id, () => setShowDialog(false));
 
-  const updateCache = update(gqlVariables);
-  const refetch = refetchQueries(gqlVariables);
+  const binPostUpdateCache = binPostUpdate(gqlVariables);
+  const binPostRefetchQUeries = binPostRefetch(gqlVariables);
+  const unPubUpdateCache = unPubUpdate(gqlVariables);
+  const unPubRefetchQueries = unPubRefetch(gqlVariables);
 
   const handleUnpublish = () => {
     setShowToast(true);
@@ -64,7 +68,9 @@ const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
         unpublishStatus={unpublish.status}
         undoUnpublishHasError={undoUnpublish.hasError}
         onCloseToast={() => setShowToast(false)}
-        onUnpublish={unpublish.unpublishFn}
+        onUnpublish={() =>
+          unpublish.unpublishFn(unPubUpdateCache, unPubRefetchQueries)
+        }
         onUndoUnpublish={undoUnpublish.undoUnpublishFn}
         onUnpublished={unpublish.unpublished}
         onUndoneUnpublish={undoUnpublish.undoneUnpublish}
@@ -76,7 +82,9 @@ const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
         isBinning={binPost.isBinning}
         isPublished={menuProps.status === "Published"}
         showTitleInDialog
-        onBinPosts={() => binPost.binPostsFn(updateCache, refetch)}
+        onBinPosts={() =>
+          binPost.binPostsFn(binPostUpdateCache, binPostRefetchQUeries)
+        }
         onCloseDialog={() => setShowDialog(false)}
         onCloseToast={binPost.handleCloseToast}
       />
