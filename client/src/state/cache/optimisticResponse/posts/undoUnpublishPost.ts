@@ -1,13 +1,14 @@
 import type { UndoUnpublishPostData as Data } from "types/posts/undoUnpublishPost";
-import type { PostData } from "types/posts";
 import type { OptimisticResponseFn } from "@types";
 import type { MutationUndoUnpublishPostArgs as Args } from "@apiTypes";
 
-type OptimisticResponse = OptimisticResponseFn<Data, Args>;
+type OptimisticResponse = (slug: string) => OptimisticResponseFn<Data, Args>;
 
-export const optimisticResponse: OptimisticResponse = vars => ({
-  undoUnpublishPost: {
-    __typename: "SinglePost",
-    post: { id: vars.postId, status: "Published" } as PostData,
-  },
-});
+export const optimisticResponse: OptimisticResponse = slug => {
+  return ({ postId: id }) => ({
+    undoUnpublishPost: {
+      __typename: "SinglePost",
+      post: { __typename: "Post", id, status: "Published", url: { slug } },
+    },
+  });
+};

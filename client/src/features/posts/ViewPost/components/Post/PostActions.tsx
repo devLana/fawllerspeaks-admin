@@ -10,6 +10,7 @@ import UnpublishPost from "@features/posts/UnpublishPost";
 import BinPost from "@features/posts/BinPost";
 import { update as binPostUpdate } from "@cache/update/posts/binPostOnView";
 import { update as unPubUpdate } from "@cache/update/posts/unpublishPostOnView";
+import { update as undoUnpublishUpdate } from "@cache/update/posts/undoUnpublishPostOnView";
 import type { PostStatus } from "@apiTypes";
 
 interface PostActionsProps {
@@ -37,6 +38,7 @@ const PostActions = ({ id, ...menuProps }: PostActionsProps) => {
   };
 
   const unpublishUpdate = unPubUpdate(menuProps.slug);
+  const undoUnPubUpdate = undoUnpublishUpdate(menuProps.slug);
 
   return (
     <>
@@ -55,7 +57,7 @@ const PostActions = ({ id, ...menuProps }: PostActionsProps) => {
         undoUnpublishHasError={undoUnpublish.hasError}
         onCloseToast={() => setShowToast(false)}
         onUnpublish={() => unpublish.unpublishFn(unpublishUpdate)}
-        onUndoUnpublish={undoUnpublish.undoUnpublishFn}
+        onUndoUnpublish={() => undoUnpublish.undoUnpublishFn(undoUnPubUpdate)}
         onUnpublished={unpublish.unpublished}
         onUndoneUnpublish={undoUnpublish.undoneUnpublish}
       />

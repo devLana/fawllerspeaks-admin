@@ -16,6 +16,9 @@ export const UNDO_UNPUBLISH_POST: UndoUnpublishPost = gql`
       ... on BaseResponse {
         __typename
       }
+      ... on Response {
+        message
+      }
       ... on SinglePost {
         post {
           ...UnpublishPostFields

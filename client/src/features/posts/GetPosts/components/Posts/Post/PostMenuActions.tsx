@@ -14,6 +14,8 @@ import { update as binPostUpdate } from "@cache/update/posts/binPostOnPosts";
 import { refetchQueries as binPostRefetch } from "@cache/refetchQueries/posts/binPostOnPosts";
 import { update as unPubUpdate } from "@cache/update/posts/unpublishPostOnPosts";
 import { refetchQueries as unPubRefetch } from "@cache/refetchQueries/posts/unpublishPostOnPosts";
+import { update as undoUnPubUpdateCache } from "@cache/update/posts/undoUnpublishPostOnPosts";
+import { refetchQueries as undoUnPubRefetchQUeries } from "@cache/refetchQueries/posts/undoUnpublishPostOnPosts";
 import type { PostStatus } from "@apiTypes";
 
 interface PostMenuActionsProps {
@@ -38,6 +40,8 @@ const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
   const binPostRefetchQUeries = binPostRefetch(gqlVariables);
   const unPubUpdateCache = unPubUpdate(gqlVariables);
   const unPubRefetchQueries = unPubRefetch(gqlVariables);
+  const undoUnPubUpdate = undoUnPubUpdateCache(gqlVariables);
+  const undoUnPubRefetch = undoUnPubRefetchQUeries(gqlVariables);
 
   const handleUnpublish = () => {
     setShowToast(true);
@@ -71,7 +75,9 @@ const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
         onUnpublish={() =>
           unpublish.unpublishFn(unPubUpdateCache, unPubRefetchQueries)
         }
-        onUndoUnpublish={undoUnpublish.undoUnpublishFn}
+        onUndoUnpublish={() =>
+          undoUnpublish.undoUnpublishFn(undoUnPubUpdate, undoUnPubRefetch)
+        }
         onUnpublished={unpublish.unpublished}
         onUndoneUnpublish={undoUnpublish.undoneUnpublish}
       />

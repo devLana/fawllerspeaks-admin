@@ -4,10 +4,11 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 
 import { optimisticResponse } from "@cache/optimisticResponse/posts/undoUnpublishPost";
-import { POST_STATUS } from "@fragments/POST_STATUS";
 import { UNDO_UNPUBLISH_POST } from "@mutations/undoUnpublishPost/UNDO_UNPUBLISH_POST";
 import { SESSION_ID } from "@utils/constants";
-import type { StateSetterFn, Status } from "@types";
+import type { RefetchQueriesFn, StateSetterFn, Status } from "@types";
+import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
+import type { UndoUnpublishPostData } from "types/posts/undoUnpublishPost";
 
 const useUndoUnpublishPost = (
   postId: string,
@@ -19,17 +20,25 @@ const useUndoUnpublishPost = (
 
   const [unpublishPost, { client }] = useMutation(UNDO_UNPUBLISH_POST);
 
-  const undoUnpublishFn = () => {
+  const handleResponse = (msg: string, responseStatus: Status) => {
+    setStatus(responseStatus);
+    setMessage(msg);
+  };
+
+  const undoUnpublishFn = (
+    update: MutationBaseOptions<UndoUnpublishPostData>["update"],
+    refetchQueries?: RefetchQueriesFn<UndoUnpublishPostData>
+  ) => {
     const msg = `An unexpected error occurred and you cannot undo the unpublish right now. Please try again later`;
+
     setStatus("loading");
 
     void unpublishPost({
       variables: { postId },
-      optimisticResponse,
-      onError() {
-        setStatus("error");
-        setMessage(msg);
-      },
+      optimisticResponse: optimisticResponse(slug),
+      update,
+      refetchQueries,
+      onError: () => handleResponse(msg, "error"),
       onCompleted(data) {
         switch (data.undoUnpublishPost.__typename) {
           case "AuthenticationError": {
@@ -57,31 +66,21 @@ const useUndoUnpublishPost = (
           }
 
           case "PostIdValidationError":
+            handleResponse(data.undoUnpublishPost.postIdError, "error");
+            break;
+
           case "UnknownError":
           case "NotAllowedPostActionError":
-            client.writeFragment({
-              id: client.cache.identify({ __typename: "Post", url: { slug } }),
-              fragment: POST_STATUS,
-              data: { __typename: "Post", status: "Unpublished" },
-            });
-
-            setStatus("error");
-            setMessage(msg);
+          case "Response":
+            handleResponse(data.undoUnpublishPost.message, "error");
             break;
 
           case "SinglePost":
-            client.cache.evict({
-              id: "ROOT_QUERY",
-              fieldName: "getPosts",
-              args: { filters: { status: "Unpublished" } },
-            });
-
             setStatus("idle");
             break;
 
           default:
-            setMessage(msg);
-            setStatus("error");
+            handleResponse(msg, "error");
         }
       },
     });
