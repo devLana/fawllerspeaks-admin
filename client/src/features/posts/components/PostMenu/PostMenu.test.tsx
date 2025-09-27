@@ -12,11 +12,17 @@ describe("PostMenu", () => {
   const onUnpublishMock = vi.fn().mockName("onUnpublish");
   const onBinPostMock = vi.fn().mockName("onBinPost");
 
-  const UI = ({ status }: { status: PostStatus }) => (
+  interface Props {
+    status: PostStatus;
+    disableUnpublish?: boolean;
+  }
+
+  const UI = ({ status, disableUnpublish = false }: Props) => (
     <PostMenu
-      slug={slug}
-      status={status}
       title={title}
+      status={status}
+      slug={slug}
+      disableUnpublish={disableUnpublish}
       onUnpublish={onUnpublishMock}
       onBinPost={onBinPostMock}
     />
