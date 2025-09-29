@@ -257,6 +257,33 @@ export const UNDO_UNPUBLISH_POST = `#graphql
   }
 `;
 
+export const BIN_POST = `#graphql
+  ${POST_FIELDS}
+  mutation BinPost($postId: ID!) {
+    binPost(postId: $postId) {
+      ... on BaseResponse {
+        __typename
+        message
+        status
+      }
+
+      ... on SinglePost {
+        __typename
+        post {
+          ...postFields
+        }
+        status
+      }
+
+      ... on PostIdValidationError {
+        __typename
+        postIdError
+        status
+      }
+    }
+  }
+`;
+
 export const BIN_POSTS = `#graphql
   ${POST_FIELDS}
   mutation BinPosts($postIds: [ID!]!) {

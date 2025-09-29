@@ -8,6 +8,7 @@ import editPost from "./editPost";
 import unpublishPost from "./unpublishPost";
 import undoUnpublishPost from "./undoUnpublishPost";
 import binPosts from "./binPosts";
+import binPost from "./binPost";
 // import unBinPosts from "./unBinPosts";
 // import deletePostsFromBin from "./deletePostsFromBin";
 // import emptyBin from "./emptyBin";
@@ -42,6 +43,7 @@ export const postsResolvers = {
     unpublishPost,
     undoUnpublishPost,
     binPosts,
+    binPost,
     // unBinPosts,
     // deletePostsFromBin,
     // emptyBin,
