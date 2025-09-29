@@ -34,7 +34,7 @@ const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
       variables: { postIds: [postId] },
       update,
       refetchQueries,
-      onError: err => handleResponse(err.graphQLErrors?.[0].message ?? MSG),
+      onError: err => handleResponse(err.graphQLErrors?.[0]?.message ?? MSG),
       onCompleted(binData) {
         switch (binData.binPosts.__typename) {
           case "AuthenticationError": {

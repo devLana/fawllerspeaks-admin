@@ -41,7 +41,9 @@ const useUnpublishPost = (
       optimisticResponse: optimisticResponse(slug),
       update,
       refetchQueries,
-      onError: () => handleResponse(msg, "error"),
+      onError(err) {
+        handleResponse(err.graphQLErrors?.[0]?.message ?? msg, "error");
+      },
       onCompleted(unpublishData) {
         switch (unpublishData.unpublishPost.__typename) {
           case "AuthenticationError": {
