@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
-import { refetchQueries } from "@cache/refetchQueries/posts/binPostOnPosts";
+import { refetchQueries } from "@cache/refetchQueries/posts/binPosts";
 import { update } from "@cache/update/posts/binPosts";
 import { BIN_POSTS } from "@mutations/binPosts/BIN_POSTS";
 import { SESSION_ID } from "@utils/constants";
