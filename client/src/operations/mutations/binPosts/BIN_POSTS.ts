@@ -1,7 +1,7 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
 import type { MutationBinPostsArgs } from "@apiTypes";
-import type { BinPostsData } from "types/posts/binPosts";
+import type { BinPostsData } from "types/posts/bin/binPosts";
 
 type BinPosts = TypedDocumentNode<BinPostsData, MutationBinPostsArgs>;
 
@@ -22,6 +22,9 @@ export const BIN_POSTS: BinPosts = gql`
       }
       ... on BaseResponse {
         __typename
+      }
+      ... on UnknownError {
+        message
       }
       ... on PostsWarning {
         message
