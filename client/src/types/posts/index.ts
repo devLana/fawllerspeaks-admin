@@ -69,18 +69,6 @@ export type RequiredFieldErrors = {
 
 export type PostItemSlug = Pick<PostData["url"], "slug" | "__typename">;
 
-type UnpublishedPostData = Pick<PostData, "__typename" | "id" | "status"> & {
-  url: PostItemSlug;
-};
-
-type UnpublishedPostDataHelper<T extends object> = T extends { post: Post }
-  ? Omit<T, "post" | "status"> & { post: UnpublishedPostData }
-  : Omit<T, "status">;
-
-export type UnpublishedPostDataMapper<T extends Record<string, object>> = {
-  [Key in keyof T]: UnpublishedPostDataHelper<T[Key]>;
-};
-
 export interface GetPostsFieldsMapData {
   args: QueryGetPostsArgs;
   fieldData: Omit<PostsPageData, "posts"> & { posts: Reference[] };

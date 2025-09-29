@@ -1,6 +1,6 @@
 import { GET_POSTS } from "@queries/getPosts/GET_POSTS";
 import type { RefetchQueriesFn } from "@types";
-import type { UndoUnpublishPostData } from "types/posts/undoUnpublishPost";
+import type { UndoUnpublishPostData } from "types/posts/unpublish/undoUnpublishPost";
 import type { QueryGetPostsArgs } from "@apiTypes";
 
 type UndoUnpublishPostRefetchQueriesFn = (

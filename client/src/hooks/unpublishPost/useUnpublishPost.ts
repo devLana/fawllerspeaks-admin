@@ -8,7 +8,7 @@ import { optimisticResponse } from "@cache/optimisticResponse/posts/unpublishPos
 import { UNPUBLISH_POST } from "@mutations/unpublishPost/UNPUBLISH_POST";
 import { SESSION_ID } from "@utils/constants";
 import type { RefetchQueriesFn, StateSetterFn, Status } from "@types";
-import type { UnpublishPostData } from "types/posts/unpublishPost";
+import type { UnpublishPostData } from "types/posts/unpublish/unpublishPost";
 
 type ResponseStatus = Status | "success";
 

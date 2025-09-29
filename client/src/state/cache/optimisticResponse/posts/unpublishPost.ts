@@ -1,4 +1,4 @@
-import type { UnpublishPostData as Data } from "types/posts/unpublishPost";
+import type { UnpublishPostData as Data } from "types/posts/unpublish/unpublishPost";
 import type { OptimisticResponseFn } from "@types";
 import type { MutationUnpublishPostArgs as Args } from "@apiTypes";
 

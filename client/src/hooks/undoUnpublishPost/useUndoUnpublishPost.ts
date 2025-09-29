@@ -8,7 +8,7 @@ import { UNDO_UNPUBLISH_POST } from "@mutations/undoUnpublishPost/UNDO_UNPUBLISH
 import { SESSION_ID } from "@utils/constants";
 import type { RefetchQueriesFn, StateSetterFn, Status } from "@types";
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
-import type { UndoUnpublishPostData } from "types/posts/undoUnpublishPost";
+import type { UndoUnpublishPostData } from "types/posts/unpublish/undoUnpublishPost";
 
 const useUndoUnpublishPost = (
   postId: string,

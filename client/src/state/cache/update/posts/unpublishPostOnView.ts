@@ -4,7 +4,7 @@ import { POST_STATUS } from "@fragments/POST_STATUS";
 import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
 import evictGetPostsFieldsOnView from "@utils/posts/evictGetPostsFieldsOnView";
 import { unpublishPostRegex } from "@utils/posts/getPostsFieldsRegex";
-import type { UnpublishPostData } from "types/posts/unpublishPost";
+import type { UnpublishPostData } from "types/posts/unpublish/unpublishPost";
 
 type Update = (
   slug: string
