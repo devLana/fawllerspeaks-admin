@@ -4,9 +4,9 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
-import { BIN_POSTS } from "@mutations/binPosts/BIN_POSTS";
+import { BIN_POST } from "@mutations/binPost/BIN_POST";
 import { SESSION_ID } from "@utils/constants";
-import type { BinPostsData } from "types/posts/binPosts";
+import type { BinPostData } from "types/posts/bin/binPost";
 import type { RefetchQueriesFn } from "@types";
 
 const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
@@ -14,7 +14,7 @@ const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
   const [toast, setToast] = React.useState({ open: false, msg: "" });
   const { replace, pathname } = useRouter();
 
-  const [binPosts, { client }] = useMutation(BIN_POSTS);
+  const [binPost, { client }] = useMutation(BIN_POST);
 
   const handleResponse = (msg: string) => {
     onCloseDialog();
@@ -23,20 +23,20 @@ const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
   };
 
   const binPostsFn = (
-    update: MutationBaseOptions<BinPostsData>["update"],
-    refetchQueries: RefetchQueriesFn<BinPostsData> | undefined = undefined
+    update: MutationBaseOptions<BinPostData>["update"],
+    refetchQueries: RefetchQueriesFn<BinPostData> | undefined = undefined
   ) => {
     const MSG = `You are unable to bin that post right now. Please try again later`;
 
     setIsBinning(true);
 
-    void binPosts({
-      variables: { postIds: [postId] },
+    void binPost({
+      variables: { postId },
       update,
       refetchQueries,
       onError: err => handleResponse(err.graphQLErrors?.[0]?.message ?? MSG),
       onCompleted(binData) {
-        switch (binData.binPosts.__typename) {
+        switch (binData.binPost.__typename) {
           case "AuthenticationError": {
             const query = { status: "unauthenticated", redirectTo: pathname };
 
@@ -61,16 +61,16 @@ const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
             break;
           }
 
-          case "PostIdsValidationError":
-            handleResponse(binData.binPosts.postIdsError);
+          case "PostIdValidationError":
+            handleResponse(binData.binPost.postIdError);
             break;
 
           case "UnknownError":
-          case "PostsWarning":
-            handleResponse(binData.binPosts.message);
+          case "NotAllowedPostActionError":
+            handleResponse(binData.binPost.message);
             break;
 
-          case "Posts":
+          case "SinglePost":
             handleResponse("Post binned");
             break;
 

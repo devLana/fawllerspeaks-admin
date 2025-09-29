@@ -2,14 +2,14 @@ import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions"
 
 import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
 import evictSubsequentGetPostsFieldsOnView from "@utils/posts/evictSubsequentGetPostsFieldsOnView";
-import type { BinPostsData } from "types/posts/binPosts";
+import type { BinPostData } from "types/posts/bin/binPost";
 
-type Update = MutationBaseOptions<BinPostsData>["update"];
+type Update = MutationBaseOptions<BinPostData>["update"];
 
 export const update: Update = (cache, { data }) => {
-  if (data?.binPosts.__typename !== "Posts") return;
+  if (data?.binPost.__typename !== "SinglePost") return;
 
-  const [{ url }] = data.binPosts.posts;
+  const { url } = data.binPost.post;
   const getPostsMap = buildGetPostsMap(cache, /^getPosts\((.*?)\)$/);
 
   if (getPostsMap.size === 0) return;

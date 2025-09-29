@@ -1,15 +1,15 @@
 import { GET_POSTS } from "@queries/getPosts/GET_POSTS";
 import type { RefetchQueriesFn } from "@types";
-import type { BinPostsData } from "types/posts/binPosts";
+import type { BinPostData } from "types/posts/bin/binPost";
 import type { QueryGetPostsArgs } from "@apiTypes";
 
 type BinPostRefetchQueriesFn = (
   gqlVariables: QueryGetPostsArgs
-) => RefetchQueriesFn<BinPostsData>;
+) => RefetchQueriesFn<BinPostData>;
 
 export const refetchQueries: BinPostRefetchQueriesFn = gqlVariables => {
   return ({ data }) => {
-    if (data?.binPosts.__typename !== "Posts") return [];
+    if (data?.binPost.__typename !== "SinglePost") return [];
     return [{ query: GET_POSTS, variables: gqlVariables }];
   };
 };
