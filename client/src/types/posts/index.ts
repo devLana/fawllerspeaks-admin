@@ -1,7 +1,10 @@
+import type { ApolloCache, Reference } from "@apollo/client";
+
 import type CustomEditor from "ckeditor5-custom-build";
 import type { Status } from "@types";
 import type { PostTagData } from "types/postTags";
-import type { Post, PostStatus } from "@apiTypes";
+import type { PostsPageData } from "./getPosts";
+import type { Post, PostStatus, QueryGetPostsArgs } from "@apiTypes";
 
 export type PostData = Omit<Post, "tags"> & { tags?: PostTagData[] | null };
 
@@ -77,3 +80,21 @@ type UnpublishedPostDataHelper<T extends object> = T extends { post: Post }
 export type UnpublishedPostDataMapper<T extends Record<string, object>> = {
   [Key in keyof T]: UnpublishedPostDataHelper<T[Key]>;
 };
+
+export interface GetPostsFieldsMapData {
+  args: QueryGetPostsArgs;
+  fieldData: Omit<PostsPageData, "posts"> & { posts: Reference[] };
+}
+
+export interface EvictSubsequentGetPostsFieldsOptions
+  extends GetPostsFieldsMapData {
+  cache: ApolloCache<unknown>;
+  getPostsMap: Map<string, GetPostsFieldsMapData>;
+  slug: string;
+}
+
+export interface EvictGetPostsFieldsOptions
+  extends EvictSubsequentGetPostsFieldsOptions {
+  newStatus: PostStatus;
+  oldStatus: PostStatus;
+}

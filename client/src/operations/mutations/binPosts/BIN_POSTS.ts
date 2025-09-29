@@ -11,6 +11,7 @@ export const BIN_POSTS: BinPosts = gql`
     url {
       slug
     }
+    status
     isBinned
     binnedAt
   }

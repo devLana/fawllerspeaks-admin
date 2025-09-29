@@ -1,7 +1,9 @@
 import type { Mutation, Post } from "@apiTypes";
 import type { PostData, PostItemSlug } from ".";
 
-type BinnedPostData = Pick<PostData, "id" | "isBinned" | "binnedAt"> & {
+type DataKeys = "id" | "isBinned" | "binnedAt" | "status";
+
+type BinnedPostData = Pick<PostData, DataKeys> & {
   url: PostItemSlug;
 };
 

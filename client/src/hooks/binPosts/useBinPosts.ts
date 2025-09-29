@@ -5,6 +5,7 @@ import { useMutation } from "@apollo/client";
 
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import { refetchQueries } from "@cache/refetchQueries/posts/binPostOnPosts";
+import { update } from "@cache/update/posts/binPosts";
 import { BIN_POSTS } from "@mutations/binPosts/BIN_POSTS";
 import { SESSION_ID } from "@utils/constants";
 
@@ -28,7 +29,6 @@ const useBinPosts = (
     if (shouldPush) {
       const query = { ...queryParams };
 
-      client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
       delete query.after;
       void push({ pathname: "/posts", query });
     }
@@ -44,8 +44,9 @@ const useBinPosts = (
 
     void binPosts({
       variables: { postIds },
+      update: update(gqlVariables.status),
       refetchQueries: refetchQueries(gqlVariablesCopy),
-      onError: err => handleResponse(err.graphQLErrors?.[0].message ?? MSG),
+      onError: err => handleResponse(err.graphQLErrors?.[0]?.message ?? MSG),
       onCompleted(binData) {
         switch (binData.binPosts.__typename) {
           case "AuthenticationError": {

@@ -1,12 +1,10 @@
-import { type ApolloCache, type Reference } from "@apollo/client";
+import { type Reference } from "@apollo/client";
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
-import { GET_CACHED_POSTS_NEXT_PAGE_DATA } from "@queries/getPosts/GET_CACHED_POSTS_NEXT_PAGE_DATA";
 import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
-import type { PostData } from "types/posts";
-import type { GetPostsFieldsMapData } from "types/posts/getPosts";
+import evictGetPostsFieldsOnView from "@utils/posts/evictGetPostsFieldsOnView";
 import type { EditPostData } from "types/posts/editPost";
-import type { PostStatus, QueryGetPostsArgs } from "@apiTypes";
+import type { PostStatus } from "@apiTypes";
 
 type Update = (
   oldSlug: string,
@@ -18,58 +16,6 @@ interface GetPostsRef {
   posts: Reference[];
 }
 
-interface EvictGetPostsFields extends GetPostsFieldsMapData {
-  cache: ApolloCache<unknown>;
-  getPostsMap: Map<string, GetPostsFieldsMapData>;
-  editedPost: PostData;
-  oldSlug: string;
-  oldStatus: PostStatus;
-}
-
-function evictGetPostsFields({
-  cache,
-  getPostsMap,
-  args,
-  fieldData,
-  editedPost,
-  oldSlug,
-  oldStatus,
-}: EvictGetPostsFields) {
-  if (args.status === editedPost.status) {
-    cache.evict({ fieldName: "getPosts", args, broadcast: false });
-  } else if (args.status === oldStatus) {
-    const hasPost = fieldData.posts.some(postRef => {
-      return postRef.__ref === `Post:{"url":{"slug":"${oldSlug}"}}`;
-    });
-
-    if (!hasPost) return;
-
-    const currentArgs: QueryGetPostsArgs = { ...args };
-    let nextCursor: string | null = null;
-
-    do {
-      const page = cache.readQuery({
-        query: GET_CACHED_POSTS_NEXT_PAGE_DATA,
-        variables: currentArgs,
-      });
-
-      nextCursor = page?.getPosts.pageData.next ?? null;
-
-      const hasEvicted = cache.evict({
-        fieldName: "getPosts",
-        args: currentArgs,
-        broadcast: false,
-      });
-
-      if (hasEvicted) getPostsMap.delete(JSON.stringify(currentArgs));
-
-      if (nextCursor) {
-        currentArgs.after = nextCursor;
-      }
-    } while (nextCursor);
-  }
-}
-
 export const update: Update = (oldSlug: string, oldStatus) => {
   return (cache, { data }) => {
     if (data?.editPost.__typename !== "SinglePost") return;
@@ -77,7 +23,11 @@ export const update: Update = (oldSlug: string, oldStatus) => {
     const editedPost = data.editPost.post;
 
     if (editedPost.url.slug !== oldSlug) {
-      const getPostsMap = buildGetPostsMap(cache);
+      const regex = new RegExp(
+        `^getPosts\\(([^)]*?"status":"(?:${editedPost.status}|${oldStatus})"[^)]*|.*?"sort":"title_(?:asc|desc)"(?!.*?"status":"[^"]+")[^)]*)\\)$`
+      );
+
+      const getPostsMap = buildGetPostsMap(cache, regex);
 
       if (getPostsMap.size === 0) return;
 
@@ -85,21 +35,21 @@ export const update: Update = (oldSlug: string, oldStatus) => {
         if (args.sort === "title_asc" || args.sort === "title_desc") {
           cache.evict({ fieldName: "getPosts", args, broadcast: false });
         } else if (editedPost.status !== oldStatus) {
-          evictGetPostsFields({
+          evictGetPostsFieldsOnView({
             args,
             cache,
-            editedPost,
+            slug: oldSlug,
+            newStatus: editedPost.status,
+            oldStatus,
             fieldData,
             getPostsMap,
-            oldSlug,
-            oldStatus,
           });
         }
       });
 
       /*
         Swap out any pre-edited post with the edited version.
-        To be called after calling evictGetPostsFields() which removes getPosts fields from the cache
+        To be called after calling evictGetPostsFieldsOnView() which removes getPosts fields from the cache
       */
       cache.modify<{ getPosts: GetPostsRef }>({
         id: "ROOT_QUERY",
@@ -110,7 +60,7 @@ export const update: Update = (oldSlug: string, oldStatus) => {
 
               if (typeof slug !== "string" || slug !== oldSlug) return postRef;
 
-              return toReference(editedPost) as Reference;
+              return toReference(editedPost);
             });
 
             return { ...getPostsRef, posts };
@@ -118,19 +68,23 @@ export const update: Update = (oldSlug: string, oldStatus) => {
         },
       });
     } else if (editedPost.status !== oldStatus) {
-      const getPostsMap = buildGetPostsMap(cache);
+      const regex = new RegExp(
+        `^getPosts\\(([^)]*?"status":"(?:${editedPost.status}|${oldStatus})"[^)]*|.*?"sort":"title_(?:asc|desc)"(?!.*?"status":"[^"]+")[^)]*)\\)$`
+      );
+
+      const getPostsMap = buildGetPostsMap(cache, regex);
 
       if (getPostsMap.size === 0) return;
 
       getPostsMap.forEach(({ args, fieldData }) => {
-        evictGetPostsFields({
+        evictGetPostsFieldsOnView({
           args,
           cache,
-          editedPost,
+          slug: oldSlug,
+          newStatus: editedPost.status,
+          oldStatus,
           fieldData,
           getPostsMap,
-          oldSlug,
-          oldStatus,
         });
       });
     }

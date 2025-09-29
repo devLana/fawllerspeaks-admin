@@ -68,7 +68,7 @@ describe("buildGetPostsMap", () => {
       },
     });
 
-    const result = buildGetPostsMap(cache);
+    const result = buildGetPostsMap(cache, /^getPosts\((.*?)\)$/);
 
     expect(result.size).toBe(3);
 
@@ -161,7 +161,7 @@ describe("buildGetPostsMap", () => {
       },
     });
 
-    const result = buildGetPostsMap(cache);
+    const result = buildGetPostsMap(cache, /^getPosts\((.*?)\)$/);
 
     expect(result.size).toBe(0);
   });
