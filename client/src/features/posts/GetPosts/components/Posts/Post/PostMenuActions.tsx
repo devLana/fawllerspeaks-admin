@@ -1,12 +1,8 @@
-import * as React from "react";
-
 import Typography from "@mui/material/Typography";
 import { type IconButtonProps } from "@mui/material/IconButton";
 
 import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
-import useUnpublishPost from "@hooks/unpublishPost/useUnpublishPost";
-import useUndoUnpublishPost from "@hooks/undoUnpublishPost/useUndoUnpublishPost";
-import useBinPost from "@hooks/binPosts/useBinPost";
+import usePostActions from "@hooks/usePostActions";
 import PostMenu from "@features/posts/components/PostMenu";
 import UnpublishPost from "@features/posts/UnpublishPost";
 import BinPost from "@features/posts/BinPost";
@@ -27,14 +23,19 @@ interface PostMenuActionsProps {
 }
 
 const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
-  const [message, setMessage] = React.useState<string | React.ReactElement>("");
-  const [showToast, setShowToast] = React.useState(false);
-  const [showDialog, setShowDialog] = React.useState(false);
-
   const { gqlVariables } = usePostsFilters();
-  const unpublish = useUnpublishPost(id, menuProps.slug, setMessage);
-  const undoUnpublish = useUndoUnpublishPost(id, menuProps.slug, setMessage);
-  const binPost = useBinPost(id, () => setShowDialog(false));
+
+  const {
+    message,
+    showToast,
+    showDialog,
+    setMessage,
+    setShowToast,
+    setShowDialog,
+    unpublish,
+    undoUnpublish,
+    binPost,
+  } = usePostActions(id, menuProps.slug);
 
   const binPostUpdateCache = binPostUpdate(gqlVariables);
   const binPostRefetchQUeries = binPostRefetch(gqlVariables);

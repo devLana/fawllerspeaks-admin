@@ -2,9 +2,7 @@ import * as React from "react";
 
 import { type IconButtonProps } from "@mui/material/IconButton";
 
-import useUnpublishPost from "@hooks/unpublishPost/useUnpublishPost";
-import useUndoUnpublishPost from "@hooks/undoUnpublishPost/useUndoUnpublishPost";
-import useBinPost from "@hooks/binPosts/useBinPost";
+import usePostActions from "@hooks/usePostActions";
 import PostMenu from "@features/posts/components/PostMenu";
 import UnpublishPost from "@features/posts/UnpublishPost";
 import BinPost from "@features/posts/BinPost";
@@ -22,13 +20,17 @@ interface PostActionsProps {
 }
 
 const PostActions = ({ id, ...menuProps }: PostActionsProps) => {
-  const [message, setMessage] = React.useState<string | React.ReactElement>("");
-  const [showToast, setShowToast] = React.useState(false);
-  const [showDialog, setShowDialog] = React.useState(false);
-
-  const unpublish = useUnpublishPost(id, menuProps.slug, setMessage);
-  const undoUnpublish = useUndoUnpublishPost(id, menuProps.slug, setMessage);
-  const binPost = useBinPost(id, () => setShowDialog(false));
+  const {
+    message,
+    showToast,
+    showDialog,
+    setMessage,
+    setShowToast,
+    setShowDialog,
+    unpublish,
+    undoUnpublish,
+    binPost,
+  } = usePostActions(id, menuProps.slug);
 
   const handleUnpublish = () => {
     setShowToast(true);
