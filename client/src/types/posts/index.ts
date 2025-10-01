@@ -57,7 +57,7 @@ export interface PostViewHeaderProps {
   buttonLabel: string;
   status: PostStatus;
   title: string;
-  children: React.ReactElement;
+  children: React.ReactElement | null;
   onClick: () => void;
 }
 

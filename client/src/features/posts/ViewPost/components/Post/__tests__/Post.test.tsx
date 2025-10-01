@@ -9,40 +9,41 @@ vi.mock("@features/posts/components/PostViewHeader");
 
 describe("Blog Post", () => {
   it("Should render all the provided blog post details", () => {
-    renderUI(<Post label="View post page" post={mocks.post} />);
+    renderUI(<Post label="View post page" post={mocks.post1} />);
 
     expect(screen.getByText(mocks.status)).toBeInTheDocument();
     expect(screen.getByRole("heading", mocks.heading)).toBeInTheDocument();
+    expect(screen.getByRole("button", mocks.menuBtn)).toBeInTheDocument();
 
     const aside = screen.getByRole("complementary");
     const metadata = within(aside).getByRole("list", mocks.metadataList);
 
     expect(within(metadata).getAllByRole("listitem")[0]).toHaveTextContent(
-      mocks.post.description
+      mocks.post1.description
     );
 
     expect(within(metadata).getAllByRole("listitem")[1]).toHaveTextContent(
-      mocks.post.excerpt
+      mocks.post1.excerpt
     );
 
     expect(within(metadata).getAllByRole("listitem")[2]).toHaveTextContent(
-      formatPostDate(mocks.post.datePublished)
+      formatPostDate(mocks.post1.datePublished)
     );
 
     expect(within(metadata).getAllByRole("listitem")[3]).toHaveTextContent(
-      formatPostDate(mocks.post.lastModified)
+      formatPostDate(mocks.post1.lastModified)
     );
 
     expect(within(metadata).getAllByRole("listitem")[4]).toHaveTextContent(
-      mocks.post.url.slug
+      mocks.post1.url.slug
     );
 
     expect(within(metadata).getAllByRole("listitem")[5]).toHaveTextContent(
-      mocks.post.url.href
+      mocks.post1.url.href
     );
 
     expect(within(metadata).getAllByRole("listitem")[6]).toHaveTextContent(
-      new Intl.NumberFormat("en-US").format(mocks.post.views)
+      new Intl.NumberFormat("en-US").format(mocks.post1.views)
     );
 
     const tagsList = within(metadata).getByRole("list", mocks.tagsList);
@@ -71,6 +72,8 @@ describe("Blog Post", () => {
       mocks.postTags[5]
     );
 
+    expect(metadata).not.toHaveTextContent("Binned At");
+
     const tOC = within(aside).getByRole("list", mocks.tOC);
 
     expect(within(tOC).getAllByRole("listitem")[0]).toContainElement(
@@ -88,11 +91,29 @@ describe("Blog Post", () => {
     expect(article).toContainElement(screen.getByText(mocks.author));
 
     expect(within(article).getByRole("time")).toHaveTextContent(
-      formatPostDate(mocks.post.dateCreated)
+      formatPostDate(mocks.post1.dateCreated)
     );
 
     const content = within(article).getByRole("region", mocks.content);
 
-    expect(content).toContainHTML(mocks.post.content.html);
+    expect(content).toContainHTML(mocks.post1.content.html);
+  });
+
+  it("Should render a binned post", () => {
+    renderUI(<Post label="View post page" post={mocks.post2} />);
+
+    expect(screen.queryByRole("button", mocks.menuBtn)).not.toBeInTheDocument();
+
+    const aside = screen.getByRole("complementary");
+    const metadata = within(aside).getByRole("list", mocks.metadataList);
+
+    expect(within(metadata).getAllByRole("listitem")[7]).toHaveTextContent(
+      formatPostDate(mocks.post2.binnedAt)
+    );
+
+    const article = screen.getByRole("article");
+    const alertStatus = screen.getByRole("status");
+
+    expect(article).toContainElement(alertStatus);
   });
 });

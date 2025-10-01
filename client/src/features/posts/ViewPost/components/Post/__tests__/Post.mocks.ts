@@ -1,6 +1,7 @@
 import { testPostTag } from "@utils/tests/testPostTag";
 import type { PostData } from "types/posts";
 
+export const menuBtn = { name: /^test blog post post actions$/i };
 export const status = /^post status - draft$/i;
 export const heading = { name: /^Test Blog Post$/i };
 export const metadataList = { name: /^post metadata$/i };
@@ -19,7 +20,7 @@ type Post = {
   [Prop in keyof PostData]-?: NonNullable<PostData[Prop]>;
 };
 
-export const post: Omit<Post, "binnedAt"> = {
+const postData: Omit<Post, "isBinned" | "binnedAt"> = {
   __typename: "Post",
   id: "id-1",
   title: "Test Blog Post",
@@ -60,4 +61,16 @@ export const post: Omit<Post, "binnedAt"> = {
   lastModified: new Date().toISOString(),
   views: 1500,
   tags,
+};
+
+export const post1: Post = {
+  ...postData,
+  isBinned: false,
+  binnedAt: "",
+};
+
+export const post2: Post = {
+  ...postData,
+  isBinned: true,
+  binnedAt: new Date().toISOString(),
 };

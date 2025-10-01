@@ -1,7 +1,9 @@
 import { useRouter } from "next/router";
 
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { InfoOutlined } from "@mui/icons-material";
 
 import ViewPostWrapper from "../ViewPostWrapper";
 import PostMetadataList from "./PostMetadataList";
@@ -24,13 +26,15 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
         status={post.status}
         title={post.title}
       >
-        <PostActions
-          id={post.id}
-          title={post.title}
-          status={post.status}
-          slug={post.url.slug}
-          menuSx={{ bgcolor: "action.selected" }}
-        />
+        {post.isBinned ? null : (
+          <PostActions
+            id={post.id}
+            title={post.title}
+            status={post.status}
+            slug={post.url.slug}
+            menuSx={{ bgcolor: "action.selected" }}
+          />
+        )}
       </PostViewHeader>
       <Box
         sx={{
@@ -60,6 +64,7 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
             url={post.url}
             views={post.views}
             tags={post.tags}
+            binnedAt={post.binnedAt}
           />
           {post.content?.tableOfContents &&
             post.content.tableOfContents.length > 0 && (
@@ -72,6 +77,17 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
           component="article"
           sx={{ gridRow: { md: 1 }, gridColumn: { md: 2 } }}
         >
+          {post.isBinned && (
+            <Alert
+              role="status"
+              variant="outlined"
+              severity="info"
+              icon={<InfoOutlined />}
+              sx={{ width: "100%" }}
+            >
+              This post has been deleted to Bin
+            </Alert>
+          )}
           <Typography variant="h1" gutterBottom>
             {post.title}
           </Typography>

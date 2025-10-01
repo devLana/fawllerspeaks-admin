@@ -15,6 +15,7 @@ interface PostMetadataListProps {
   url: PostUrl;
   views: number;
   tags: PostTagData[] | null | undefined;
+  binnedAt: string | null | undefined;
 }
 
 const PostMetadataList = ({
@@ -25,6 +26,7 @@ const PostMetadataList = ({
   url,
   tags,
   views,
+  binnedAt,
 }: PostMetadataListProps) => (
   <List
     disablePadding
@@ -74,6 +76,14 @@ const PostMetadataList = ({
         secondary={new Intl.NumberFormat("en-US").format(views)}
       />
     </ListItem>
+    {binnedAt && (
+      <ListItem disableGutters>
+        <ListItemText
+          primary="Binned At"
+          secondary={<PostDate dateString={binnedAt} />}
+        />
+      </ListItem>
+    )}
     {tags && tags.length > 0 && <PostTags tags={tags} />}
   </List>
 );
