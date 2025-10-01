@@ -1,13 +1,15 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 
 const apolloClient = (jwt?: string, cache = new InMemoryCache()) => {
   return new ApolloClient({
-    uri: process.env.NEXT_PUBLIC_API_URL,
+    link: new HttpLink({
+      uri: process.env.NEXT_PUBLIC_API_URL,
+      credentials: "include",
+      ...(jwt && { headers: { authorization: `Bearer ${jwt}` } }),
+    }),
     cache,
-    credentials: "include",
     ssrMode: false,
-    connectToDevTools: typeof window !== "undefined",
-    ...(jwt && { headers: { authorization: `Bearer ${jwt}` } }),
+    devtools: { name: "fawllerspeaks_client" },
   });
 };
 
