@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
+import { update } from "@cache/update/posts/createPost";
 import { CREATE_POST } from "@mutations/createPost/CREATE_POST";
 import { SESSION_ID } from "@utils/constants";
 import { CREATE_STORAGE_POST } from "@utils/posts/createStoragePost";
@@ -42,6 +43,7 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
 
     void createPost({
       variables: { post },
+      update,
       onError: () => {
         setStatus("error");
         setIsOpen(false);
@@ -83,7 +85,6 @@ export const useCreatePost = (postData: Data): types.CreateHookReturnData => {
             const { slug } = createData.createPost.post.url;
             const query = { create: uploadHasError };
 
-            client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
             localStorage.removeItem(CREATE_STORAGE_POST);
             void push({ pathname: `/posts/view/${slug}`, query });
             break;

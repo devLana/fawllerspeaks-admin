@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
 
 import useUploadImage from "@hooks/useUploadImage";
+import { update } from "@cache/update/posts/draftPost";
 import { DRAFT_POST } from "@mutations/createPost/DRAFT_POST";
 import * as storage from "@utils/posts/createStoragePost";
 import { SESSION_ID } from "@utils/constants";
@@ -56,6 +57,7 @@ export const useDraftPost = (
 
     void draftPost({
       variables: { post },
+      update,
       onError: () => setStatus("error"),
       onCompleted(draftData) {
         switch (draftData.draftPost.__typename) {
@@ -98,7 +100,6 @@ export const useDraftPost = (
             const { slug } = draftData.draftPost.post.url;
             const query = { draft: uploadHasError };
 
-            client.cache.evict({ id: "ROOT_QUERY", fieldName: "getPosts" });
             localStorage.removeItem(storage.CREATE_STORAGE_POST);
             void push({ pathname: `/posts/view/${slug}`, query });
             break;
