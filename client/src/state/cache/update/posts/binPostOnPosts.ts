@@ -2,7 +2,7 @@ import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions"
 
 import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
 import evictSubsequentGetPostsFieldsOnPosts from "@utils/posts/evictSubsequentGetPostsFieldsOnPosts";
-import { binPostsRegex } from "@utils/posts/getPostsFieldsRegex";
+import { getPostsFieldsRegex } from "@utils/posts/getPostsFieldsRegex";
 import type { BinPostData } from "types/posts/bin/binPost";
 import type { QueryGetPostsArgs } from "@apiTypes";
 
@@ -15,7 +15,7 @@ export const update: Update = gqlVariables => {
     if (data?.binPost.__typename !== "SinglePost") return;
 
     const { url, status } = data.binPost.post;
-    const regex = binPostsRegex(status);
+    const regex = getPostsFieldsRegex(status);
     const getPostsMap = buildGetPostsMap(cache, regex);
 
     getPostsMap.forEach(({ args, fieldData }) => {

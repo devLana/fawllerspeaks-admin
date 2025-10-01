@@ -18,7 +18,7 @@ const evictSubsequentGetPostsFieldsOnPosts = ({
   cacheUpdateQuery,
 }: EvictOptions) => {
   const hasPost = fieldData.posts.some(postRef => {
-    return postRef.__ref === `Post:{"url":{"slug":"${slug}"}}`;
+    return postRef.__ref === `Post:${slug}`;
   });
 
   if (!hasPost) return;
