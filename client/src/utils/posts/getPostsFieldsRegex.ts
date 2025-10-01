@@ -4,7 +4,7 @@ export const unpublishPostRegex = new RegExp(
   '^getPosts\\(([^)]*"status":"(?:Published|Unpublished)"[^)]*)\\)$'
 );
 
-export const binPostsRegex = (status: PostStatus) => {
+export const getPostsFieldsRegex = (status: PostStatus) => {
   return new RegExp(
     `^getPosts\\(([^)]*?"status":"${status}"[^)]*|(?!.*?"status":"[^"]+")[^)]*)\\)$`
   );

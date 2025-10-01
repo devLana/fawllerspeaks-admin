@@ -1,7 +1,7 @@
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
 import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
-import { binPostsRegex } from "@utils/posts/getPostsFieldsRegex";
+import { getPostsFieldsRegex } from "@utils/posts/getPostsFieldsRegex";
 import type { BinPostsData } from "types/posts/bin/binPosts";
 import type { PostStatus } from "@apiTypes";
 
@@ -18,7 +18,7 @@ export const update: Update = status => {
     if (__typename !== "Posts" && __typename !== "PostsWarning") return;
 
     const regex = status
-      ? binPostsRegex(status)
+      ? getPostsFieldsRegex(status)
       : /^getPosts\(((?!.*?"status":"[^"]+")[^)]*)\)$/;
 
     const getPostsMap = buildGetPostsMap(cache, regex);
