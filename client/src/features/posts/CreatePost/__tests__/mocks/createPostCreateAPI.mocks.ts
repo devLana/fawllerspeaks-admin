@@ -123,6 +123,8 @@ export const server = setupServer(
           dateCreated: new Date().toISOString(),
           datePublished: null,
           lastModified: null,
+          isBinned: false,
+          binnedAt: null,
           views: 0,
           tags: null,
         },

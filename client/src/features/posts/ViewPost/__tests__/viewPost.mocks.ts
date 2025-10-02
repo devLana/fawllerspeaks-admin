@@ -49,6 +49,8 @@ const post: PostData = {
   lastModified: null,
   views: 0,
   tags: null,
+  isBinned: false,
+  binnedAt: null,
 };
 
 export const writePost: Cache.WriteQueryOptions<ViewPostData, object> = {

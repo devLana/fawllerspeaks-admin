@@ -61,6 +61,8 @@ const post: PostData = {
   dateCreated: new Date().toISOString(),
   datePublished: null,
   lastModified: null,
+  isBinned: false,
+  binnedAt: null,
   views: 0,
   tags: null,
 };
