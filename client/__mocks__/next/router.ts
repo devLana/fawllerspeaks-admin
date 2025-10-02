@@ -21,11 +21,19 @@ const routerObject = {
   push: vi
     .fn(() => {
       if (handler) handler();
+      return {
+        then: (cb: () => void) => cb(),
+        catch: (_: (err: unknown) => void) => {},
+      };
     })
     .mockName("router.push"),
   replace: vi
     .fn(() => {
       if (handler) handler();
+      return {
+        then: (cb: () => void) => cb(),
+        catch: (_: (err: unknown) => void) => {},
+      };
     })
     .mockName("router.replace"),
   reload: vi.fn().mockName("router.reload"),
