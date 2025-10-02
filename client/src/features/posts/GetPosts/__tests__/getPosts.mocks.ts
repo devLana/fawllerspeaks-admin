@@ -11,9 +11,11 @@ export const server = setupServer();
 export const page = { name: /^$/i };
 export const load = { name: /^loading blog posts$/i };
 export const PARAMS_MSG = `It seems some of the search filters provided are invalid`;
+export const VALIDATION_MSG = `Invalid search filters provided`;
+export const afterError = "Invalid posts pagination cursor provided";
+export const sizeError = "Invalid posts pagination size provided";
 const GQL_MSG = `It appears we could not find what you are looking for. Please try again later`;
 const FORBID_MSG = "Unable to get posts";
-const CURSOR_MSG = "Invalid posts pagination cursor provided";
 
 const MESSAGE =
   "You are unable to get posts at the moment. Please try again later";
@@ -22,7 +24,7 @@ export const posts = graphql.query(GET_POSTS, async () => {
   await delay(50);
   return mswData("getPosts", "GetPostsData", {
     posts: [],
-    pageData: { after: null, before: null },
+    pageData: { next: null, previous: null },
   });
 });
 
@@ -42,6 +44,14 @@ const resolver = (typename: Typename, data: object = {}) => {
     return mswData("getPosts", typename, data);
   };
 };
+
+export const validations = graphql.query(GET_POSTS, async () => {
+  await delay(50);
+  return mswData("getPosts", "GetPostsValidationError", {
+    afterError,
+    sizeError,
+  });
+});
 
 export const redirects = [
   [
@@ -74,21 +84,13 @@ export const redirects = [
       },
       asPath,
       query: { params: ["before", "post-cursor"] },
-    }))("/posts/before/post-cursor"),
+    }))("/posts/after/post-cursor"),
     graphql.query(GET_POSTS, resolver("RegistrationError")),
   ],
 ] as const;
 
 const text = "Expect a notification status message if the API";
 export const alerts = [
-  [
-    `${text} responds with a cursor validation error`,
-    CURSOR_MSG,
-    graphql.query(
-      GET_POSTS,
-      resolver("GetPostsValidationError", { cursorError: CURSOR_MSG })
-    ),
-  ],
   [
     `${text} request contains an invalid cursor format`,
     FORBID_MSG,

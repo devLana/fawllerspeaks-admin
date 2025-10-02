@@ -29,9 +29,10 @@ describe("Get Posts Page", () => {
       router.asPath = "/posts/NEXT/cursor?status=DrafTs&sort=TITLE_Down";
 
       router.query = {
-        status: "DrafTs",
+        size: "100",
         sort: "TITLE_Down",
-        params: ["NEXT", "cursor"],
+        status: "DrafTs",
+        params: ["after", "cursor"],
       };
 
       renderUI(<GetPosts />);
@@ -42,15 +43,15 @@ describe("Get Posts Page", () => {
       expect(status).toHaveTextContent(mocks.PARAMS_MSG);
 
       expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
-        "sort: TITLE_Down"
+        "size: 100"
       );
 
       expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent(
-        "status: DrafTs"
+        "sort: TITLE_Down"
       );
 
       expect(within(list).getAllByRole("listitem")[2]).toHaveTextContent(
-        "type: NEXT"
+        "status: DrafTs"
       );
     });
   });
@@ -74,14 +75,46 @@ describe("Get Posts Page", () => {
   });
 
   describe("API response is an error or an unsupported object type", () => {
+    it("Expect a notification status message if the API responds with a cursor validation error", async () => {
+      const router = useRouter();
+      router.asPath = "/posts/after/cursor?status=Published";
+
+      router.query = { status: "Published", params: ["after", "cursor"] };
+
+      mocks.server.use(mocks.validations);
+      renderUI(<GetPosts />);
+
+      expect(screen.getByRole("progressbar", mocks.load)).toBeInTheDocument();
+
+      await expect(screen.findByRole("status")).resolves.toHaveTextContent(
+        mocks.VALIDATION_MSG
+      );
+
+      const list = within(screen.getByRole("status")).getByRole("list");
+
+      expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
+        mocks.afterError
+      );
+
+      expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent(
+        mocks.sizeError
+      );
+
+      expect(
+        screen.queryByRole("progressbar", mocks.load)
+      ).not.toBeInTheDocument();
+    });
+
     it.each(mocks.alerts)("%s", async (_, msg, handler) => {
       const router = useRouter();
-      router.asPath = "/posts/before/cursor?status=Published&sort=title_desc";
+      router.asPath =
+        "/posts/after/cursor?size=12&sort=title_desc&status=Published";
 
       router.query = {
-        params: ["before", "cursor"],
-        status: "Published",
+        size: "12",
         sort: "title_desc",
+        status: "Published",
+        params: ["after", "cursor"],
       };
 
       mocks.server.use(handler);
