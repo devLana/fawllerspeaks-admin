@@ -10,9 +10,9 @@ import apolloClient from "@context/Auth/helpers/apolloClient";
 import { BaseResponse, UserData } from "@cache/possibleTypes";
 import * as typePolicies from "@cache/typePolicies";
 
-interface Options extends RenderOptions {
-  writeFragment?: Cache.WriteFragmentOptions<object, object>;
-  writeQuery?: Cache.WriteQueryOptions<object, object>;
+interface Options<D extends object, V extends object> extends RenderOptions {
+  writeFragment?: Cache.WriteFragmentOptions<D, V>;
+  writeQuery?: Cache.WriteQueryOptions<D, V>;
 }
 
 export const testUserId = "Authenticated_User_Id";
@@ -23,7 +23,10 @@ export const stopRefreshTokenTimer = vi
   .fn()
   .mockName("handleClearRefreshTokenTimer");
 
-export const renderUI = (ui: React.ReactElement, options: Options = {}) => {
+export const renderUI = <D extends object, V extends object>(
+  ui: React.ReactElement,
+  options: Options<D, V> = {}
+) => {
   const { writeFragment, writeQuery, ...renderOptions } = options;
 
   const cache = new InMemoryCache({
