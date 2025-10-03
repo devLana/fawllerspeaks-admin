@@ -2,7 +2,7 @@ import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions"
 
 import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
 import evictSubsequentGetPostsFieldsOnPosts from "@utils/posts/evictSubsequentGetPostsFieldsOnPosts";
-import { getPostsFieldsRegex } from "@utils/posts/getPostsFieldsRegex";
+import { getPostsFieldsRegex } from "@utils/posts/regex/getPostsFieldsRegex";
 import type { BinPostData } from "types/posts/bin/binPost";
 import type { QueryGetPostsArgs } from "@apiTypes";
 

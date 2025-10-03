@@ -3,6 +3,7 @@ import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions"
 
 import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
 import evictGetPostsFieldsOnView from "@utils/posts/evictGetPostsFieldsOnView";
+import { editPostRegex } from "@utils/posts/regex/editPostRegex";
 import type { EditPostData } from "types/posts/editPost";
 import type { PostStatus } from "@apiTypes";
 
@@ -23,10 +24,7 @@ export const update: Update = (oldSlug: string, oldStatus) => {
     const editedPost = data.editPost.post;
 
     if (editedPost.url.slug !== oldSlug) {
-      const regex = new RegExp(
-        `^getPosts\\(([^)]*?"status":"(?:${editedPost.status}|${oldStatus})"[^)]*|.*?"sort":"title_(?:asc|desc)"(?!.*?"status":"[^"]+")[^)]*)\\)$`
-      );
-
+      const regex = editPostRegex(oldStatus, editedPost.status);
       const getPostsMap = buildGetPostsMap(cache, regex);
 
       if (getPostsMap.size === 0) return;
@@ -68,10 +66,7 @@ export const update: Update = (oldSlug: string, oldStatus) => {
         },
       });
     } else if (editedPost.status !== oldStatus) {
-      const regex = new RegExp(
-        `^getPosts\\(([^)]*?"status":"(?:${editedPost.status}|${oldStatus})"[^)]*|.*?"sort":"title_(?:asc|desc)"(?!.*?"status":"[^"]+")[^)]*)\\)$`
-      );
-
+      const regex = editPostRegex(oldStatus, editedPost.status);
       const getPostsMap = buildGetPostsMap(cache, regex);
 
       if (getPostsMap.size === 0) return;

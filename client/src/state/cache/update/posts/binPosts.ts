@@ -1,7 +1,7 @@
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
 import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
-import { getPostsFieldsRegex } from "@utils/posts/getPostsFieldsRegex";
+import { getPostsFieldsRegex } from "@utils/posts/regex/getPostsFieldsRegex";
 import type { BinPostsData } from "types/posts/bin/binPosts";
 import type { PostStatus } from "@apiTypes";
 
