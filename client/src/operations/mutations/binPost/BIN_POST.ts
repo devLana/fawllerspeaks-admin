@@ -1,20 +1,13 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
 
+import { BIN_POST_FIELDS } from "@fragments/BIN_POST";
 import type { MutationBinPostArgs } from "@apiTypes";
 import type { BinPostData } from "types/posts/bin/binPost";
 
 type BinPost = TypedDocumentNode<BinPostData, MutationBinPostArgs>;
 
 export const BIN_POST: BinPost = gql`
-  fragment PostFields on Post {
-    id
-    url {
-      slug
-    }
-    status
-    isBinned
-    binnedAt
-  }
+  ${BIN_POST_FIELDS}
   mutation BinPost($postId: ID!) {
     binPost(postId: $postId) {
       ... on PostIdValidationError {
@@ -31,7 +24,7 @@ export const BIN_POST: BinPost = gql`
       }
       ... on SinglePost {
         post {
-          ...PostFields
+          ...BinPostFields
         }
       }
     }
