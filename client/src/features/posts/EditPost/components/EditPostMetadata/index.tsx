@@ -61,7 +61,7 @@ const EditPostMetadata = (props: EditPostMetadataProps) => {
     }
 
     storagePost.saveEditStoragePost({ id: props.postId, slug: props.postSlug });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
     props.dispatch({ type: "PROCEED_TO_POST_CONTENT", payload: { metadata } });
   };
 

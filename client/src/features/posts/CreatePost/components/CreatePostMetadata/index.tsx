@@ -74,7 +74,7 @@ const CreatePostMetadata = (props: CreatePostMetadataProps) => {
       localStorage.removeItem(storagePost.CREATE_STORAGE_POST);
     }
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
     storagePost.saveCreateStoragePost(metadata);
     props.dispatch({ type: "PROCEED_TO_POST_CONTENT", payload: { metadata } });
   };

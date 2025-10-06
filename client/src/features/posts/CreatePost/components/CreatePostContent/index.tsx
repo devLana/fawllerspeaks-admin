@@ -33,7 +33,7 @@ const CreatePostContent = ({
   const handleNext = () => {
     if (content.replace(/<p>(?:<br>)*&nbsp;<\/p>/g, "")) {
       dispatch({ type: "PREVIEW_POST" });
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "instant" });
     } else {
       setContentIsEmpty(true);
     }
