@@ -1,4 +1,5 @@
 import { gql, type TypedDocumentNode } from "@apollo/client";
+
 import type { PostData } from "types/posts";
 import type { QueryGetPostsArgs as Args, GetPostsData } from "@apiTypes";
 
@@ -16,7 +17,11 @@ export const GET_CACHED_POSTS: GetCachedPosts = gql`
     $status: PostStatus
   ) {
     getPosts(after: $after, size: $size, sort: $sort, status: $status) {
-      posts
+      posts {
+        url {
+          slug
+        }
+      }
       pageData
     }
   }

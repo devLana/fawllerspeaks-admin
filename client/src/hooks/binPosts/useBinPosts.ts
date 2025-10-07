@@ -34,11 +34,10 @@ const useBinPosts = (
     }
   };
 
-  const gqlVariablesCopy = { ...gqlVariables };
-  delete gqlVariablesCopy.after;
-
   const binPostsFn = () => {
     const MSG = `You are unable to bin posts right now. Please try again later`;
+    const gqlVariablesCopy = { ...gqlVariables };
+    delete gqlVariablesCopy.after;
 
     setIsBinning(true);
 

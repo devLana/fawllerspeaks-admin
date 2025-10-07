@@ -14,7 +14,7 @@ export const refetchQueries: UnpublishPostRefetchQueriesFn = gqlVariables => {
       data?.unpublishPost.__typename === "PostIdValidationError" ||
       data?.unpublishPost.__typename === "RegistrationError" ||
       data?.unpublishPost.__typename === "UnknownError" ||
-      data?.unpublishPost.__typename === "SinglePost"
+      (data?.unpublishPost.__typename === "SinglePost" && gqlVariables.status)
     ) {
       return [{ query: GET_POSTS, variables: gqlVariables }];
     }

@@ -8,7 +8,12 @@ export const optimisticResponse: OptimisticResponse = slug => {
   return ({ postId: id }) => ({
     unpublishPost: {
       __typename: "SinglePost",
-      post: { __typename: "Post", id, status: "Unpublished", url: { slug } },
+      post: {
+        __typename: "Post",
+        id,
+        status: "Unpublished",
+        url: { __typename: "PostUrl", slug },
+      },
     },
   });
 };

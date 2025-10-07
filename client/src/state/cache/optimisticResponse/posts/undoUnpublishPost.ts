@@ -8,7 +8,12 @@ export const optimisticResponse: OptimisticResponse = slug => {
   return ({ postId: id }) => ({
     undoUnpublishPost: {
       __typename: "SinglePost",
-      post: { __typename: "Post", id, status: "Published", url: { slug } },
+      post: {
+        __typename: "Post",
+        id,
+        status: "Published",
+        url: { __typename: "PostUrl", slug },
+      },
     },
   });
 };

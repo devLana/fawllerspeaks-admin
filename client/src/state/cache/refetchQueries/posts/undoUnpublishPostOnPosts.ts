@@ -14,7 +14,7 @@ export const refetchQueries: UndoUnpublishPostRefetchQueriesFn = variables => {
       data?.undoUnpublishPost.__typename === "PostIdValidationError" ||
       data?.undoUnpublishPost.__typename === "RegistrationError" ||
       data?.undoUnpublishPost.__typename === "UnknownError" ||
-      data?.undoUnpublishPost.__typename === "SinglePost"
+      (data?.undoUnpublishPost.__typename === "SinglePost" && variables.status)
     ) {
       return [{ query: GET_POSTS, variables }];
     }
