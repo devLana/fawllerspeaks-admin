@@ -45,5 +45,7 @@ export const update: Update = slug => {
         getPostsMap,
       });
     });
+
+    // cache.gc();
   };
 };

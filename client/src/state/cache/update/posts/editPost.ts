@@ -65,6 +65,8 @@ export const update: Update = (oldSlug: string, oldStatus) => {
           },
         },
       });
+
+      // cache.gc()
     } else if (editedPost.status !== oldStatus) {
       const regex = editPostRegex(oldStatus, editedPost.status);
       const getPostsMap = buildGetPostsMap(cache, regex);
@@ -82,6 +84,8 @@ export const update: Update = (oldSlug: string, oldStatus) => {
           getPostsMap,
         });
       });
+
+      // cache.gc();
     }
   };
 };

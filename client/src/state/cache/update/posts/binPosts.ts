@@ -17,14 +17,19 @@ export const update: Update = status => {
 
     if (__typename !== "Posts" && __typename !== "PostsWarning") return;
 
-    const regex = status
-      ? getPostsFieldsRegex(status)
-      : /^getPosts\(((?!.*?"status":"[^"]+")[^)]*)\)$/;
+    if (!status) {
+      cache.evict({ fieldName: "getPosts", broadcast: false });
+      // cache.gc()
+      return;
+    }
 
+    const regex = getPostsFieldsRegex(status);
     const getPostsMap = buildGetPostsMap(cache, regex);
 
     getPostsMap.forEach(({ args }) => {
       cache.evict({ fieldName: "getPosts", args, broadcast: false });
     });
+
+    // cache.gc()
   };
 };

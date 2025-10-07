@@ -13,6 +13,8 @@ const evictGetPostsFieldsOnCreatePost = (
   getPostsMap.forEach(({ args }) => {
     cache.evict({ fieldName: "getPosts", args, broadcast: false });
   });
+
+  // cache.gc()
 };
 
 export default evictGetPostsFieldsOnCreatePost;

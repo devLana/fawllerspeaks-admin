@@ -29,5 +29,7 @@ export const update: Update = gqlVariables => {
         gqlVariables,
       });
     });
+
+    // cache.gc();
   };
 };

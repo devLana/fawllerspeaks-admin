@@ -25,4 +25,6 @@ export const update: Update = (cache, { data }) => {
       slug: url.slug,
     });
   });
+
+  // cache.gc();
 };
