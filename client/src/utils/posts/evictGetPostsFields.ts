@@ -1,7 +1,8 @@
-import type { PostStatus } from "@apiTypes";
+import type { ApolloCache } from "@apollo/client";
+
 import buildGetPostsMap from "./buildGetPostsMap";
 import { getPostsFieldsRegex } from "./regex/getPostsFieldsRegex";
-import type { ApolloCache } from "@apollo/client";
+import type { PostStatus } from "@apiTypes";
 
 const evictGetPostsFieldsOnCreatePost = (
   cache: ApolloCache<unknown>,

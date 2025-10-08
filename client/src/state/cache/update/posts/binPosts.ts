@@ -1,7 +1,6 @@
 import type { MutationBaseOptions } from "@apollo/client/core/watchQueryOptions";
 
-import buildGetPostsMap from "@utils/posts/buildGetPostsMap";
-import { getPostsFieldsRegex } from "@utils/posts/regex/getPostsFieldsRegex";
+import evictGetPostsFields from "@utils/posts/evictGetPostsFields";
 import type { BinPostsData } from "types/posts/bin/binPosts";
 import type { PostStatus } from "@apiTypes";
 
@@ -23,13 +22,6 @@ export const update: Update = status => {
       return;
     }
 
-    const regex = getPostsFieldsRegex(status);
-    const getPostsMap = buildGetPostsMap(cache, regex);
-
-    getPostsMap.forEach(({ args }) => {
-      cache.evict({ fieldName: "getPosts", args, broadcast: false });
-    });
-
-    // cache.gc()
+    evictGetPostsFields(cache, status);
   };
 };
