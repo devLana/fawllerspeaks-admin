@@ -4,9 +4,17 @@ import Typography from "@mui/material/Typography";
 import PostsPageBackButton from "@features/posts/components/PostsPageBackButton";
 import { postStatusColors as colors } from "@utils/posts/postStatusColors";
 import type { PostViewHeaderProps } from "types/posts";
+import type { SxPropsArray } from "@types";
 
-const PostViewHeader = (props: PostViewHeaderProps) => {
-  const { buttonLabel, status, title, children, onClick } = props;
+const PostViewHeader = ({
+  buttonLabel,
+  status,
+  title,
+  children,
+  status_menu_sx: sx,
+  onClick,
+}: PostViewHeaderProps) => {
+  const sxProps: SxPropsArray = Array.isArray(sx) ? sx : [sx];
 
   return (
     <Box
@@ -20,14 +28,7 @@ const PostViewHeader = (props: PostViewHeaderProps) => {
     >
       <PostsPageBackButton buttonLabel={buttonLabel} onClick={onClick} />
       <Box
-        sx={{
-          pl: 1,
-          display: "flex",
-          alignItems: "center",
-          columnGap: 2,
-          bgcolor: "action.selected",
-          borderRadius: "16px",
-        }}
+        sx={[{ bgcolor: "action.selected", borderRadius: "16px" }, ...sxProps]}
       >
         <Typography
           variant="body2"

@@ -1,4 +1,5 @@
 import type { ApolloCache, Reference } from "@apollo/client";
+import type { BoxProps } from "@mui/material/Box";
 
 import type CustomEditor from "ckeditor5-custom-build";
 import type { Status } from "@types";
@@ -59,6 +60,7 @@ export interface PostViewHeaderProps {
   title: string;
   children: React.ReactElement | null;
   onClick: () => void;
+  status_menu_sx?: BoxProps["sx"];
 }
 
 type RequiredFieldErrorKeys = `${keyof RequiredPostMetadataFields}Error`;

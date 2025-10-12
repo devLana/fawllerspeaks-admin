@@ -25,6 +25,11 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
         onClick={() => back()}
         status={post.status}
         title={post.title}
+        status_menu_sx={
+          post.isBinned
+            ? { px: 1 }
+            : { pl: 1, display: "flex", alignItems: "center", columnGap: 2 }
+        }
       >
         {post.isBinned ? null : (
           <PostActions
@@ -80,12 +85,11 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
           {post.isBinned && (
             <Alert
               role="status"
-              variant="outlined"
               severity="info"
               icon={<InfoOutlined />}
-              sx={{ width: "100%" }}
+              sx={{ mb: 6 }}
             >
-              This post has been deleted to Bin
+              This post has been Binned
             </Alert>
           )}
           <Typography variant="h1" gutterBottom>

@@ -55,6 +55,12 @@ const EditPostPreview = ({ postStatus, post, ...props }: EditPostProps) => {
         title={post.title}
         buttonLabel="Go back to edit post content section"
         onClick={() => props.dispatch({ type: "GO_BACK_TO_CONTENT" })}
+        status_menu_sx={{
+          pl: 1,
+          display: "flex",
+          alignItems: "center",
+          columnGap: 2,
+        }}
       >
         <IconButton
           size="small"
