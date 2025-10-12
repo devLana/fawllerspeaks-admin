@@ -2,6 +2,7 @@ import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 
 // import usePostsLoadingState from "@hooks/getPosts/usePostsLoadingState";
+import { usePostsFilters } from "@hooks/getPosts/usePostsFilters";
 import PostsWrapper from "../PostsWrapper";
 import PostStatusInput from "./PostsMenuInputs/PostStatusInput";
 import SortByInput from "./PostsMenuInputs/SortByInput";
@@ -18,6 +19,18 @@ interface PostsProps {
 
 const Posts = ({ id, isLoadingMore = false, postsData }: PostsProps) => {
   // const isLoading = usePostsLoadingState(isLoadingMore);
+  const { queryParams } = usePostsFilters();
+  const { status, sort } = queryParams;
+
+  let pageKey = "date";
+
+  if (sort && status) {
+    pageKey = `${sort.startsWith("date") ? "date" : "title"}-${status}`;
+  } else if (sort) {
+    pageKey = sort.startsWith("date") ? "date" : "title";
+  } else if (status) {
+    pageKey = `${status}-date`;
+  }
 
   return (
     <PostsWrapper id={id} ariaBusy={false}>
@@ -42,7 +55,11 @@ const Posts = ({ id, isLoadingMore = false, postsData }: PostsProps) => {
           No posts found
         </Alert>
       ) : (
-        <PostsList isLoadingMore={isLoadingMore} postsData={postsData} />
+        <PostsList
+          key={pageKey}
+          isLoadingMore={isLoadingMore}
+          postsData={postsData}
+        />
       )}
     </PostsWrapper>
   );
