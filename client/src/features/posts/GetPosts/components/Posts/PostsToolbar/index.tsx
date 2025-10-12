@@ -1,19 +1,16 @@
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
 import Toolbar from "@mui/material/Toolbar";
 
-import useSelectAllCheckbox from "@hooks/useSelectAllCheckbox";
-import type {
-  GetPostsListAction,
-  PostsPagePostData,
-} from "types/posts/getPosts";
+import AllSelectedPostsActions from "./AllSelectedPostsActions";
+import ClearPageSelectionButton from "./ClearPageSelectionButton";
+import SelectPostsControl from "./SelectPostsControl";
+import type * as types from "types/posts/getPosts";
 
 interface PostsToolbarProps {
   selectedPosts: Record<string, string>;
   selectedPostsIds: string[];
   viewButtons: React.ReactElement;
-  posts: PostsPagePostData[];
-  dispatch: React.Dispatch<GetPostsListAction>;
+  posts: types.PostsPagePostData[];
+  dispatch: React.Dispatch<types.GetPostsListAction>;
 }
 
 const PostsToolbar = ({
@@ -23,60 +20,37 @@ const PostsToolbar = ({
   posts,
   dispatch,
 }: PostsToolbarProps) => {
-  let postsSelected = 0;
+  const pagePostsSelected = posts.reduce((numberOfSelectedPosts, { id }) => {
+    let numberOfPagePostsSelected = numberOfSelectedPosts;
 
-  posts.forEach(({ id }) => {
-    if (selectedPosts[id]) postsSelected++;
-  });
+    if (selectedPosts[id]) numberOfPagePostsSelected++;
 
-  const checkboxRef = useSelectAllCheckbox(postsSelected, posts.length);
-  const allIsSelected = postsSelected === posts.length;
-  let label: string;
-
-  if (selectedPostsIds.length === 1) {
-    label = "post";
-  } else if (
-    postsSelected === posts.length &&
-    postsSelected === selectedPostsIds.length
-  ) {
-    label = "all posts on this page";
-  } else {
-    label = "selected posts";
-  }
-
-  const handleSelect = () => {
-    dispatch({ type: "TOGGLE_ALL_POSTS_SELECT", payload: { posts } });
-  };
-
-  const handleDelete = () => {
-    dispatch({
-      type: "OPEN_DELETE",
-      payload: {
-        ids: selectedPostsIds,
-        title: selectedPosts[selectedPostsIds[0]],
-      },
-    });
-  };
+    return numberOfPagePostsSelected;
+  }, 0);
 
   return (
-    <Toolbar disableGutters variant="dense" sx={{ mb: 4 }}>
-      <Checkbox
-        inputRef={checkboxRef}
-        id="all-posts-checkbox"
-        size="small"
-        inputProps={{
-          "aria-label": `${allIsSelected ? "Unselect" : "Select"} all posts`,
-        }}
-        onChange={handleSelect}
-        checked={allIsSelected}
-        indeterminate={!(postsSelected === 0 || postsSelected === posts.length)}
-        sx={{ ml: 0.75 }}
+    <Toolbar
+      disableGutters
+      variant="dense"
+      sx={{ mb: 5, columnGap: { columnGap: 8, md: 3 } }}
+    >
+      <SelectPostsControl
+        pagePostsSelected={pagePostsSelected}
+        posts={posts}
+        dispatch={dispatch}
       />
-      {selectedPostsIds.length > 0 && (
-        <Button color="error" onClick={handleDelete} size="small">
-          Send {label} to bin
-        </Button>
-      )}
+      <AllSelectedPostsActions
+        selectedPosts={selectedPosts}
+        selectedPostsIds={selectedPostsIds}
+        postsLength={posts.length}
+        pagePostsSelected={pagePostsSelected}
+        dispatch={dispatch}
+      />
+      <ClearPageSelectionButton
+        numOfPagePostsSelected={pagePostsSelected}
+        posts={posts}
+        dispatch={dispatch}
+      />
       {viewButtons}
     </Toolbar>
   );
