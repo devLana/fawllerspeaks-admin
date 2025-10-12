@@ -130,6 +130,64 @@ export const reducer: Reducer = (state, action) => {
       return { ...state, selectedPosts };
     }
 
+    case "SELECT_POSTS_BY_STATUS": {
+      const { posts, status } = action.payload;
+      let selectedPosts: S["selectedPosts"] = { ...state.selectedPosts };
+
+      posts.forEach(({ id, status: postStatus, title }) => {
+        if (status === "none" || status !== postStatus) {
+          const { [id]: _, ...selected } = selectedPosts;
+          selectedPosts = selected;
+          return;
+        }
+
+        selectedPosts[id] = title;
+      });
+
+      return { ...state, selectedPosts };
+    }
+
+    case "CLEAR_PAGE_POSTS_SELECTION": {
+      const { posts } = action.payload;
+      let selectedPosts: S["selectedPosts"] = { ...state.selectedPosts };
+
+      posts.forEach(({ id }) => {
+        const { [id]: _, ...selected } = selectedPosts;
+        selectedPosts = selected;
+      });
+
+      return { ...state, selectedPosts };
+    }
+
+    case "CLEAR_ALL_POSTS_SELECTION":
+      return { ...state, selectedPosts: {} };
+
+    case "REMOVE_SELECTED_POST": {
+      const { id } = action.payload;
+
+      if (!state.selectedPosts[id]) return state;
+
+      let selectedPosts = { ...state.selectedPosts };
+      const { [id]: _, ...selected } = selectedPosts;
+      selectedPosts = selected;
+
+      return { ...state, selectedPosts };
+    }
+
+    case "REMOVE_SELECTED_POSTS": {
+      const { ids } = action.payload;
+      let selectedPosts = { ...state.selectedPosts };
+
+      ids.forEach(id => {
+        if (!selectedPosts[id]) return;
+
+        const { [id]: _, ...selected } = selectedPosts;
+        selectedPosts = selected;
+      });
+
+      return { ...state, selectedPosts };
+    }
+
     default:
       throw new Error("Unexpected action object dispatched");
   }

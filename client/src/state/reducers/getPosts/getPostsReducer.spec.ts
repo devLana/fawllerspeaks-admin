@@ -53,7 +53,7 @@ describe("Get Posts List - State Reducer", () => {
     });
   });
 
-  describe("Select posts", () => {
+  describe("Selecting or Unselecting posts", () => {
     const posts1: PostsPagePostData[] = [
       {
         title: "Post Title 1",
@@ -79,15 +79,11 @@ describe("Get Posts List - State Reducer", () => {
         url: { slug: "post-title-3" },
         imageBanner: null,
       },
-    ];
-
-    const posts2: PostsPagePostData[] = [
-      ...posts1,
       {
         title: "Post Title 4",
         id: "id-4",
         dateCreated: new Date().toISOString(),
-        status: "Unpublished",
+        status: "Draft",
         url: { slug: "post-title-4" },
         imageBanner: null,
       },
@@ -95,7 +91,7 @@ describe("Get Posts List - State Reducer", () => {
         title: "Post Title 5",
         id: "id-5",
         dateCreated: new Date().toISOString(),
-        status: "Unpublished",
+        status: "Draft",
         url: { slug: "post-title-5" },
         imageBanner: null,
       },
@@ -103,8 +99,28 @@ describe("Get Posts List - State Reducer", () => {
         title: "Post Title 6",
         id: "id-6",
         dateCreated: new Date().toISOString(),
-        status: "Unpublished",
+        status: "Draft",
         url: { slug: "post-title-6" },
+        imageBanner: null,
+      },
+    ];
+
+    const posts2: PostsPagePostData[] = [
+      ...posts1,
+      {
+        title: "Post Title 7",
+        id: "id-7",
+        dateCreated: new Date().toISOString(),
+        status: "Unpublished",
+        url: { slug: "post-title-7" },
+        imageBanner: null,
+      },
+      {
+        title: "Post Title 8",
+        id: "id-8",
+        dateCreated: new Date().toISOString(),
+        status: "Draft",
+        url: { slug: "post-title-8" },
         imageBanner: null,
       },
     ];
@@ -149,14 +165,13 @@ describe("Get Posts List - State Reducer", () => {
           payload: { posts: posts1 },
         });
 
-        expect(result).toStrictEqual({
-          postsView: "grid",
-          delete: { open: false, title: "", ids: [] },
-          selectedPosts: {
-            "id-1": "Post Title 1",
-            "id-2": "Post Title 2",
-            "id-3": "Post Title 3",
-          },
+        expect(result.selectedPosts).toEqual({
+          "id-1": "Post Title 1",
+          "id-2": "Post Title 2",
+          "id-3": "Post Title 3",
+          "id-4": "Post Title 4",
+          "id-5": "Post Title 5",
+          "id-6": "Post Title 6",
         });
       });
 
@@ -167,6 +182,9 @@ describe("Get Posts List - State Reducer", () => {
             "id-1": "Post Title 1",
             "id-2": "Post Title 2",
             "id-3": "Post Title 3",
+            "id-4": "Post Title 4",
+            "id-5": "Post Title 5",
+            "id-6": "Post Title 6",
           },
         };
 
@@ -175,11 +193,7 @@ describe("Get Posts List - State Reducer", () => {
           payload: { posts: posts1 },
         });
 
-        expect(result).toStrictEqual({
-          postsView: "grid",
-          delete: { open: false, title: "", ids: [] },
-          selectedPosts: {},
-        });
+        expect(result.selectedPosts).toEqual({});
       });
     });
 
@@ -373,6 +387,137 @@ describe("Get Posts List - State Reducer", () => {
             "id-6": "Post Title 6",
           },
         });
+      });
+    });
+
+    describe("SELECT_POSTS_BY_STATUS", () => {
+      it("Should select only posts matching the status and unselect all others", () => {
+        const initState = {
+          ...state,
+          selectedPosts: {
+            "id-1": "Post Title 1",
+            "id-2": "Post Title 2",
+            "id-4": "Post Title 4",
+          },
+        };
+
+        const result = reducer(initState, {
+          type: "SELECT_POSTS_BY_STATUS",
+          payload: { posts: posts1, status: "Published" },
+        });
+
+        expect(result.selectedPosts).toEqual({
+          "id-1": "Post Title 1",
+          "id-3": "Post Title 3",
+        });
+      });
+
+      it("Should unselect all posts if status is 'none' or does not match any", () => {
+        const initState = {
+          ...state,
+          selectedPosts: {
+            "id-1": "Post Title 1",
+            "id-2": "Post Title 2",
+            "id-3": "Post Title 3",
+            "id-4": "Post Title 4",
+          },
+        };
+
+        const result = reducer(initState, {
+          type: "SELECT_POSTS_BY_STATUS",
+          payload: { posts: posts1, status: "none" },
+        });
+
+        expect(result.selectedPosts).toEqual({});
+      });
+    });
+
+    describe("CLEAR_PAGE_POSTS_SELECTION", () => {
+      it("Should clear selection for given posts only", () => {
+        const initState = {
+          ...state,
+          selectedPosts: {
+            "id-1": "Post Title 1",
+            "id-2": "Post Title 2",
+            "id-3": "Post Title 3",
+            "id-4": "Post Title 4",
+            "id-5": "Post Title 5",
+            "id-6": "Post Title 6",
+          },
+        };
+
+        const result = reducer(initState, {
+          type: "CLEAR_PAGE_POSTS_SELECTION",
+          payload: { posts: posts1.slice(0, 2) },
+        });
+
+        expect(result.selectedPosts).toEqual({
+          "id-3": "Post Title 3",
+          "id-4": "Post Title 4",
+          "id-5": "Post Title 5",
+          "id-6": "Post Title 6",
+        });
+      });
+    });
+
+    describe("CLEAR_ALL_POSTS_SELECTION", () => {
+      it("Should clear all selected posts", () => {
+        const initState = {
+          ...state,
+          selectedPosts: { "id-1": "Post 1", "id-2": "Post 2" },
+        };
+
+        const result = reducer(initState, {
+          type: "CLEAR_ALL_POSTS_SELECTION",
+        });
+
+        expect(result.selectedPosts).toEqual({});
+      });
+    });
+
+    describe("REMOVE_SELECTED_POST", () => {
+      it("Should remove a selected post by id", () => {
+        const initState = {
+          ...state,
+          selectedPosts: { "id-1": "Post 1", "id-2": "Post 2" },
+        };
+
+        const result = reducer(initState, {
+          type: "REMOVE_SELECTED_POST",
+          payload: { id: "id-1" },
+        });
+
+        expect(result.selectedPosts).toEqual({ "id-2": "Post 2" });
+      });
+
+      it("Should not change state if post id is not selected", () => {
+        const result = reducer(state, {
+          type: "REMOVE_SELECTED_POST",
+          payload: { id: "id-99" },
+        });
+
+        expect(result).toBe(state);
+      });
+    });
+
+    describe("REMOVE_SELECTED_POSTS", () => {
+      it("Should remove multiple selected posts by ids", () => {
+        const initState = {
+          ...state,
+          selectedPosts: {
+            "id-1": "Post 1",
+            "id-2": "Post 2",
+            "id-3": "Post 3",
+            "id-4": "Post 4",
+          },
+        };
+
+        const result = reducer(initState, {
+          type: "REMOVE_SELECTED_POSTS",
+          payload: { ids: ["id-1", "id-3", "id-4"] },
+        });
+
+        expect(result.selectedPosts).toEqual({ "id-2": "Post 2" });
       });
     });
   });

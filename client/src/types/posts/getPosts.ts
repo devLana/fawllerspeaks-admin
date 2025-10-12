@@ -59,7 +59,18 @@ export type GetPostsListAction =
         prevTargetIndex: number | null;
         posts: PostsPagePostData[];
       };
-    };
+    }
+  | {
+      type: "SELECT_POSTS_BY_STATUS";
+      payload: { posts: PostsPagePostData[]; status: PostStatus | "none" };
+    }
+  | {
+      type: "CLEAR_PAGE_POSTS_SELECTION";
+      payload: { posts: PostsPagePostData[] };
+    }
+  | { type: "CLEAR_ALL_POSTS_SELECTION" }
+  | { type: "REMOVE_SELECTED_POST"; payload: { id: string } }
+  | { type: "REMOVE_SELECTED_POSTS"; payload: { ids: string[] } };
 
 export interface PostsQueryParams {
   after?: string;
