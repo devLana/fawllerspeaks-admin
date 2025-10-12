@@ -51,7 +51,10 @@ const PostMenuActions = ({ id, dispatch, ...props }: PostMenuActionsProps) => {
     setMessage(
       <>
         Are you sure you want to unpublish{" "}
-        <Typography component="span" sx={{ fontWeight: "bold" }}>
+        <Typography
+          component="span"
+          sx={{ fontWeight: "bold", fontSize: "inherit" }}
+        >
           {props.title}
         </Typography>
         ? Unpublishing this post will de-list it from the blog website

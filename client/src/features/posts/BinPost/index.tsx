@@ -36,18 +36,26 @@ const BinPost = ({
       aria-labelledby="bin-post-dialog-title"
       onClose={isBinning ? undefined : onCloseDialog}
     >
-      <DialogTitle id="bin-post-dialog-title">Bin post</DialogTitle>
-      <DialogContent>
+      <DialogTitle id="bin-post-dialog-title" sx={{ textAlign: "center" }}>
+        Bin post
+      </DialogTitle>
+      <DialogContent
+        sx={{
+          "&>p": { textAlign: "center" },
+          "&>p:not(:last-child)": { mb: 1 },
+        }}
+      >
         <DialogContentText>
           Are you sure you want to send this post to bin?
         </DialogContentText>
         {showTitleInDialog && (
-          <DialogContentText component="strong">{title}</DialogContentText>
+          <DialogContentText sx={{ fontWeight: "bold" }}>
+            {title}
+          </DialogContentText>
         )}
         {isPublished && (
           <DialogContentText>
-            NB: Sending a Published post to bin will de-list it on the blog
-            website.
+            Sending a Published post to bin will de-list it on the blog website.
           </DialogContentText>
         )}
       </DialogContent>

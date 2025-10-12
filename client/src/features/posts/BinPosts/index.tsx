@@ -14,11 +14,16 @@ interface BinPostsProps {
   firstPostTitle: string;
   showDialog: boolean;
   onCloseDialog: VoidFunction;
+  onUnselect: (ids: string[]) => void;
 }
 
-const BinPosts = (props: BinPostsProps) => {
-  const { postIds, firstPostTitle: title, showDialog, onCloseDialog } = props;
-
+const BinPosts = ({
+  postIds,
+  firstPostTitle: title,
+  showDialog,
+  onUnselect,
+  onCloseDialog,
+}: BinPostsProps) => {
   const postOrPosts = postIds.length > 1 ? "Posts" : "Post";
   const text = postIds.length > 1 ? `${postIds.length} posts` : `"${title}"`;
 
@@ -31,8 +36,15 @@ const BinPosts = (props: BinPostsProps) => {
         aria-labelledby="bin-posts-dialog-title"
         onClose={binPosts.isBinning ? undefined : onCloseDialog}
       >
-        <DialogTitle id="bin-posts-dialog-title">Bin {postOrPosts}</DialogTitle>
-        <DialogContent>
+        <DialogTitle id="bin-posts-dialog-title" sx={{ textAlign: "center" }}>
+          Bin {postOrPosts}
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            "&>p": { textAlign: "center" },
+            "&>p:not(:last-child)": { mb: 1 },
+          }}
+        >
           <DialogContentText>
             Are you sure you want to send {text} to bin?
           </DialogContentText>
@@ -48,7 +60,7 @@ const BinPosts = (props: BinPostsProps) => {
           <LoadingButton
             color="error"
             loading={binPosts.isBinning}
-            onClick={() => binPosts.binPostsFn()}
+            onClick={() => binPosts.binPostsFn(onUnselect)}
             variant="contained"
           >
             <span>Send {postOrPosts} to bin</span>
