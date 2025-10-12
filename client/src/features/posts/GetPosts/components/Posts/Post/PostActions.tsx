@@ -64,6 +64,7 @@ const PostActions = ({
         title={title}
         status={status}
         slug={slug}
+        dispatch={dispatch}
         menuSx={({ shape }) => ({
           borderRadius: 0,
           borderTopRightRadius: `${shape.borderRadius}px`,

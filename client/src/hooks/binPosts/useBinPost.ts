@@ -24,7 +24,8 @@ const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
 
   const binPostsFn = (
     update: MutationBaseOptions<BinPostData>["update"],
-    refetchQueries: RefetchQueriesFn<BinPostData> | undefined = undefined
+    refetchQueries: RefetchQueriesFn<BinPostData> | undefined = undefined,
+    unselectPost?: (postId: string) => void
   ) => {
     const MSG = `You are unable to bin that post right now. Please try again later`;
 
@@ -72,6 +73,7 @@ const useBinPost = (postId: string, onCloseDialog: VoidFunction) => {
 
           case "SinglePost":
             handleResponse("Post binned");
+            unselectPost?.(binData.binPost.post.id);
             break;
 
           default:

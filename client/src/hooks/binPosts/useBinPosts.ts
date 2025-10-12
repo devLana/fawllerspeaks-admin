@@ -34,7 +34,7 @@ const useBinPosts = (
     }
   };
 
-  const binPostsFn = () => {
+  const binPostsFn = (unselectPosts: (ids: string[]) => void) => {
     const MSG = `You are unable to bin posts right now. Please try again later`;
     const gqlVariablesCopy = { ...gqlVariables };
     delete gqlVariablesCopy.after;
@@ -82,10 +82,12 @@ const useBinPosts = (
 
           case "PostsWarning":
             handleResponse(binData.binPosts.message, true);
+            unselectPosts(binData.binPosts.posts.map(({ id }) => id));
             break;
 
           case "Posts":
             handleResponse(`${postOrPosts} binned`, true);
+            unselectPosts(binData.binPosts.posts.map(({ id }) => id));
             break;
 
           default:

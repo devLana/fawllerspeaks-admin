@@ -82,6 +82,9 @@ const PostsList = ({ isLoadingMore, postsData }: PostsListProps) => {
         postIds={state.delete.ids}
         showDialog={state.delete.open}
         firstPostTitle={state.delete.title}
+        onUnselect={ids => {
+          dispatch({ type: "REMOVE_SELECTED_POSTS", payload: { ids } });
+        }}
         onCloseDialog={() => dispatch({ type: "CLOSE_DELETE" })}
       />
     </>

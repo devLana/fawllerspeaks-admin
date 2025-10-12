@@ -9,6 +9,8 @@ type BinnedPostData = Pick<PostData, DataKeys> & {
 
 type BinnedPostDataHelper<T extends object> = T extends { posts: Post[] }
   ? Omit<T, "posts" | "status"> & { posts: BinnedPostData[] }
+  : T extends { post: Post }
+  ? Omit<T, "post" | "status"> & { post: BinnedPostData }
   : Omit<T, "status">;
 
 export type BinnedPostDataMapper<T extends Record<string, object>> = {

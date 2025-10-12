@@ -29,7 +29,8 @@ const useUnpublishPost = (
 
   const unpublishFn = (
     update: MutationBaseOptions<UnpublishPostData>["update"],
-    refetchQueries?: RefetchQueriesFn<UnpublishPostData>
+    refetchQueries?: RefetchQueriesFn<UnpublishPostData>,
+    unselectPost?: (id: string) => void
   ) => {
     const msg = `You are unable to unpublish a post right now. Please try again later`;
 
@@ -82,6 +83,7 @@ const useUnpublishPost = (
 
           case "SinglePost":
             handleResponse("Post unpublished", "success");
+            unselectPost?.(unpublishData.unpublishPost.post.id);
             break;
 
           default:

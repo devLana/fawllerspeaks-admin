@@ -13,6 +13,7 @@ import { refetchQueries as unPubRefetch } from "@cache/refetchQueries/posts/unpu
 import { update as undoUnPubUpdateCache } from "@cache/update/posts/undoUnpublishPostOnPosts";
 import { refetchQueries as undoUnPubRefetchQUeries } from "@cache/refetchQueries/posts/undoUnpublishPostOnPosts";
 import type { PostStatus } from "@apiTypes";
+import type { GetPostsListAction } from "types/posts/getPosts";
 
 interface PostMenuActionsProps {
   id: string;
@@ -20,10 +21,11 @@ interface PostMenuActionsProps {
   status: PostStatus;
   slug: string;
   menuSx?: IconButtonProps["sx"];
+  dispatch: React.Dispatch<GetPostsListAction>;
 }
 
-const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
-  const { gqlVariables } = usePostsFilters();
+const PostMenuActions = ({ id, dispatch, ...props }: PostMenuActionsProps) => {
+  const { gqlVariables, queryParams } = usePostsFilters();
 
   const {
     message,
@@ -35,7 +37,7 @@ const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
     unpublish,
     undoUnpublish,
     binPost,
-  } = usePostActions(id, menuProps.slug);
+  } = usePostActions(id, props.slug);
 
   const binPostUpdateCache = binPostUpdate(gqlVariables);
   const binPostRefetchQUeries = binPostRefetch(gqlVariables);
@@ -50,17 +52,26 @@ const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
       <>
         Are you sure you want to unpublish{" "}
         <Typography component="span" sx={{ fontWeight: "bold" }}>
-          {menuProps.title}
+          {props.title}
         </Typography>
         ? Unpublishing this post will de-list it from the blog website
       </>
     );
   };
 
+  const unPubUndoSelect = (postId: string) => {
+    if (!queryParams.status) return;
+    dispatch({ type: "REMOVE_SELECTED_POST", payload: { id: postId } });
+  };
+
+  const unselectPost = (postId: string) => {
+    dispatch({ type: "REMOVE_SELECTED_POST", payload: { id: postId } });
+  };
+
   return (
     <>
       <PostMenu
-        {...menuProps}
+        {...props}
         onUnpublish={handleUnpublish}
         onBinPost={() => setShowDialog(true)}
         disableUnpublish={
@@ -73,25 +84,33 @@ const PostMenuActions = ({ id, ...menuProps }: PostMenuActionsProps) => {
         unpublishStatus={unpublish.status}
         undoUnpublishHasError={undoUnpublish.hasError}
         onCloseToast={() => setShowToast(false)}
-        onUnpublish={() =>
-          unpublish.unpublishFn(unPubUpdateCache, unPubRefetchQueries)
-        }
-        onUndoUnpublish={() =>
-          undoUnpublish.undoUnpublishFn(undoUnPubUpdate, undoUnPubRefetch)
-        }
+        onUnpublish={() => {
+          unpublish.unpublishFn(
+            unPubUpdateCache,
+            unPubRefetchQueries,
+            unPubUndoSelect
+          );
+        }}
+        onUndoUnpublish={() => {
+          undoUnpublish.undoUnpublishFn(undoUnPubUpdate, undoUnPubRefetch);
+        }}
         onUnpublished={unpublish.unpublished}
         onUndoneUnpublish={undoUnpublish.undoneUnpublish}
       />
       <BinPost
         showDialog={showDialog}
         toast={binPost.toast}
-        title={menuProps.title}
+        title={props.title}
         isBinning={binPost.isBinning}
-        isPublished={menuProps.status === "Published"}
+        isPublished={props.status === "Published"}
         showTitleInDialog
-        onBinPosts={() =>
-          binPost.binPostsFn(binPostUpdateCache, binPostRefetchQUeries)
-        }
+        onBinPosts={() => {
+          binPost.binPostsFn(
+            binPostUpdateCache,
+            binPostRefetchQUeries,
+            unselectPost
+          );
+        }}
         onCloseDialog={() => setShowDialog(false)}
         onCloseToast={binPost.handleCloseToast}
       />
