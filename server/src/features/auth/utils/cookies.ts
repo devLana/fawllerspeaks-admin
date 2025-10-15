@@ -1,17 +1,15 @@
 import type { CookieOptions, Response } from "express";
 
-// import { nodeEnv } from "@utils/nodeEnv";
+import { nodeEnv } from "@utils/nodeEnv";
 import type { Cookies } from "@types";
 
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
-  sameSite: "none",
-
-  /* Postman cookie options */
-  // secure: nodeEnv === "production",
-
-  /* Apollo explorer(development) cookie options */
   secure: true,
+  ...((nodeEnv === "production" || nodeEnv === "demo") && {
+    domain: "fawllerspeaks.com",
+    sameSite: "none",
+  }),
 };
 
 const createCookieOptions: CookieOptions = {

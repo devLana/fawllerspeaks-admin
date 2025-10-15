@@ -6,9 +6,9 @@ const getServerUrl = (server: Server, pathname: string): string => {
 
   if (nodeEnv === "production" || !info) return "";
 
-  if (typeof info === "string") {
-    return info;
-  }
+  if (typeof info === "string") return info;
+
+  if (nodeEnv === "demo") return `${info.address}${info.port}${pathname}`;
 
   return `http://localhost:${info.port}${pathname}`;
 };

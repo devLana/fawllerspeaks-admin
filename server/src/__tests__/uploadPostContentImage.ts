@@ -294,7 +294,7 @@ describe("Upload post content image - E2E", () => {
       expect(res.statusCode).toBe(201);
       expect(res.statusMessage).toBe("Created");
       expect(res.data).toHaveProperty("url");
-      expect(res.data.url).toMatch(/post\/content-image\/[\w-]+\.jpe?g$/);
+      expect(res.data.url).toMatch(/misc\/post\/content-image\/[\w-]+\.jpe?g$/);
     });
   });
 });

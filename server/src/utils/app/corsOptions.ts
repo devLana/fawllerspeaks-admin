@@ -9,6 +9,11 @@ export const corsOptions: CorsOptions = {
           "https://https://app.fawllerspeaks.com",
           "https://studio.apollographql.com",
         ]
+      : nodeEnv === "demo"
+      ? [
+          "https://https://demo.fawllerspeaks.com",
+          "https://studio.apollographql.com",
+        ]
       : [
           "http://localhost:4000",
           "http://localhost:4040",

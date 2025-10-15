@@ -21,12 +21,26 @@ export const generateImageFilePath = async (
   mimeType: string
 ) => {
   const randomBytes = util.promisify(crypto.randomBytes);
-
   const filenameBuf = await randomBytes(25);
   const filename = filenameBuf.toString("base64url");
-  const isDev = nodeEnv === "development" ? "dev/" : "";
   const extension = mimeTypeDict[mimeType] ?? "";
+  let pathname: string;
   let folderName: string;
+
+  switch (nodeEnv) {
+    case "development":
+      pathname = "dev/";
+      break;
+    case "demo":
+      pathname = "demo/";
+      break;
+    case "production":
+      pathname = "files/";
+      break;
+    case "test":
+    default:
+      pathname = "misc/";
+  }
 
   switch (imageCategory) {
     case "avatar":
@@ -45,5 +59,5 @@ export const generateImageFilePath = async (
       folderName = "";
   }
 
-  return `${isDev}${folderName}${filename}${extension}`;
+  return `${pathname}${folderName}${filename}${extension}`;
 };

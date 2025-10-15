@@ -50,8 +50,8 @@ export const startServer = async (port: number) => {
   app.use(cors(corsOptions));
   app.use(
     helmet({
-      crossOriginEmbedderPolicy: nodeEnv === "production",
-      contentSecurityPolicy: nodeEnv === "production",
+      crossOriginEmbedderPolicy: nodeEnv === "production" || nodeEnv === "demo",
+      contentSecurityPolicy: nodeEnv === "production" || nodeEnv === "demo",
     })
   );
 

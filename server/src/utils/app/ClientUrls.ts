@@ -6,13 +6,9 @@ class ClientUrls implements IClientUrls {
   private testUrl = "https://test-url.com";
 
   get login() {
-    if (this.env === "production") {
-      return "https://app.fawllerspeaks.com/login";
-    }
-
-    if (this.env === "development") {
-      return "http://localhost:4040/login";
-    }
+    if (this.env === "production") return "https://app.fawllerspeaks.com/login";
+    if (this.env === "demo") return "https://demo.fawllerspeaks.com/login";
+    if (this.env === "development") return "http://localhost:4040/login";
 
     return this.testUrl;
   }
@@ -20,6 +16,10 @@ class ClientUrls implements IClientUrls {
   get forgotPassword() {
     if (this.env === "production") {
       return "https://app.fawllerspeaks.com/forgot-password";
+    }
+
+    if (this.env === "demo") {
+      return "https://demo.fawllerspeaks.com/forgot-password";
     }
 
     if (this.env === "development") {
@@ -34,6 +34,10 @@ class ClientUrls implements IClientUrls {
       return "https://app.fawllerspeaks.com/reset-password";
     }
 
+    if (this.env === "demo") {
+      return "https://demo.fawllerspeaks.com/reset-password";
+    }
+
     if (this.env === "development") {
       return "http://localhost:4040/reset-password";
     }
@@ -42,13 +46,11 @@ class ClientUrls implements IClientUrls {
   }
 
   get siteUrl() {
-    if (this.env === "production") {
+    if (this.env === "production" || this.env === "demo") {
       return "https://fawllerspeaks.com";
     }
 
-    if (this.env === "development") {
-      return "http://localhost:4000";
-    }
+    if (this.env === "development") return "http://localhost:4000";
 
     return this.testUrl;
   }

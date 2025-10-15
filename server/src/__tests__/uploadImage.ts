@@ -314,7 +314,7 @@ describe("Upload image - E2E", () => {
       expect(res.statusCode).toBe(201);
       expect(res.statusMessage).toBe("Created");
       expect(res.data).toHaveProperty("image");
-      expect(res.data.image).toMatch(/^post\/banner\/[\w-]+\.jpe?g$/);
+      expect(res.data.image).toMatch(/^misc\/post\/banner\/[\w-]+\.jpe?g$/);
     });
   });
 });
