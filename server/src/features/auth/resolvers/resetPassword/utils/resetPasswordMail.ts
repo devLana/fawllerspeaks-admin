@@ -1,15 +1,8 @@
-import sgMail from "@sendgrid/mail";
+import { sendMail } from "@lib/mailService";
 import { urls } from "@utils/ClientUrls";
 import { MailError } from "@utils/Errors";
 
 const resetPasswordMail = async (email: string) => {
-  const errorMsg =
-    "Your password has been reset but we are unable to send a confirmation mail at this time";
-
-  if (!process.env.SEND_GRID_API_KEY) {
-    throw new MailError(errorMsg);
-  }
-
   const html = `
     <div
       style="
@@ -53,19 +46,14 @@ const resetPasswordMail = async (email: string) => {
     Please ensure your e-mail address is secure and open a ticket at info@fawllerspeaks.com.
   `;
 
-  const mail = {
-    to: email,
-    from: "info@fawllerspeaks.com",
-    subject: "Fawller Speaks Admin Password Reset",
-    text,
-    html,
-  };
+  const subject = "Fawller Speaks Admin Password Reset";
 
   try {
-    sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
-    await sgMail.send(mail);
+    await sendMail({ to: email, subject, text, html });
   } catch {
-    throw new MailError(errorMsg);
+    throw new MailError(
+      "Your password has been reset but we are unable to send a confirmation mail at this time"
+    );
   }
 };
 

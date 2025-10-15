@@ -1,15 +1,9 @@
-import sgMail from "@sendgrid/mail";
-
+import { sendMail } from "@lib/mailService";
 import { MailError } from "@utils/Errors";
 import { urls } from "@utils/ClientUrls";
 
 const sessionMail = async (email: string) => {
-  try {
-    if (!process.env.SEND_GRID_API_KEY) {
-      throw new Error("Server Error");
-    }
-
-    const html = `
+  const html = `
     <div
       style="
         font-family: Verdana, sans-serif;
@@ -36,7 +30,7 @@ const sessionMail = async (email: string) => {
     </div>
 `;
 
-    const text = `
+  const text = `
     Fawller Speaks
     --------------
 
@@ -47,17 +41,11 @@ const sessionMail = async (email: string) => {
     We advice that you also change your password at ${urls.forgotPassword} to keep your account secure.
   `;
 
-    const mail = {
-      to: email,
-      from: "info@fawllerspeaks.com",
-      subject: "Fawller Speaks Admin Activity",
-      text,
-      html,
-    };
+  const subject = "Fawller Speaks Admin Activity";
 
-    sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
-    await sgMail.send(mail);
-  } catch {
+  try {
+    await sendMail({ to: email, subject, text, html });
+  } catch (err) {
     throw new MailError("Unable to send mail. Please try again later");
   }
 };

@@ -1,15 +1,9 @@
-import sgMail from "@sendgrid/mail";
+import { sendMail } from "@lib/mailService";
 import { URL } from "node:url";
 import { MailError } from "@utils/Errors";
 import { urls } from "@utils/ClientUrls";
 
 const forgotPasswordMail = async (email: string, token: string) => {
-  const errorMsg = "Unable to send password reset link. Please try again later";
-
-  if (!process.env.SEND_GRID_API_KEY) {
-    throw new MailError(errorMsg);
-  }
-
   try {
     const { href } = new URL(`${urls.resetPassword}?tId=${token}`);
 
@@ -79,18 +73,13 @@ const forgotPasswordMail = async (email: string, token: string) => {
       Please ensure your e-mail address is secure and proceed to the console to change your password.
     `;
 
-    const mail = {
-      to: email,
-      from: "info@fawllerspeaks.com",
-      subject: "Fawller Speaks Admin Reset Password",
-      text,
-      html,
-    };
+    const subject = "Fawller Speaks Admin Reset Password";
 
-    sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
-    await sgMail.send(mail);
-  } catch {
-    throw new MailError(errorMsg);
+    await sendMail({ to: email, subject, text, html });
+  } catch (err) {
+    throw new MailError(
+      "Unable to send password reset link. Please try again later"
+    );
   }
 };
 

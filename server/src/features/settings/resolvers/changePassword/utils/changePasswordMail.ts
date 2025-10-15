@@ -1,13 +1,7 @@
-import sgMail from "@sendgrid/mail";
+import { sendMail } from "@lib/mailService";
 import { MailError } from "@utils/Errors";
 
 const changePasswordMail = async (email: string) => {
-  const errorMsg = "Unable to change password. Please try again later";
-
-  if (!process.env.SEND_GRID_API_KEY) {
-    throw new MailError(errorMsg);
-  }
-
   const html = `
     <div
       style="
@@ -47,19 +41,12 @@ const changePasswordMail = async (email: string) => {
     If you didn't carry out this action, please open a ticket at info@fawllerspeaks.com.
   `;
 
-  const mail = {
-    to: email,
-    from: "info@fawllerspeaks.com",
-    subject: "Fawller Speaks Admin Password Change",
-    text,
-    html,
-  };
+  const subject = "Fawller Speaks Admin Password Change";
 
   try {
-    sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
-    await sgMail.send(mail);
+    await sendMail({ to: email, subject, text, html });
   } catch {
-    throw new MailError(errorMsg);
+    throw new MailError("Unable to change password. Please try again later");
   }
 };
 

@@ -1,14 +1,8 @@
-import sgMail from "@sendgrid/mail";
+import { sendMail } from "@lib/mailService";
 import { MailError } from "@utils/Errors";
 import { urls } from "@utils/ClientUrls";
 
 const createUserMail = async (email: string, password: string) => {
-  const errMsg = "Unable to send confirmation mail. Please try again later";
-
-  if (!process.env.SEND_GRID_API_KEY) {
-    throw new MailError(errMsg);
-  }
-
   const html = `
     <div
       style="
@@ -65,19 +59,14 @@ const createUserMail = async (email: string, password: string) => {
     Password: ${password}
   `;
 
-  const mail = {
-    to: email,
-    from: "info@fawllerspeaks.com",
-    subject: "Fawller Speaks Admin New User",
-    text,
-    html,
-  };
+  const subject = "Fawller Speaks Admin New User";
 
   try {
-    sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
-    await sgMail.send(mail);
+    await sendMail({ to: email, subject, text, html });
   } catch {
-    throw new MailError(errMsg);
+    throw new MailError(
+      "Unable to send confirmation mail. Please try again later"
+    );
   }
 };
 
