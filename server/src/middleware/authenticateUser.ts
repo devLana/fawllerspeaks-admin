@@ -8,17 +8,13 @@ import {
   UnauthenticatedError,
   UnauthorizedError,
 } from "@utils/Errors";
+import { env } from "@lib/env";
 
 export const authenticateUser = async (
   req: Request,
   _: Response,
   next: NextFunction
 ) => {
-  if (!process.env.ACCESS_TOKEN_SECRET) {
-    const error = new ApiError("Sever error. Please try again later");
-    return next(error);
-  }
-
   if (!req.headers.authorization?.startsWith("Bearer ")) {
     const error = new UnauthenticatedError("Unable to upload image");
     return next(error);
@@ -27,7 +23,7 @@ export const authenticateUser = async (
   try {
     const jwt = req.headers.authorization.substring(7);
 
-    const { sub } = (await verify(jwt, process.env.ACCESS_TOKEN_SECRET)) as {
+    const { sub } = (await verify(jwt, env.ACCESS_TOKEN_SECRET)) as {
       sub: string;
     };
 

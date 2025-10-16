@@ -4,15 +4,16 @@ import { test, expect } from "@jest/globals";
 
 import signTokens from ".";
 import { verify } from "@lib/tokenPromise";
+import { env } from "@lib/env";
 import { JWT_REGEX } from "@tests/constants";
 
 interface Verify {
   sub: string;
 }
 
-const algorithm = process.env.CIPHER_ALGORITHM ?? "";
-const key = Buffer.from(process.env.CIPHER_KEY ?? "", "hex");
-const iv = Buffer.from(process.env.CIPHER_IV ?? "", "hex");
+const algorithm = env.CIPHER_ALGORITHM ?? "";
+const key = new Uint8Array(Buffer.from(env.CIPHER_KEY ?? "", "hex"));
+const iv = new Uint8Array(Buffer.from(env.CIPHER_IV ?? "", "hex"));
 
 const decrypt = (token: string) => {
   const decipher = createDecipheriv(algorithm, key, iv);
@@ -38,8 +39,8 @@ test("Auth | Should sign auth tokens", async () => {
   expect(decrypt(tokens[2].token)).toBe(signature);
   expect(decrypt(tokens[2].sig)).toBe(header);
 
-  const refreshSecret = process.env.REFRESH_TOKEN_SECRET ?? "";
-  const accessSecret = process.env.ACCESS_TOKEN_SECRET ?? "";
+  const refreshSecret = env.REFRESH_TOKEN_SECRET ?? "";
+  const accessSecret = env.ACCESS_TOKEN_SECRET ?? "";
 
   const refresh = verify(tokens[0], refreshSecret) as Promise<Verify>;
   const access = verify(tokens[1], accessSecret) as Promise<Verify>;

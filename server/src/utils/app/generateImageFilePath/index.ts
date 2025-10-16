@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import util from "node:util";
 
-import { nodeEnv } from "../nodeEnv";
+import { env } from "@lib/env";
 import type { ImageCategory } from "@types";
 
 const mimeTypeDict: Record<string, string | undefined> = {
@@ -27,7 +27,7 @@ export const generateImageFilePath = async (
   let pathname: string;
   let folderName: string;
 
-  switch (nodeEnv) {
+  switch (env.NAME) {
     case "development":
       pathname = "dev/";
       break;

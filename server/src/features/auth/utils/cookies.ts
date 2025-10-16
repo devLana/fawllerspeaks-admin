@@ -1,12 +1,12 @@
 import type { CookieOptions, Response } from "express";
 
-import { nodeEnv } from "@utils/nodeEnv";
+import { env } from "@lib/env";
 import type { Cookies } from "@types";
 
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
-  ...((nodeEnv === "production" || nodeEnv === "demo") && {
+  ...((env.NAME === "production" || env.NAME === "demo") && {
     domain: "fawllerspeaks.com",
     sameSite: "none",
   }),

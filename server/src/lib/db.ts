@@ -1,14 +1,14 @@
 import { Pool } from "pg";
 
-import { nodeEnv } from "@utils/nodeEnv";
+import { env } from "@lib/env";
 
 export const db = new Pool({
   connectionString:
-    nodeEnv === "development"
+    env.NAME === "development"
       ? "postgresql://lana:lana@localhost:5432/dev_fawllerspeaks"
-      : nodeEnv === "test"
+      : env.NAME === "test"
       ? "postgresql://lana:lana@localhost:5432/test_fawllerspeaks"
-      : process.env.PG_CONNECTION_STRING,
+      : env.PG_CONNECTION_STRING,
 });
 
 db.on("error", (err, client) => {

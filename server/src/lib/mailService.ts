@@ -1,18 +1,18 @@
 import nodemailer, { type Transporter, type SendMailOptions } from "nodemailer";
-import { nodeEnv } from "../utils/app/nodeEnv";
+import { env } from "@lib/env";
 
 const mailTransporter: Transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: Number(process.env.MAIL_PORT),
-  secure: nodeEnv === "production",
-  auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASSWORD },
+  host: env.MAIL_HOST,
+  port: env.MAIL_PORT,
+  secure: env.NAME === "production",
+  auth: { user: env.MAIL_USER, pass: env.MAIL_PASSWORD },
 });
 
 export const sendMail = (options: Omit<SendMailOptions, "from">) => {
   const { html, subject, to, text } = options;
 
   return mailTransporter.sendMail({
-    from: process.env.MAIL_USER,
+    from: env.MAIL_USER,
     to,
     subject,
     text,

@@ -1,8 +1,8 @@
 import type { IClientUrls } from "@types";
-import { nodeEnv } from "./nodeEnv";
+import { env } from "../../lib/env";
 
 class ClientUrls implements IClientUrls {
-  private readonly env = nodeEnv;
+  private readonly env = env.NAME;
   private testUrl = "https://test-url.com";
 
   get login() {

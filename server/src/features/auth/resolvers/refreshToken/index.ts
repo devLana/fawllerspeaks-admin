@@ -21,6 +21,7 @@ import {
   UserSessionError,
 } from "@utils/ObjectTypes";
 import { MailError } from "@utils/Errors";
+import { env } from "@lib/env";
 
 import type { MutationResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
@@ -35,8 +36,6 @@ interface DBResponse {
 }
 
 const refreshToken: Refresh = async (_, args, { db, req, res }) => {
-  if (!process.env.REFRESH_TOKEN_SECRET) throw new GraphQLError("Server Error");
-
   const SELECT = `
     SELECT
       s.refresh_token "refreshToken",
@@ -68,7 +67,7 @@ const refreshToken: Refresh = async (_, args, { db, req, res }) => {
     jwt = `${sig}.${auth}.${token}`;
     payload = auth;
 
-    const { sub } = (await verify(jwt, process.env.REFRESH_TOKEN_SECRET)) as {
+    const { sub } = (await verify(jwt, env.REFRESH_TOKEN_SECRET)) as {
       sub: string;
     };
 

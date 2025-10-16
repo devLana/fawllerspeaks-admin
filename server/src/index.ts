@@ -7,7 +7,6 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import * as dotenv from "dotenv";
 
 import typeDefs from "@schema/typeDefs";
 import { resolvers } from "@schema/resolvers";
@@ -28,11 +27,9 @@ import { catchAll } from "@controllers/catchAll";
 import { startServerHandler } from "@utils/startServerHandler";
 import { corsOptions } from "@utils/corsOptions";
 import getServerUrl from "@utils/getServerUrl";
-import { nodeEnv } from "@utils/nodeEnv";
+import { env } from "@lib/env";
 
 import type { APIContext } from "@types";
-
-dotenv.config();
 
 export const startServer = async (port: number) => {
   const httpServer = createServer();
@@ -50,8 +47,9 @@ export const startServer = async (port: number) => {
   app.use(cors(corsOptions));
   app.use(
     helmet({
-      crossOriginEmbedderPolicy: nodeEnv === "production" || nodeEnv === "demo",
-      contentSecurityPolicy: nodeEnv === "production" || nodeEnv === "demo",
+      contentSecurityPolicy: env.NAME === "production" || env.NAME === "demo",
+      crossOriginEmbedderPolicy:
+        env.NAME === "production" || env.NAME === "demo",
     })
   );
 
@@ -80,7 +78,7 @@ export const startServer = async (port: number) => {
   return { url, server };
 };
 
-if (nodeEnv !== "test") {
+if (env.NAME !== "test") {
   const port = process.env.PORT ? +process.env.PORT : 7692;
 
   startServer(port)

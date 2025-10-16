@@ -2,6 +2,7 @@ import { createDecipheriv } from "node:crypto";
 
 import type { Response, NextFunction } from "express";
 
+import { env } from "@lib/env";
 import type { Cookies, GQLRequest } from "@types";
 
 export const parseCookies = (
@@ -9,20 +10,15 @@ export const parseCookies = (
   _: Response,
   next: NextFunction
 ) => {
-  if (
-    !process.env.CIPHER_ALGORITHM ||
-    !process.env.CIPHER_KEY ||
-    !process.env.CIPHER_IV ||
-    !req.headers.cookie
-  ) {
+  if (!req.headers.cookie) {
     const cookieReq = req;
     cookieReq.cookies = {};
     return next();
   }
 
-  const algorithm = process.env.CIPHER_ALGORITHM;
-  const key = Buffer.from(process.env.CIPHER_KEY, "hex");
-  const iv = Buffer.from(process.env.CIPHER_IV, "hex");
+  const algorithm = env.CIPHER_ALGORITHM;
+  const key = new Uint8Array(Buffer.from(env.CIPHER_KEY, "hex"));
+  const iv = new Uint8Array(Buffer.from(env.CIPHER_IV, "hex"));
   const cookies = req.headers.cookie.split(/;\s?/);
   const parsedCookies: Cookies = {};
 

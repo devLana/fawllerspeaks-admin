@@ -18,6 +18,7 @@ import {
   NotAllowedError,
   UnknownError,
 } from "@utils/ObjectTypes";
+import { env } from "@lib/env";
 import { MailError } from "@utils/Errors";
 
 import { type MutationResolvers } from "@resolverTypes";
@@ -37,10 +38,6 @@ interface DBResponse {
 }
 
 const verifySession: VerifySession = async (_, args, { db, req, res }) => {
-  if (!process.env.REFRESH_TOKEN_SECRET) {
-    throw new GraphQLError("Server Error. Please try again later");
-  }
-
   const SELECT = `
     SELECT
       u.id "userId",
@@ -75,7 +72,7 @@ const verifySession: VerifySession = async (_, args, { db, req, res }) => {
     const jwt = `${sig}.${auth}.${token}`;
     payload = auth;
 
-    const { sub } = (await verify(jwt, process.env.REFRESH_TOKEN_SECRET)) as {
+    const { sub } = (await verify(jwt, env.REFRESH_TOKEN_SECRET)) as {
       sub: string;
     };
 

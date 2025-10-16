@@ -4,6 +4,7 @@ import util from "node:util";
 import type { Pool } from "pg";
 
 import { sign } from "@lib/tokenPromise";
+import { env } from "@lib/env";
 
 const testSession = async (
   db: Pool,
@@ -11,17 +12,8 @@ const testSession = async (
   userUUID: string,
   expiresIn = "15m"
 ) => {
-  if (
-    !process.env.REFRESH_TOKEN_SECRET ||
-    !process.env.CIPHER_ALGORITHM ||
-    !process.env.CIPHER_KEY ||
-    !process.env.CIPHER_IV
-  ) {
-    throw new Error("No secret in environment");
-  }
-
   try {
-    const refresh = sign({ sub: userUUID }, process.env.REFRESH_TOKEN_SECRET, {
+    const refresh = sign({ sub: userUUID }, env.REFRESH_TOKEN_SECRET, {
       expiresIn,
     });
 
@@ -35,9 +27,9 @@ const testSession = async (
       [refreshToken, userId, sessionId]
     );
 
-    const algorithm = process.env.CIPHER_ALGORITHM;
-    const key = Buffer.from(process.env.CIPHER_KEY, "hex");
-    const iv = Buffer.from(process.env.CIPHER_IV, "hex");
+    const algorithm = env.CIPHER_ALGORITHM;
+    const key = new Uint8Array(Buffer.from(env.CIPHER_KEY, "hex"));
+    const iv = new Uint8Array(Buffer.from(env.CIPHER_IV, "hex"));
 
     const [header, payload, signature] = refreshToken.split(".").map(part => {
       const cipher = crypto.createCipheriv(algorithm, key, iv);

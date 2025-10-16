@@ -1,14 +1,14 @@
 import type { Server } from "node:http";
-import { nodeEnv } from "./nodeEnv";
+import { env } from "../../lib/env";
 
 const getServerUrl = (server: Server, pathname: string): string => {
   const info = server.address();
 
-  if (nodeEnv === "production" || !info) return "";
+  if (env.NAME === "production" || !info) return "";
 
   if (typeof info === "string") return info;
 
-  if (nodeEnv === "demo") return `${info.address}${info.port}${pathname}`;
+  if (env.NAME === "demo") return `${info.address}${info.port}${pathname}`;
 
   return `http://localhost:${info.port}${pathname}`;
 };

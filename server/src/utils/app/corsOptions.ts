@@ -1,15 +1,14 @@
 import type { CorsOptions } from "cors";
-
-import { nodeEnv } from "./nodeEnv";
+import { env } from "../../lib/env";
 
 export const corsOptions: CorsOptions = {
   origin:
-    nodeEnv === "production"
+    env.NAME === "production"
       ? [
           "https://https://app.fawllerspeaks.com",
           "https://studio.apollographql.com",
         ]
-      : nodeEnv === "demo"
+      : env.NAME === "demo"
       ? [
           "https://https://demo.fawllerspeaks.com",
           "https://studio.apollographql.com",
