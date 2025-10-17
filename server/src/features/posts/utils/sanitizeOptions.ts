@@ -59,13 +59,6 @@ export const sanitizeOptions: IOptions = {
     ul: ["class", "style"],
   },
   allowedSchemes: ["http", "https", "mailto", "tel"],
-  exclusiveFilter({ mediaChildren, tag, text }) {
-    return (
-      !new Set(["br", "hr", "img", "input", "td"]).has(tag) &&
-      mediaChildren.length === 0 &&
-      !text.trim()
-    );
-  },
   nonBooleanAttributes: ["class", "href", "id", "rel", "style", "target"],
   parser: { lowerCaseTags: false, lowerCaseAttributeNames: false },
   selfClosing: ["br", "hr", "img", "input"],
