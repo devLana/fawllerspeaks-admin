@@ -10,6 +10,7 @@ import PostMetadataList from "./PostMetadataList";
 import PostTableOfContents from "./PostTableOfContents";
 import PostContentHeader from "./PostContentHeader";
 import PostActions from "./PostActions";
+import PostDate from "@features/posts/components/PostDate";
 import PostImageBanner from "@features/posts/components/PostImageBanner";
 import PostContentView from "@features/posts/components/PostContentView";
 import PostViewHeader from "@features/posts/components/PostViewHeader";
@@ -69,7 +70,6 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
             url={post.url}
             views={post.views}
             tags={post.tags}
-            binnedAt={post.binnedAt}
           />
           {post.content?.tableOfContents &&
             post.content.tableOfContents.length > 0 && (
@@ -82,14 +82,15 @@ const Post = ({ label, post }: { label: string; post: PostData }) => {
           component="article"
           sx={{ gridRow: { md: 1 }, gridColumn: { md: 2 } }}
         >
-          {post.isBinned && (
+          {post.isBinned && post.binnedAt && (
             <Alert
               role="status"
               severity="info"
               icon={<InfoOutlined />}
               sx={{ mb: 6 }}
             >
-              This post has been Binned
+              This post was binned on <PostDate dateString={post.binnedAt} />.
+              It is now read-only
             </Alert>
           )}
           <Typography variant="h1" gutterBottom>

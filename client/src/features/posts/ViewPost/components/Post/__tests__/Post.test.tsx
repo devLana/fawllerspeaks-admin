@@ -72,8 +72,6 @@ describe("Blog Post", () => {
       mocks.postTags[5]
     );
 
-    expect(metadata).not.toHaveTextContent("Binned At");
-
     const tOC = within(aside).getByRole("list", mocks.tOC);
 
     expect(within(tOC).getAllByRole("listitem")[0]).toContainElement(
@@ -103,13 +101,6 @@ describe("Blog Post", () => {
     renderUI(<Post label="View post page" post={mocks.post2} />);
 
     expect(screen.queryByRole("button", mocks.menuBtn)).not.toBeInTheDocument();
-
-    const aside = screen.getByRole("complementary");
-    const metadata = within(aside).getByRole("list", mocks.metadataList);
-
-    expect(within(metadata).getAllByRole("listitem")[7]).toHaveTextContent(
-      formatPostDate(mocks.post2.binnedAt)
-    );
 
     const article = screen.getByRole("article");
     const alertStatus = screen.getByRole("status");
