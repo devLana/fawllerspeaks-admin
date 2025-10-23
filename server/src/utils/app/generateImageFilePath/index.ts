@@ -29,17 +29,15 @@ export const generateImageFilePath = async (
 
   switch (env.NAME) {
     case "development":
-      pathname = "dev/";
-      break;
     case "demo":
-      pathname = "demo/";
-      break;
-    case "production":
-      pathname = "files/";
+      pathname = "dev/";
       break;
     case "test":
     default:
       pathname = "misc/";
+      break;
+    case "production":
+      pathname = "files/";
   }
 
   switch (imageCategory) {
