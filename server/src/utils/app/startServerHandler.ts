@@ -4,6 +4,7 @@ import type { ApolloServer } from "@apollo/server";
 
 import { db } from "@lib/db";
 import type { APIContext } from "@types";
+import { env } from "@lib/env";
 
 interface Prop {
   url: string;
@@ -33,5 +34,5 @@ export const startServerHandler = ({ url, server }: Prop) => {
     });
   });
 
-  console.log(`🚀 Server ready${url ? ` at ${url}` : ""}`);
+  console.log(`🚀 ${env.NAME} Server ready${url ? ` at ${url}` : ""}`);
 };
