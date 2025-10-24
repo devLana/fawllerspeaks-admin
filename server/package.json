@@ -12,7 +12,8 @@
     "dev": "npm run dev:build",
     "build:compile": "tsc -p tsconfig.build.json",
     "build": "npm run build:compile && tsc-alias -p tsconfig.build.json",
-    "start": "SET NODE_ENV=demo&& node build/index.js"
+    "demo": "SET NODE_ENV=demo&& node build/index.js",
+    "start": "SET NODE_ENV=production&& node build/index.js"
   },
   "license": "MIT",
   "engines": {
