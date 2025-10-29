@@ -5,15 +5,14 @@
   "main": "build/index.js",
   "scripts": {
     "lint": "eslint . --ext .ts,.js",
-    "test": "SET NODE_ENV=test&& jest --watch --runInBand",
+    "test": "cross-env NODE_ENV=test jest --watch --runInBand",
     "codegen": "graphql-codegen --config codegen.yml",
-    "dev:compile": "npm run codegen && npm run dev:build",
     "dev:build": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
+    "codegen:dev": "npm run codegen && npm run dev:build",
     "dev": "npm run dev:build",
-    "build:compile": "tsc -p tsconfig.build.json",
-    "build": "npm run build:compile && tsc-alias -p tsconfig.build.json",
-    "demo": "cross-env NODE_ENV=demo && npm run build && node build/index.js",
-    "start": "cross-env NODE_ENV=production && npm run build && node build/index.js"
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "demo": "cross-env NODE_ENV=demo node build/index.js",
+    "start": "cross-env NODE_ENV=production node build/index.js"
   },
   "license": "MIT",
   "engines": {

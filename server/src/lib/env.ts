@@ -116,9 +116,8 @@ const schema = joi.object<EnvVars>({
       "any.required": "PG_CONNECTION_STRING environment variable is required",
       "string.empty": "PG_CONNECTION_STRING environment variable not provided",
     }),
-    otherwise: joi.forbidden().messages({
-      "any.unknown":
-        "PG_CONNECTION_STRING is not needed in development or test environments",
+    otherwise: joi.any().forbidden().messages({
+      "any.unknown": `PG_CONNECTION_STRING is not needed in development or test environments`,
     }),
   }),
 });

@@ -34,5 +34,5 @@ export const startServerHandler = ({ url, server }: Prop) => {
     });
   });
 
-  console.log(`🚀 ${env.NAME} Server ready${url ? ` at ${url}` : ""}`);
+  console.log(`🚀 ${env.NAME} server ready${url ? ` at ${url}` : ""}`);
 };
