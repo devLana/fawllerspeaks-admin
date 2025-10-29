@@ -6,9 +6,9 @@ import type { Cookies } from "@types";
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
+  ...(env.NAME !== "test" && { sameSite: "none" }),
   ...((env.NAME === "production" || env.NAME === "demo") && {
     domain: "fawllerspeaks.com",
-    sameSite: "none",
   }),
 };
 

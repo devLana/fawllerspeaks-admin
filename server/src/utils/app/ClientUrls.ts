@@ -6,8 +6,14 @@ class ClientUrls implements IClientUrls {
   private testUrl = "https://test-url.com";
 
   get login() {
-    if (this.env === "production") return "https://app.fawllerspeaks.com/login";
-    if (this.env === "demo") return "https://demo.fawllerspeaks.com/login";
+    if (this.env === "production") {
+      return "https://admin.fawllerspeaks.com/login";
+    }
+
+    if (this.env === "demo") {
+      return "https://admin-demo.fawllerspeaks.com/login";
+    }
+
     if (this.env === "development") return "http://localhost:4040/login";
 
     return this.testUrl;
@@ -15,11 +21,11 @@ class ClientUrls implements IClientUrls {
 
   get forgotPassword() {
     if (this.env === "production") {
-      return "https://app.fawllerspeaks.com/forgot-password";
+      return "https://admin.fawllerspeaks.com/forgot-password";
     }
 
     if (this.env === "demo") {
-      return "https://demo.fawllerspeaks.com/forgot-password";
+      return "https://admin-demo.fawllerspeaks.com/forgot-password";
     }
 
     if (this.env === "development") {
@@ -31,11 +37,11 @@ class ClientUrls implements IClientUrls {
 
   get resetPassword() {
     if (this.env === "production") {
-      return "https://app.fawllerspeaks.com/reset-password";
+      return "https://admin.fawllerspeaks.com/reset-password";
     }
 
     if (this.env === "demo") {
-      return "https://demo.fawllerspeaks.com/reset-password";
+      return "https://admin-demo.fawllerspeaks.com/reset-password";
     }
 
     if (this.env === "development") {
