@@ -2,13 +2,13 @@ import { readFile } from "node:fs/promises";
 
 import type { Response, NextFunction } from "express";
 
-import supabase from "@lib/supabase/supabaseClient";
+import { storageUrl } from "@services/supabase";
 import { removeFile } from "@events/removeFile";
 
-import { ApiError } from "@utils/Errors";
+import { ApiError } from "@lib/Errors";
 import { generateImageFilePath } from "@utils/generateImageFilePath";
 import { UPLOAD_DIR } from "@utils/constants";
-import { upload } from "@utils/upload";
+import { uploadImage } from "@services/supabase/uploadImage";
 
 import type { PostContentImageRequest } from "@types";
 
@@ -23,7 +23,6 @@ export const uploadPostContentImage = async (
   }
 
   try {
-    const { storageUrl } = supabase();
     const { file } = req.upload;
     const { mimetype, filepath } = file;
 
@@ -33,7 +32,7 @@ export const uploadPostContentImage = async (
       mimetype
     );
 
-    const { error: supabaseErr } = await upload(
+    const { error: supabaseErr } = await uploadImage(
       imageFilePath,
       mimetype,
       imageFile

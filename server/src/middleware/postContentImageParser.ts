@@ -2,7 +2,7 @@ import formidable from "formidable";
 import type { Response, NextFunction } from "express";
 
 import { removeFile } from "@events/removeFile";
-import { ApiError, BadRequestError } from "@utils/Errors";
+import { ApiError, BadRequestError } from "@lib/Errors";
 import { UPLOAD_DIR } from "@utils/constants";
 import type { PostContentImageRequest } from "@types";
 

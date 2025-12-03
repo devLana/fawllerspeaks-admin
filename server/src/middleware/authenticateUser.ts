@@ -1,13 +1,9 @@
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 import type { Response, Request, NextFunction } from "express";
 
-import { db } from "@lib/db";
+import { db } from "@services/db";
 import { verify } from "@lib/tokenPromise";
-import {
-  ApiError,
-  UnauthenticatedError,
-  UnauthorizedError,
-} from "@utils/Errors";
+import { ApiError, UnauthenticatedError, UnauthorizedError } from "@lib/Errors";
 import { env } from "@lib/env";
 
 export const authenticateUser = async (

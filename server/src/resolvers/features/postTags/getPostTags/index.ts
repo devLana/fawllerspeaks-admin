@@ -1,0 +1,82 @@
+import { GraphQLError } from "graphql";
+
+import { PostTags } from "@typeResolvers/postTags/PostTags";
+import { ErrorResponse } from "@typeResolvers/commonResolvers";
+import deleteSession from "@utils/deleteSession";
+import type { PostTag } from "@resolverTypes";
+import type { GetPostTags } from "types/postTags/getPostTags";
+
+const getPostTags: GetPostTags = async (_, __, { db, user, req, res }) => {
+  try {
+    const MSG = "Unable to get post tags";
+
+    if (!user) {
+      void deleteSession(db, req, res);
+      return new ErrorResponse("AuthenticationError", MSG);
+    }
+
+    const { rows: findUser } = await db.query<{ is_registered: boolean }>(
+      `SELECT is_registered FROM users WHERE user_id = $1`,
+      [user]
+    );
+
+    if (findUser.length === 0) {
+      void deleteSession(db, req, res);
+      return new ErrorResponse("UnknownError", MSG);
+    }
+
+    if (!findUser[0].is_registered) {
+      return new ErrorResponse("RegistrationError", MSG);
+    }
+
+    const { rows: tags } = await db.query<PostTag>(
+      `SELECT
+        name,
+        tag_id id,
+        date_created "dateCreated",
+        last_Modified "lastModified"
+      FROM post_tags`
+    );
+
+    tags.sort(({ name: tagName1 }, { name: tagName2 }) => {
+      const match1 = tagName1.match(/^\d+/);
+
+      if (match1) {
+        const match = tagName2.match(/^\d+/);
+
+        if (!match) return -1;
+
+        return +match1[0] - +match[0];
+      }
+
+      const match2 = tagName1.match(/\d+$/);
+
+      if (match2) {
+        if (/^\d+/.test(tagName2)) return 1;
+
+        const match = tagName2.match(/\d+$/);
+
+        if (match) return +match2[0] - +match[0];
+
+        if (tagName1.toUpperCase() < tagName2.toUpperCase()) return -1;
+
+        if (tagName1.toUpperCase() > tagName2.toUpperCase()) return 1;
+
+        return 0;
+      }
+
+      if (tagName1.toUpperCase() < tagName2.toUpperCase()) return -1;
+
+      if (tagName1.toUpperCase() > tagName2.toUpperCase()) return 1;
+
+      return 0;
+    });
+
+    return new PostTags(tags);
+  } catch {
+    // log any system error
+    throw new GraphQLError("Unable to get post tags. Please try again later");
+  }
+};
+
+export default getPostTags;

@@ -1,5 +1,6 @@
-import getPostSlug from "@features/posts/utils/getPostSlug";
-import type { TestUser, TestPostData, RemoveNull } from "@types";
+import getPostSlug from "@utils/posts/getPostSlug";
+import type { RemoveNull } from "@types";
+import type { TestUser, TestPostData } from "types/tests";
 
 type RemoveNullFromTestUser = RemoveNull<TestUser>;
 type Params = Omit<Partial<TestPostData>, "slug" | "imageBanner">;

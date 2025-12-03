@@ -1,6 +1,6 @@
 import type { Response, Request, NextFunction } from "express";
 
-import type { ApiError } from "@utils/Errors";
+import type { ApiError } from "@lib/Errors";
 
 export const errorMiddleware = (
   err: ApiError,

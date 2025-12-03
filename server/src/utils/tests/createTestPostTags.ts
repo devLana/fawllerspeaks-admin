@@ -1,7 +1,7 @@
 import type { Pool } from "pg";
 
-import type { PostTag } from "@resolverTypes";
 import dateToISOString from "@utils/dateToISOString";
+import type { PostTag } from "@resolverTypes";
 
 const createTestPostTags = async (db: Pool): Promise<PostTag[]> => {
   try {

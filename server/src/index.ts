@@ -8,8 +8,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 
-import typeDefs from "@schema/typeDefs";
-import { resolvers } from "@schema/resolvers";
+import typeDefs from "./typeDefs";
+import { resolvers } from "./resolvers";
 
 import { createTempDirectory } from "@middleware/createTempDirectory";
 import { authenticateUser } from "@middleware/authenticateUser";
@@ -24,9 +24,9 @@ import { uploadPostContentImage } from "@controllers/uploadPostContentImage";
 import { graphqlApi } from "@controllers/graphqlApi";
 import { catchAll } from "@controllers/catchAll";
 
-import { startServerHandler } from "@utils/startServerHandler";
-import { corsOptions } from "@utils/corsOptions";
-import getServerUrl from "@utils/getServerUrl";
+import { startServerHandler } from "@lib/startServerHandler";
+import { corsOptions } from "@lib/corsOptions";
+import getServerUrl from "@lib/getServerUrl";
 import { env } from "@lib/env";
 
 import type { APIContext } from "@types";

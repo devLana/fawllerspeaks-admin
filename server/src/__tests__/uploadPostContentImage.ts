@@ -15,20 +15,20 @@ import FormData from "form-data";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import { db } from "@lib/db";
+import { db } from "@services/db";
+import { uploadImage } from "@services/supabase/uploadImage";
 
-import { upload } from "@utils/upload";
-import testUsers from "@tests/createTestUsers/testUsers";
-import loginTestUser from "@tests/loginTestUser";
-import postFormData from "@tests/postFormData";
+import testUsers from "@utils/tests/createTestUsers/testUsers";
+import loginTestUser from "@utils/tests/loginTestUser";
+import postFormData from "@utils/tests/postFormData";
 
 import type { APIContext } from "@types";
 
 type UploadReturn = () => Promise<{ error: Error | null }>;
 
-jest.mock("@utils/upload");
+jest.mock("@services/supabase/uploadImage");
 
-describe("Upload post content image - E2E", () => {
+describe("Upload post content image", () => {
   const unknownUserId = randomUUID();
   let server: ApolloServer<APIContext>, url: string, unknownJwt: string;
   let unregisteredJwt: string, registeredJwt: string, expiredJwtUser: string;
@@ -247,7 +247,7 @@ describe("Upload post content image - E2E", () => {
       jest.restoreAllMocks();
     });
 
-    const mock = upload as jest.MockedFunction<UploadReturn>;
+    const mock = uploadImage as jest.MockedFunction<UploadReturn>;
 
     it("Image upload fails, Respond with a server error", async () => {
       mock.mockResolvedValueOnce({ error: new Error("Error") });

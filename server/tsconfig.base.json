@@ -7,14 +7,14 @@
       "@server": ["index"],
       "@controllers/*": ["controllers/*"],
       "@events/*": ["events/*"],
-      "@features/*": ["features/*"],
       "@lib/*": ["lib/*"],
+      "@services/*": ["services/*"],
       "@middleware/*": ["middleware/*"],
-      "@schema/*": ["schema/*"],
       "@types": ["types"],
       "@resolverTypes": ["types/resolverTypes"],
-      "@utils/*": ["utils/app/*"],
-      "@tests/*": ["utils/tests/*"]
+      "@validators/*": ["validators/*"],
+      "@utils/*": ["utils/*"],
+      "@typeResolvers/*": ["resolvers/typeResolvers/*"]
     },
 
     // Language and Environment

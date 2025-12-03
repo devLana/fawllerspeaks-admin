@@ -36,9 +36,9 @@ const post = <T = unknown>(
     const req = request(url, options);
 
     req.on("response", res => {
-      const chunkData: Buffer[] = [];
+      const chunkData: Uint8Array[] = [];
 
-      res.on("data", (chunk: Buffer) => {
+      res.on("data", (chunk: Uint8Array) => {
         chunkData.push(chunk);
       });
 

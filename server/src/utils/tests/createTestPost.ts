@@ -1,17 +1,17 @@
 import type { Pool } from "pg";
 
-import supabase from "@lib/supabase/supabaseClient";
-import { getPostContentResponse } from "@features/posts/utils/getPostContentResponse";
-import { urls } from "@utils/ClientUrls";
+import { storageUrl } from "@services/supabase";
+import { getPostContentResponse } from "@utils/posts/getPostContentResponse";
+import { urls } from "@lib/ClientUrls";
 import dateToISOString from "@utils/dateToISOString";
-
+import type { PostDBData } from "types/posts";
+import type { TestPostAuthor, TestPostData } from "types/tests";
 import type {
   Post,
   PostContent,
   PostTableOfContents,
   PostTag,
 } from "@resolverTypes";
-import type { PostDBData, TestPostAuthor, TestPostData } from "@types";
 
 interface Options {
   db: Pool;
@@ -118,7 +118,6 @@ const createTestPost = async (params: Options): Promise<Post> => {
     );
 
     const [post] = rows;
-    const { storageUrl } = supabase();
     let content: PostContent | null = null;
 
     const datePublished = post.datePublished
