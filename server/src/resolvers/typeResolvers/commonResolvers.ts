@@ -9,7 +9,6 @@ type ErrorResponseNames =
   | "ServerError"
   | "UnknownError"
   | "UserSessionError"
-  | "DuplicatePostTitleError"
   | "NotAllowedPostActionError"
   | "DuplicatePostTagError";
 
