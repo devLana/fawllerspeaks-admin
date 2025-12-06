@@ -27,9 +27,8 @@ const testUsers = async (db: Pool): Promise<Users> => {
         first_name,
         last_name,
         is_registered,
-        reset_token,
         image
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING
         id "userId",
         user_id "userUUID",
@@ -40,7 +39,6 @@ const testUsers = async (db: Pool): Promise<Users> => {
         registeredUser.firstName,
         registeredUser.lastName,
         registeredUser.registered,
-        `{${registeredUser.resetToken[0]}, ${registeredUser.resetToken[1]}}`,
         registeredUser.image,
       ]
     );
@@ -49,19 +47,13 @@ const testUsers = async (db: Pool): Promise<Users> => {
       `INSERT INTO users (
         email,
         password,
-        is_registered,
-        reset_token
-      ) VALUES ($1, $2, $3, $4)
+        is_registered
+      ) VALUES ($1, $2, $3)
       RETURNING
         id "userId",
         user_id "userUUID",
         date_created "dateCreated"`,
-      [
-        unRegisteredUser.email,
-        unRegisterHash,
-        unRegisteredUser.registered,
-        `{${unRegisteredUser.resetToken[0]}, ${unRegisteredUser.resetToken[1]}}`,
-      ]
+      [unRegisteredUser.email, unRegisterHash, unRegisteredUser.registered]
     );
 
     const [registerRes, unregisterRes] = await Promise.all([

@@ -30,9 +30,8 @@ const authUsers = async (db: Pool): Promise<Users> => {
         first_name,
         last_name,
         is_registered,
-        image,
-        reset_token
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        image
+      ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING
         id "userId",
         user_id "userUUID",
@@ -44,7 +43,6 @@ const authUsers = async (db: Pool): Promise<Users> => {
         registeredUser.lastName,
         registeredUser.registered,
         registeredUser.image,
-        `{${registeredUser.resetToken[0]}, ${registeredUser.resetToken[1]}}`,
       ]
     );
 
@@ -55,9 +53,8 @@ const authUsers = async (db: Pool): Promise<Users> => {
         first_name,
         last_name,
         is_registered,
-        image,
-        reset_token
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        image
+      ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING
         id "userId",
         user_id "userUUID",
@@ -69,7 +66,6 @@ const authUsers = async (db: Pool): Promise<Users> => {
         newRegisteredUser.lastName,
         newRegisteredUser.registered,
         newRegisteredUser.image,
-        `{${newRegisteredUser.resetToken[0]}, ${newRegisteredUser.resetToken[1]}}`,
       ]
     );
 
@@ -77,19 +73,13 @@ const authUsers = async (db: Pool): Promise<Users> => {
       `INSERT INTO users (
         email,
         password,
-        is_registered,
-        reset_token
-      ) VALUES ($1, $2, $3, $4)
+        is_registered
+      ) VALUES ($1, $2, $3)
       RETURNING
         id "userId",
         user_id "userUUID",
         date_created "dateCreated"`,
-      [
-        unRegisteredUser.email,
-        unRegisterHash,
-        unRegisteredUser.registered,
-        `{${unRegisteredUser.resetToken[0]}, ${unRegisteredUser.resetToken[1]}}`,
-      ]
+      [unRegisteredUser.email, unRegisterHash, unRegisteredUser.registered]
     );
 
     const [registerRes, unregisterRes, newRegisterRes] = await Promise.all([

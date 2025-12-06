@@ -10,7 +10,6 @@ import { FORGOT_PASSWORD } from "@utils/tests/gqlQueries/authTestQueries";
 import { unRegisteredUser, registeredUser } from "@utils/tests/mocks";
 import testUsers from "@utils/tests/createTestUsers/testUsers";
 import post from "@utils/tests/post";
-
 import type { APIContext } from "@types";
 import type { ForgotPasswordData } from "types/auth/forgotPassword";
 
@@ -18,7 +17,7 @@ jest.mock("@services/mail/forgotPassword", () => {
   return jest.fn().mockName("forgotPasswordMail");
 });
 
-describe.skip("Forgot password", () => {
+describe("Forgot password", () => {
   let server: ApolloServer<APIContext>, url: string;
 
   beforeAll(async () => {
@@ -28,8 +27,9 @@ describe.skip("Forgot password", () => {
 
   afterAll(async () => {
     await db.query(
-      "Truncate TABLE forgot_password, users RESTART IDENTITY CASCADE"
+      "Truncate TABLE password_reset, users RESTART IDENTITY CASCADE"
     );
+
     await Promise.all([server.stop(), db.end()]);
   });
 
@@ -62,7 +62,7 @@ describe.skip("Forgot password", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
         __typename: "NotAllowedError",
-        message: "Unable to reset the password for this user",
+        message: "Unable to reset user password",
         status: "ERROR",
       });
     });
@@ -78,7 +78,7 @@ describe.skip("Forgot password", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
         __typename: "RegistrationError",
-        message: "Unable to reset password for unregistered user",
+        message: "Unable to reset user password",
         status: "ERROR",
       });
     });
@@ -96,7 +96,7 @@ describe.skip("Forgot password", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
         __typename: "Response",
-        message: `Your request is being processed and a mail will be sent to you shortly if that email address exists`,
+        message: `A password reset link has been sent to the email address provided`,
         status: "SUCCESS",
       });
     });
@@ -119,7 +119,7 @@ describe.skip("Forgot password", () => {
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
         __typename: "ServerError",
-        message: "Unable to send forgot password mail",
+        message: `An error has occurred in trying to set up your password reset. Please try again later`,
         status: "ERROR",
       });
     });
