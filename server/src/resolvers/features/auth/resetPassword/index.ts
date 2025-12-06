@@ -7,6 +7,7 @@ import { ResetPasswordValidationError } from "@typeResolvers/auth/ResetPasswordV
 import resetPasswordMail from "@services/mail/resetPassword";
 import { resetPasswordValidator as schema } from "@validators/auth/resetPassword";
 import { MailError } from "@lib/Errors";
+import { generateResetHash } from "@utils/auth/generateResetToken";
 import generateErrorsObject from "@utils/generateErrorsObject";
 import type { Reset, User } from "types/auth/resetPassword";
 
@@ -15,45 +16,50 @@ const resetPassword: Reset = async (_, args, { db }) => {
     const MSG = "Unable to reset password";
     const validations = await schema.validateAsync(args, { abortEarly: false });
     const { token, password } = validations;
+    const tokenHash = generateResetHash(token);
 
-    const generateHash = bcrypt.hash(password, 10);
-    const findUser = db.query<User>(
+    const { rows } = await db.query<User>(
       `SELECT
         u.id "userId",
         u.email,
-        u.is_registered "isRegistered",
-        fp.id "resetId"
-      FROM users U INNER JOIN forgot_password fp
-      ON u.id = fp.user_id
-      WHERE fp.is_valid = TRUE AND fp.reset_token = $1`,
-      [token]
+        u.is_registered,
+        pr.used,
+        pr.expire_date
+      FROM password_reset pr
+      INNER JOIN users u ON pr.user_id = u.id
+      WHERE pr.token = $1
+      FOR UPDATE`,
+      [tokenHash]
     );
 
-    const [hash, { rows }] = await Promise.all([generateHash, findUser]);
+    if (rows.length === 0) return new ErrorResponse("UnknownError", MSG);
 
-    if (rows.length === 0) return new ErrorResponse("NotAllowedError", MSG);
+    const [{ userId, email, is_registered, expire_date, used }] = rows;
 
-    const [{ userId, email, isRegistered, resetId }] = rows;
-
-    if (!isRegistered) {
-      void db.query(
-        `UPDATE forgot_password SET is_valid = FALSE WHERE id = $1`,
-        [resetId]
-      );
-
-      const msg = `This account is currently unregistered. Please log in with the default generated password sent to you in box and register your account with a new password or reach out to support so a new default password can be generated for you`;
+    if (!is_registered) {
+      const msg = "The password of unregistered accounts cannot be reset";
       return new ErrorResponse("RegistrationError", msg);
     }
 
-    await db.query(
-      `UPDATE forgot_password SET is_valid = FALSE WHERE resetId = $1`,
-      [resetId]
-    );
+    if (used) return new ErrorResponse("ForbiddenError", MSG);
 
-    await db.query(`UPDATE users SET password = $1 WHERE id = $2`, [
-      hash,
-      userId,
-    ]);
+    if (Date.parse(expire_date) < Date.now()) {
+      const msg = "The password reset token has already expired";
+      return new ErrorResponse("NotAllowedError", msg);
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await db.query(
+      `WITH reset_password AS (
+        UPDATE users SET password = $1 WHERE id = $2
+      ),
+      set_reset_token_as_used AS (
+        UPDATE password_reset SET used = true WHERE token = $3
+      )
+      SELECT 1`,
+      [passwordHash, userId, tokenHash]
+    );
 
     await resetPasswordMail(email);
 
@@ -69,7 +75,12 @@ const resetPassword: Reset = async (_, args, { db }) => {
       );
     }
 
-    if (err instanceof MailError) return new Response(err.message, "WARN");
+    if (err instanceof MailError) {
+      // log mail error
+      return new Response("Your password has been reset");
+    }
+
+    // log any system errors
 
     throw new GraphQLError("Unable to reset password. Please try again later");
   }

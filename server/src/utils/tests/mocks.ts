@@ -52,6 +52,11 @@ export const registeredReset = {
   hash: "76a9306fcc07c34833cab818b5753e82fdab171dadeab4eae205f44e0b43360c",
 };
 
+export const otherRegisteredReset = {
+  token: "YQkJXWWCrTdkufvT-RL8SdpnzhRypEVtjgNhm4AkauQ",
+  hash: "64584b96833487c303f2ababfacd38c4188d805749941841a96e39fdbb2d350d",
+};
+
 const html =
   "<h2>heading 2</h2><p>Test post content</p><h3>heading 3</h3><p>paragraph</p>";
 

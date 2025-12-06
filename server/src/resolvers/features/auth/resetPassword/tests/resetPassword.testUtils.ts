@@ -1,4 +1,8 @@
-import { unRegisteredUser } from "@utils/tests/mocks";
+import {
+  newRegisteredReset,
+  otherNewRegisteredReset,
+  unregisteredReset,
+} from "@utils/tests/mocks";
 import type { InputErrors } from "types/tests";
 
 interface Input {
@@ -50,15 +54,29 @@ export const validations: [string, Input, InputErrors<Input>][] = [
   ],
 ];
 
-export const verifyEmail: [string, string, string][] = [
+export const verify: [string, string, string, string][] = [
   [
     "Should return an error response if the password reset token is unknown",
     "token_token_token",
-    "NotAllowedError",
+    "UnknownError",
+    "Unable to reset password",
   ],
   [
-    "Should return an error response if the user is unregistered",
-    unRegisteredUser.resetToken[0],
+    "Should return an error response if user tries to reset the password of an unregistered account",
+    unregisteredReset.token,
     "RegistrationError",
+    "The password of unregistered accounts cannot be reset",
+  ],
+  [
+    "Should return an error if the password reset token has already been used",
+    newRegisteredReset.token,
+    "ForbiddenError",
+    "Unable to reset password",
+  ],
+  [
+    "Should return an error response if the password reset token has expired",
+    otherNewRegisteredReset.token,
+    "NotAllowedError",
+    "The password reset token has already expired",
   ],
 ];

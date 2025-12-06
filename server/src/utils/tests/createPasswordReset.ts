@@ -22,7 +22,8 @@ const createPasswordReset = async (
         ($1, $2, $3, $4),
         ($5, $6, $7, $8),
         ($9, $10, $11, $12),
-        ($13, $14, $15, $16)`,
+        ($13, $14, $15, $16),
+        ($17, $18, $19, $20)`,
       [
         unregisteredId,
         unregisteredReset.hash,
@@ -38,6 +39,10 @@ const createPasswordReset = async (
         false,
         registeredId,
         registeredReset.hash,
+        new Date(Date.now() + 300_000).toISOString(),
+        false,
+        registeredId,
+        otherRegisteredReset.hash,
         new Date(Date.now() + 300_000).toISOString(),
         false,
       ]

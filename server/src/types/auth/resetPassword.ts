@@ -11,7 +11,8 @@ export type ResetPassword = TestData<{
 
 export interface User {
   userId: number;
-  isRegistered: boolean;
+  is_registered: boolean;
   email: string;
-  resetId: number;
+  used: boolean;
+  expire_date: string;
 }
