@@ -127,7 +127,7 @@ describe("Change password", () => {
       });
     });
 
-    it("Confirmation mail fails to send, Revert all updates and send an error response", async () => {
+    it("Should change the user's password even if the confirmation mail fails to send", async () => {
       const mock = changePasswordMail as jest.MockedFunction<() => never>;
       const options = { authorization: `Bearer ${registeredJWT}` };
       const payload = { query: CHANGE_PASSWORD, variables: mocks.validInput2 };
