@@ -4,10 +4,11 @@ import type { TestData } from "types/tests";
 
 export type VerifyToken = ResolverFunc<MutationResolvers["verifyResetToken"]>;
 
-export interface Verification {
+export interface VerifyData {
   email: string;
-  isRegistered: boolean;
-  resetId: number;
+  is_registered: boolean;
+  used: boolean;
+  expire_date: string;
 }
 
 export type VerifyResetToken = TestData<{

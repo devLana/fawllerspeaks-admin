@@ -12,7 +12,6 @@ export const unRegisteredUser: TestUser = {
   email: "test_email@example.com",
   password: "passWord1!",
   registered: false,
-  resetToken: ["reset_token_reset_token_unregistered", "90"],
 };
 
 export const registeredUser: RemoveNullFromTestUser = {
@@ -22,7 +21,6 @@ export const registeredUser: RemoveNullFromTestUser = {
   lastName: "Maxwell",
   image: "registeredUser/image/storage/path",
   registered: true,
-  resetToken: ["registered_reset_token_reset_token", "78"],
 };
 
 export const newRegisteredUser: RemoveNullFromTestUser = {
@@ -32,7 +30,26 @@ export const newRegisteredUser: RemoveNullFromTestUser = {
   lastName: "Doe",
   image: "newRegisteredUser/image/storage/path",
   registered: true,
-  resetToken: ["new_registered_user_reset_token", "203"],
+};
+
+export const unregisteredReset = {
+  token: "geBEEmMq148kqdeeWQmynK1kvOBwPg8gGOcFl2Z8XNk",
+  hash: "55f482c3aa0fbbac566b5f0a5ac63011d362429987efa189587bbe0430fb62e7",
+};
+
+export const newRegisteredReset = {
+  token: "DvL2LU8sUQg0OeULKTAs8nJPT_x9NaHIETw12vNrul0",
+  hash: "60238d3e2816bf810fa9ce032bf085ba42985e34f6a3b2fb3300a7e1e89c0b0b",
+};
+
+export const otherNewRegisteredReset = {
+  token: "7c0UauaXpmtBCJUmco3AkcQAgu9-M0xbXxwgsT6bHWo",
+  hash: "c07b542d69f34f0b5e6e1fbea5362fc660f8711e4491be686edd11f315381b25",
+};
+
+export const registeredReset = {
+  token: "hDWlbd_pY3iRI7BKFANn4ok4ZCXfZRvW67br9Usvf8k",
+  hash: "76a9306fcc07c34833cab818b5753e82fdab171dadeab4eae205f44e0b43360c",
 };
 
 const html =

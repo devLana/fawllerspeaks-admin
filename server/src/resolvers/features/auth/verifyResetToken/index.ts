@@ -5,37 +5,42 @@ import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { VerifyResetTokenValidationError } from "@typeResolvers/auth/VerifyResetTokenValidationError";
 import { VerifiedResetToken } from "@typeResolvers/auth/VerifiedResetToken";
 import { verifyTokenValidator } from "@validators/auth/verifyToken";
-import type { Verification, VerifyToken } from "types/auth/verifyResetToken";
+import { generateResetHash } from "@utils/auth/generateResetToken";
+import type { VerifyData, VerifyToken } from "types/auth/verifyResetToken";
 
 const verifyResetToken: VerifyToken = async (_, { token }, { db }) => {
   const MSG = "Unable to verify password reset token";
 
   try {
     const validatedToken = await verifyTokenValidator.validateAsync(token);
+    const hash = generateResetHash(validatedToken);
 
-    const { rows } = await db.query<Verification>(
+    const { rows } = await db.query<VerifyData>(
       `SELECT
         u.email,
-        u.is_registered "isRegistered",
-        fp.id "resetId"
-      FROM users u INNER JOIN forgot_password fp
-      ON u.id = fp.user_id
-      WHERE fp.is_valid = TRUE AND fp.reset_token = $1`,
-      [validatedToken]
+        u.is_registered,
+        pr.expire_date,
+        pr.used
+        FROM password_reset pr
+      INNER JOIN users u ON pr.user_id = u.id
+      WHERE pr.token = $1`,
+      [hash]
     );
 
-    if (rows.length === 0) return new ErrorResponse("NotAllowedError", MSG);
+    if (rows.length === 0) return new ErrorResponse("UnknownError", MSG);
 
-    const [{ isRegistered, email, resetId }] = rows;
+    const [{ is_registered, email, expire_date, used }] = rows;
 
-    if (!isRegistered) {
-      void db.query(
-        `UPDATE forgot_password SET is_valid = FALSE WHERE id = $1`,
-        [resetId]
-      );
-
-      const msg = `This account is currently unregistered. Please log in with the default generated password sent to you in box and register your account with a new password or reach out to support so a new default password can be generated for you`;
+    if (!is_registered) {
+      const msg = "The password of unregistered accounts cannot be reset";
       return new ErrorResponse("RegistrationError", msg);
+    }
+
+    if (used) return new ErrorResponse("ForbiddenError", MSG);
+
+    if (Date.parse(expire_date) < Date.now()) {
+      const msg = "The password reset token has already expired";
+      return new ErrorResponse("NotAllowedError", msg);
     }
 
     return new VerifiedResetToken(email, validatedToken);
@@ -43,6 +48,8 @@ const verifyResetToken: VerifyToken = async (_, { token }, { db }) => {
     if (err instanceof ValidationError) {
       return new VerifyResetTokenValidationError(err.message);
     }
+
+    // log any system errors
 
     throw new GraphQLError(`${MSG}. Please try again later`);
   }

@@ -12,7 +12,6 @@ export interface TestUser {
   readonly email: string;
   readonly password: string;
   readonly registered: boolean;
-  readonly resetToken: [string, string];
 }
 
 export interface DbTestUser {

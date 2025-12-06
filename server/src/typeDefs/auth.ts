@@ -78,7 +78,7 @@ export const authTypeDefs = `#graphql
 
   union ResetPassword = Response | ResetPasswordValidationError | NotAllowedError | RegistrationError
 
-  union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | NotAllowedError | RegistrationError
+  union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | UnknownError | NotAllowedError | ForbiddenError | RegistrationError
 
   union VerifySession = VerifiedSession | SessionIdValidationError | NotAllowedError | UnknownError | ForbiddenError | AuthCookieError
 
