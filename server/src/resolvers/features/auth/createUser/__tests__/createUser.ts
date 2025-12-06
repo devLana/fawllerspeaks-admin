@@ -81,7 +81,7 @@ describe("Create user", () => {
     it("Should return an error response if the confirmation mail fails to send after creating a new user", async () => {
       const variables = { email: "lanas_mail@example.org" };
       const payload = { query: CREATE_USER, variables };
-      const msg = `An error has occurred in trying to create the new user. please try again later`;
+      const msg = `An error has occurred in trying to create the new user. Please try again later`;
       const mock = createUserMail as jest.MockedFunction<() => never>;
       mock.mockImplementation(() => {
         throw new MailError("Unable to send mail");

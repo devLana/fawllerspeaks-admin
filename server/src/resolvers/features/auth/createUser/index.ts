@@ -41,7 +41,7 @@ const createUser: CreateUser = async (_, { email }, { db }) => {
     }
 
     if (err instanceof MailError) {
-      const msg = `An error has occurred in trying to create the new user. please try again later`;
+      const msg = `An error has occurred in trying to create the new user. Please try again later`;
 
       // log the create user mail error
       void db.query("ROLLBACK");
