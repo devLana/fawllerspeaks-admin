@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import generateBytes from "../generateBytes";
 
 export const generateResetHash = (token: string) => {
-  return createHash("sha256").update(token).digest("hex");
+  return createHash("sha256").update(token, "base64url").digest("hex");
 };
 
 const generateResetToken = async () => {

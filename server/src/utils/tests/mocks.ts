@@ -33,28 +33,28 @@ export const newRegisteredUser: RemoveNullFromTestUser = {
 };
 
 export const unregisteredReset = {
-  token: "geBEEmMq148kqdeeWQmynK1kvOBwPg8gGOcFl2Z8XNk",
-  hash: "55f482c3aa0fbbac566b5f0a5ac63011d362429987efa189587bbe0430fb62e7",
+  token: "2NiAlHaa9YGopc5aP6oJ55YE8QKz-j8ii7vEtgPOUC0",
+  hash: "410a1830dbe4b21c01ba08b529bb02dc510d19ae7fb754e1b1a2fa2695f26938",
 };
 
 export const newRegisteredReset = {
-  token: "DvL2LU8sUQg0OeULKTAs8nJPT_x9NaHIETw12vNrul0",
-  hash: "60238d3e2816bf810fa9ce032bf085ba42985e34f6a3b2fb3300a7e1e89c0b0b",
+  token: "atE86XPwwDEv_zlDkNsZ-lXUxZiOmiDaAb29Et4qL5A",
+  hash: "37713c02acd2b9f033a45d546dbcecc528b1205dc17269bb4ea9526d8a27e428",
 };
 
 export const otherNewRegisteredReset = {
-  token: "7c0UauaXpmtBCJUmco3AkcQAgu9-M0xbXxwgsT6bHWo",
-  hash: "c07b542d69f34f0b5e6e1fbea5362fc660f8711e4491be686edd11f315381b25",
+  token: "3E53dWglHY0Dvvx5kv1iK-82YZr9RElRNKSDibhda4Q",
+  hash: "475ee532719198d31640ef1ed69ce2c2c7987e2074a35d548d6e4e3322b4665c",
 };
 
 export const registeredReset = {
-  token: "hDWlbd_pY3iRI7BKFANn4ok4ZCXfZRvW67br9Usvf8k",
-  hash: "76a9306fcc07c34833cab818b5753e82fdab171dadeab4eae205f44e0b43360c",
+  token: "Ndoc736vY53k0QmVxLoIdqsEpOvm3ToqsCdmp7eROu0",
+  hash: "07e88a9b265e3a50ed7f52b9b3836c1e1222e21ba59384ea773187c6755eb5d7",
 };
 
 export const otherRegisteredReset = {
-  token: "YQkJXWWCrTdkufvT-RL8SdpnzhRypEVtjgNhm4AkauQ",
-  hash: "64584b96833487c303f2ababfacd38c4188d805749941841a96e39fdbb2d350d",
+  token: "FUXaSS1miuQ9Ue93EflTe7fNaYdIDGqGNVtsVVZbvTc",
+  hash: "035014177026c4c78653f92729e6f788496629ee748edf6b3ce63e93e036e550",
 };
 
 const html =

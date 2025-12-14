@@ -21,7 +21,7 @@ const verifyResetToken: VerifyToken = async (_, { token }, { db }) => {
         u.is_registered,
         pr.expire_date,
         pr.used
-        FROM password_reset pr
+      FROM password_reset pr
       INNER JOIN users u ON pr.user_id = u.id
       WHERE pr.token = $1`,
       [hash]

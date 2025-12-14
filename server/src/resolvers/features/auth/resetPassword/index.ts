@@ -27,8 +27,7 @@ const resetPassword: Reset = async (_, args, { db }) => {
         pr.expire_date
       FROM password_reset pr
       INNER JOIN users u ON pr.user_id = u.id
-      WHERE pr.token = $1
-      FOR UPDATE`,
+      WHERE pr.token = $1`,
       [tokenHash]
     );
 
