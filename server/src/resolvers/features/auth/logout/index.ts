@@ -1,77 +1,45 @@
 import { GraphQLError } from "graphql";
-import { ValidationError } from "joi";
 
-import { SessionIdValidationError } from "@typeResolvers/auth/SessionIdValidationError";
-import { ErrorResponse, Response } from "@typeResolvers/commonResolvers";
-import { sessionIdValidator } from "@validators/auth/sessionId";
-import { clearCookies } from "@utils/auth/cookies";
-import deleteSession from "@utils/deleteSession";
-
+import { Response } from "@typeResolvers/commonResolvers";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { Logout } from "types/auth/logout";
 
-const logout: Logout = async (_, { sessionId }, { db, user, req, res }) => {
+const logout: Logout = async (_, __, { db, user, req, res }) => {
   try {
-    const MSG = "Unable to logout";
+    // const ip = req.ip || null;
+    // const userAgent = req.headers["user-agent"] || null;
+    const { auth } = req.cookies;
 
-    if (!user) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("AuthenticationError", MSG);
+    if (!user || !auth) {
+      // log suspicious log out activity along with the request's ip and userAgent
+      clearAuthCookie(res);
+      return new Response("User logged out");
     }
 
-    const validatedSession = await sessionIdValidator.validateAsync(sessionId);
-
-    const { auth, sig, token } = req.cookies;
-
-    if (!auth && !sig && !token) {
-      const { rows } = await db.query<{ user: string }>(
-        `SELECT u.user_id "user"
-        FROM sessions s INNER JOIN users u
-        ON s.user_id = u.id
-        WHERE s.session_id = $1`,
-        [validatedSession]
-      );
-
-      if (rows.length === 0) return new ErrorResponse("UnknownError", MSG);
-
-      if (rows[0].user !== user) {
-        return new ErrorResponse("NotAllowedError", MSG);
-      }
-
-      await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
-        validatedSession,
-      ]);
-
-      return new Response("User logged out", "WARN");
-    }
-
-    if (!auth || !sig || !token) {
-      return new ErrorResponse("NotAllowedError", MSG);
-    }
-
-    const jwToken = `${sig}.${auth}.${token}`;
-
-    const { rows: session } = await db.query<{ user: string }>(
-      `SELECT u.id "user"
-      FROM sessions s INNER JOIN users u
-      ON s.user_id = u.id
-      WHERE u.user_id = $1 AND s.session_id = $2 AND s.refresh_token = $3`,
-      [user, validatedSession, jwToken]
+    const { rows } = await db.query<{ user_id: string }>(
+      `WITH revoke_session AS (
+        UPDATE sessions
+        SET revoked_at = CURRENT_TIMESTAMP(3)
+        WHERE refresh_token = $1 AND revoked_at IS NULL
+        RETURNING user_id
+      )
+      SELECT u.user_id
+      FROM revoke_session AS rs
+      INNER JOIN users u ON rs.user_id = u.id`,
+      [auth]
     );
 
-    if (session.length === 0) return new ErrorResponse("UnknownError", MSG);
+    if (rows.length === 0) {
+      // log suspicious log out activity from user along with the request's ip and userAgent
+    } else if (rows[0].user_id !== user) {
+      // log suspicious log out activity from user along with the request's ip and userAgent
+      // maybe also notify user_id of suspicious activity on their auth session
+    }
 
-    await db.query(
-      `DELETE FROM sessions WHERE user_id = $1 AND session_id = $2 AND refresh_token = $3`,
-      [session[0].user, validatedSession, jwToken]
-    );
-
-    clearCookies(res);
-
+    clearAuthCookie(res);
     return new Response("User logged out");
   } catch (err) {
-    if (err instanceof ValidationError) {
-      return new SessionIdValidationError(err.message);
-    }
+    // log any system errors
 
     throw new GraphQLError("Unable to logout. Please try again later");
   }

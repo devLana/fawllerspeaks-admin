@@ -1,54 +1,32 @@
 import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
-
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
-
 import { LOGOUT } from "@utils/tests/gqlQueries/authTestQueries";
 import testUsers from "@utils/tests/createTestUsers/testUsers";
 import loginTestUser from "@utils/tests/loginTestUser";
 import testSession from "@utils/tests/testSession";
 import post from "@utils/tests/post";
-
 import type { APIContext } from "@types";
-import type { LogoutData } from "types/auth/logout";
+import type { LogoutData as Data } from "types/auth/logout";
 
-describe.skip("LogoutData", () => {
+describe("Logout", () => {
   let server: ApolloServer<APIContext>, url: string, unregisteredJwt: string;
-  let unregisteredSessionId: string, registeredJwt: string;
-  let registeredSessionId: string, registeredCookie: string;
+  let registeredJwt: string, registeredCookie: string;
+  let unregisteredCookie: string;
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
     const { unregisteredUser, registeredUser } = await testUsers(db);
 
-    const unregisteredToken = loginTestUser(unregisteredUser.userUUID);
-    const registeredToken = loginTestUser(registeredUser.userUUID);
-
-    const unregisteredSession = testSession(
-      db,
-      unregisteredUser.userId,
-      unregisteredUser.userUUID
-    );
-
-    const registeredSession = testSession(
-      db,
-      registeredUser.userId,
-      registeredUser.userUUID
-    );
-
-    [
-      unregisteredJwt,
-      registeredJwt,
-      { sessionId: unregisteredSessionId },
-      { sessionId: registeredSessionId, cookies: registeredCookie },
-    ] = await Promise.all([
-      unregisteredToken,
-      registeredToken,
-      unregisteredSession,
-      registeredSession,
-    ]);
+    [unregisteredJwt, registeredJwt, unregisteredCookie, registeredCookie] =
+      await Promise.all([
+        loginTestUser(unregisteredUser.userUUID),
+        loginTestUser(registeredUser.userUUID),
+        testSession(db, unregisteredUser.userId),
+        testSession(db, registeredUser.userId),
+      ]);
   });
 
   afterAll(async () => {
@@ -56,143 +34,104 @@ describe.skip("LogoutData", () => {
     await Promise.all([server.stop(), db.end()]);
   });
 
-  describe("Validate user authentication", () => {
-    it("Should return an error response if the user is not logged in", async () => {
-      const payload = { query: LOGOUT, variables: { sessionId: "" } };
+  describe("No user authentication", () => {
+    it("Expect a successful log out action even if the user could not be authenticated", async () => {
+      const payload = { query: LOGOUT };
 
-      const { data } = await post<LogoutData>(url, payload);
+      const { data, responseHeaders } = await post<Data>(url, payload);
 
-      expect(data.errors).toBeUndefined();
-      expect(data.data).toBeDefined();
-      expect(data.data?.logout).toStrictEqual({
-        __typename: "AuthenticationError",
-        message: "Unable to logout",
-        status: "ERROR",
-      });
-    });
-  });
-
-  describe("Validate user session input", () => {
-    it.each([
-      [
-        "Should return an error response if the session id is an empty string",
-        "",
-      ],
-      [
-        "Should return an error response if the session id is an empty whitespace string",
-        "      ",
-      ],
-    ])("%s", async (_, id) => {
-      const payload = { query: LOGOUT, variables: { sessionId: id } };
-      const options = { authorization: `Bearer ${unregisteredJwt}` };
-
-      const { data } = await post<LogoutData>(url, payload, options);
-
-      expect(data.errors).toBeUndefined();
-      expect(data.data).toBeDefined();
-      expect(data.data?.logout).toStrictEqual({
-        __typename: "SessionIdValidationError",
-        sessionIdError: "Invalid session id",
-        status: "ERROR",
-      });
-    });
-  });
-
-  describe("LogoutData request is made with an empty cookie header", () => {
-    it("Should return an error response if the session id is unknown", async () => {
-      const payload = { query: LOGOUT, variables: { sessionId: "wrong_id" } };
-      const options = { authorization: `Bearer ${unregisteredJwt}` };
-
-      const { data } = await post<LogoutData>(url, payload, options);
-
-      expect(data.errors).toBeUndefined();
-      expect(data.data).toBeDefined();
-      expect(data.data?.logout).toStrictEqual({
-        __typename: "UnknownError",
-        message: "Unable to logout",
-        status: "ERROR",
-      });
-    });
-
-    it("Should return an error response if the session was not assigned to the logged in user", async () => {
-      const variables = { sessionId: unregisteredSessionId };
-      const payload = { query: LOGOUT, variables };
-      const options = { authorization: `Bearer ${registeredJwt}` };
-
-      const { data } = await post<LogoutData>(url, payload, options);
-
-      expect(data.errors).toBeUndefined();
-      expect(data.data).toBeDefined();
-      expect(data.data?.logout).toStrictEqual({
-        __typename: "NotAllowedError",
-        message: "Unable to logout",
-        status: "ERROR",
-      });
-    });
-
-    it("Should delete the current session and log the user out", async () => {
-      const variables = { sessionId: unregisteredSessionId };
-      const payload = { query: LOGOUT, variables };
-      const options = { authorization: `Bearer ${unregisteredJwt}` };
-
-      const { data } = await post<LogoutData>(url, payload, options);
-
+      // expect(loggerMock).toHaveBeenCalled()
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.logout).toStrictEqual({
         __typename: "Response",
         message: "User logged out",
-        status: "WARN",
+        status: "SUCCESS",
+      });
+    });
+
+    it("Expect the user to be logged out if the request has no authenticated session", async () => {
+      const payload = { query: LOGOUT };
+      const options = { authorization: `Bearer ${unregisteredJwt}` };
+
+      const { data, responseHeaders } = await post<Data>(url, payload, options);
+
+      // expect(loggerMock).toHaveBeenCalled()
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.logout).toStrictEqual({
+        __typename: "Response",
+        message: "User logged out",
+        status: "SUCCESS",
       });
     });
   });
 
-  describe("Validate request cookie", () => {
-    it("Should return an error response if the request has a missing cookie", async () => {
-      const cookie = registeredCookie.split(";").splice(1, 1).join(";");
-      const variables = { sessionId: registeredSessionId };
-      const payload = { query: LOGOUT, variables };
+  describe("Log suspicious logout activity", () => {
+    it("Expect the request activity to be logged if no session could be logged out", async () => {
+      const cookie = "auth=475ee532719198d31640ef1ed69ce2c2c7987e";
+      const payload = { query: LOGOUT };
+      const options = { authorization: `Bearer ${unregisteredJwt}`, cookie };
+
+      const { data, responseHeaders } = await post<Data>(url, payload, options);
+
+      // expect(loggerMock).toHaveBeenCalled()
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.logout).toStrictEqual({
+        __typename: "Response",
+        message: "User logged out",
+        status: "SUCCESS",
+      });
+    });
+
+    it("Expect the request activity to be logged if a user tries to log out another user's session", async () => {
+      const cookie = unregisteredCookie;
+      const payload = { query: LOGOUT };
       const options = { authorization: `Bearer ${registeredJwt}`, cookie };
 
-      const { data } = await post<LogoutData>(url, payload, options);
+      const { data, responseHeaders } = await post<Data>(url, payload, options);
 
+      // expect(loggerMock).toHaveBeenCalled()
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.logout).toStrictEqual({
-        __typename: "NotAllowedError",
-        message: "Unable to logout",
-        status: "ERROR",
-      });
-    });
-  });
-
-  describe("Verify user session", () => {
-    it("Should return an error response if the user session could not be found", async () => {
-      const payload = { query: LOGOUT, variables: { sessionId: "wrong_id" } };
-      const jwt = `Bearer ${registeredJwt}`;
-      const options = { authorization: jwt, cookie: registeredCookie };
-
-      const { data } = await post<LogoutData>(url, payload, options);
-
-      expect(data.errors).toBeUndefined();
-      expect(data.data).toBeDefined();
-      expect(data.data?.logout).toStrictEqual({
-        __typename: "UnknownError",
-        message: "Unable to logout",
-        status: "ERROR",
+        __typename: "Response",
+        message: "User logged out",
+        status: "SUCCESS",
       });
     });
   });
 
   describe("Successfully log user out", () => {
-    it("Should log the user out and delete the user session from the db", async () => {
-      const variables = { sessionId: registeredSessionId };
-      const jwt = `Bearer ${registeredJwt}`;
-      const payload = { query: LOGOUT, variables };
-      const options = { authorization: jwt, cookie: registeredCookie };
+    it("Expect the user to be logged out", async () => {
+      const authorization = `Bearer ${registeredJwt}`;
+      const payload = { query: LOGOUT };
+      const options = { authorization, cookie: registeredCookie };
 
-      const { data } = await post<LogoutData>(url, payload, options);
+      const { data, responseHeaders } = await post<Data>(url, payload, options);
 
+      // expect(loggerMock).not.toHaveBeenCalled()
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.logout).toStrictEqual({
