@@ -9,13 +9,13 @@ export const unRegisteredUser: TestUser = {
   firstName: null,
   lastName: null,
   image: null,
-  email: "test_email@example.com",
+  email: "unregistered_user_test_email@example.com",
   password: "passWord1!",
   registered: false,
 };
 
 export const registeredUser: RemoveNullFromTestUser = {
-  email: "test_mail@mail.com",
+  email: "registered_user_test_mail@mail.com",
   password: "passWord2!",
   firstName: "Jim",
   lastName: "Maxwell",

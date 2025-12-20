@@ -1,172 +1,100 @@
-import { Buffer } from "node:buffer";
-
 import { GraphQLError } from "graphql";
-import { ValidationError } from "joi";
-import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
-import { AccessToken } from "@typeResolvers/auth/AccessToken";
-import { SessionIdValidationError } from "@typeResolvers/auth/SessionIdValidationError";
+import { RefreshData } from "@typeResolvers/auth/RefreshData";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import sessionMail from "@services/mail/session";
-import { sessionIdValidator } from "@validators/auth/sessionId";
-import { verify } from "@lib/tokenPromise";
 import { MailError } from "@lib/Errors";
-import { env } from "@lib/env";
-import { setCookies, clearCookies } from "@utils/auth/cookies";
+import { setAuthCookie, clearAuthCookie } from "@utils/auth/cookies";
 import signTokens from "@utils/auth/signTokens";
-
 import type { DBResponse, Refresh } from "types/auth/refreshToken";
 
-const refreshToken: Refresh = async (_, args, { db, req, res }) => {
-  const SELECT = `
-    SELECT
-      s.refresh_token "refreshToken",
-      u.id "userId",
-      u.email "userEmail",
-      u.user_id "userUUID"
-    FROM sessions s INNER JOIN users u
-    ON s.user_id = u.id
-    WHERE s.session_id = $1
-  `;
-
-  let payload = "";
-  let validatedSession: string | null = null;
-  let jwt: string | null = null;
+const refreshToken: Refresh = async (_, __, { db, req, res, user }) => {
+  const MSG = "Unable to refresh token";
 
   try {
-    validatedSession = await sessionIdValidator.validateAsync(args.sessionId);
+    const { auth } = req.cookies;
+    const ip = req.ip || null;
+    const userAgent = req.headers["user-agent"] || null;
 
-    const { auth, sig, token } = req.cookies;
+    if (!user || !auth) return new ErrorResponse("AuthCookieError", MSG);
 
-    if (!auth && !sig && !token) {
-      return new ErrorResponse("AuthCookieError", "Unable to refresh token");
-    }
-
-    if (!auth || !sig || !token) {
-      return new ErrorResponse("ForbiddenError", "Unable to refresh token");
-    }
-
-    jwt = `${sig}.${auth}.${token}`;
-    payload = auth;
-
-    const { sub } = (await verify(jwt, env.REFRESH_TOKEN_SECRET)) as {
-      sub: string;
-    };
-
-    const { rows } = await db.query<DBResponse>(SELECT, [validatedSession]);
-
-    // Unable to find a valid session with the provided session id
-    if (rows.length === 0)
-      return new ErrorResponse("UnknownError", "Unable to refresh token");
-
-    // Provided session was not assigned to the current user
-    if (rows[0].userUUID !== sub) {
-      return new ErrorResponse("UserSessionError", "Unable to refresh token");
-    }
-
-    /*
-      The refreshToken for the provided session isn't the same as the refreshToken assigned to the current user(User may have been hacked):
-      - clear that session from db
-      - clear cookies
-      - send mail
-    */
-    if (rows[0].refreshToken !== jwt) {
-      await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
-        validatedSession,
-      ]);
-
-      clearCookies(res);
-      await sessionMail(rows[0].userEmail);
-      return new ErrorResponse("NotAllowedError", "Unable to refresh token");
-    }
-
-    const [newRefreshToken, accessToken, cookies] = await signTokens(sub);
-
-    setCookies(res, cookies);
-
-    await db.query(
-      `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND user_id = $3`,
-      [newRefreshToken, validatedSession, rows[0].userId]
+    const { rows } = await db.query<DBResponse>(
+      `SELECT
+        s.id "sid",
+        s.ip_address,
+        s.user_agent,
+        s.expire_date,
+        s.revoked_at,
+        u.email,
+        u.user_id
+      FROM sessions s
+      INNER JOIN users u ON s.user_id = u.id
+      WHERE s.refresh_token = $1`,
+      [auth]
     );
 
-    return new AccessToken(accessToken);
+    if (rows.length === 0) {
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
+    }
+
+    const [
+      { sid, ip_address, user_agent, expire_date, revoked_at, email, user_id },
+    ] = rows;
+
+    if (userAgent !== user_agent || ip !== ip_address) {
+      // log potential suspicious refresh token request along with the request's ip and userAgent
+      // maybe also alert user via email
+    }
+
+    if (user !== user_id) {
+      // log suspicious refresh token request along with the request's ip and userAgent
+      // maybe also blacklist ip and userAgent
+
+      await db.query(
+        `UPDATE SESSIONS SET revoked_at = CURRENT_TIMESTAMP(3) WHERE id = $1 AND revoked_at IS NULL`,
+        [sid]
+      );
+
+      await sessionMail(email);
+      clearAuthCookie(res);
+      return new ErrorResponse("NotAllowedError", MSG);
+    }
+
+    if (revoked_at) {
+      clearAuthCookie(res);
+      return new ErrorResponse("NotAllowedError", MSG);
+    }
+
+    if (Date.parse(expire_date) < Date.now()) {
+      clearAuthCookie(res);
+      return new ErrorResponse("NotAllowedError", MSG);
+    }
+
+    const tokens = await signTokens(user_id);
+    const { refreshToken: token, accessToken, refreshTokenHash } = tokens;
+
+    await db.query(
+      `UPDATE sessions
+      SET
+        refresh_token = $1,
+        expire_date = CURRENT_TIMESTAMP(3) + INTERVAL '6 months',
+        last_refresh = CURRENT_TIMESTAMP(3)
+      WHERE id = $2`,
+      [refreshTokenHash, sid]
+    );
+
+    setAuthCookie(res, token);
+
+    return new RefreshData(accessToken);
   } catch (err) {
-    if (err instanceof TokenExpiredError) {
-      try {
-        const { rows } = await db.query<DBResponse>(SELECT, [validatedSession]);
-
-        // Unable to find a valid session with the provided session id
-        if (rows.length === 0) {
-          return new ErrorResponse("UnknownError", "Unable to refresh token");
-        }
-
-        const decoded = Buffer.from(payload, "base64").toString();
-        const decodedPayload = JSON.parse(decoded) as { sub: string };
-
-        // Provided session was not assigned to the current user
-        if (rows[0].userUUID !== decodedPayload.sub) {
-          return new ErrorResponse(
-            "UserSessionError",
-            "Unable to refresh token"
-          );
-        }
-
-        /*
-          The refreshToken for the provided session isn't the same as the refreshToken assigned to the current user(User may have been hacked):
-          - clear that session from db
-          - clear cookies
-          - send mail
-        */
-        if (rows[0].refreshToken !== jwt) {
-          await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
-            validatedSession,
-          ]);
-
-          clearCookies(res);
-          await sessionMail(rows[0].userEmail);
-          return new ErrorResponse(
-            "NotAllowedError",
-            "Unable to refresh token"
-          );
-        }
-
-        const [newRefreshToken, accessToken, cookies] = await signTokens(
-          rows[0].userUUID
-        );
-
-        setCookies(res, cookies);
-
-        await db.query(
-          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND user_id = $3`,
-          [newRefreshToken, validatedSession, rows[0].userId]
-        );
-
-        return new AccessToken(accessToken);
-      } catch (error) {
-        if (error instanceof MailError) {
-          return new ErrorResponse(
-            "NotAllowedError",
-            "Unable to refresh token"
-          );
-        }
-
-        throw new GraphQLError(
-          "Unable to refresh token. Please try again later"
-        );
-      }
-    }
-
-    if (err instanceof JsonWebTokenError) {
-      return new ErrorResponse("ForbiddenError", "Unable to refresh token");
-    }
-
-    if (err instanceof ValidationError) {
-      return new SessionIdValidationError(err.message);
-    }
-
     if (err instanceof MailError) {
-      return new ErrorResponse("NotAllowedError", "Unable to refresh token");
+      // log session mail error
+      clearAuthCookie(res);
+      return new ErrorResponse("NotAllowedError", MSG);
     }
+
+    // log any system errors
 
     throw new GraphQLError("Unable to refresh token. Please try again later");
   }
