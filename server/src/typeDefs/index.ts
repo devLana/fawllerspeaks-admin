@@ -19,25 +19,25 @@ const types = `#graphql
   type Mutation {
     ####AUTHENTICATION####
     "Create a new user"
-    createUser(email: String!): CreateUser!
-    "Verify user email and initiate password reset"
-    forgotPassword(email: String!): Forgot_Generate!
+    createUser(email: String!): CreateUser_GeneratePassword!
+    "Generate new password for unregistered user"
+    generatePassword(email: String!): CreateUser_GeneratePassword!
     "Login a user"
     login(email: String!, password: String!): Login!
     "Logout a user"
-    logout(sessionId: String!): Logout!
+    logout: Response!
+    "Verify user session"
+    verifySession: VerifySession!
     "Refresh jwt access token"
-    refreshToken(sessionId: String!): RefreshToken!
+    refreshToken: RefreshToken!
     "Register newly created user"
     registerUser(userInput: RegisterUserInput!): RegisterUser!
-    "Reset password for registered user"
-    resetPassword(token: String!, password: String!, confirmPassword: String!): ResetPassword!
-    "Generate new password for unregistered user"
-    generatePassword(email: String!): Forgot_Generate!
+    "Verify user email and initiate password reset"
+    forgotPassword(email: String!): ForgotPassword!
     "Verify password reset token"
     verifyResetToken(token: String!): VerifyResetToken!
-    "Verify user session"
-    verifySession(sessionId: String!): VerifySession!
+    "Reset password for registered user"
+    resetPassword(token: String!, password: String!, confirmPassword: String!): ResetPassword!
 
     ####SETTINGS####
     "Change password of registered and signed in user"
@@ -104,11 +104,6 @@ const types = `#graphql
   }
 
   type AuthenticationError implements BaseResponse {
-    message: String!
-    status: Status!
-  }
-
-  type UserSessionError implements BaseResponse {
     message: String!
     status: Status!
   }

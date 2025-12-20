@@ -1,12 +1,11 @@
 export const authTypeDefs = `#graphql
-  type LoggedInUser {
+  type SessionData {
     accessToken: String!
-    sessionId: ID!
     user: User!
     status: Status!
   }
 
-  type AccessToken {
+  type RefreshData {
     accessToken: String!
     status: Status!
   }
@@ -18,12 +17,6 @@ export const authTypeDefs = `#graphql
   }
 
   type RegisteredUser {
-    user: User!
-    status: Status!
-  }
-
-  type VerifiedSession {
-    accessToken: String!
     user: User!
     status: Status!
   }
@@ -46,11 +39,6 @@ export const authTypeDefs = `#graphql
     status: Status!
   }
 
-  type SessionIdValidationError {
-    sessionIdError: String!
-    status: Status!
-  }
-
   type RegisterUserValidationError {
     firstNameError: String
     lastNameError: String
@@ -64,23 +52,21 @@ export const authTypeDefs = `#graphql
     status: Status!
   }
 
-  union CreateUser = Response | EmailValidationError | NotAllowedError | ServerError
+  union CreateUser_GeneratePassword = Response | EmailValidationError | NotAllowedError | ServerError
 
-  union Forgot_Generate = Response | EmailValidationError | NotAllowedError | RegistrationError | ServerError
-
-  union Login = LoggedInUser | LoginValidationError | NotAllowedError
-
-  union Logout = Response | SessionIdValidationError | AuthenticationError | NotAllowedError | UnknownError
-
-  union RefreshToken = AccessToken | SessionIdValidationError | ForbiddenError | UserSessionError | NotAllowedError | UnknownError | AuthCookieError
-
+  union Login = SessionData | LoginValidationError | UnknownError | NotAllowedError
+  
+  union VerifySession = SessionData | AuthCookieError | AuthenticationError | NotAllowedError
+  
+  union RefreshToken = RefreshData | AuthCookieError | AuthenticationError | NotAllowedError
+  
   union RegisterUser = RegisteredUser | RegisterUserValidationError | AuthenticationError | UnknownError | RegistrationError
-
-  union ResetPassword = Response | ResetPasswordValidationError | NotAllowedError | ForbiddenError | UnknownError | RegistrationError
+  
+  union ForgotPassword = Response | EmailValidationError | NotAllowedError | RegistrationError | ServerError
 
   union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | UnknownError | NotAllowedError | ForbiddenError | RegistrationError
-
-  union VerifySession = VerifiedSession | SessionIdValidationError | NotAllowedError | UnknownError | ForbiddenError | AuthCookieError
+  
+  union ResetPassword = Response | ResetPasswordValidationError | NotAllowedError | ForbiddenError | UnknownError | RegistrationError
 
   input RegisterUserInput {
     firstName: String!

@@ -62,13 +62,13 @@ export const LOGIN = `#graphql
         status
       }
 
-      ... on NotAllowedError {
+      ... on BaseResponse {
         __typename
         message
         status
       }
 
-      ... on LoggedInUser {
+      ... on SessionData {
         __typename
         user {
           __typename
@@ -81,7 +81,6 @@ export const LOGIN = `#graphql
           dateCreated
         }
         accessToken
-        sessionId
         status
       }
     }
@@ -89,39 +88,25 @@ export const LOGIN = `#graphql
 `;
 
 export const LOGOUT = `#graphql
-  mutation Logout($sessionId: String!) {
-    logout(sessionId: $sessionId) {
-      ... on SessionIdValidationError {
-        __typename
-        sessionIdError
-        status
-      }
-
-      ... on BaseResponse {
-        __typename
-        message
-        status
-      }
+  mutation Logout {
+    logout {
+      __typename
+      message
+      status
     }
   }
 `;
 
 export const REFRESH_TOKEN = `#graphql
-  mutation RefreshToken($sessionId: String!) {
-    refreshToken(sessionId: $sessionId) {
-      ... on SessionIdValidationError {
-        __typename
-        sessionIdError
-        status
-      }
-
+  mutation RefreshToken {
+    refreshToken {
       ... on BaseResponse {
         __typename
         message
         status
       }
 
-      ... on AccessToken {
+      ... on RefreshData {
         __typename
         accessToken
         status
@@ -212,21 +197,15 @@ export const VERIFY_PASSWORD_RESET_TOKEN = `#graphql
 `;
 
 export const VERIFY_SESSION = `#graphql
-  mutation VerifySession($sessionId: String!) {
-    verifySession(sessionId: $sessionId) {
-      ... on SessionIdValidationError {
-        __typename
-        sessionIdError
-        status
-      }
-
+  mutation VerifySession {
+    verifySession {
       ... on BaseResponse {
         __typename
         message
         status
       }
 
-      ... on VerifiedSession {
+      ... on SessionData {
         __typename
         user {
           __typename
