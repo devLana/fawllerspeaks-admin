@@ -8,9 +8,6 @@ interface BaseEnvVars {
   MAIL_PASSWORD: string;
   ACCESS_TOKEN_SECRET: string;
   REFRESH_TOKEN_SECRET: string;
-  CIPHER_ALGORITHM: string;
-  CIPHER_KEY: string;
-  CIPHER_IV: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
 }
 
@@ -41,9 +38,6 @@ export const rawEnv: EnvObject = {
   MAIL_PASSWORD: process.env.MAIL_PASSWORD,
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
-  CIPHER_ALGORITHM: process.env.CIPHER_ALGORITHM,
-  CIPHER_KEY: process.env.CIPHER_KEY,
-  CIPHER_IV: process.env.CIPHER_IV,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   PG_CONNECTION_STRING: process.env.PG_CONNECTION_STRING,
 };
@@ -92,18 +86,6 @@ const schema = joi.object<EnvVars>({
     "any.required": "REFRESH_TOKEN_SECRET environment variable is required",
     "string.empty": "REFRESH_TOKEN_SECRET environment variable not provided",
   }),
-  CIPHER_ALGORITHM: joi.string().required().trim().messages({
-    "any.required": "CIPHER_ALGORITHM environment variable is required",
-    "string.empty": "CIPHER_ALGORITHM environment variable not provided",
-  }),
-  CIPHER_KEY: joi.string().required().trim().messages({
-    "any.required": "CIPHER_KEY environment variable is required",
-    "string.empty": "CIPHER_KEY environment variable not provided",
-  }),
-  CIPHER_IV: joi.string().required().trim().messages({
-    "any.required": "CIPHER_IV environment variable is required",
-    "string.empty": "CIPHER_IV environment variable not provided",
-  }),
   SUPABASE_SERVICE_ROLE_KEY: joi.string().required().trim().messages({
     "any.required":
       "SUPABASE_SERVICE_ROLE_KEY environment variable is required",
@@ -146,4 +128,4 @@ if (error) {
   process.exit(1);
 }
 
-export const env: EnvVars = value;
+export const env = value;

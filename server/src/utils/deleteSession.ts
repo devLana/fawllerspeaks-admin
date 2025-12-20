@@ -1,17 +1,19 @@
 import type { Response } from "express";
 import type { Pool } from "pg";
 
-import { clearCookies } from "@utils/auth/cookies";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { GQLRequest } from "@types";
 
-const deleteSession = async (db: Pool, req: GQLRequest, res: Response) => {
-  const { auth, sig, token } = req.cookies;
+const deleteSession = (db: Pool, req: GQLRequest, res: Response) => {
+  if (req.cookies.auth) {
+    clearAuthCookie(res);
 
-  if (auth && sig && token) {
-    const jwt = `${sig}.${auth}.${token}`;
-
-    await db.query(`DELETE FROM sessions WHERE refresh_token = $1`, [jwt]);
-    clearCookies(res);
+    void db.query(
+      `UPDATE sessions
+      SET revoked_at = CURRENT_TIMESTAMP(3)
+      WHERE refresh_token = $1`,
+      [req.cookies.auth]
+    );
   }
 };
 

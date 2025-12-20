@@ -11,8 +11,6 @@ export type ObjectMapper<T extends object> = {
 export interface Cookies {
   [index: string]: string | undefined;
   auth?: string;
-  token?: string;
-  sig?: string;
 }
 
 export type RemoveNull<T extends object> = {

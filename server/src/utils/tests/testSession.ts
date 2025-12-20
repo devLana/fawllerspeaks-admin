@@ -1,47 +1,31 @@
-import crypto from "node:crypto";
-import util from "node:util";
-
 import type { Pool } from "pg";
 
-import { sign } from "@lib/tokenPromise";
-import { env } from "@lib/env";
+import { hmacRefreshToken } from "@utils/auth/signTokens";
+import generateBytes from "@utils/generateBytes";
 
-const testSession = async (
-  db: Pool,
-  userId: number,
-  userUUID: string,
-  expiresIn = "15m"
-) => {
+interface Options {
+  isExpired?: boolean;
+  isRevoked?: boolean;
+}
+
+const testSession = async (db: Pool, userId: number, options?: Options) => {
   try {
-    const refresh = sign({ sub: userUUID }, env.REFRESH_TOKEN_SECRET, {
-      expiresIn,
-    });
+    const refresh = await generateBytes(48, "hex");
+    const refreshHash = hmacRefreshToken(refresh);
 
-    const randomBytes = util.promisify(crypto.randomBytes);
-    const buf = randomBytes(28);
-    const [refreshToken, sessionBuffer] = await Promise.all([refresh, buf]);
-    const sessionId = sessionBuffer.toString("base64url");
+    const expired = options?.isExpired
+      ? "CURRENT_TIMESTAMP(3)"
+      : "CURRENT_TIMESTAMP(3) + INTERVAL '6 months'";
+
+    const revoked = options?.isRevoked ? "CURRENT_TIMESTAMP(3)" : "NULL";
 
     await db.query(
-      `INSERT INTO sessions (refresh_token, user_id, session_id) VALUES ($1, $2, $3)`,
-      [refreshToken, userId, sessionId]
+      `INSERT INTO sessions (refresh_token, user_id, expire_date, revoked_at)
+      VALUES ($1, $2, ${expired}, ${revoked})`,
+      [refreshHash, userId]
     );
 
-    const algorithm = env.CIPHER_ALGORITHM;
-    const key = new Uint8Array(Buffer.from(env.CIPHER_KEY, "hex"));
-    const iv = new Uint8Array(Buffer.from(env.CIPHER_IV, "hex"));
-
-    const [header, payload, signature] = refreshToken.split(".").map(part => {
-      const cipher = crypto.createCipheriv(algorithm, key, iv);
-      let encrypted = cipher.update(part, "utf8", "hex");
-
-      encrypted += cipher.final("hex");
-      return encrypted;
-    });
-
-    const [auth, token, sig] = [payload, signature, header];
-
-    return { cookies: `auth=${auth};token=${token};sig=${sig}`, sessionId };
+    return `auth=${refresh}`;
   } catch (err) {
     console.error("Create Test User Session Error - ", err);
     throw new Error("Unable to create test user session");
