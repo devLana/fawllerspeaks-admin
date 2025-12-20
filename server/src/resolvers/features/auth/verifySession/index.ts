@@ -1,179 +1,91 @@
-import { Buffer } from "node:buffer";
-
 import { GraphQLError } from "graphql";
-import { ValidationError } from "joi";
-import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
-import { VerifiedSession } from "@typeResolvers/auth/VerifiedSession";
-import { SessionIdValidationError } from "@typeResolvers/auth/SessionIdValidationError";
+import { SessionData } from "@typeResolvers/auth/SessionData";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
-import { sessionIdValidator } from "@validators/auth/sessionId";
-import sessionMail from "@services/mail/session";
-import { verify } from "@lib/tokenPromise";
-import { env } from "@lib/env";
-import { MailError } from "@lib/Errors";
 import signTokens from "@utils/auth/signTokens";
-import { clearCookies, setCookies } from "@utils/auth/cookies";
-
+import { clearAuthCookie, setAuthCookie } from "@utils/auth/cookies";
 import type { DBResponse, VerifySession } from "types/auth/verifySession";
 
-const verifySession: VerifySession = async (_, args, { db, req, res }) => {
-  const MSG = "Unable to verify session";
-  let validatedSession: string | null = null;
-  let payload = "";
-
-  const SELECT = `
-    SELECT
-      u.id "userId",
-      u.user_id "userUUID",
-      u.email,
-      u.first_name "firstName",
-      u.last_name "lastName",
-      u.image,
-      u.is_Registered "isRegistered",
-      u.date_created "dateCreated"
-    FROM sessions s INNER JOIN users u
-    ON s.user_id = u.id
-    WHERE s.session_id = $1
-  `;
-
+const verifySession: VerifySession = async (_, __, { db, req, res }) => {
   try {
-    validatedSession = await sessionIdValidator.validateAsync(args.sessionId);
+    const { auth } = req.cookies;
+    const ip = req.ip || null;
+    const userAgent = req.headers["user-agent"] || null;
+    const MSG = "Unable to verify session";
 
-    const { auth, sig, token } = req.cookies;
+    if (!auth) return new ErrorResponse("AuthCookieError", MSG);
 
-    if (!auth && !sig && !token) {
-      return new ErrorResponse("AuthCookieError", MSG);
+    const { rows } = await db.query<DBResponse>(
+      `SELECT
+        u.user_id,
+        u.email,
+        u.first_name ,
+        u.last_name,
+        u.image,
+        u.is_registered,
+        u.date_created,
+        s.id "sid",
+        s.ip_address,
+        s.user_agent,
+        s.expire_date,
+        s.revoked_at
+      FROM sessions s
+      INNER JOIN users u ON s.user_id = u.id
+      WHERE s.refresh_token = $1`,
+      [auth]
+    );
+
+    if (rows.length === 0) {
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
     }
 
-    if (!auth || !sig || !token) {
-      return new ErrorResponse("ForbiddenError", MSG);
+    const [{ sid, ip_address, user_agent, expire_date, revoked_at, ...user }] =
+      rows;
+
+    if (userAgent !== user_agent || ip !== ip_address) {
+      // log potential suspicious verify session request along with the request's ip and userAgent
+      // maybe alert user via email
     }
 
-    const jwt = `${sig}.${auth}.${token}`;
-    payload = auth;
-
-    const { sub } = (await verify(jwt, env.REFRESH_TOKEN_SECRET)) as {
-      sub: string;
-    };
-
-    const { rows } = await db.query<DBResponse>(SELECT, [validatedSession]);
-
-    // Unable to find any valid session with the provided session id
-    if (rows.length === 0) return new ErrorResponse("UnknownError", MSG);
-
-    /*
-      The provided session was not assigned to the current user(User may have been hacked):
-      - clear that session from db
-      - clear cookies
-      - send mail
-    */
-    if (rows[0].userUUID !== sub) {
-      await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
-        validatedSession,
-      ]);
-
-      clearCookies(res);
-      await sessionMail(rows[0].email);
+    if (revoked_at) {
+      clearAuthCookie(res);
       return new ErrorResponse("NotAllowedError", MSG);
     }
 
-    const [refreshToken, accessToken, cookies] = await signTokens(sub);
+    if (Date.parse(expire_date) < Date.now()) {
+      clearAuthCookie(res);
+      return new ErrorResponse("NotAllowedError", MSG);
+    }
 
-    setCookies(res, cookies);
+    const tokens = await signTokens(user.user_id);
+    const { refreshToken, accessToken, refreshTokenHash } = tokens;
 
     await db.query(
-      `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND user_id = $3`,
-      [refreshToken, validatedSession, rows[0].userId]
+      `UPDATE sessions
+      SET
+        refresh_token = $1,
+        expire_date = CURRENT_TIMESTAMP(3) + INTERVAL '6 months',
+        last_refresh = CURRENT_TIMESTAMP(3)
+      WHERE id = $2`,
+      [refreshTokenHash, sid]
     );
 
-    return new VerifiedSession(
-      {
-        email: rows[0].email,
-        id: sub,
-        firstName: rows[0].firstName,
-        lastName: rows[0].lastName,
-        image: rows[0].image,
-        isRegistered: rows[0].isRegistered,
-        dateCreated: rows[0].dateCreated,
-      },
-      accessToken
-    );
+    setAuthCookie(res, refreshToken);
+
+    const userData = {
+      id: user.user_id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      image: user.image,
+      isRegistered: user.is_registered,
+      dateCreated: user.date_created,
+    };
+
+    return new SessionData(userData, accessToken);
   } catch (err) {
-    if (err instanceof TokenExpiredError) {
-      try {
-        const { rows } = await db.query<DBResponse>(SELECT, [validatedSession]);
-
-        // Unable to find any valid session with the provided session id
-        if (rows.length === 0) {
-          return new ErrorResponse("UnknownError", MSG);
-        }
-
-        const decoded = Buffer.from(payload, "base64").toString();
-        const decodedPayload = JSON.parse(decoded) as { sub: string };
-
-        /*
-          The provided session was not assigned to the current user(User may have been hacked):
-          - clear that session from db
-          - clear cookies
-          - send mail
-        */
-        if (rows[0].userUUID !== decodedPayload.sub) {
-          await db.query(`DELETE FROM sessions WHERE session_id = $1`, [
-            validatedSession,
-          ]);
-
-          clearCookies(res);
-          await sessionMail(rows[0].email);
-          return new ErrorResponse("NotAllowedError", MSG);
-        }
-
-        const [refreshToken, accessToken, cookies] = await signTokens(
-          rows[0].userUUID
-        );
-
-        setCookies(res, cookies);
-
-        await db.query(
-          `UPDATE sessions SET refresh_token = $1 WHERE session_id = $2 AND user_id = $3`,
-          [refreshToken, validatedSession, rows[0].userId]
-        );
-
-        return new VerifiedSession(
-          {
-            email: rows[0].email,
-            id: rows[0].userUUID,
-            firstName: rows[0].firstName,
-            lastName: rows[0].lastName,
-            image: rows[0].image,
-            isRegistered: rows[0].isRegistered,
-            dateCreated: rows[0].dateCreated,
-          },
-          accessToken
-        );
-      } catch (error) {
-        if (error instanceof MailError) {
-          return new ErrorResponse("NotAllowedError", MSG);
-        }
-
-        throw new GraphQLError(
-          "Unable to verify session. Please try again later"
-        );
-      }
-    }
-
-    if (err instanceof JsonWebTokenError) {
-      return new ErrorResponse("ForbiddenError", MSG);
-    }
-
-    if (err instanceof ValidationError) {
-      return new SessionIdValidationError(err.message);
-    }
-
-    if (err instanceof MailError) {
-      return new ErrorResponse("NotAllowedError", MSG);
-    }
-
+    // log any system errors
     throw new GraphQLError("Unable to verify session. Please try again later");
   }
 };

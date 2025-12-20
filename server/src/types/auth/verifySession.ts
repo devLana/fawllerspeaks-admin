@@ -6,12 +6,16 @@ export type VerifySession = ResolverFunc<MutationResolvers["verifySession"]>;
 export type Verify = TestData<{ verifySession: Record<string, unknown> }>;
 
 export interface DBResponse {
-  userId: string;
-  userUUID: string;
+  user_id: string;
   email: string;
-  firstName: string | null;
-  lastName: string | null;
+  first_name: string | null;
+  last_name: string | null;
   image: string | null;
-  isRegistered: boolean;
-  dateCreated: string;
+  is_registered: boolean;
+  date_created: string;
+  sid: number;
+  ip_address: string | null;
+  user_agent: string | null;
+  expire_date: string;
+  revoked_at: string | null;
 }
