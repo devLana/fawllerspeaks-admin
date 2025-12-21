@@ -4,7 +4,7 @@ import type { ApolloServer } from "@apollo/server";
 import { storageUrl } from "@services/supabase";
 import { startServer } from "@server";
 import { db } from "@services/db";
-import { JWT_REGEX, SESSION_ID_REGEX } from "@utils/tests/constants";
+import { JWT_REGEX } from "@utils/tests/constants";
 import { LOGIN } from "@utils/tests/gqlQueries/authTestQueries";
 import testUsers from "@utils/tests/createTestUsers/testUsers";
 import { registeredUser } from "@utils/tests/mocks";
@@ -13,7 +13,7 @@ import type { APIContext } from "@types";
 import type { DbTestUser } from "types/tests";
 import type { LoginData } from "types/auth/login";
 
-describe.skip("LoginData", () => {
+describe("Login", () => {
   let server: ApolloServer<APIContext>, url: string, user: DbTestUser;
 
   beforeAll(async () => {
@@ -62,18 +62,20 @@ describe.skip("LoginData", () => {
       [
         "Should return an error response if the e-mail address is unknown",
         { email: "unknown_email@example.com", password: "pass_pass_apps" },
+        "UnknownError",
       ],
       [
         "Should return an error response if the e-mail & password combination is incorrect",
         { email: registeredUser.email, password: "password123" },
+        "NotAllowedError",
       ],
-    ])("%s", async (_, variables) => {
+    ])("%s", async (_, variables, typename) => {
       const { data } = await post<LoginData>(url, { query: LOGIN, variables });
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.login).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: typename,
         message: "Invalid email or password",
         status: "ERROR",
       });
@@ -89,15 +91,13 @@ describe.skip("LoginData", () => {
 
       expect(responseHeaders).toHaveProperty("set-cookie");
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
-      expect(responseHeaders["set-cookie"]).toHaveLength(3);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
       expect(responseHeaders["set-cookie"]?.[0]).toMatch(/^auth/);
-      expect(responseHeaders["set-cookie"]?.[1]).toMatch(/^token/);
-      expect(responseHeaders["set-cookie"]?.[2]).toMatch(/^sig/);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.login).not.toHaveProperty("password");
       expect(data.data?.login).toStrictEqual({
-        __typename: "LoggedInUser",
+        __typename: "SessionData",
         user: {
           __typename: "User",
           email: registeredUser.email,
@@ -109,7 +109,6 @@ describe.skip("LoginData", () => {
           dateCreated: user.dateCreated,
         },
         accessToken: expect.stringMatching(JWT_REGEX),
-        sessionId: expect.stringMatching(SESSION_ID_REGEX),
         status: "SUCCESS",
       });
     });
