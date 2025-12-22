@@ -55,6 +55,9 @@ const resetPassword: Reset = async (_, args, { db }) => {
       ),
       set_reset_token_as_used AS (
         UPDATE password_reset SET used = true WHERE token = $3
+      ),
+      revoke_all_sessions AS (
+        UPDATE sessions SET revoked_at = CURRENT_TIMESTAMP(3) WHERE revoked_at IS NULL AND user_id = $2
       )
       SELECT 1`,
       [passwordHash, userId, tokenHash]

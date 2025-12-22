@@ -12,6 +12,7 @@ import loginTestUser from "@utils/tests/loginTestUser";
 import post from "@utils/tests/post";
 import type { APIContext } from "@types";
 import type { ChangePasswordData as Data } from "types/settings/changePassword";
+import testSession from "@utils/tests/testSession";
 
 jest.mock("@services/mail/changePassword", () => {
   return jest.fn().mockName("changePasswordMail");
@@ -20,22 +21,23 @@ jest.mock("@services/mail/changePassword", () => {
 describe("Change password", () => {
   let server: ApolloServer<APIContext>, url: string;
   let registeredJWT: string, unRegisteredJWT: string;
+  let registeredCookie: string, unregisteredCookie: string;
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
-    const { registeredUser: user, unregisteredUser } = await testUsers(db);
+    const users = await testUsers(db);
 
-    const registered = loginTestUser(user.userUUID);
-    const unRegistered = loginTestUser(unregisteredUser.userUUID);
-
-    [registeredJWT, unRegisteredJWT] = await Promise.all([
-      registered,
-      unRegistered,
-    ]);
+    [registeredJWT, unRegisteredJWT, registeredCookie, unregisteredCookie] =
+      await Promise.all([
+        loginTestUser(users.registeredUser.userUUID),
+        loginTestUser(users.unregisteredUser.userUUID),
+        testSession(db, users.registeredUser.userId),
+        testSession(db, users.unregisteredUser.userId),
+      ]);
   });
 
   afterAll(async () => {
-    await db.query("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
+    await db.query("TRUNCATE TABLE sessions, users RESTART IDENTITY CASCADE");
     await Promise.all([server.stop(), db.end()]);
   });
 
@@ -54,12 +56,29 @@ describe("Change password", () => {
         status: "ERROR",
       });
     });
+
+    it("Expect an error response if the request has no authentication cookie", async () => {
+      const payload = { query: CHANGE_PASSWORD, variables: mocks.authCheck };
+      const options = { authorization: `Bearer ${unRegisteredJWT}` };
+
+      const { data } = await post<Data>(url, payload, options);
+
+      expect(changePasswordMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.changePassword).toStrictEqual({
+        __typename: "AuthenticationError",
+        message: "Unable to change password",
+        status: "ERROR",
+      });
+    });
   });
 
   describe("Validate user input", () => {
     it.each(mocks.validations)("%s", async (_, variables, errors) => {
-      const payload = { query: CHANGE_PASSWORD, variables: { ...variables } };
-      const options = { authorization: `Bearer ${unRegisteredJWT}` };
+      const cookie = unregisteredCookie;
+      const payload = { query: CHANGE_PASSWORD, variables };
+      const options = { authorization: `Bearer ${unRegisteredJWT}`, cookie };
 
       const { data } = await post<Data>(url, payload, options);
 
@@ -74,10 +93,30 @@ describe("Change password", () => {
     });
   });
 
+  describe("Verify user session cookie", () => {
+    it("Expect an error response if the session cookie could not be found", async () => {
+      const cookie = "auth=475ee532719198d31640ef1ed69ce2c2c7987e";
+      const payload = { query: CHANGE_PASSWORD, variables: mocks.errorInput };
+      const options = { authorization: `Bearer ${unRegisteredJWT}`, cookie };
+
+      const { data } = await post<Data>(url, payload, options);
+
+      expect(changePasswordMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.changePassword).toStrictEqual({
+        __typename: "AuthenticationError",
+        message: "Unable to change password",
+        status: "ERROR",
+      });
+    });
+  });
+
   describe("Verify user registration status", () => {
     it("Should send an error response if the user is unregistered", async () => {
+      const cookie = unregisteredCookie;
       const payload = { query: CHANGE_PASSWORD, variables: mocks.errorInput };
-      const options = { authorization: `Bearer ${unRegisteredJWT}` };
+      const options = { authorization: `Bearer ${unRegisteredJWT}`, cookie };
 
       const { data } = await post<Data>(url, payload, options);
 
@@ -94,8 +133,9 @@ describe("Change password", () => {
 
   describe("Verify user's current password", () => {
     it("Should send an error response if the current password does not match the user's password", async () => {
+      const cookie = registeredCookie;
       const payload = { query: CHANGE_PASSWORD, variables: mocks.errorInput };
-      const options = { authorization: `Bearer ${registeredJWT}` };
+      const options = { authorization: `Bearer ${registeredJWT}`, cookie };
 
       const { data } = await post<Data>(url, payload, options);
 
@@ -112,7 +152,8 @@ describe("Change password", () => {
 
   describe("Change user password", () => {
     it("Should change the user's password and send a confirmation mail", async () => {
-      const options = { authorization: `Bearer ${registeredJWT}` };
+      const cookie = registeredCookie;
+      const options = { authorization: `Bearer ${registeredJWT}`, cookie };
       const payload = { query: CHANGE_PASSWORD, variables: mocks.validInput1 };
 
       const { data } = await post<Data>(url, payload, options);
@@ -129,7 +170,8 @@ describe("Change password", () => {
 
     it("Should change the user's password even if the confirmation mail fails to send", async () => {
       const mock = changePasswordMail as jest.MockedFunction<() => never>;
-      const options = { authorization: `Bearer ${registeredJWT}` };
+      const cookie = registeredCookie;
+      const options = { authorization: `Bearer ${registeredJWT}`, cookie };
       const payload = { query: CHANGE_PASSWORD, variables: mocks.validInput2 };
 
       mock.mockImplementation(() => {

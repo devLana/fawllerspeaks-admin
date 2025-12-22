@@ -14,9 +14,10 @@ import type { ChangePassword as Fn, User } from "types/settings/changePassword";
 const changePassword: Fn = async (_, args, { db, user, req, res }) => {
   try {
     const MSG = "Unable to change password";
+    const { auth } = req.cookies;
 
-    if (!user) {
-      void deleteSession(db, req, res);
+    if (!user || !auth) {
+      deleteSession(db, req, res);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
@@ -24,16 +25,33 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
     const { newPassword, currentPassword } = input;
 
     const { rows } = await db.query<User>(
-      `SELECT password, is_Registered, email FROM users WHERE user_id = $1`,
-      [user]
+      `WITH find_user AS (
+        SELECT
+          id,
+          password,
+          is_Registered,
+          email
+        FROM users
+        WHERE user_id = $1
+      )
+      SELECT
+        fu.id "uId",
+        fu.password,
+        fu.is_registered,
+        fu.email,
+        s.id "sId"
+      FROM find_user fu
+      LEFT JOIN sessions s ON fu.id = s.user_id
+      WHERE s.refresh_token = $2`,
+      [user, auth]
     );
 
     if (rows.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("UnknownError", MSG);
+      deleteSession(db, req, res);
+      return new ErrorResponse("AuthenticationError", MSG);
     }
 
-    const [{ email, is_registered, password }] = rows;
+    const [{ uId, email, is_registered, password, sId }] = rows;
 
     if (!is_registered) return new ErrorResponse("RegistrationError", MSG);
 
@@ -43,10 +61,16 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
 
     const hash = await bcrypt.hash(newPassword, 10);
 
-    await db.query(`UPDATE users SET password = $1 WHERE user_id = $2`, [
-      hash,
-      user,
-    ]);
+    await db.query(
+      `WITH change_password AS (
+        UPDATE users SET password = $1 WHERE id = $2
+      ),
+      revoke_sessions AS (
+        UPDATE sessions SET revoked_at = CURRENT_TIMESTAMP(3) WHERE revoked_at IS NULL AND user_id = $2 AND id != $3
+      )
+      SELECT 1`,
+      [hash, uId, sId]
+    );
 
     await changePasswordMail(email);
 
