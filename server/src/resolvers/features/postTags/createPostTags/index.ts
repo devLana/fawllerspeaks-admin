@@ -6,17 +6,17 @@ import { CreatePostTagsValidationError } from "@typeResolvers/postTags/CreatePos
 import { CreatedPostTagsWarning } from "@typeResolvers/postTags/CreatedPostTagsWarning";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { createPostTagsValidator as schema } from "@validators/postTags/createPostTags";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { PostTag } from "@resolverTypes";
 import type { CreatePostTags as Fn } from "types/postTags/createPostTags";
 
-const createPostTags: Fn = async (_, { tags }, { user, db, req, res }) => {
+const createPostTags: Fn = async (_, { tags }, { user, db, res }) => {
   const tagOrTags = tags.length > 1 ? "tags" : "tag";
   const MSG = `Unable to create post ${tagOrTags}`;
 
   try {
     if (!user) {
-      void deleteSession(db, req, res);
+      clearAuthCookie(res);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
@@ -28,8 +28,8 @@ const createPostTags: Fn = async (_, { tags }, { user, db, req, res }) => {
     );
 
     if (author.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("UnknownError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
     }
 
     if (!author[0].is_registered) {

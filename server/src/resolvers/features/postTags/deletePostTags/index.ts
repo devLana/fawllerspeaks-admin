@@ -6,15 +6,15 @@ import { DeletedPostTags } from "@typeResolvers/postTags/DeletedPostTags";
 import { DeletedPostTagsWarning } from "@typeResolvers/postTags/DeletedPostTagsWarning";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { deletePostTagsValidator as schema } from "@validators/postTags/deletePostTags";
-import deleteSession from "@utils/deleteSession";
-import type { DeletePostTags as Fn } from "types/postTags/deletePostTags";
+import { clearAuthCookie } from "@utils/auth/cookies";
+import type { DeletePostTags as Fn, Del } from "types/postTags/deletePostTags";
 
-const deletePostTags: Fn = async (_, { tagIds }, { db, user, req, res }) => {
+const deletePostTags: Fn = async (_, { tagIds }, { db, user, res }) => {
   const MSG = `Unable to delete post ${tagIds.length > 1 ? "tags" : "tag"}`;
 
   try {
     if (!user) {
-      void deleteSession(db, req, res);
+      clearAuthCookie(res);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
@@ -26,24 +26,18 @@ const deletePostTags: Fn = async (_, { tagIds }, { db, user, req, res }) => {
     );
 
     if (findUser.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
     }
 
     if (!findUser[0].is_registered) {
       return new ErrorResponse("RegistrationError", MSG);
     }
 
-    const { rows: allDeletedTags } = await db.query<{
-      id: string;
-      name: string;
-    }>(
+    const { rows: allDeletedTags } = await db.query<Del>(
       `DELETE FROM post_tags
-      WHERE
-        tag_id = ANY ($1)
-      RETURNING
-        tag_id id,
-        name`,
+      WHERE tag_id = ANY ($1)
+      RETURNING tag_id id, name`,
       [inputTags]
     );
 

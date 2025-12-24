@@ -7,16 +7,16 @@ import { EditedPostTagWarning } from "@typeResolvers/postTags/EditedPostTagWarni
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { editPostTagValidator as schema } from "@validators/postTags/editPostTag";
 import generateErrorsObject from "@utils/generateErrorsObject";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { PostTag } from "@resolverTypes";
 import type { EditPostTag } from "types/postTags/editPostTag";
 
-const editPostTag: EditPostTag = async (_, args, { db, user, req, res }) => {
+const editPostTag: EditPostTag = async (_, args, { db, user, res }) => {
   try {
     const MSG = "Unable to edit post tag";
 
     if (!user) {
-      void deleteSession(db, req, res);
+      clearAuthCookie(res);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
@@ -29,8 +29,8 @@ const editPostTag: EditPostTag = async (_, args, { db, user, req, res }) => {
     );
 
     if (findUser.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
     }
 
     if (!findUser[0].is_registered) {

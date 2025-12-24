@@ -4,3 +4,8 @@ import type { TestData } from "types/tests";
 
 export type DeletePostTags = ResolverFunc<MutationResolvers["deletePostTags"]>;
 export type DeleteTags = TestData<{ deletePostTags: Record<string, unknown> }>;
+
+export interface Del {
+  id: string;
+  name: string;
+}

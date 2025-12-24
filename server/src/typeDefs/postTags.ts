@@ -60,11 +60,11 @@ export const postTagsTypeDefs = `#graphql
     status: Status!
   }
 
-  union CreatePostTags = PostTags | CreatedPostTagsWarning | CreatePostTagsValidationError | DuplicatePostTagError | UnknownError | AuthenticationError | RegistrationError
+  union CreatePostTags = PostTags | CreatedPostTagsWarning | CreatePostTagsValidationError | DuplicatePostTagError | AuthenticationError | RegistrationError
 
-  union DeletePostTags = DeletedPostTags | DeletedPostTagsWarning | DeletePostTagsValidationError | NotAllowedError | UnknownError | AuthenticationError | RegistrationError
+  union DeletePostTags = DeletedPostTags | DeletedPostTagsWarning | DeletePostTagsValidationError | UnknownError | AuthenticationError | RegistrationError
 
-  union EditPostTag = EditedPostTag | EditedPostTagWarning | EditPostTagValidationError | AuthenticationError | RegistrationError | DuplicatePostTagError | NotAllowedError | UnknownError
+  union EditPostTag = EditedPostTag | EditedPostTagWarning | EditPostTagValidationError | AuthenticationError | RegistrationError | DuplicatePostTagError | UnknownError
 
-  union GetPostTags = PostTags | AuthenticationError | UnknownError | RegistrationError
+  union GetPostTags = PostTags | AuthenticationError | RegistrationError
 `;

@@ -2,16 +2,16 @@ import { GraphQLError } from "graphql";
 
 import { PostTags } from "@typeResolvers/postTags/PostTags";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { PostTag } from "@resolverTypes";
 import type { GetPostTags } from "types/postTags/getPostTags";
 
-const getPostTags: GetPostTags = async (_, __, { db, user, req, res }) => {
+const getPostTags: GetPostTags = async (_, __, { db, user, res }) => {
   try {
     const MSG = "Unable to get post tags";
 
     if (!user) {
-      void deleteSession(db, req, res);
+      clearAuthCookie(res);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
@@ -21,8 +21,8 @@ const getPostTags: GetPostTags = async (_, __, { db, user, req, res }) => {
     );
 
     if (findUser.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("UnknownError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
     }
 
     if (!findUser[0].is_registered) {
