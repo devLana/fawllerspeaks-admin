@@ -6,46 +6,43 @@ import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { RegisterUserValidationError } from "@typeResolvers/auth/RegisterUserValidationError";
 import { RegisteredUser } from "@typeResolvers/auth/RegisteredUser";
 import { registerUserValidator as schema } from "@validators/auth/registerUser";
-import deleteSession from "@utils/deleteSession";
 import generateErrorsObject from "@utils/generateErrorsObject";
-import type { RegisterUser, Select } from "types/auth/registerUser";
+import { clearAuthCookie } from "@utils/auth/cookies";
+import type { RegisterUser as Fn, Select } from "types/auth/registerUser";
 
-const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
+const registerUser: Fn = async (_, { userInput }, { db, user, res }) => {
   try {
-    const { db, user, req, res } = ctx;
     const MSG = "Unable to register user";
 
     if (!user) {
-      void deleteSession(db, req, res);
+      clearAuthCookie(res);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
     const input = await schema.validateAsync(userInput, { abortEarly: false });
-    const { firstName, lastName, password } = input;
-    const generateHash = bcrypt.hash(password, 10);
 
-    const findUser = db.query<Select>(
+    const { rows } = await db.query<Select>(
       `SELECT
         email,
         image,
-        is_registered "isRegistered",
-        date_created "dateCreated"
+        is_registered,
+        date_created
       FROM users
       WHERE user_id = $1`,
       [user]
     );
 
-    const [hash, { rows }] = await Promise.all([generateHash, findUser]);
-
     if (rows.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("UnknownError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
     }
 
-    if (rows[0].isRegistered) {
+    if (rows[0].is_registered) {
       const msg = "User is already registered";
       return new ErrorResponse("RegistrationError", msg);
     }
+
+    const hash = await bcrypt.hash(input.password, 10);
 
     await db.query(
       `UPDATE users
@@ -53,19 +50,19 @@ const registerUser: RegisterUser = async (_, { userInput }, ctx) => {
         first_name = $1,
         last_name = $2,
         password = $3,
-        is_registered = $4
-      WHERE user_id = $5`,
-      [firstName, lastName, hash, true, user]
+        is_registered = TRUE
+      WHERE user_id = $4`,
+      [input.firstName, input.lastName, hash, user]
     );
 
     return new RegisteredUser({
       id: user,
       email: rows[0].email,
-      firstName,
-      lastName,
+      firstName: input.firstName,
+      lastName: input.lastName,
       image: rows[0].image,
       isRegistered: true,
-      dateCreated: rows[0].dateCreated,
+      dateCreated: rows[0].date_created,
     });
   } catch (err) {
     if (err instanceof ValidationError) {

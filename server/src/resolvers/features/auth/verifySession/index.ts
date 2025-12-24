@@ -13,7 +13,10 @@ const verifySession: VerifySession = async (_, __, { db, req, res }) => {
     const userAgent = req.headers["user-agent"] || null;
     const MSG = "Unable to verify session";
 
-    if (!auth) return new ErrorResponse("AuthCookieError", MSG);
+    if (!auth) {
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
+    }
 
     const { rows } = await db.query<DBResponse>(
       `SELECT

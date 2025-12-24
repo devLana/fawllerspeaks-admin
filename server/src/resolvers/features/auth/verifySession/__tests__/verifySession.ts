@@ -43,11 +43,14 @@ describe("Verify Session", () => {
 
       const { data, responseHeaders } = await post<GQL>(url, payload);
 
-      expect(responseHeaders).not.toHaveProperty("set-cookie");
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.verifySession).toStrictEqual({
-        __typename: "AuthCookieError",
+        __typename: "AuthenticationError",
         message: "Unable to verify session",
         status: "ERROR",
       });

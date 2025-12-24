@@ -36,7 +36,7 @@ const verifyResetToken: VerifyToken = async (_, { token }, { db }) => {
       return new ErrorResponse("RegistrationError", msg);
     }
 
-    if (used) return new ErrorResponse("ForbiddenError", MSG);
+    if (used) return new ErrorResponse("NotAllowedError", MSG);
 
     if (Date.parse(expire_date) < Date.now()) {
       const msg = "The password reset token has already expired";

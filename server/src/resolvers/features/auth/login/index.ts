@@ -18,7 +18,6 @@ const login: Login = async (_, args, { db, req, res }) => {
     const userAgent = req.headers["user-agent"] || null;
 
     const input = await schema.validateAsync(args, { abortEarly: false });
-    const { email, password } = input;
 
     const { rows } = await db.query<DBUser>(
       `SELECT
@@ -27,20 +26,20 @@ const login: Login = async (_, args, { db, req, res }) => {
         first_name,
         last_name,
         image,
-        email "userEmail",
-        password "userPassword",
+        email,
+        password,
         is_registered,
         date_created
       FROM users
       WHERE lower(email) = $1`,
-      [email.toLowerCase()]
+      [input.email.toLowerCase()]
     );
 
     if (rows.length === 0) return new ErrorResponse("UnknownError", MSG);
 
-    const [{ user_id, userPassword, ...row }] = rows;
+    const [{ user_id, password, ...row }] = rows;
 
-    const match = await bcrypt.compare(password, userPassword);
+    const match = await bcrypt.compare(input.password, password);
 
     if (!match) return new ErrorResponse("NotAllowedError", MSG);
 
@@ -58,7 +57,7 @@ const login: Login = async (_, args, { db, req, res }) => {
 
     const user = {
       id: user_id,
-      email: row.userEmail,
+      email: row.email,
       firstName: row.first_name,
       lastName: row.last_name,
       image: row.image,

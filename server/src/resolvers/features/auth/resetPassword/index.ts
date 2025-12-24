@@ -14,9 +14,8 @@ import type { Reset, User } from "types/auth/resetPassword";
 const resetPassword: Reset = async (_, args, { db }) => {
   try {
     const MSG = "Unable to reset password";
-    const validations = await schema.validateAsync(args, { abortEarly: false });
-    const { token, password } = validations;
-    const tokenHash = generateResetHash(token);
+    const input = await schema.validateAsync(args, { abortEarly: false });
+    const tokenHash = generateResetHash(input.token);
 
     const { rows } = await db.query<User>(
       `SELECT
@@ -40,14 +39,14 @@ const resetPassword: Reset = async (_, args, { db }) => {
       return new ErrorResponse("RegistrationError", msg);
     }
 
-    if (used) return new ErrorResponse("ForbiddenError", MSG);
+    if (used) return new ErrorResponse("NotAllowedError", MSG);
 
     if (Date.parse(expire_date) < Date.now()) {
       const msg = "The password reset token has already expired";
       return new ErrorResponse("NotAllowedError", msg);
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(input.password, 10);
 
     await db.query(
       `WITH reset_password AS (

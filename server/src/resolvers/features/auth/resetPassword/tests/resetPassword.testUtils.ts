@@ -70,7 +70,7 @@ export const verify: [string, string, string, string][] = [
   [
     "Should return an error if the password reset token has already been used",
     newRegisteredReset.token,
-    "ForbiddenError",
+    "NotAllowedError",
     "Unable to reset password",
   ],
   [

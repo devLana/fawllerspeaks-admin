@@ -11,7 +11,7 @@ import { unRegisteredUser } from "@utils/tests/mocks";
 import post from "@utils/tests/post";
 import type { APIContext } from "@types";
 import type { DbTestUser } from "types/tests";
-import type { RegisterUserData } from "types/auth/registerUser";
+import type { RegisterUserData as Data } from "types/auth/registerUser";
 
 describe("Register user", () => {
   let server: ApolloServer<APIContext>, url: string, user: DbTestUser;
@@ -39,8 +39,12 @@ describe("Register user", () => {
     test("User is not logged in, Return an error response", async () => {
       const payload = { query: REGISTER_USER, variables: { userInput } };
 
-      const { data } = await post<RegisterUserData>(url, payload);
+      const { data, responseHeaders } = await post<Data>(url, payload);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.registerUser).toStrictEqual({
@@ -56,7 +60,7 @@ describe("Register user", () => {
       const payload = { query: REGISTER_USER, variables: { userInput: input } };
       const options = { authorization: `Bearer ${unregisteredJwt}` };
 
-      const { data } = await post<RegisterUserData>(url, payload, options);
+      const { data } = await post<Data>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -76,7 +80,7 @@ describe("Register user", () => {
       const payload = { query: REGISTER_USER, variables: { userInput } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await post<RegisterUserData>(url, payload, options);
+      const { data } = await post<Data>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -93,7 +97,7 @@ describe("Register user", () => {
       const payload = { query: REGISTER_USER, variables: { userInput } };
       const options = { authorization: `Bearer ${unregisteredJwt}` };
 
-      const { data } = await post<RegisterUserData>(url, payload, options);
+      const { data } = await post<Data>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();

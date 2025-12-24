@@ -56,17 +56,17 @@ export const authTypeDefs = `#graphql
 
   union Login = SessionData | LoginValidationError | UnknownError | NotAllowedError
   
-  union VerifySession = SessionData | AuthCookieError | AuthenticationError | NotAllowedError
+  union VerifySession = SessionData | AuthenticationError | NotAllowedError
   
-  union RefreshToken = RefreshData | AuthCookieError | AuthenticationError | NotAllowedError
+  union RefreshToken = RefreshData | AuthenticationError | NotAllowedError
   
-  union RegisterUser = RegisteredUser | RegisterUserValidationError | AuthenticationError | UnknownError | RegistrationError
+  union RegisterUser = RegisteredUser | RegisterUserValidationError | AuthenticationError | RegistrationError
   
   union ForgotPassword = Response | EmailValidationError | NotAllowedError | RegistrationError | ServerError
 
-  union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | UnknownError | NotAllowedError | ForbiddenError | RegistrationError
+  union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | UnknownError | NotAllowedError | RegistrationError
   
-  union ResetPassword = Response | ResetPasswordValidationError | NotAllowedError | ForbiddenError | UnknownError | RegistrationError
+  union ResetPassword = Response | ResetPasswordValidationError | NotAllowedError | UnknownError | RegistrationError
 
   input RegisterUserInput {
     firstName: String!

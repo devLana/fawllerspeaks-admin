@@ -53,26 +53,35 @@ describe("RefreshData Token", () => {
 
   describe("Verify authentication", () => {
     it("Expect an error response if the user could not be authenticated", async () => {
-      const { data } = await post<Data>(url, { query: GQL });
+      const { data, responseHeaders } = await post<Data>(url, { query: GQL });
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "AuthCookieError",
+        __typename: "AuthenticationError",
         message: "Unable to refresh token",
         status: "ERROR",
       });
     });
 
     it("Expect an error response if the request has no session cookie", async () => {
+      const payload = { query: GQL };
       const options = { authorization: `Bearer ${unregisteredJwt}` };
 
-      const { data } = await post<Data>(url, { query: GQL }, options);
+      const { data, responseHeaders } = await post<Data>(url, payload, options);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "AuthCookieError",
+        __typename: "AuthenticationError",
         message: "Unable to refresh token",
         status: "ERROR",
       });

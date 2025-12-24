@@ -7,8 +7,8 @@ export type RegisterUser = ResolverFunc<MutationResolvers["registerUser"]>;
 export interface Select {
   email: string;
   image: string | null;
-  isRegistered: boolean;
-  dateCreated: string;
+  is_registered: boolean;
+  date_created: string;
 }
 
 export type RegisterUserData = TestData<{

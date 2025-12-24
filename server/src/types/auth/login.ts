@@ -10,8 +10,8 @@ export interface DBUser {
   first_name: string | null;
   last_name: string | null;
   image: string | null;
-  userEmail: string;
-  userPassword: string;
+  email: string;
+  password: string;
   is_registered: boolean;
   date_created: string;
 }

@@ -113,11 +113,6 @@ const types = `#graphql
     status: Status!
   }
 
-  type AuthCookieError implements BaseResponse {
-    message: String!
-    status: Status!
-  }
-
   type Response implements BaseResponse {
     message: String!
     status: Status!

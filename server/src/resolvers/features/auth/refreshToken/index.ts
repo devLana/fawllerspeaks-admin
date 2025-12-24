@@ -16,7 +16,10 @@ const refreshToken: Refresh = async (_, __, { db, req, res, user }) => {
     const ip = req.ip || null;
     const userAgent = req.headers["user-agent"] || null;
 
-    if (!user || !auth) return new ErrorResponse("AuthCookieError", MSG);
+    if (!user || !auth) {
+      clearAuthCookie(res);
+      return new ErrorResponse("AuthenticationError", MSG);
+    }
 
     const { rows } = await db.query<DBResponse>(
       `SELECT

@@ -1,7 +1,6 @@
 import type { BaseResponse as BR, Status } from "@resolverTypes";
 
 type ErrorResponseNames =
-  | "AuthCookieError"
   | "AuthenticationError"
   | "ForbiddenError"
   | "NotAllowedError"
