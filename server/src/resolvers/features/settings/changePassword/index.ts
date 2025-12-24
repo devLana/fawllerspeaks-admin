@@ -8,7 +8,7 @@ import { ErrorResponse, Response } from "@typeResolvers/commonResolvers";
 import { changePasswordValidator as schema } from "@validators/settings/changePassword";
 import { MailError } from "@lib/Errors";
 import generateErrorsObject from "@utils/generateErrorsObject";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { ChangePassword as Fn, User } from "types/settings/changePassword";
 
 const changePassword: Fn = async (_, args, { db, user, req, res }) => {
@@ -17,7 +17,7 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
     const { auth } = req.cookies;
 
     if (!user || !auth) {
-      deleteSession(db, req, res);
+      clearAuthCookie(res);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
@@ -41,13 +41,13 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
         fu.email,
         s.id "sId"
       FROM find_user fu
-      LEFT JOIN sessions s ON fu.id = s.user_id
-      WHERE s.refresh_token = $2`,
+      INNER JOIN sessions s ON fu.id = s.user_id
+      WHERE s.refresh_token = $2 AND s.revoked_at IS NULL`,
       [user, auth]
     );
 
     if (rows.length === 0) {
-      deleteSession(db, req, res);
+      clearAuthCookie(res);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
@@ -66,7 +66,9 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
         UPDATE users SET password = $1 WHERE id = $2
       ),
       revoke_sessions AS (
-        UPDATE sessions SET revoked_at = CURRENT_TIMESTAMP(3) WHERE revoked_at IS NULL AND user_id = $2 AND id != $3
+        UPDATE sessions
+        SET revoked_at = CURRENT_TIMESTAMP(3)
+        WHERE revoked_at IS NULL AND user_id = $2 AND id != $3
       )
       SELECT 1`,
       [hash, uId, sId]

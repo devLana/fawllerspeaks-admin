@@ -6,23 +6,22 @@ import { EditedProfile } from "@typeResolvers/settings/EditedProfile";
 import { EditProfileValidationError } from "@typeResolvers/settings/EditProfileValidationError";
 import { supabaseEvent } from "@events/supabase";
 import { editProfileValidator as schema } from "@validators/settings/editProfile";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import generateErrorsObject from "@utils/generateErrorsObject";
 import type { Edit, SelectInfo, UserInfo } from "types/settings/editProfile";
 
-const editProfile: Edit = async (_, args, { db, user, req, res }) => {
+const editProfile: Edit = async (_, args, { db, user, res }) => {
   const argsImage = args.image && args.image.trim();
   const MSG = "Unable to edit user profile";
 
   try {
     if (!user) {
-      void deleteSession(db, req, res);
+      clearAuthCookie(res);
       if (argsImage) supabaseEvent.emit("removeImage", argsImage);
       return new ErrorResponse("AuthenticationError", MSG);
     }
 
     const input = await schema.validateAsync(args, { abortEarly: false });
-    const { firstName, lastName, image } = input;
 
     const { rows } = await db.query<SelectInfo>(
       `SELECT is_registered, image FROM users WHERE user_id = $1`,
@@ -30,19 +29,19 @@ const editProfile: Edit = async (_, args, { db, user, req, res }) => {
     );
 
     if (rows.length === 0) {
-      void deleteSession(db, req, res);
-      if (image) supabaseEvent.emit("removeImage", image);
-      return new ErrorResponse("UnknownError", MSG);
+      clearAuthCookie(res);
+      if (input.image) supabaseEvent.emit("removeImage", input.image);
+      return new ErrorResponse("AuthenticationError", MSG);
     }
 
-    const [{ is_registered, image: userImage }] = rows;
+    const [{ is_registered, image }] = rows;
 
     if (!is_registered) {
-      if (image) supabaseEvent.emit("removeImage", image);
+      if (input.image) supabaseEvent.emit("removeImage", input.image);
       return new ErrorResponse("RegistrationError", MSG);
     }
 
-    const updateImg = image !== undefined ? image : userImage;
+    const updateImg = input.image !== undefined ? input.image : image;
 
     const { rows: userInfo } = await db.query<UserInfo>(
       `UPDATE users SET
@@ -51,18 +50,18 @@ const editProfile: Edit = async (_, args, { db, user, req, res }) => {
         image = $3
       WHERE user_id = $4
       RETURNING email, date_created, image`,
-      [firstName, lastName, updateImg, user]
+      [input.firstName, input.lastName, updateImg, user]
     );
 
-    if (image !== undefined && userImage) {
-      supabaseEvent.emit("removeImage", userImage);
+    if (input.image !== undefined && image) {
+      supabaseEvent.emit("removeImage", image);
     }
 
     return new EditedProfile({
       id: user,
       email: userInfo[0].email,
-      firstName,
-      lastName,
+      firstName: input.firstName,
+      lastName: input.lastName,
       image: userInfo[0].image,
       isRegistered: is_registered,
       dateCreated: userInfo[0].date_created,

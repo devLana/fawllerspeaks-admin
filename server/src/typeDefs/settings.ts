@@ -20,5 +20,5 @@ export const settingsTypeDefs = `#graphql
 
   union ChangePassword = Response | ChangePasswordValidationError | AuthenticationError | NotAllowedError | RegistrationError
 
-  union EditProfile = EditedProfile | EditProfileValidationError | AuthenticationError | UnknownError | RegistrationError
+  union EditProfile = EditedProfile | EditProfileValidationError | AuthenticationError | RegistrationError
 `;

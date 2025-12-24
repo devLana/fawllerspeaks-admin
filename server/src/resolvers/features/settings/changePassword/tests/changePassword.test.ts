@@ -7,7 +7,7 @@ import changePasswordMail from "@services/mail/changePassword";
 import { MailError } from "@lib/Errors";
 import * as mocks from "./changePassword.testUtils";
 import { CHANGE_PASSWORD } from "@utils/tests/gqlQueries/settingsTestQueries";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
+import authUsers from "@utils/tests/createTestUsers/authUsers";
 import loginTestUser from "@utils/tests/loginTestUser";
 import post from "@utils/tests/post";
 import type { APIContext } from "@types";
@@ -20,20 +20,27 @@ jest.mock("@services/mail/changePassword", () => {
 
 describe("Change password", () => {
   let server: ApolloServer<APIContext>, url: string;
-  let registeredJWT: string, unRegisteredJWT: string;
-  let registeredCookie: string, unregisteredCookie: string;
+  let registeredJWT: string, registeredCookie: string;
+  let unRegisteredJWT: string, unregisteredCookie: string;
+  let newRegisteredJWT: string;
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
-    const users = await testUsers(db);
+    const users = await authUsers(db);
 
-    [registeredJWT, unRegisteredJWT, registeredCookie, unregisteredCookie] =
-      await Promise.all([
-        loginTestUser(users.registeredUser.userUUID),
-        loginTestUser(users.unregisteredUser.userUUID),
-        testSession(db, users.registeredUser.userId),
-        testSession(db, users.unregisteredUser.userId),
-      ]);
+    [
+      registeredJWT,
+      unRegisteredJWT,
+      newRegisteredJWT,
+      registeredCookie,
+      unregisteredCookie,
+    ] = await Promise.all([
+      loginTestUser(users.registeredUser.userUUID),
+      loginTestUser(users.unregisteredUser.userUUID),
+      loginTestUser(users.newRegisteredUser.userUUID),
+      testSession(db, users.registeredUser.userId),
+      testSession(db, users.unregisteredUser.userId),
+    ]);
   });
 
   afterAll(async () => {
@@ -45,8 +52,12 @@ describe("Change password", () => {
     it("User is not logged in, Send an error response", async () => {
       const payload = { query: CHANGE_PASSWORD, variables: mocks.authCheck };
 
-      const { data } = await post<Data>(url, payload);
+      const { data, responseHeaders } = await post<Data>(url, payload);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -61,8 +72,12 @@ describe("Change password", () => {
       const payload = { query: CHANGE_PASSWORD, variables: mocks.authCheck };
       const options = { authorization: `Bearer ${unRegisteredJWT}` };
 
-      const { data } = await post<Data>(url, payload, options);
+      const { data, responseHeaders } = await post<Data>(url, payload, options);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -99,8 +114,32 @@ describe("Change password", () => {
       const payload = { query: CHANGE_PASSWORD, variables: mocks.errorInput };
       const options = { authorization: `Bearer ${unRegisteredJWT}`, cookie };
 
-      const { data } = await post<Data>(url, payload, options);
+      const { data, responseHeaders } = await post<Data>(url, payload, options);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
+      expect(changePasswordMail).not.toHaveBeenCalled();
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect(data.data?.changePassword).toStrictEqual({
+        __typename: "AuthenticationError",
+        message: "Unable to change password",
+        status: "ERROR",
+      });
+    });
+
+    it("Expect an error response if the logged in user somehow does not have an active session", async () => {
+      const payload = { query: CHANGE_PASSWORD, variables: mocks.validInput1 };
+      const options = { authorization: `Bearer ${newRegisteredJWT}` };
+
+      const { data, responseHeaders } = await post<Data>(url, payload, options);
+
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
