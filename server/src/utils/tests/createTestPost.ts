@@ -5,13 +5,20 @@ import { getPostContentResponse } from "@utils/posts/getPostContentResponse";
 import { urls } from "@lib/ClientUrls";
 import dateToISOString from "@utils/dateToISOString";
 import type { PostDBData } from "types/posts";
-import type { TestPostAuthor, TestPostData } from "types/tests";
+import type { TestPostData } from "types/tests";
 import type {
   Post,
   PostContent,
   PostTableOfContents,
   PostTag,
 } from "@resolverTypes";
+
+interface TestPostAuthor {
+  readonly userId: number;
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly image: string | null;
+}
 
 interface Options {
   db: Pool;
@@ -38,16 +45,15 @@ const createTestPost = async (params: Options): Promise<Post> => {
           image_banner,
           date_published,
           last_modified,
-          is_in_bin,
-          is_deleted
+          binned_at
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *
       ),
       resolved_tags AS (
         SELECT id, tag_id, name, date_created, last_modified
         FROM post_tags
-        WHERE tag_id = ANY ($12::uuid[])
+        WHERE tag_id = ANY ($11::uuid[])
       ),
       insert_tags AS (
         INSERT INTO post_tags_to_posts (post_id, tag_id)
@@ -56,9 +62,9 @@ const createTestPost = async (params: Options): Promise<Post> => {
       ),
       insert_content AS (
         INSERT INTO post_contents (post_id, content)
-        SELECT id, $13::text
+        SELECT id, $12::text
         FROM create_post
-        WHERE $13::text IS NOT NULL
+        WHERE $12::text IS NOT NULL
       )
       SELECT
         cp.post_id id,
@@ -66,14 +72,13 @@ const createTestPost = async (params: Options): Promise<Post> => {
         cp.title,
         cp.description,
         cp.excerpt,
-        $13::text content,
+        $12::text content,
         cp.status,
         cp.image_banner "imageBanner",
         cp.date_created "dateCreated",
         cp.date_published "datePublished",
         cp.last_modified "lastModified",
         cp.views,
-        cp.is_in_bin "isBinned",
         cp.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -97,9 +102,8 @@ const createTestPost = async (params: Options): Promise<Post> => {
         cp.date_published,
         cp.last_modified,
         cp.views,
-        cp.is_in_bin,
         cp.binned_at,
-        $13::text`,
+        $12::text`,
       [
         postData.title,
         postData.slug,
@@ -110,8 +114,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         postData.imageBanner,
         postData.datePublished,
         postData.lastModified,
-        postData.isBinned,
-        postData.isDeleted,
+        postData.binnedAt,
         dbTags,
         postData.content,
       ]
@@ -173,7 +176,6 @@ const createTestPost = async (params: Options): Promise<Post> => {
       datePublished,
       lastModified,
       views: post.views,
-      isBinned: post.isBinned,
       binnedAt,
       tags: postTags ?? null,
     };

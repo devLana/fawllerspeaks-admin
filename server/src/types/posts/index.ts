@@ -20,7 +20,6 @@ interface DBPostData {
   readonly lastModified: string | null;
   readonly views: number;
   readonly binnedAt: string | null;
-  readonly isBinned: boolean;
   readonly tags: PostTag[] | null;
 }
 
@@ -70,5 +69,4 @@ export interface CreateDraftUser {
 export interface UnpublishUndo {
   is_registered: boolean;
   status: PostStatus | null;
-  is_in_bin: boolean | null;
 }

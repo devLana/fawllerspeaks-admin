@@ -1,10 +1,21 @@
 import getPostSlug from "@utils/posts/getPostSlug";
 import type { RemoveNull } from "@types";
-import type { TestUser, TestPostData } from "types/tests";
+import type { TestPostData } from "types/tests";
 
-type RemoveNullFromTestUser = RemoveNull<TestUser>;
-type Params = Omit<Partial<TestPostData>, "slug" | "imageBanner">;
+interface TestUser {
+  readonly firstName: string | null;
+  readonly lastName: string | null;
+  readonly image: string | null;
+  readonly email: string;
+  readonly password: string;
+  readonly registered: boolean;
+}
 
+type Params = Partial<Omit<TestPostData, "title" | "slug">> & {
+  readonly title: string;
+};
+
+// Test Users
 export const unRegisteredUser: TestUser = {
   firstName: null,
   lastName: null,
@@ -14,7 +25,7 @@ export const unRegisteredUser: TestUser = {
   registered: false,
 };
 
-export const registeredUser: RemoveNullFromTestUser = {
+export const registeredUser: RemoveNull<TestUser> = {
   email: "registered_user_test_mail@mail.com",
   password: "passWord2!",
   firstName: "Jim",
@@ -23,7 +34,7 @@ export const registeredUser: RemoveNullFromTestUser = {
   registered: true,
 };
 
-export const newRegisteredUser: RemoveNullFromTestUser = {
+export const newRegisteredUser: RemoveNull<TestUser> = {
   email: "new_registered_user@gmail.com",
   password: "passWord3!",
   firstName: "Paul",
@@ -32,6 +43,7 @@ export const newRegisteredUser: RemoveNullFromTestUser = {
   registered: true,
 };
 
+// Test User Sessions
 export const unregisteredReset = {
   token: "2NiAlHaa9YGopc5aP6oJ55YE8QKz-j8ii7vEtgPOUC0",
   hash: "410a1830dbe4b21c01ba08b529bb02dc510d19ae7fb754e1b1a2fa2695f26938",
@@ -57,44 +69,16 @@ export const otherRegisteredReset = {
   hash: "035014177026c4c78653f92729e6f788496629ee748edf6b3ce63e93e036e550",
 };
 
-const html =
-  "<h2>heading 2</h2><p>Test post content</p><h3>heading 3</h3><p>paragraph</p>";
-
-export const testPostData = (params?: Params): TestPostData => {
-  let status: Params["status"];
-  let postContent: Params["content"];
-  let binnedAt: Params["binnedAt"];
-
-  if (params?.content === null) {
-    postContent = null;
-  } else {
-    postContent = params?.content ?? html;
-  }
-
-  if (params?.datePublished) {
-    status = "Published";
-  } else {
-    status = params?.status ?? "Draft";
-  }
-
-  if (params?.isBinned) {
-    binnedAt = new Date().toISOString();
-  } else {
-    binnedAt = params?.binnedAt ?? null;
-  }
-
-  return {
-    title: params?.title ?? "Test post default title",
-    slug: getPostSlug(params?.title ?? "Test post default title"),
-    description: params?.description ?? "Test post description",
-    excerpt: params?.excerpt ?? "Test post excerpt",
-    content: postContent,
-    status,
-    imageBanner: "post/image/banner/storage/path",
-    datePublished: params?.datePublished ?? null,
-    lastModified: params?.lastModified ?? null,
-    isBinned: params?.isBinned ?? false,
-    binnedAt,
-    isDeleted: params?.isDeleted ?? false,
-  };
-};
+// Test Post Data
+export const testPostData = (p: Params): TestPostData => ({
+  title: p.title,
+  slug: getPostSlug(p.title),
+  status: p.status ?? "Draft",
+  description: p.description ?? null,
+  excerpt: p.excerpt ?? null,
+  content: p.content ?? null,
+  imageBanner: p.imageBanner ?? null,
+  datePublished: p.datePublished ?? null,
+  lastModified: p.lastModified ?? null,
+  binnedAt: p.binnedAt ?? null,
+});
