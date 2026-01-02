@@ -20,11 +20,11 @@ const forgotPassword: ForgotPassword = async (_, { email }, { db }) => {
       [validated.toLowerCase()]
     );
 
-    if (rows.length === 0) return new ErrorResponse("NotAllowedError", MSG);
+    if (rows.length === 0) return new ErrorResponse("ForbiddenError", MSG);
 
     const [{ id, email: userEmail, is_registered }] = rows;
 
-    if (!is_registered) return new ErrorResponse("RegistrationError", MSG);
+    if (!is_registered) return new ErrorResponse("ForbiddenError", MSG);
 
     const { token, hash } = await generateResetToken();
 
@@ -49,7 +49,7 @@ const forgotPassword: ForgotPassword = async (_, { email }, { db }) => {
       const msg = `An error has occurred in trying to set up your password reset. Please try again later`;
 
       // log mail error
-      void db.query("ROLLBACK");
+      await db.query("ROLLBACK");
       return new ErrorResponse("ServerError", msg);
     }
 

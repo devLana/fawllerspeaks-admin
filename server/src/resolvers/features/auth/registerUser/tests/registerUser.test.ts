@@ -48,7 +48,7 @@ describe("Register user", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.registerUser).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to register user",
         status: "ERROR",
       });

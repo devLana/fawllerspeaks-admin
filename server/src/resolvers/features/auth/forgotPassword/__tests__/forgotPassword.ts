@@ -61,7 +61,7 @@ describe("Forgot password", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: "ForbiddenError",
         message: "Unable to reset user password",
         status: "ERROR",
       });
@@ -77,7 +77,7 @@ describe("Forgot password", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
-        __typename: "RegistrationError",
+        __typename: "ForbiddenError",
         message: "Unable to reset user password",
         status: "ERROR",
       });

@@ -62,7 +62,7 @@ describe("RefreshData Token", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to refresh token",
         status: "ERROR",
       });
@@ -81,7 +81,7 @@ describe("RefreshData Token", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to refresh token",
         status: "ERROR",
       });
@@ -103,7 +103,7 @@ describe("RefreshData Token", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to refresh token",
         status: "ERROR",
       });
@@ -131,7 +131,7 @@ describe("RefreshData Token", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: "ForbiddenError",
         message: "Unable to refresh token",
         status: "ERROR",
       });
@@ -151,7 +151,7 @@ describe("RefreshData Token", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: "ForbiddenError",
         message: "Unable to refresh token",
         status: "ERROR",
       });
@@ -171,7 +171,7 @@ describe("RefreshData Token", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: "ForbiddenError",
         message: "Unable to refresh token",
         status: "ERROR",
       });

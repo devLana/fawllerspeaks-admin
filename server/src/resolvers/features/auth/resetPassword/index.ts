@@ -30,20 +30,20 @@ const resetPassword: Reset = async (_, args, { db }) => {
       [tokenHash]
     );
 
-    if (rows.length === 0) return new ErrorResponse("UnknownError", MSG);
+    if (rows.length === 0) return new ErrorResponse("ForbiddenError", MSG);
 
     const [{ userId, email, is_registered, expire_date, used }] = rows;
 
     if (!is_registered) {
       const msg = "The password of unregistered accounts cannot be reset";
-      return new ErrorResponse("RegistrationError", msg);
+      return new ErrorResponse("ForbiddenError", msg);
     }
 
-    if (used) return new ErrorResponse("NotAllowedError", MSG);
+    if (used) return new ErrorResponse("ForbiddenError", MSG);
 
     if (Date.parse(expire_date) < Date.now()) {
       const msg = "The password reset token has already expired";
-      return new ErrorResponse("NotAllowedError", msg);
+      return new ErrorResponse("ForbiddenError", msg);
     }
 
     const passwordHash = await bcrypt.hash(input.password, 10);

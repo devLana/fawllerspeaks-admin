@@ -72,7 +72,7 @@ describe("Create user", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createUser).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: "ForbiddenError",
         message: "The new user you are trying to create already exits",
         status: "ERROR",
       });

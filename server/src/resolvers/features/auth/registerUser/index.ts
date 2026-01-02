@@ -16,7 +16,7 @@ const registerUser: Fn = async (_, { userInput }, { db, user, res }) => {
 
     if (!user) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const input = await schema.validateAsync(userInput, { abortEarly: false });
@@ -34,7 +34,7 @@ const registerUser: Fn = async (_, { userInput }, { db, user, res }) => {
 
     if (rows.length === 0) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     if (rows[0].is_registered) {

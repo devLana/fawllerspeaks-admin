@@ -62,20 +62,18 @@ describe("Login", () => {
       [
         "Should return an error response if the e-mail address is unknown",
         { email: "unknown_email@example.com", password: "pass_pass_apps" },
-        "UnknownError",
       ],
       [
         "Should return an error response if the e-mail & password combination is incorrect",
         { email: registeredUser.email, password: "password123" },
-        "NotAllowedError",
       ],
-    ])("%s", async (_, variables, typename) => {
+    ])("%s", async (_, variables) => {
       const { data } = await post<LoginData>(url, { query: LOGIN, variables });
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.login).toStrictEqual({
-        __typename: typename,
+        __typename: "ForbiddenError",
         message: "Invalid email or password",
         status: "ERROR",
       });

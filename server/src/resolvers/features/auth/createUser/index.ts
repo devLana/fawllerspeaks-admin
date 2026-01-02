@@ -19,8 +19,9 @@ const createUser: CreateUser = async (_, { email }, { db }) => {
 
     if (user.rows.length > 0) {
       const msg = "The new user you are trying to create already exits";
-      return new ErrorResponse("NotAllowedError", msg);
+      return new ErrorResponse("ForbiddenError", msg);
     }
+
     const { hash, password } = await bytesHash();
 
     await db.query("BEGIN");
@@ -31,7 +32,7 @@ const createUser: CreateUser = async (_, { email }, { db }) => {
     ]);
 
     await createUserMail(validatedEmail, password);
-    void db.query("COMMIT");
+    await db.query("COMMIT");
 
     const msg = `New user created. A confirmation mail has been sent to their email address`;
     return new Response(msg);
@@ -44,7 +45,7 @@ const createUser: CreateUser = async (_, { email }, { db }) => {
       const msg = `An error has occurred in trying to create the new user. Please try again later`;
 
       // log the create user mail error
-      void db.query("ROLLBACK");
+      await db.query("ROLLBACK");
       return new ErrorResponse("ServerError", msg);
     }
 

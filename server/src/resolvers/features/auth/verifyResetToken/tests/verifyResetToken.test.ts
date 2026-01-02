@@ -54,7 +54,7 @@ describe("Verify password reset token", () => {
   });
 
   describe("Verify password reset token", () => {
-    test.each(verify)("%s", async (_, token, typeName, errorMsg) => {
+    test.each(verify)("%s", async (_, token, errorMsg) => {
       const variables = { token };
       const payload = { query: VERIFY_PASSWORD_RESET_TOKEN, variables };
 
@@ -63,7 +63,7 @@ describe("Verify password reset token", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.verifyResetToken).toStrictEqual({
-        __typename: typeName,
+        __typename: "ForbiddenError",
         message: errorMsg,
         status: "ERROR",
       });

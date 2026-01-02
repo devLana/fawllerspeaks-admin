@@ -18,7 +18,7 @@ const refreshToken: Refresh = async (_, __, { db, req, res, user }) => {
 
     if (!user || !auth) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const { rows } = await db.query<DBResponse>(
@@ -38,7 +38,7 @@ const refreshToken: Refresh = async (_, __, { db, req, res, user }) => {
 
     if (rows.length === 0) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const [
@@ -61,17 +61,17 @@ const refreshToken: Refresh = async (_, __, { db, req, res, user }) => {
 
       await sessionMail(email);
       clearAuthCookie(res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      return new ErrorResponse("ForbiddenError", MSG);
     }
 
     if (revoked_at) {
       clearAuthCookie(res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      return new ErrorResponse("ForbiddenError", MSG);
     }
 
     if (Date.parse(expire_date) < Date.now()) {
       clearAuthCookie(res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      return new ErrorResponse("ForbiddenError", MSG);
     }
 
     const tokens = await signTokens(user_id);
@@ -94,7 +94,7 @@ const refreshToken: Refresh = async (_, __, { db, req, res, user }) => {
     if (err instanceof MailError) {
       // log session mail error
       clearAuthCookie(res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      return new ErrorResponse("ForbiddenError", MSG);
     }
 
     // log any system errors

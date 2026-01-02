@@ -52,21 +52,21 @@ export const authTypeDefs = `#graphql
     status: Status!
   }
 
-  union CreateUser_GeneratePassword = Response | EmailValidationError | NotAllowedError | ServerError
+  union CreateUser_GeneratePassword = Response | EmailValidationError | ForbiddenError | ServerError
 
-  union Login = SessionData | LoginValidationError | UnknownError | NotAllowedError
+  union Login = SessionData | LoginValidationError | ForbiddenError
   
-  union VerifySession = SessionData | AuthenticationError | NotAllowedError
+  union VerifySession = SessionData | UnauthorizedError | ForbiddenError
   
-  union RefreshToken = RefreshData | AuthenticationError | NotAllowedError
+  union RefreshToken = RefreshData | UnauthorizedError | ForbiddenError
   
-  union RegisterUser = RegisteredUser | RegisterUserValidationError | AuthenticationError | RegistrationError
+  union RegisterUser = RegisteredUser | RegisterUserValidationError | UnauthorizedError | RegistrationError
   
-  union ForgotPassword = Response | EmailValidationError | NotAllowedError | RegistrationError | ServerError
+  union ForgotPassword = Response | EmailValidationError | ForbiddenError | ServerError
 
-  union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | UnknownError | NotAllowedError | RegistrationError
+  union VerifyResetToken = VerifiedResetToken | VerifyResetTokenValidationError | ForbiddenError
   
-  union ResetPassword = Response | ResetPasswordValidationError | NotAllowedError | UnknownError | RegistrationError
+  union ResetPassword = Response | ResetPasswordValidationError | ForbiddenError
 
   input RegisterUserInput {
     firstName: String!

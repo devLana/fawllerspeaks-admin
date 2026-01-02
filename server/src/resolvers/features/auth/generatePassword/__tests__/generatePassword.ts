@@ -53,14 +53,12 @@ describe("Generate password", () => {
       [
         "Should return an error response for an unknown e-mail address",
         "example_mail@examplemail.com",
-        "NotAllowedError",
       ],
       [
         "Should return an error response if the provided e-mail is for a registered account",
         registeredUser.email,
-        "NotAllowedError",
       ],
-    ])("%s", async (_, email, typename) => {
+    ])("%s", async (_, email) => {
       const payload = { query: GENERATE_PASSWORD, variables: { email } };
 
       const { data } = await post<DATA>(url, payload);
@@ -68,7 +66,7 @@ describe("Generate password", () => {
       expect(generatePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data?.generatePassword).toStrictEqual({
-        __typename: typename,
+        __typename: "ForbiddenError",
         message: msg,
         status: "ERROR",
       });

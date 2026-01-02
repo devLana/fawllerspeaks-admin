@@ -35,13 +35,13 @@ const login: Login = async (_, args, { db, req, res }) => {
       [input.email.toLowerCase()]
     );
 
-    if (rows.length === 0) return new ErrorResponse("UnknownError", MSG);
+    if (rows.length === 0) return new ErrorResponse("ForbiddenError", MSG);
 
     const [{ user_id, password, ...row }] = rows;
 
     const match = await bcrypt.compare(input.password, password);
 
-    if (!match) return new ErrorResponse("NotAllowedError", MSG);
+    if (!match) return new ErrorResponse("ForbiddenError", MSG);
 
     const { refreshTokenHash, refreshToken, accessToken } = await signTokens(
       user_id

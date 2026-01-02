@@ -50,7 +50,7 @@ describe("Verify Session", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.verifySession).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to verify session",
         status: "ERROR",
       });
@@ -71,7 +71,7 @@ describe("Verify Session", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.verifySession).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to verify session",
         status: "ERROR",
       });
@@ -90,7 +90,7 @@ describe("Verify Session", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.verifySession).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: "ForbiddenError",
         message: "Unable to verify session",
         status: "ERROR",
       });
@@ -109,7 +109,7 @@ describe("Verify Session", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.verifySession).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: "ForbiddenError",
         message: "Unable to verify session",
         status: "ERROR",
       });

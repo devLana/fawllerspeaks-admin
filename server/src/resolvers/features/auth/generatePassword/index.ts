@@ -19,9 +19,9 @@ const generatePassword: GeneratePassword = async (_, arg, { db }) => {
       [validated.toLowerCase()]
     );
 
-    if (rows.length === 0) return new ErrorResponse("NotAllowedError", MSG);
+    if (rows.length === 0) return new ErrorResponse("ForbiddenError", MSG);
 
-    if (rows[0].is_registered) return new ErrorResponse("NotAllowedError", MSG);
+    if (rows[0].is_registered) return new ErrorResponse("ForbiddenError", MSG);
 
     const { hash, password } = await bytesHash();
 
