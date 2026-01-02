@@ -49,7 +49,7 @@ describe("Edit post tags", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editPostTag).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to edit post tag",
         status: "ERROR",
       });
@@ -119,7 +119,7 @@ describe("Edit post tags", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editPostTag).toStrictEqual({
-        __typename: "UnknownError",
+        __typename: "NotFoundError",
         message: "The post tag you are trying to edit does not exist",
         status: "ERROR",
       });
@@ -137,7 +137,7 @@ describe("Edit post tags", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editPostTag).toStrictEqual({
-        __typename: "DuplicatePostTagError",
+        __typename: "ForbiddenError",
         message: `A post tag with the name "${variables.name}" already exists`,
         status: "ERROR",
       });

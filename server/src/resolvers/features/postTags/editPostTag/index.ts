@@ -17,7 +17,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user, res }) => {
 
     if (!user) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const input = await schema.validateAsync(args, { abortEarly: false });
@@ -30,7 +30,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user, res }) => {
 
     if (findUser.length === 0) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     if (!findUser[0].is_registered) {
@@ -60,7 +60,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user, res }) => {
 
     if (rows.length === 0) {
       const msg = "The post tag you are trying to edit does not exist";
-      return new ErrorResponse("UnknownError", msg);
+      return new ErrorResponse("NotFoundError", msg);
     }
 
     const [{ duplicateExists, ...tag }] = rows;
@@ -72,7 +72,7 @@ const editPostTag: EditPostTag = async (_, args, { db, user, res }) => {
 
     if (duplicateExists) {
       const msg = `A post tag with the name "${name}" already exists`;
-      return new ErrorResponse("DuplicatePostTagError", msg);
+      return new ErrorResponse("ForbiddenError", msg);
     }
 
     const { rows: updateTag } = await db.query<PostTag>(

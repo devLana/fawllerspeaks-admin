@@ -44,7 +44,7 @@ describe("Get post tags", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.getPostTags).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to get post tags",
         status: "ERROR",
       });

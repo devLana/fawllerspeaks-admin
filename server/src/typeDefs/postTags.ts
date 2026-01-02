@@ -55,16 +55,11 @@ export const postTagsTypeDefs = `#graphql
     status: Status!
   }
 
-  type DuplicatePostTagError implements BaseResponse {
-    message: String!
-    status: Status!
-  }
+  union CreatePostTags = PostTags | CreatedPostTagsWarning | CreatePostTagsValidationError | ForbiddenError | UnauthorizedError | RegistrationError
 
-  union CreatePostTags = PostTags | CreatedPostTagsWarning | CreatePostTagsValidationError | DuplicatePostTagError | AuthenticationError | RegistrationError
+  union DeletePostTags = DeletedPostTags | DeletedPostTagsWarning | DeletePostTagsValidationError | NotFoundError | UnauthorizedError | RegistrationError
 
-  union DeletePostTags = DeletedPostTags | DeletedPostTagsWarning | DeletePostTagsValidationError | UnknownError | AuthenticationError | RegistrationError
+  union EditPostTag = EditedPostTag | EditedPostTagWarning | EditPostTagValidationError | UnauthorizedError | RegistrationError | ForbiddenError | NotFoundError
 
-  union EditPostTag = EditedPostTag | EditedPostTagWarning | EditPostTagValidationError | AuthenticationError | RegistrationError | DuplicatePostTagError | UnknownError
-
-  union GetPostTags = PostTags | AuthenticationError | RegistrationError
+  union GetPostTags = PostTags | UnauthorizedError | RegistrationError
 `;

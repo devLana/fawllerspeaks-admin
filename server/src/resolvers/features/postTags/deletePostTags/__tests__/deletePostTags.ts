@@ -49,7 +49,7 @@ describe("Delete post tags", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.deletePostTags).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to delete post tag",
         status: "ERROR",
       });
@@ -161,7 +161,7 @@ describe("Delete post tags", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.deletePostTags).toStrictEqual({
-        __typename: "UnknownError",
+        __typename: "NotFoundError",
         message: "The selected post tag could not be deleted",
         status: "ERROR",
       });
@@ -178,7 +178,7 @@ describe("Delete post tags", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.deletePostTags).toStrictEqual({
-        __typename: "UnknownError",
+        __typename: "NotFoundError",
         message: "None of the selected post tags could be deleted",
         status: "ERROR",
       });

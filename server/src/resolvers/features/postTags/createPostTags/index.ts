@@ -17,7 +17,7 @@ const createPostTags: Fn = async (_, { tags }, { user, db, res }) => {
   try {
     if (!user) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const inputTags = await schema.validateAsync(tags, { abortEarly: false });
@@ -29,7 +29,7 @@ const createPostTags: Fn = async (_, { tags }, { user, db, res }) => {
 
     if (author.length === 0) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     if (!author[0].is_registered) {
@@ -67,7 +67,7 @@ const createPostTags: Fn = async (_, { tags }, { user, db, res }) => {
           ? "Post tags with similar names to the ones provided already exist"
           : "A post tag with a similar name to the one provided already exists";
 
-      return new ErrorResponse("DuplicatePostTagError", msg);
+      return new ErrorResponse("ForbiddenError", msg);
     }
 
     if (createdPostTags.length < inputTags.length) {

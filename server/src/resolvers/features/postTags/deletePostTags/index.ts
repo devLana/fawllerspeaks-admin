@@ -15,7 +15,7 @@ const deletePostTags: Fn = async (_, { tagIds }, { db, user, res }) => {
   try {
     if (!user) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const inputTags = await schema.validateAsync(tagIds, { abortEarly: false });
@@ -27,7 +27,7 @@ const deletePostTags: Fn = async (_, { tagIds }, { db, user, res }) => {
 
     if (findUser.length === 0) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     if (!findUser[0].is_registered) {
@@ -47,7 +47,7 @@ const deletePostTags: Fn = async (_, { tagIds }, { db, user, res }) => {
           ? "The selected post tag could not be deleted"
           : "None of the selected post tags could be deleted";
 
-      return new ErrorResponse("UnknownError", msg);
+      return new ErrorResponse("NotFoundError", msg);
     }
 
     const deletedTagIds = allDeletedTags.map(tag => tag.id);

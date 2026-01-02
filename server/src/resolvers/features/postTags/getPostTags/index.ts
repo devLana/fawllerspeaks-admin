@@ -12,7 +12,7 @@ const getPostTags: GetPostTags = async (_, __, { db, user, res }) => {
 
     if (!user) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const { rows: findUser } = await db.query<{ is_registered: boolean }>(
@@ -22,7 +22,7 @@ const getPostTags: GetPostTags = async (_, __, { db, user, res }) => {
 
     if (findUser.length === 0) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     if (!findUser[0].is_registered) {
