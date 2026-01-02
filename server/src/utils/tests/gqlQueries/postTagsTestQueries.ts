@@ -19,20 +19,17 @@ export const CREATE_POST_TAGS = `#graphql
         }
         status
       }
-
       ... on CreatedPostTagsWarning {
         tags {
           __typename
           ...postTagFields
         }
       }
-
       ... on CreatePostTagsValidationError {
         __typename
         tagsError
         status
       }
-
       ... on BaseResponse {
         __typename
         message
@@ -50,17 +47,14 @@ export const DELETE_POST_TAGS = `#graphql
         tagIds
         status
       }
-
       ... on DeletedPostTagsWarning {
         tagIds
       }
-
       ... on DeletePostTagsValidationError {
         __typename
         tagIdsError
         status
       }
-
       ... on BaseResponse {
         __typename
         message
@@ -82,7 +76,6 @@ export const EDIT_POST_TAG = `#graphql
         }
         status
       }
-
       ... on EditedPostTagWarning {
         __typename
         tag {
@@ -92,14 +85,12 @@ export const EDIT_POST_TAG = `#graphql
         message
         status
       }
-
       ... on EditPostTagValidationError {
         __typename
         tagIdError
         nameError
         status
       }
-
       ... on BaseResponse {
         __typename
         message
@@ -121,7 +112,6 @@ export const GET_POST_TAGS = `#graphql
         }
         status
       }
-
       ... on BaseResponse {
         __typename
         message

@@ -1,14 +1,11 @@
 import type { BaseResponse as BR, Status } from "@resolverTypes";
 
 type ErrorResponseNames =
-  | "AuthenticationError"
+  | "NotFoundError"
+  | "UnauthorizedError"
   | "ForbiddenError"
-  | "NotAllowedError"
-  | "RegistrationError"
   | "ServerError"
-  | "UnknownError"
-  | "NotAllowedPostActionError"
-  | "DuplicatePostTagError";
+  | "RegistrationError";
 
 export class ErrorResponse<T extends ErrorResponseNames> implements BR {
   readonly status: Status;

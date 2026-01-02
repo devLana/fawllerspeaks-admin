@@ -51,7 +51,6 @@ export const CREATE_POST = `#graphql
         message
         status
       }
-
       ... on SinglePost {
         __typename
         post {
@@ -59,7 +58,6 @@ export const CREATE_POST = `#graphql
         }
         status
       }
-
       ... on PostValidationError {
         __typename
         titleError
@@ -83,7 +81,6 @@ export const EDIT_POST = `#graphql
         message
         status
       }
-
       ... on SinglePost {
         __typename
         post {
@@ -91,7 +88,6 @@ export const EDIT_POST = `#graphql
         }
         status
       }
-
       ... on EditPostValidationError {
         __typename
         idError
@@ -117,7 +113,6 @@ export const DRAFT_POST = `#graphql
         message
         status
       }
-
       ... on SinglePost {
         __typename
         post {
@@ -125,7 +120,6 @@ export const DRAFT_POST = `#graphql
         }
         status
       }
-
       ... on PostValidationError {
         __typename
         titleError
@@ -149,7 +143,6 @@ export const GET_POST = `#graphql
         message
         status
       }
-
       ... on SinglePost {
         __typename
         post {
@@ -157,7 +150,6 @@ export const GET_POST = `#graphql
         }
         status
       }
-
       ... on GetPostValidationError {
         __typename
         slugError
@@ -183,7 +175,6 @@ export const GET_POSTS = `#graphql
         }
         status
       }
-
       ... on GetPostsValidationError {
         __typename
         afterError
@@ -192,7 +183,6 @@ export const GET_POSTS = `#graphql
         statusError
         status
       }
-
       ... on BaseResponse {
         __typename
         message
@@ -211,7 +201,6 @@ export const UNPUBLISH_POST = `#graphql
         message
         status
       }
-
       ... on SinglePost {
         __typename
         post {
@@ -219,7 +208,6 @@ export const UNPUBLISH_POST = `#graphql
         }
         status
       }
-
       ... on PostIdValidationError {
         __typename
         postIdError
@@ -238,7 +226,6 @@ export const UNDO_UNPUBLISH_POST = `#graphql
         message
         status
       }
-
       ... on SinglePost {
         __typename
         post {
@@ -246,7 +233,6 @@ export const UNDO_UNPUBLISH_POST = `#graphql
         }
         status
       }
-
       ... on PostIdValidationError {
         __typename
         postIdError
@@ -265,7 +251,6 @@ export const BIN_POST = `#graphql
         message
         status
       }
-
       ... on SinglePost {
         __typename
         post {
@@ -273,7 +258,6 @@ export const BIN_POST = `#graphql
         }
         status
       }
-
       ... on PostIdValidationError {
         __typename
         postIdError
@@ -292,7 +276,6 @@ export const BIN_POSTS = `#graphql
         message
         status
       }
-
       ... on Posts {
         __typename
         posts {
@@ -300,14 +283,12 @@ export const BIN_POSTS = `#graphql
         }
         status
       }
-
       ... on PostsWarning {
         __typename
         posts {
           ...postFields
         }
       }
-
       ... on PostIdsValidationError {
         __typename
         postIdsError
@@ -326,7 +307,6 @@ export const UN_BIN_POSTS = `#graphql
         message
         status
       }
-
       ... on Posts {
         __typename
         posts {
@@ -334,15 +314,12 @@ export const UN_BIN_POSTS = `#graphql
         }
         status
       }
-
-
       ... on PostsWarning {
         __typename
         posts {
           ...postFields
         }
       }
-
       ... on PostIdsValidationError {
         __typename
         postIdsError
@@ -361,7 +338,6 @@ export const DELETE_POSTS_FROM_BIN = `#graphql
         message
         status
       }
-
       ... on Posts {
         __typename
         posts {
@@ -369,14 +345,12 @@ export const DELETE_POSTS_FROM_BIN = `#graphql
         }
         status
       }
-
       ... on PostsWarning {
         __typename
         posts {
           ...postFields
         }
       }
-
       ... on PostIdsValidationError {
         __typename
         postIdsError
@@ -395,7 +369,6 @@ export const EMPTY_BIN = `#graphql
         message
         status
       }
-
       ... on Posts {
         __typename
         posts {

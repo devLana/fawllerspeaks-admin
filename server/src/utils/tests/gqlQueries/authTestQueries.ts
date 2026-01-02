@@ -6,7 +6,6 @@ export const CREATE_USER = `#graphql
         message
         status
       }
-
       ... on EmailValidationError {
         __typename
         emailError
@@ -24,7 +23,6 @@ export const FORGOT_PASSWORD = `#graphql
         message
         status
       }
-
       ... on EmailValidationError {
         __typename
         emailError
@@ -42,7 +40,6 @@ export const GENERATE_PASSWORD = `#graphql
         message
         status
       }
-
       ... on EmailValidationError {
         __typename
         emailError
@@ -61,13 +58,11 @@ export const LOGIN = `#graphql
         passwordError
         status
       }
-
       ... on BaseResponse {
         __typename
         message
         status
       }
-
       ... on SessionData {
         __typename
         user {
@@ -105,7 +100,6 @@ export const REFRESH_TOKEN = `#graphql
         message
         status
       }
-
       ... on RefreshData {
         __typename
         accessToken
@@ -126,13 +120,11 @@ export const REGISTER_USER = `#graphql
         confirmPasswordError
         status
       }
-
       ... on BaseResponse {
         __typename
         message
         status
       }
-
       ... on RegisteredUser {
         __typename
         user {
@@ -159,7 +151,6 @@ export const RESET_PASSWORD = `#graphql
         message
         status
       }
-
       ... on ResetPasswordValidationError {
         __typename
         tokenError
@@ -179,13 +170,11 @@ export const VERIFY_PASSWORD_RESET_TOKEN = `#graphql
         message
         status
       }
-
       ... on VerifyResetTokenValidationError {
         __typename
         tokenError
         status
       }
-
       ... on VerifiedResetToken {
         __typename
         email
@@ -204,7 +193,6 @@ export const VERIFY_SESSION = `#graphql
         message
         status
       }
-
       ... on SessionData {
         __typename
         user {

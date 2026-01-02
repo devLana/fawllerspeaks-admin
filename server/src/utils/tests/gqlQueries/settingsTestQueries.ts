@@ -6,7 +6,6 @@ export const CHANGE_PASSWORD = `#graphql
         message
         status
       }
-
       ... on ChangePasswordValidationError {
         __typename
         currentPasswordError
@@ -26,7 +25,6 @@ export const EDIT_PROFILE = `#graphql
         message
         status
       }
-
       ... on EditProfileValidationError {
         __typename
         firstNameError
@@ -34,7 +32,6 @@ export const EDIT_PROFILE = `#graphql
         imageError
         status
       }
-
       ... on EditedProfile {
         __typename
         user {

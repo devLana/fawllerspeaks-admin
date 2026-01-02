@@ -83,12 +83,17 @@ const types = `#graphql
     status: Status!
   }
 
-  type NotAllowedError implements BaseResponse {
+  type NotFoundError implements BaseResponse {
     message: String!
     status: Status!
   }
 
-  type UnknownError implements BaseResponse {
+  type UnauthorizedError implements BaseResponse {
+    message: String!
+    status: Status!
+  }
+
+  type ForbiddenError implements BaseResponse {
     message: String!
     status: Status!
   }
@@ -99,16 +104,6 @@ const types = `#graphql
   }
 
   type RegistrationError implements BaseResponse {
-    message: String!
-    status: Status!
-  }
-
-  type AuthenticationError implements BaseResponse {
-    message: String!
-    status: Status!
-  }
-
-  type ForbiddenError implements BaseResponse {
     message: String!
     status: Status!
   }
