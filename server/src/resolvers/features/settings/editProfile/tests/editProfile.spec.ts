@@ -58,7 +58,7 @@ describe("Edit user profile", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editProfile).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to edit user profile",
         status: "ERROR",
       });

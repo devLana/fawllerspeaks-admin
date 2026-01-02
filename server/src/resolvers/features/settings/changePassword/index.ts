@@ -18,7 +18,7 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
 
     if (!user || !auth) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const input = await schema.validateAsync(args, { abortEarly: false });
@@ -48,7 +48,7 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
 
     if (rows.length === 0) {
       clearAuthCookie(res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const [{ uId, email, is_registered, password, sId }] = rows;
@@ -57,7 +57,7 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
 
     const matchPasswords = await bcrypt.compare(currentPassword, password);
 
-    if (!matchPasswords) return new ErrorResponse("NotAllowedError", MSG);
+    if (!matchPasswords) return new ErrorResponse("ForbiddenError", MSG);
 
     const hash = await bcrypt.hash(newPassword, 10);
 

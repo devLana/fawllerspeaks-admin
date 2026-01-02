@@ -18,7 +18,7 @@ const editProfile: Edit = async (_, args, { db, user, res }) => {
     if (!user) {
       clearAuthCookie(res);
       if (argsImage) supabaseEvent.emit("removeImage", argsImage);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const input = await schema.validateAsync(args, { abortEarly: false });
@@ -31,7 +31,7 @@ const editProfile: Edit = async (_, args, { db, user, res }) => {
     if (rows.length === 0) {
       clearAuthCookie(res);
       if (input.image) supabaseEvent.emit("removeImage", input.image);
-      return new ErrorResponse("AuthenticationError", MSG);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const [{ is_registered, image }] = rows;

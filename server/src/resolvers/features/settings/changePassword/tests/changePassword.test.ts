@@ -62,7 +62,7 @@ describe("Change password", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to change password",
         status: "ERROR",
       });
@@ -82,7 +82,7 @@ describe("Change password", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to change password",
         status: "ERROR",
       });
@@ -124,7 +124,7 @@ describe("Change password", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to change password",
         status: "ERROR",
       });
@@ -144,7 +144,7 @@ describe("Change password", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to change password",
         status: "ERROR",
       });
@@ -182,7 +182,7 @@ describe("Change password", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
-        __typename: "NotAllowedError",
+        __typename: "ForbiddenError",
         message: "Unable to change password",
         status: "ERROR",
       });
