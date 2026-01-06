@@ -11,9 +11,12 @@ export interface EditPostCTE {
   is_registered: boolean;
   userName: string;
   userImage: string | null;
-  status: PostStatus | null;
+  id: number | null;
+  status: PostStatus;
   image_banner: string | null;
-  is_in_bin: boolean;
+  binned_at: string | null;
 }
+
+export type SqlValues = (string | number | null)[];
 
 export type EditData = TestData<{ editPost: Record<string, unknown> }>;

@@ -182,7 +182,7 @@ describe.skip("Un-bin posts", () => {
     expect(data.errors).toBeUndefined();
     expect(data.data).toBeDefined();
     expect(data.data?.unBinPosts).toStrictEqual({
-      __typename: "UnknownError",
+      __typename: "NotFoundError",
       message: "The provided posts could not be removed from bin",
       status: "ERROR",
     });

@@ -8,5 +8,5 @@ export type BinPostData = TestData<{ binPost: Record<string, unknown> }>;
 
 export interface BinPostCTE {
   is_registered: boolean;
-  is_in_bin: boolean | null;
+  post: { id: number; binnedAt: string | null } | null;
 }

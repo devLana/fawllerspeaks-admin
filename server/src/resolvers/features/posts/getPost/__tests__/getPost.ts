@@ -14,7 +14,7 @@ import type { PostTag, Post } from "@resolverTypes";
 import type { APIContext } from "@types";
 import type { GetPostData } from "types/posts/getPost";
 
-describe("Get post", () => {
+describe("Get Post", () => {
   let server: ApolloServer<APIContext>, url: string, post1: Post;
   let registeredJwt: string, unregisteredJwt: string, postTags: PostTag[];
 
@@ -37,8 +37,14 @@ describe("Get post", () => {
       postTags,
       postData: testPostData({
         title: "Test Post Title - 1",
+        status: "Published",
         datePublished: new Date().toISOString(),
-        isBinned: true,
+        binnedAt: new Date().toISOString(),
+        imageBanner: "path/to/image/avatar/image.jpg",
+        description: "This is a binned published test post description",
+        excerpt: "This is a binned published test post excerpt",
+        content: "<p>This is a binned published test post content</p>",
+        lastModified: new Date().toISOString(),
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -66,7 +72,7 @@ describe("Get post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.getPost).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to retrieve post",
         status: "ERROR",
       });
@@ -126,7 +132,7 @@ describe("Get post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.getPost).toStrictEqual({
-        __typename: "UnknownError",
+        __typename: "NotFoundError",
         message: "Unable to retrieve post",
         status: "ERROR",
       });

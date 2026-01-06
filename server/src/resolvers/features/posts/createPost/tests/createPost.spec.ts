@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { afterAll, beforeAll, describe, it, expect, jest } from "@jest/globals";
 import { type ApolloServer } from "@apollo/server";
 
@@ -10,9 +12,8 @@ import * as mocks from "./createPost.testUtils";
 import loginTestUser from "@utils/tests/loginTestUser";
 import testUsers from "@utils/tests/createTestUsers/testUsers";
 import createTestPostTags from "@utils/tests/createTestPostTags";
-import createTestPost from "@utils/tests/createTestPost";
 import post from "@utils/tests/post";
-import { registeredUser as user, testPostData } from "@utils/tests/mocks";
+import { registeredUser as user } from "@utils/tests/mocks";
 import { CREATE_POST } from "@utils/tests/gqlQueries/postsTestQueries";
 import { DATE_REGEX, UUID_REGEX } from "@utils/tests/constants";
 import type { APIContext } from "@types";
@@ -24,7 +25,7 @@ jest.mock("@events/supabase");
 const mockEvent = jest.spyOn(supabaseEvent, "emit");
 mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
-describe("Create post", () => {
+describe("Create Post", () => {
   let server: ApolloServer<APIContext>, url: string, postTags: PostTag[];
   let registeredJwt: string, unRegisteredJwt: string;
 
@@ -41,18 +42,6 @@ describe("Create post", () => {
       unregistered,
       createPostTags,
     ]);
-
-    await createTestPost({
-      db,
-      postTags,
-      postAuthor: {
-        userId: registeredUser.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        image: user.image,
-      },
-      postData: testPostData({ title: "Create Test Post Title" }),
-    });
   });
 
   afterAll(async () => {
@@ -71,14 +60,14 @@ describe("Create post", () => {
 
       const { data } = await post<Create>(url, payload);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to create post",
         status: "ERROR",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
   });
 
@@ -89,7 +78,6 @@ describe("Create post", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -97,6 +85,7 @@ describe("Create post", () => {
         ...errors,
         status: "ERROR",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
   });
 
@@ -108,7 +97,6 @@ describe("Create post", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
-      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -116,6 +104,7 @@ describe("Create post", () => {
         message: "Unable to create post",
         status: "ERROR",
       });
+      expect(mockEvent).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -135,7 +124,6 @@ describe("Create post", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -159,12 +147,12 @@ describe("Create post", () => {
           datePublished: expect.stringMatching(DATE_REGEX),
           lastModified: null,
           views: 0,
-          isBinned: false,
           binnedAt: null,
           tags: expect.arrayContaining(postTags),
         },
         status: "SUCCESS",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
 
     it("Should create and publish a new post without an image banner and post tags", async () => {
@@ -174,7 +162,6 @@ describe("Create post", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPost).toStrictEqual({
@@ -198,12 +185,12 @@ describe("Create post", () => {
           datePublished: expect.stringMatching(DATE_REGEX),
           lastModified: null,
           views: 0,
-          isBinned: false,
           binnedAt: null,
           tags: null,
         },
         status: "SUCCESS",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
 
     it("Should create a new blog post with a tokenized slug for slug uniqueness", async () => {
@@ -213,14 +200,43 @@ describe("Create post", () => {
 
       const { data } = await post<Create>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-      expect(data.data?.createPost).toHaveProperty("post.url.slug");
-
       expect((data.data?.createPost.post as Post).url.slug).toMatch(
         new RegExp("^another-blog-post-title-[a-z0-9]{4}$")
       );
+      expect(mockEvent).not.toHaveBeenCalled();
+    });
+
+    it("Expect a new post to be created and published without any of the provided post tags", async () => {
+      const tagIds = [randomUUID(), randomUUID(), randomUUID(), randomUUID()];
+      const variables = { post: { ...mocks.postData1, tagIds } };
+      const payload = { query: CREATE_POST, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<Create>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect((data.data?.createPost.post as Post).tags).toBeNull();
+      expect(mockEvent).not.toHaveBeenCalled();
+    });
+
+    it("Expect a new post to be created and published with some of the provided post tags", async () => {
+      const [tag1, , , , tag5] = postTags;
+      const tagIds = [tag1.id, randomUUID(), randomUUID(), tag5.id];
+      const variables = { post: { ...mocks.postData2, tagIds } };
+      const payload = { query: CREATE_POST, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<Create>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect((data.data?.createPost.post as Post).tags).toStrictEqual(
+        expect.arrayContaining([tag1, tag5])
+      );
+      expect(mockEvent).not.toHaveBeenCalled();
     });
   });
 });

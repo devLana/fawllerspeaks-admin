@@ -39,7 +39,6 @@ export const postsTypeDefs = `#graphql
     datePublished: String
     lastModified: String
     views: Int!
-    isBinned: Boolean!
     binnedAt: String
     tags: [PostTag!]
   }
@@ -62,11 +61,6 @@ export const postsTypeDefs = `#graphql
 
   type PostsWarning implements BaseResponse {
     posts: [Post!]!
-    message: String!
-    status: Status!
-  }
-
-  type NotAllowedPostActionError implements BaseResponse {
     message: String!
     status: Status!
   }
@@ -121,21 +115,21 @@ export const postsTypeDefs = `#graphql
     status: Status!
   }
 
-  union BinPosts = Posts | PostsWarning | PostIdsValidationError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError
+  union BinPost = SinglePost | PostIdValidationError | UnauthorizedError | RegistrationError | NotFoundError | ForbiddenError
 
-  union BinPost = SinglePost | PostIdValidationError | AuthenticationError | RegistrationError | NotAllowedError | UnknownError | NotAllowedPostActionError
+  union BinPosts = Posts | PostsWarning | PostIdsValidationError | UnauthorizedError | RegistrationError | NotFoundError
 
-  union Create_Draft = SinglePost | PostValidationError | AuthenticationError | RegistrationError | NotAllowedError
+  union Create_Draft = SinglePost | PostValidationError | UnauthorizedError | RegistrationError
 
-  union EditPost = SinglePost | EditPostValidationError | AuthenticationError |  NotAllowedError | NotAllowedPostActionError | UnknownError | RegistrationError
+  union EditPost = SinglePost | EditPostValidationError | UnauthorizedError | ForbiddenError | NotFoundError | RegistrationError
 
-  union GetPost = SinglePost | GetPostValidationError | AuthenticationError | NotAllowedError | RegistrationError | UnknownError
+  union GetPost = SinglePost | GetPostValidationError | UnauthorizedError | RegistrationError | NotFoundError
 
-  union GetPosts = GetPostsData | GetPostsValidationError | AuthenticationError | NotAllowedError | RegistrationError | ForbiddenError
+  union GetPosts = GetPostsData | GetPostsValidationError | UnauthorizedError | RegistrationError | ForbiddenError
 
-  union Unpublish_Undo = SinglePost | Response | PostIdValidationError | NotAllowedPostActionError | UnknownError | RegistrationError | NotAllowedError | AuthenticationError
+  union Unpublish_Undo = SinglePost | Response | PostIdValidationError | ForbiddenError | NotFoundError | RegistrationError | UnauthorizedError
 
-  union DeletePostContentImages = Response | DeletePostContentImagesValidationError | AuthenticationError | ForbiddenError | RegistrationError | ServerError | UnknownError
+  union DeletePostContentImages = Response | DeletePostContentImagesValidationError | UnauthorizedError | ForbiddenError | RegistrationError | ServerError
 
   enum PostStatus {
     Draft

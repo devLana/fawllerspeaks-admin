@@ -7,150 +7,115 @@ import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { PostValidationError } from "@typeResolvers/posts/PostValidationError";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import generateErrorsObject from "@utils/generateErrorsObject";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import getPostSlug from "@utils/posts/getPostSlug";
 import generateUniqueSlug from "@utils/posts/generateUniqueSlug";
-import type { CreatePost } from "types/posts/createPost";
-import type { CreateDraftUser, PostDBData } from "types/posts";
+import { resolvePostTags, findRows } from "@utils/posts/create_draft";
+import type { CreatePost, InsertedPost } from "types/posts/createPost";
+import type { PostTag } from "@resolverTypes";
 
-const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
+const createPost: CreatePost = async (_, { post }, { db, user, res }) => {
   const postImage = post.imageBanner && post.imageBanner.trim();
 
   try {
     if (!user) {
       if (postImage) supabaseEvent.emit("removeImage", postImage);
-      void deleteSession(db, req, res);
-      return new ErrorResponse("AuthenticationError", "Unable to create post");
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", "Unable to create post");
     }
 
     const input = await schema.validateAsync(post, { abortEarly: false });
     const { title, description, excerpt, content, tagIds, imageBanner } = input;
     let slug = getPostSlug(title);
 
-    const { rows } = await db.query<CreateDraftUser>(
-      `WITH find_user AS (
-        SELECT
-          id,
-          is_registered,
-          concat(first_name,' ',last_name) "authorName",
-          image
-        FROM users
-        WHERE user_id = $1
-      ),
-      find_post AS (
-        SELECT 1 as slug
-        FROM posts
-        WHERE slug = $2
-      )
-      SELECT *
-      FROM find_user
-      LEFT JOIN find_post ON true`,
-      [user, slug]
-    );
+    const rows = await findRows(db, user, slug);
 
     if (rows.length === 0) {
-      void deleteSession(db, req, res);
+      clearAuthCookie(res);
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
-      return new ErrorResponse("NotAllowedError", "Unable to create post");
+      return new ErrorResponse("UnauthorizedError", "Unable to create post");
     }
 
-    const [{ id, authorName, image, is_registered }] = rows;
+    const [{ id, authorName, image, is_registered, slug: s }] = rows;
 
     if (!is_registered) {
       if (imageBanner) supabaseEvent.emit("removeImage", imageBanner);
       return new ErrorResponse("RegistrationError", "Unable to create post");
     }
 
-    if (rows[0].slug) {
+    if (s === 1) {
       slug = await generateUniqueSlug(slug);
     }
 
-    const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
+    const insertValues = [title, description, excerpt, slug, id, content];
+    let postInsertFields = `title, description, excerpt, slug, author, status, date_published`;
+    let postInsertParams = `$1, $2, $3, $4, $5, 'Published', CURRENT_TIMESTAMP(3)`;
 
-    const { rows: savedPost } = await db.query<PostDBData>(
+    if (imageBanner) {
+      insertValues.push(imageBanner);
+      postInsertFields = `${postInsertFields}, image_banner`;
+      postInsertParams = `${postInsertParams}, $7`;
+    }
+
+    await db.query("BEGIN");
+
+    const { rows: insertedPost } = await db.query<InsertedPost>(
       `WITH create_post AS (
-        INSERT INTO posts (title, description, excerpt, slug, author, image_banner, status, date_published)
-        VALUES ($1, $2, $3, $4, $5, $6, 'Published', CURRENT_TIMESTAMP(3))
-        RETURNING *
-      ),
-      resolved_tags AS (
-        SELECT id, tag_id, name, date_created, last_modified
-        FROM post_tags
-        WHERE tag_id = ANY ($7::uuid[])
-      ),
-      insert_tags AS (
-        INSERT INTO post_tags_to_posts (post_id, tag_id)
-        SELECT cp.id, rt.id
-        FROM create_post cp, resolved_tags rt
-        WHERE EXISTS (SELECT 1 FROM resolved_tags)
+        INSERT INTO posts (${postInsertFields})
+        VALUES (${postInsertParams})
+        RETURNING id, post_id, slug, title, description, excerpt, status, image_banner, date_created, date_published, last_modified, views, binned_at
       ),
       insert_content AS (
         INSERT INTO post_contents (post_id, content)
-        SELECT id, $8::text
+        SELECT id, $6::text
         FROM create_post
+        RETURNING post_id, content
       )
       SELECT
-        cp.post_id id,
-        cp.slug,
-        cp.title,
-        cp.description,
-        cp.excerpt,
-        $8::text content,
-        cp.status,
-        cp.image_banner "imageBanner",
-        cp.date_created "dateCreated",
-        cp.date_published "datePublished",
-        cp.last_modified "lastModified",
-        cp.views,
-        cp.is_in_bin "isBinned",
-        cp.binned_at "binnedAt",
-        json_agg(
-          json_build_object(
-            'id', rt.tag_id,
-            'name', rt.name,
-            'dateCreated', rt.date_created,
-            'lastModified', rt.last_modified
-          )
-        ) FILTER (WHERE rt.id IS NOT NULL) tags
-      FROM create_post cp
-      LEFT JOIN resolved_tags rt ON TRUE
-      GROUP BY
+        cp.id,
         cp.post_id,
         cp.slug,
         cp.title,
         cp.description,
         cp.excerpt,
-        $8::text,
         cp.status,
         cp.image_banner,
         cp.date_created,
         cp.date_published,
         cp.last_modified,
         cp.views,
-        cp.is_in_bin,
-        cp.binned_at`,
-      [title, description, excerpt, slug, id, imageBanner, dbTags, content]
+        cp.binned_at,
+        ic.content
+      FROM create_post cp
+      INNER JOIN insert_content ic ON cp.id = ic.post_id`,
+      insertValues
     );
 
-    const [saved] = savedPost;
+    const [{ id: postId, ...postInserted }] = insertedPost;
+    let insertedPostTags: PostTag[] | null = null;
+
+    if (tagIds) {
+      insertedPostTags = await resolvePostTags(db, postId, tagIds);
+    }
+
+    await db.query("COMMIT");
 
     return new SinglePost({
-      id: saved.id,
-      title: saved.title,
-      description: saved.description,
-      excerpt: saved.excerpt,
-      content: saved.content,
+      id: postInserted.post_id,
+      title: postInserted.title,
+      description: postInserted.description,
+      excerpt: postInserted.excerpt,
+      content: postInserted.content,
       author: { name: authorName, image },
-      status: saved.status,
-      url: { slug: saved.slug, href: saved.slug },
-      imageBanner: saved.imageBanner,
-      dateCreated: saved.dateCreated,
-      datePublished: saved.datePublished,
-      lastModified: saved.lastModified,
-      views: saved.views,
-      isBinned: saved.isBinned,
-      binnedAt: saved.binnedAt,
-      tags: saved.tags,
+      status: postInserted.status,
+      url: { slug: postInserted.slug, href: postInserted.slug },
+      imageBanner: postInserted.image_banner,
+      dateCreated: postInserted.date_created,
+      datePublished: postInserted.date_published,
+      lastModified: postInserted.last_modified,
+      views: postInserted.views,
+      binnedAt: postInserted.binned_at,
+      tags: insertedPostTags,
     });
   } catch (err) {
     if (postImage) supabaseEvent.emit("removeImage", postImage);
@@ -158,6 +123,8 @@ const createPost: CreatePost = async (_, { post }, { db, user, req, res }) => {
     if (err instanceof ValidationError) {
       return new PostValidationError(generateErrorsObject(err.details));
     }
+
+    await db.query("ROLLBACK");
 
     // log any system errors
 

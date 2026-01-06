@@ -22,15 +22,6 @@ export const expectedPostContent: PostContent = {
   ],
 };
 
-const input: EditPostInput = {
-  id: UUID,
-  title: "Blog Post Title",
-  description: "post description",
-  excerpt: "post excerpt",
-};
-
-export const post: EditPostInput = { ...input, content: "post content" };
-
 type Validations = [string, EditPostInput, InputErrors<EditPostInput>][];
 
 export const validations: Validations = [
@@ -174,16 +165,81 @@ export const validations: Validations = [
   ],
 ];
 
-export const post1: EditPostInput = {
-  ...input,
+export const post1 = {
+  id: UUID,
+  title: "Blog Post Title",
+  description: null,
+  excerpt: null,
+  content: null,
+  imageBanner: null,
+};
+
+export const post2 = {
+  description: "This is a draft test post description 2",
+  excerpt: "This is a draft test post excerpt 2",
+  content: "<p>This is a draft test post content 2</p>",
+  imageBanner: "post/image/banner/storage/path/image.png",
+};
+
+export const post2ExpectedContent: PostContent = {
+  __typename: "PostContent",
+  html: "<p>This is a draft test post content 2</p>",
+  tableOfContents: null,
+};
+
+export const post3 = {
+  title: "The Edit Of A Published Post",
+  description: "The Edit Of A Published Post Description",
+  excerpt: "The Edit Of A Published Post Excerpt",
   content,
+};
+
+export const post4 = {
+  title: "The Edit Of An Unpublished Post",
+  description: "The Edit Of An Unpublished Post Description",
+  excerpt: "The Edit Of An Unpublished Post Excerpt",
+  content,
+};
+
+export const post5 = {
+  title: "An Edit Of A Draft Post Edited To A Published Post",
+  description: "An Edit Of A Draft Post Edited To A Published Post Description",
+  excerpt: "An Edit Of A Draft Post Edited To A Published Post Excerpt",
+  content: "<p>An Edit Of A Draft Post Edited To A Published Post</p>",
   imageBanner,
-  tagIds,
   editStatus: true,
 };
 
-export const post2: EditPostInput = {
-  ...input,
-  content: null,
-  editStatus: false,
+export const post5ExpectedContent: PostContent = {
+  __typename: "PostContent",
+  html: "<p>An Edit Of A Draft Post Edited To A Published Post</p>",
+  tableOfContents: null,
+};
+
+export const post6 = {
+  title: "An Unpublished Post Edited To A Published Post",
+  description: "An Unpublished Post Edited To A Published Post Description",
+  excerpt: "An Unpublished Post Edited To A Published Post Excerpt",
+  content,
+  editStatus: true,
+};
+
+export const post7 = {
+  title: "A Published Post Edited To An Unpublished Post",
+  description: "A Published Post Edited To An Unpublished Post description",
+  excerpt: "A Published Post Edited To An Unpublished Post Excerpt",
+  content: "<p>A Published Post Edited To An Unpublished Post</p>",
+  editStatus: true,
+};
+
+export const post7ExpectedContent: PostContent = {
+  __typename: "PostContent",
+  html: "<p>A Published Post Edited To An Unpublished Post</p>",
+  tableOfContents: null,
+};
+
+export const expectedUpdatedDraftPostContent: PostContent = {
+  __typename: "PostContent",
+  html: "<p>A Published Post Edited To An Unpublished Post</p>",
+  tableOfContents: null,
 };

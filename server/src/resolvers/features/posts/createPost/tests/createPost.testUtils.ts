@@ -191,3 +191,15 @@ export const postContentWithNoImage: PostContent = {
     },
   ],
 };
+
+export const postData1 = {
+  ...mockData,
+  title: "Published Post With Unknown Tag Ids",
+  content: "<p>published post with unknown tag ids paragraph</p>",
+};
+
+export const postData2 = {
+  ...mockData,
+  title: "Published Post With Some Unknown Tag Ids",
+  content: "<p>published post with some unknown tag ids paragraph</p>",
+};

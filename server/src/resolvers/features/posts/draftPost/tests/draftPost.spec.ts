@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { afterAll, beforeAll, describe, it, expect, jest } from "@jest/globals";
 import { type ApolloServer } from "@apollo/server";
 
@@ -8,11 +10,10 @@ import { storageUrl } from "@services/supabase";
 import { urls } from "@lib/ClientUrls";
 import * as mocks from "./draftPost.testUtils";
 import { DRAFT_POST } from "@utils/tests/gqlQueries/postsTestQueries";
-import { testPostData, registeredUser as user } from "@utils/tests/mocks";
+import { registeredUser as user } from "@utils/tests/mocks";
 import createTestPostTags from "@utils/tests/createTestPostTags";
 import { DATE_REGEX, UUID_REGEX } from "@utils/tests/constants";
 import testUsers from "@utils/tests/createTestUsers/testUsers";
-import createTestPost from "@utils/tests/createTestPost";
 import loginTestUser from "@utils/tests/loginTestUser";
 import post from "@utils/tests/post";
 import type { APIContext } from "@types";
@@ -24,7 +25,7 @@ jest.mock("@events/supabase");
 const mockEvent = jest.spyOn(supabaseEvent, "emit");
 mockEvent.mockImplementation(() => true).mockName("supabaseEvent.emit");
 
-describe("Draft post", () => {
+describe("Draft Post", () => {
   let server: ApolloServer<APIContext>, url: string;
   let registeredJwt: string, unRegisteredJwt: string, postTags: PostTag[];
 
@@ -41,23 +42,6 @@ describe("Draft post", () => {
       unregistered,
       createPostTags,
     ]);
-
-    await createTestPost({
-      db,
-      postTags,
-      postAuthor: {
-        userId: registeredUser.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        image: user.image,
-      },
-      postData: testPostData({
-        title: "Draft Post Title",
-        content: null,
-        status: "Draft",
-        datePublished: null,
-      }),
-    });
   });
 
   afterAll(async () => {
@@ -76,14 +60,14 @@ describe("Draft post", () => {
 
       const { data } = await post<DraftData>(url, payload);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to save post to draft",
         status: "ERROR",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
   });
 
@@ -94,7 +78,6 @@ describe("Draft post", () => {
 
       const { data } = await post<DraftData>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -102,6 +85,7 @@ describe("Draft post", () => {
         ...errors,
         status: "ERROR",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
   });
 
@@ -113,7 +97,6 @@ describe("Draft post", () => {
 
       const { data } = await post<DraftData>(url, payload, options);
 
-      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -121,6 +104,7 @@ describe("Draft post", () => {
         message: "Unable to save post to draft",
         status: "ERROR",
       });
+      expect(mockEvent).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -140,7 +124,6 @@ describe("Draft post", () => {
 
       const { data } = await post<DraftData>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -164,12 +147,12 @@ describe("Draft post", () => {
           datePublished: null,
           lastModified: null,
           views: 0,
-          isBinned: false,
           binnedAt: null,
           tags: expect.arrayContaining(postTags),
         },
         status: "SUCCESS",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
 
     it("Should save a new post without an image and post tags as draft", async () => {
@@ -179,7 +162,6 @@ describe("Draft post", () => {
 
       const { data } = await post<DraftData>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({
@@ -203,12 +185,12 @@ describe("Draft post", () => {
           datePublished: null,
           lastModified: null,
           views: 0,
-          isBinned: false,
           binnedAt: null,
           tags: null,
         },
         status: "SUCCESS",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
 
     it("Should draft a new blog post with a tokenized slug for slug uniqueness", async () => {
@@ -218,14 +200,43 @@ describe("Draft post", () => {
 
       const { data } = await post<DraftData>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-      expect(data.data?.draftPost).toHaveProperty("post.url.slug");
-
       expect((data.data?.draftPost.post as Post).url.slug).toMatch(
         new RegExp("^blog-post-title-[a-z0-9]{4}$")
       );
+      expect(mockEvent).not.toHaveBeenCalled();
+    });
+
+    it("Expect a new post to be drafted without any of the provided post tags", async () => {
+      const tagIds = [randomUUID(), randomUUID(), randomUUID(), randomUUID()];
+      const variables = { post: { title: mocks.title1, tagIds } };
+      const payload = { query: DRAFT_POST, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<DraftData>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect((data.data?.draftPost.post as Post).tags).toBeNull();
+      expect(mockEvent).not.toHaveBeenCalled();
+    });
+
+    it("Expect a new post to be drafted with some of the provided post tags", async () => {
+      const [tag1, , , , tag5] = postTags;
+      const tagIds = [tag1.id, randomUUID(), randomUUID(), tag5.id];
+      const variables = { post: { title: mocks.title2, tagIds } };
+      const payload = { query: DRAFT_POST, variables };
+      const options = { authorization: `Bearer ${registeredJwt}` };
+
+      const { data } = await post<DraftData>(url, payload, options);
+
+      expect(data.errors).toBeUndefined();
+      expect(data.data).toBeDefined();
+      expect((data.data?.draftPost.post as Post).tags).toStrictEqual(
+        expect.arrayContaining([tag1, tag5])
+      );
+      expect(mockEvent).not.toHaveBeenCalled();
     });
   });
 });

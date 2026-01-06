@@ -5,17 +5,17 @@ import { ErrorResponse, Response } from "@typeResolvers/commonResolvers";
 import { PostIdValidationError } from "@typeResolvers/posts/PostIdValidationError";
 import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { postUUIDSchema } from "@validators/posts/postUUID";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { GetPostDBData, UnpublishUndo } from "types/posts";
 import type { UndoUnpublishPost as Fn } from "types/posts/undoUnpublishPost";
 
-const undoUnpublishPost: Fn = async (_, { postId }, { db, req, res, user }) => {
+const undoUnpublishPost: Fn = async (_, { postId }, { db, res, user }) => {
   const MSG = "Unable to undo unpublish post";
 
   try {
     if (!user) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const post = await postUUIDSchema.validateAsync(postId);
@@ -25,7 +25,7 @@ const undoUnpublishPost: Fn = async (_, { postId }, { db, req, res, user }) => {
         SELECT is_registered FROM users WHERE user_id = $1
       ),
       find_post AS (
-        SELECT status, is_in_bin FROM posts WHERE post_id = $2
+        SELECT status, binned_at FROM posts WHERE post_id = $2
       )
       SELECT *
       FROM find_user
@@ -34,24 +34,24 @@ const undoUnpublishPost: Fn = async (_, { postId }, { db, req, res, user }) => {
     );
 
     if (rows.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
-    const [{ is_registered, status, is_in_bin }] = rows;
+    const [{ is_registered, status, binned_at }] = rows;
 
     if (!is_registered) return new ErrorResponse("RegistrationError", MSG);
 
-    if (!status) return new ErrorResponse("UnknownError", MSG);
+    if (!status) return new ErrorResponse("NotFoundError", MSG);
 
-    if (is_in_bin) {
+    if (binned_at) {
       const msg = "This blog post cannot be undone back to Published";
-      return new ErrorResponse("NotAllowedPostActionError", msg);
+      return new ErrorResponse("ForbiddenError", msg);
     }
 
     if (status === "Draft") {
       const msg = "Only an Unpublished post can be undone back to Published";
-      return new ErrorResponse("NotAllowedPostActionError", msg);
+      return new ErrorResponse("ForbiddenError", msg);
     }
 
     if (status === "Published") {
@@ -88,7 +88,6 @@ const undoUnpublishPost: Fn = async (_, { postId }, { db, req, res, user }) => {
         us.date_published "datePublished",
         us.last_modified "lastModified",
         p.views,
-        p.is_in_bin "isBinned",
         p.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -121,7 +120,6 @@ const undoUnpublishPost: Fn = async (_, { postId }, { db, req, res, user }) => {
         us.date_published,
         us.last_modified,
         p.views,
-        p.is_in_bin,
         p.binned_at`,
       [post]
     );

@@ -7,18 +7,18 @@ import { GetPostsValidationError } from "@typeResolvers/posts/GetPostsValidation
 import { GetPostsData } from "@typeResolvers/posts/GetPostsData";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { getPostsSchema as schema } from "@validators/posts/getPosts";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import generateErrorsObject from "@utils/generateErrorsObject";
 import type { GetPostDBData } from "types/posts";
 import type { GetPosts, PreviousPost, Sort } from "types/posts/getPosts";
 
-const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
+const getPosts: GetPosts = async (_, args, { db, user, res }) => {
   try {
     const MSG = "Unable to retrieve posts";
 
     if (!user) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const input = await schema.validateAsync(args, { abortEarly: false });
@@ -29,8 +29,8 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
     );
 
     if (foundUser.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     if (!foundUser[0].is_registered) {
@@ -42,7 +42,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
     const LIMIT = size ?? 12;
     const sort: Sort = { column: "p.date_created", order: "DESC" };
     const sqlArgs: (string | number)[] = [];
-    let where = "WHERE is_in_bin = FALSE";
+    let where = "WHERE binned_at IS NULL";
     let orderBy = "p.date_created DESC, p.id DESC";
     let operator: "<" | ">" = "<";
     let count = 0;
@@ -105,7 +105,6 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         p.date_published "datePublished",
         p.last_modified "lastModified",
         p.views,
-        p.is_in_bin "isBinned",
         p.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -137,7 +136,6 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
         p.date_published,
         p.last_modified,
         p.views,
-        p.is_in_bin,
         p.binned_at
       ORDER BY ${orderBy}
       LIMIT ${LIMIT + 1}`,
@@ -168,7 +166,7 @@ const getPosts: GetPosts = async (_, args, { db, user, req, res }) => {
       const prevOperator = operator === ">" ? "<=" : ">=";
       const prevArgs: (number | string)[] = [];
       const prevOrder = order === "DESC" ? "ASC" : "DESC";
-      let prevWhere = "WHERE is_in_bin = FALSE";
+      let prevWhere = "WHERE binned_at IS NULL";
       let prevOrderBy: string;
       let prevCount = 0;
 

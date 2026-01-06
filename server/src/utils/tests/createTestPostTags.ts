@@ -3,19 +3,30 @@ import type { Pool } from "pg";
 import dateToISOString from "@utils/dateToISOString";
 import type { PostTag } from "@resolverTypes";
 
-const createTestPostTags = async (db: Pool): Promise<PostTag[]> => {
+const createTestPostTags = async (
+  db: Pool,
+  numberOfTags = 5
+): Promise<PostTag[]> => {
+  const values: string[] = [];
+  let params = "";
+
+  for (let i = 1; i <= numberOfTags; i++) {
+    const comma = i === 1 ? "" : ", ";
+    values.push(`Post Tag ${i}`);
+    params = `${params}${comma}($${i})`;
+  }
+
   try {
     const { rows } = await db.query<PostTag>(
       `INSERT INTO
         post_tags (name)
-      VALUES
-        ($1), ($2), ($3), ($4), ($5)
+      VALUES ${params}
       RETURNING
         tag_id id,
         name,
         date_created "dateCreated",
         last_Modified "lastModified"`,
-      ["tag10", "tag11", "tag12", "tag13", "tag14"]
+      values
     );
 
     return rows.map(row => ({

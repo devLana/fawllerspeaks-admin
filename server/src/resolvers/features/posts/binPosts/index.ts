@@ -6,17 +6,17 @@ import { PostIdsValidationError } from "@typeResolvers/posts/PostIdsValidationEr
 import { PostsWarning } from "@typeResolvers/posts/PostsWarning";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { binPostsValidator as schema } from "@validators/posts/binPosts";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { GetPostDBData } from "types/posts";
 import type { BinPosts } from "types/posts/binPosts";
 
-const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
+const binPosts: BinPosts = async (_, { postIds }, { res, db, user }) => {
   const MSG = `Unable to move ${postIds.length > 1 ? "posts" : "post"} to bin`;
 
   try {
     if (!user) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const ids = await schema.validateAsync(postIds, { abortEarly: false });
@@ -27,8 +27,8 @@ const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
     );
 
     if (foundUser.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     if (!foundUser[0].is_registered) {
@@ -38,9 +38,8 @@ const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
     const { rows: binnedPosts } = await db.query<Omit<GetPostDBData, "postId">>(
       `WITH bin_posts AS (
         UPDATE posts SET
-          is_in_bin = TRUE,
           binned_at = CURRENT_TIMESTAMP(3)
-        WHERE post_id = ANY ($1) AND is_in_bin = FALSE
+        WHERE post_id = ANY ($1) AND binned_at IS NULL
         RETURNING *
       )
       SELECT
@@ -63,7 +62,6 @@ const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
         bp.date_published "datePublished",
         bp.last_modified "lastModified",
         bp.views,
-        bp.is_in_bin "isBinned",
         bp.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -94,7 +92,6 @@ const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
         bp.date_published,
         bp.last_modified,
         bp.views,
-        bp.is_in_bin,
         bp.binned_at`,
       [ids]
     );
@@ -105,7 +102,7 @@ const binPosts: BinPosts = async (_, { postIds }, { req, res, db, user }) => {
           ? "The selected post could not be moved to bin"
           : "None of the selected posts could be moved to bin";
 
-      return new ErrorResponse("UnknownError", msg);
+      return new ErrorResponse("NotFoundError", msg);
     }
 
     if (binnedPosts.length < ids.length) {

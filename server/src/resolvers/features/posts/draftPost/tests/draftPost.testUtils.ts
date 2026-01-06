@@ -31,6 +31,9 @@ export const argsWithNoImage = {
   imageBanner: null,
 };
 
+export const title1 = "Published Post With Unknown Tag Ids";
+export const title2 = "Published Post With Some Unknown Tag Ids";
+
 export const validations: Validations = [
   [
     "Should return a validation error response for empty input strings",

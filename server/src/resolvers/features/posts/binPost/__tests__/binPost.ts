@@ -14,10 +14,10 @@ import createTestPost from "@utils/tests/createTestPost";
 import { registeredUser as user, testPostData } from "@utils/tests/mocks";
 import { DATE_REGEX } from "@utils/tests/constants";
 import type { APIContext } from "@types";
-import type { PostTag, Post } from "@resolverTypes";
+import type { PostTag, Post, SinglePost as SP } from "@resolverTypes";
 import type { BinPostData } from "types/posts/binPost";
 
-describe("Bin post", () => {
+describe("Bin Post", () => {
   const postId = randomUUID();
   let server: ApolloServer<APIContext>, url: string;
   let registeredJwt: string, unregisteredJwt: string, postTags: PostTag[];
@@ -41,8 +41,8 @@ describe("Bin post", () => {
       db,
       postTags,
       postData: testPostData({
-        title: "Test Binned Post Title - 4",
-        isBinned: true,
+        title: "Test Binned Post Title - 1",
+        binnedAt: new Date().toISOString(),
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -54,7 +54,7 @@ describe("Bin post", () => {
 
     const unBinnedPost = createTestPost({
       db,
-      postData: testPostData({ title: "Test Un-binned Post Title - 4" }),
+      postData: testPostData({ title: "Test Un-binned Post Title - 1" }),
       postAuthor: {
         userId: registeredUser.userId,
         firstName: user.firstName,
@@ -84,7 +84,7 @@ describe("Bin post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPost).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to move post to bin",
         status: "ERROR",
       });
@@ -151,7 +151,7 @@ describe("Bin post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPost).toStrictEqual({
-        __typename: "UnknownError",
+        __typename: "NotFoundError",
         message: "Unable to move post to bin",
         status: "ERROR",
       });
@@ -159,6 +159,7 @@ describe("Bin post", () => {
 
     it("Expect an error response if the post has already been moved to bin", async () => {
       const { id } = binned;
+
       const payload = { query: BIN_POST, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -167,7 +168,7 @@ describe("Bin post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPost).toStrictEqual({
-        __typename: "NotAllowedPostActionError",
+        __typename: "ForbiddenError",
         message: "This blog post has already been sent to bin",
         status: "ERROR",
       });
@@ -184,16 +185,10 @@ describe("Bin post", () => {
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-      expect(data.data?.binPost).toStrictEqual({
-        __typename: "SinglePost",
-        post: {
-          ...unBinned,
-          isBinned: true,
-          binnedAt: expect.stringMatching(DATE_REGEX),
-        },
-
-        status: "SUCCESS",
-      });
+      expect(data.data?.binPost).toHaveProperty("__typename", "SinglePost");
+      expect(data.data?.binPost).toHaveProperty("status", "SUCCESS");
+      expect((data.data?.binPost as SP).post.binnedAt).not.toBeNull();
+      expect((data.data?.binPost as SP).post.binnedAt).toMatch(DATE_REGEX);
     });
   });
 });

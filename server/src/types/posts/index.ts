@@ -7,7 +7,7 @@ import type {
   ResolverTypeWrapper,
 } from "@resolverTypes";
 
-interface DBPostData {
+export interface DBPostData {
   readonly id: string;
   readonly title: string;
   readonly description: string | null;
@@ -21,10 +21,6 @@ interface DBPostData {
   readonly views: number;
   readonly binnedAt: string | null;
   readonly tags: PostTag[] | null;
-}
-
-export interface PostDBData extends DBPostData {
-  readonly slug: string;
 }
 
 export interface GetPostDBData extends DBPostData {
@@ -58,15 +54,27 @@ export type PostFieldResolver<T extends FunctionLike> = (
   ...args: Parameters<T>
 ) => ResolverTypeWrapper<PostFieldMapper<T>>;
 
-export interface CreateDraftUser {
-  id: number;
-  is_registered: boolean;
-  authorName: string;
-  image: string | null;
-  slug: number | null;
-}
-
 export interface UnpublishUndo {
   is_registered: boolean;
   status: PostStatus | null;
+  binned_at: string | null;
+}
+
+export interface BasePostData {
+  id: number;
+  post_id: string;
+  slug: string;
+  title: string;
+  status: PostStatus;
+  image_banner: string | null;
+  date_created: string;
+  last_modified: string | null;
+  views: number;
+  binned_at: string | null;
+}
+
+export interface Draft_Edit extends BasePostData {
+  description: string | null;
+  excerpt: string | null;
+  date_published: string | null;
 }

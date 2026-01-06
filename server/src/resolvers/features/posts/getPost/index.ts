@@ -5,17 +5,17 @@ import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { GetPostValidationError } from "@typeResolvers/posts/GetPostValidationError";
 import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { getPostSchema } from "@validators/posts/getPost";
-import deleteSession from "@utils/deleteSession";
+import { clearAuthCookie } from "@utils/auth/cookies";
 import type { GetPostDBData } from "types/posts";
 import type { GetPost } from "types/posts/getPost";
 
-const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
+const getPost: GetPost = async (_, { slug }, { user, db, res }) => {
   try {
     const MSG = "Unable to retrieve post";
 
     if (!user) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("AuthenticationError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     const postSlug = await getPostSchema.validateAsync(slug);
@@ -26,8 +26,8 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
     );
 
     if (foundUser.length === 0) {
-      void deleteSession(db, req, res);
-      return new ErrorResponse("NotAllowedError", MSG);
+      clearAuthCookie(res);
+      return new ErrorResponse("UnauthorizedError", MSG);
     }
 
     if (!foundUser[0].is_registered) {
@@ -55,7 +55,6 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.date_published "datePublished",
         p.last_modified "lastModified",
         p.views,
-        p.is_in_bin "isBinned",
         p.binned_at "binnedAt",
         json_agg(
           json_build_object(
@@ -86,12 +85,11 @@ const getPost: GetPost = async (_, { slug }, { user, db, req, res }) => {
         p.date_published,
         p.last_modified,
         p.views,
-        p.is_in_bin,
         p.binned_at`,
       [postSlug]
     );
 
-    if (foundPost.length === 0) return new ErrorResponse("UnknownError", MSG);
+    if (foundPost.length === 0) return new ErrorResponse("NotFoundError", MSG);
 
     return new SinglePost(foundPost[0]);
   } catch (err) {

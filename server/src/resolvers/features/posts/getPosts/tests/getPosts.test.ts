@@ -15,7 +15,7 @@ import type { APIContext } from "@types";
 import type { GetPostsData, PostTag } from "@resolverTypes";
 import type { GetPostsTestData as Data } from "types/posts/getPosts";
 
-describe("Get posts", () => {
+describe("Get Posts", () => {
   let server: ApolloServer<APIContext>, url: string, postTags: PostTag[];
   let registeredJwt: string, unregisteredJwt: string;
 
@@ -39,6 +39,10 @@ describe("Get posts", () => {
       postData: testPostData({
         title: "Draft Test Post Title 1",
         status: "Draft",
+        imageBanner: "post/image/banner/storage/path/one",
+        content: "<p>This is a draft test post content one</p>",
+        description: "This is a draft test post description One",
+        excerpt: "This is a draft test post excerpt One",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -69,6 +73,10 @@ describe("Get posts", () => {
       postData: testPostData({
         title: "Draft Test Post Title 3",
         status: "Draft",
+        imageBanner: "post/image/banner/storage/path/three",
+        content: "<p>This is a draft test post content/three</p>",
+        description: "This is a draft test post description/Three",
+        excerpt: "This is a draft test post excerpt/Three",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -80,10 +88,10 @@ describe("Get posts", () => {
 
     const draftPost4 = createTestPost({
       db,
-      postTags,
       postData: testPostData({
         title: "Draft Test Post Title 4",
         status: "Draft",
+        imageBanner: "post/image/banner/storage/path/four",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -99,6 +107,10 @@ describe("Get posts", () => {
       postData: testPostData({
         title: "Draft Test Post Title 5",
         status: "Draft",
+        imageBanner: "post/image/banner/storage/path/five",
+        content: "<p>This is a draft test post content five</p>",
+        description: "This is a draft test post description Five",
+        excerpt: "This is a draft test post excerpt Five",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -131,6 +143,10 @@ describe("Get posts", () => {
         title: "Published Test Post 2",
         status: "Published",
         datePublished: new Date().toISOString(),
+        imageBanner: "path/to/image/avatar/image-two.jpg",
+        description: "This is a published test post description two",
+        excerpt: "This is a published test post excerpt two",
+        content: "<p>This is a published test post content two</p>",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -142,11 +158,14 @@ describe("Get posts", () => {
 
     const publishedPost3 = createTestPost({
       db,
-      postTags,
       postData: testPostData({
         title: "Published Test Post 3",
         status: "Published",
         datePublished: new Date().toISOString(),
+        imageBanner: "path/to/image/avatar/image-three.jpg",
+        description: "This is a published test post description three",
+        excerpt: "This is a published test post excerpt three",
+        content: "<p>This is a published test post content three</p>",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -162,6 +181,7 @@ describe("Get posts", () => {
       postData: testPostData({
         title: "Published Test Post 4",
         status: "Published",
+        imageBanner: "path/to/image/avatar/image-four.jpg",
         datePublished: new Date().toISOString(),
       }),
       postAuthor: {
@@ -174,10 +194,14 @@ describe("Get posts", () => {
 
     const unpublishedPost1 = createTestPost({
       db,
+      postTags,
       postData: testPostData({
         title: "Unpublished Test Post 1",
         status: "Unpublished",
-        datePublished: null,
+        description: "This is an unpublished test post description one",
+        excerpt: "This is an unpublished test post excerpt one",
+        content: "<p>This is an unpublished test post content one</p>",
+        imageBanner: "path/to/image/avatar/image-one.jpg",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -193,7 +217,6 @@ describe("Get posts", () => {
       postData: testPostData({
         title: "Unpublished Test Post 2",
         status: "Unpublished",
-        datePublished: null,
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -205,6 +228,7 @@ describe("Get posts", () => {
 
     const unpublishedPost3 = createTestPost({
       db,
+      postTags,
       postData: testPostData({
         title: "Unpublished Test Post 3",
         status: "Unpublished",
@@ -223,7 +247,10 @@ describe("Get posts", () => {
       postData: testPostData({
         title: "Unpublished Test Post 4",
         status: "Unpublished",
-        datePublished: null,
+        description: "This is an unpublished test post description four",
+        excerpt: "This is an unpublished test post excerpt four",
+        content: "<p>This is an unpublished test post content four</p>",
+        imageBanner: "path/to/image/avatar/image-four.jpg",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -266,7 +293,7 @@ describe("Get posts", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.getPosts).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to retrieve posts",
         status: "ERROR",
       });
@@ -358,7 +385,7 @@ describe("Get posts", () => {
       });
     });
 
-    it("Expect an array of posts based on the application of filters provided", async () => {
+    it("Expect an array of posts that is based on the combination of filters provided", async () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload = { query: GET_POSTS, variables: mocks.e2eFilters1 };
 

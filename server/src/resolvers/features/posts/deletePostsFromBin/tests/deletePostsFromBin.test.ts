@@ -222,7 +222,7 @@ describe.skip("Delete posts from bin", () => {
     expect(data.data).toBeDefined();
 
     expect(data.data?.deletePostsFromBin).toStrictEqual({
-      __typename: "UnknownError",
+      __typename: "NotFoundError",
       message: "The provided posts could not be deleted from bin",
       status: "ERROR",
     });

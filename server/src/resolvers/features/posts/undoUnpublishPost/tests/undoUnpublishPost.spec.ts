@@ -17,7 +17,7 @@ import type { APIContext } from "@types";
 import type { PostTag, Post } from "@resolverTypes";
 import type { UndoUnpublishPostData as Data } from "types/posts/undoUnpublishPost";
 
-describe("Undo Unpublish post", () => {
+describe("Undo Unpublish Post", () => {
   const UUID = randomUUID();
   let server: ApolloServer<APIContext>, url: string;
   let published: Post, unpublished: Post, draft: Post, binned: Post;
@@ -40,7 +40,11 @@ describe("Undo Unpublish post", () => {
     const draftPost = createTestPost({
       db,
       postTags,
-      postData: testPostData({ title: "Test Draft Post Title - 1" }),
+      postData: testPostData({
+        title: "Test Draft Post Title - 1",
+        imageBanner: "post/image/banner/storage/path",
+        content: "<p>This is a draft test post content</p>",
+      }),
       postAuthor: {
         userId: registeredUser.userId,
         firstName: user.firstName,
@@ -54,7 +58,13 @@ describe("Undo Unpublish post", () => {
       postTags,
       postData: testPostData({
         title: "Test Published Post Title - 2",
+        status: "Published",
         datePublished: new Date().toISOString(),
+        imageBanner: "path/to/image/avatar/image.jpg",
+        description: "This is a published test post description",
+        excerpt: "This is a published test post excerpt",
+        content: "<p>This is a published test post content</p>",
+        lastModified: new Date().toISOString(),
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -70,6 +80,9 @@ describe("Undo Unpublish post", () => {
       postData: testPostData({
         title: "Test Unpublished Post Title - 3",
         status: "Unpublished",
+        description: "This is an unpublished test post description",
+        excerpt: "This is an unpublished test post excerpt",
+        content: "<p>This is an unpublished test post content</p>",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -81,11 +94,13 @@ describe("Undo Unpublish post", () => {
 
     const binnedPost = createTestPost({
       db,
-      postTags,
       postData: testPostData({
         title: "Test Binned Post Title - 3",
         status: "Draft",
-        isBinned: true,
+        binnedAt: new Date().toISOString(),
+        description: "This is a draft test post description",
+        excerpt: "This is a draft test post excerpt",
+        lastModified: new Date().toISOString(),
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -113,7 +128,7 @@ describe("Undo Unpublish post", () => {
   });
 
   describe("Verify user authentication", () => {
-    it("Expect an error object response if the user is logged out", async () => {
+    it("Expect an error object response if the user could not be authenticated", async () => {
       const payload = { query: GQL, variables: { postId: "UUID" } };
 
       const { data } = await post<Data>(url, payload);
@@ -121,7 +136,7 @@ describe("Undo Unpublish post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.undoUnpublishPost).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to undo unpublish post",
         status: "ERROR",
       });
@@ -188,13 +203,13 @@ describe("Undo Unpublish post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.undoUnpublishPost).toStrictEqual({
-        __typename: "UnknownError",
+        __typename: "NotFoundError",
         message: "Unable to undo unpublish post",
         status: "ERROR",
       });
     });
 
-    it("Expect an error object response if the post is a binned post", async () => {
+    it("Expect an error object response if there is an attempt to undo-unpublish a binned post", async () => {
       const { id } = binned;
       const payload = { query: GQL, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -204,7 +219,7 @@ describe("Undo Unpublish post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.undoUnpublishPost).toStrictEqual({
-        __typename: "NotAllowedPostActionError",
+        __typename: "ForbiddenError",
         message: "This blog post cannot be undone back to Published",
         status: "ERROR",
       });
@@ -212,7 +227,7 @@ describe("Undo Unpublish post", () => {
   });
 
   describe("Verify post status", () => {
-    it("Expect an error object response if the user tries to undo a Draft post", async () => {
+    it("Expect an error object response if there is an attempt to undo-unpublish a Draft post", async () => {
       const { id } = draft;
       const payload = { query: GQL, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -222,13 +237,13 @@ describe("Undo Unpublish post", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.undoUnpublishPost).toStrictEqual({
-        __typename: "NotAllowedPostActionError",
+        __typename: "ForbiddenError",
         message: "Only an Unpublished post can be undone back to Published",
         status: "ERROR",
       });
     });
 
-    it("Expect an warning object response if the user tries to undo a Published post", async () => {
+    it("Expect an warning object response if there is an attempt to undo-unpublish a Published post", async () => {
       const { id } = published;
       const payload = { query: GQL, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -245,8 +260,8 @@ describe("Undo Unpublish post", () => {
     });
   });
 
-  describe("Update post status and undo an Unpublished post status", () => {
-    it("Expect to be able to undo an Unpublished post back to Published", async () => {
+  describe("Undo-Unpublish a post", () => {
+    it("Expect to be able to undo the unpublish action of an Unpublished post", async () => {
       const { id } = unpublished;
       const payload = { query: GQL, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };

@@ -38,7 +38,7 @@ describe("Delete Post Content Images", () => {
   });
 
   describe("Verify user authentication", () => {
-    it("User is not logged in, Expect an error response", async () => {
+    it("Expect an error response if the user is unauthenticated", async () => {
       const payload = { query: MUTATION, variables: { images: ["images"] } };
       const { data } = await post<DeleteData>(url, payload);
 
@@ -47,7 +47,7 @@ describe("Delete Post Content Images", () => {
       expect(data.data).toBeDefined();
 
       expect(data.data?.deletePostContentImages).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to delete post content image",
         status: "ERROR",
       });
@@ -72,7 +72,7 @@ describe("Delete Post Content Images", () => {
     });
 
     describe("Images input array validated", () => {
-      it("The input uri strings are not storage url strings, Expect an error object response", async () => {
+      it("Expect an error object response if the input url strings are not the actual storage url strings", async () => {
         const images = mocks.nonStorageUris;
         const options = { authorization: `Bearer ${unregisteredJwt}` };
         const payload = { query: MUTATION, variables: { images } };
@@ -92,7 +92,7 @@ describe("Delete Post Content Images", () => {
   });
 
   describe("Verify logged in user", () => {
-    it("The logged in user is unregistered, Expect an error response", async () => {
+    it("Expect an error response if the logged in user is unregistered", async () => {
       const options = { authorization: `Bearer ${unregisteredJwt}` };
       const payload = { query: MUTATION, variables: { images: mocks.images } };
       const { data } = await post<DeleteData>(url, payload, options);
@@ -110,7 +110,7 @@ describe("Delete Post Content Images", () => {
   });
 
   describe("DeleteData request failed", () => {
-    it("Post content images request failed, Expect an error object response", async () => {
+    it("Expect an error object response if the request fails", async () => {
       mockFn.mockResolvedValueOnce({ error: "Request Failed" });
 
       const options = { authorization: `Bearer ${registeredJwt}` };
@@ -131,7 +131,7 @@ describe("Delete Post Content Images", () => {
   });
 
   describe("Images deleted", () => {
-    it("Post content images deleted, Expect a success object response", async () => {
+    it("Expect a success object response if the post content images are successfully deleted", async () => {
       mockFn.mockResolvedValueOnce({ error: null });
 
       const options = { authorization: `Bearer ${registeredJwt}` };

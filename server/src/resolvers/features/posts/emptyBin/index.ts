@@ -23,7 +23,7 @@ type DbPost = Omit<GetPostDBData, "author" | "isInBin" | "isDeleted">;
 
 const emptyBin: EmptyBin = () => {
   return new ErrorResponse(
-    "NotAllowedError",
+    "ForbiddenError",
     "This feature is currently disabled"
   );
   // try {

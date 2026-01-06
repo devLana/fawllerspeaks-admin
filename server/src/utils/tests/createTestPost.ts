@@ -4,8 +4,7 @@ import { storageUrl } from "@services/supabase";
 import { getPostContentResponse } from "@utils/posts/getPostContentResponse";
 import { urls } from "@lib/ClientUrls";
 import dateToISOString from "@utils/dateToISOString";
-import type { PostDBData } from "types/posts";
-import type { TestPostData } from "types/tests";
+import type { PostDBData, TestPostData } from "types/tests";
 import type {
   Post,
   PostContent,

@@ -23,7 +23,7 @@ interface User {
 
 const unBinPosts: UnBinPosts = () => {
   return new ErrorResponse(
-    "NotAllowedError",
+    "ForbiddenError",
     "This feature is currently disabled"
   );
   // const schema = Joi.array<typeof postIds>()
@@ -181,7 +181,7 @@ const unBinPosts: UnBinPosts = () => {
   //       notUnBinnedPosts.length > 1 ? "posts" : "post";
 
   //     if (unBinnedPosts.length === 0) {
-  //       return new UnknownError(
+  //       return new NotFoundError(
   //         `The provided ${notBinnedPostOrPosts} could not be removed from bin`
   //       );
   //     }

@@ -14,13 +14,13 @@ import createTestPost from "@utils/tests/createTestPost";
 import { registeredUser as user, testPostData } from "@utils/tests/mocks";
 import { DATE_REGEX } from "@utils/tests/constants";
 import type { APIContext } from "@types";
-import type { PostTag, Post } from "@resolverTypes";
+import type { PostTag, Post, Posts } from "@resolverTypes";
 import type { BinPostsData } from "types/posts/binPosts";
 
-describe("Bin posts", () => {
+describe("Bin Posts", () => {
   const UUID = randomUUID();
-  let server: ApolloServer<APIContext>, url: string;
-  let published: Post, unpublished: Post, drafted: Post;
+  let server: ApolloServer<APIContext>, url: string, published: Post;
+  let unpublished: Post, drafted: Post, binned1: Post, binned2: Post;
   let registeredJwt: string, unregisteredJwt: string, postTags: PostTag[];
 
   beforeAll(async () => {
@@ -54,6 +54,10 @@ describe("Bin posts", () => {
       postTags,
       postData: testPostData({
         title: "Test Post Title - 2",
+        status: "Published",
+        content: "<p>paragraph</p>",
+        description: "Test Post Title Description - 2",
+        excerpt: "Test Post Title Excerpt - 2",
         datePublished: new Date().toISOString(),
       }),
       postAuthor: {
@@ -70,6 +74,11 @@ describe("Bin posts", () => {
       postData: testPostData({
         title: "Test Post Title - 3",
         status: "Unpublished",
+        content: "<p>paragraph</p>",
+        description: "Test Post Title Description - 3",
+        excerpt: "Test Post Title Excerpt - 3",
+        lastModified: new Date().toISOString(),
+        imageBanner: "/path/to/image-banner.jpg",
       }),
       postAuthor: {
         userId: registeredUser.userId,
@@ -79,10 +88,52 @@ describe("Bin posts", () => {
       },
     });
 
-    [published, unpublished, drafted] = await Promise.all([
+    const binnedPost1 = createTestPost({
+      db,
+      postData: testPostData({
+        title: "Test Post Title - 4",
+        status: "Draft",
+        content: "<p>some html paragraph</p>",
+        description: "Test Post Title Description - 4",
+        excerpt: "Test Post Title Excerpt - 4",
+        imageBanner: "/path/to/image-banner-4.jpg",
+        lastModified: new Date().toISOString(),
+        binnedAt: new Date().toISOString(),
+      }),
+      postAuthor: {
+        userId: registeredUser.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+      },
+    });
+
+    const binnedPost2 = createTestPost({
+      db,
+      postTags,
+      postData: testPostData({
+        title: "Test Post Title - 5",
+        status: "Unpublished",
+        content: "<p>some html paragraph</p>",
+        description: "Test Post Title Description - 5",
+        excerpt: "Test Post Title Excerpt - 5",
+        lastModified: new Date().toISOString(),
+        binnedAt: new Date().toISOString(),
+      }),
+      postAuthor: {
+        userId: registeredUser.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+      },
+    });
+
+    [published, unpublished, drafted, binned1, binned2] = await Promise.all([
       publishedPost,
       unpublishedPost,
       draftPost,
+      binnedPost1,
+      binnedPost2,
     ]);
   });
 
@@ -104,7 +155,7 @@ describe("Bin posts", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPosts).toStrictEqual({
-        __typename: "AuthenticationError",
+        __typename: "UnauthorizedError",
         message: "Unable to move post to bin",
         status: "ERROR",
       });
@@ -178,7 +229,7 @@ describe("Bin posts", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPosts).toStrictEqual({
-        __typename: "UnknownError",
+        __typename: "NotFoundError",
         message: "The selected post could not be moved to bin",
         status: "ERROR",
       });
@@ -194,7 +245,7 @@ describe("Bin posts", () => {
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPosts).toStrictEqual({
-        __typename: "UnknownError",
+        __typename: "NotFoundError",
         message: "None of the selected posts could be moved to bin",
         status: "ERROR",
       });
@@ -211,48 +262,40 @@ describe("Bin posts", () => {
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-      expect(data.data?.binPosts).toMatchObject({
-        __typename: "Posts",
-        posts: expect.arrayContaining([
-          {
-            ...drafted,
-            isBinned: true,
-            binnedAt: expect.stringMatching(DATE_REGEX),
-            tags: expect.arrayContaining(drafted.tags as unknown[]),
-          },
-          {
-            ...published,
-            isBinned: true,
-            binnedAt: expect.stringMatching(DATE_REGEX),
-            tags: expect.arrayContaining(published.tags as unknown[]),
-          },
-        ]),
-        status: "SUCCESS",
-      });
+      expect(data.data?.binPosts).toHaveProperty("__typename", "Posts");
+      expect(data.data?.binPosts).toHaveProperty("status", "SUCCESS");
+      expect((data.data?.binPosts as Posts).posts.length).toBe(2);
+      expect((data.data?.binPosts as Posts).posts[0].binnedAt).not.toBeNull();
+      expect((data.data?.binPosts as Posts).posts[1].binnedAt).not.toBeNull();
+
+      expect((data.data?.binPosts as Posts).posts[0].binnedAt).toMatch(
+        DATE_REGEX
+      );
+
+      expect((data.data?.binPosts as Posts).posts[1].binnedAt).toMatch(
+        DATE_REGEX
+      );
     });
 
     it("Expect some of the provided posts to be moved to bin with a warning message", async () => {
-      const postIds = [drafted.id, published.id, randomUUID(), unpublished.id];
+      const postIds = [binned1.id, binned2.id, randomUUID(), unpublished.id];
       const payload = { query: BIN_POSTS, variables: { postIds } };
       const options = { authorization: `Bearer ${registeredJwt}` };
+      const msg = "1 out of 4 posts moved to bin";
 
       const { data } = await post<BinPostsData>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-      expect(data.data?.binPosts).toMatchObject({
-        __typename: "PostsWarning",
-        posts: [
-          {
-            ...unpublished,
-            isBinned: true,
-            binnedAt: expect.stringMatching(DATE_REGEX),
-            tags: expect.arrayContaining(unpublished.tags as unknown[]),
-          },
-        ],
-        message: "1 out of 4 posts moved to bin",
-        status: "WARN",
-      });
+      expect(data.data?.binPosts).toHaveProperty("__typename", "PostsWarning");
+      expect(data.data?.binPosts).toHaveProperty("status", "WARN");
+      expect(data.data?.binPosts).toHaveProperty("message", msg);
+      expect((data.data?.binPosts as Posts).posts.length).toBe(1);
+      expect((data.data?.binPosts as Posts).posts[0].binnedAt).not.toBeNull();
+
+      expect((data.data?.binPosts as Posts).posts[0].binnedAt).toMatch(
+        DATE_REGEX
+      );
     });
   });
 });

@@ -24,7 +24,7 @@ interface User {
 
 const deletePostsFromBin: DeletePosts = () => {
   return new ErrorResponse(
-    "NotAllowedError",
+    "ForbiddenError",
     "This feature is currently disabled"
   );
   // const schema = Joi.array<typeof args.postIds>()
@@ -177,7 +177,7 @@ const deletePostsFromBin: DeletePosts = () => {
   //       notDeletedPosts.length > 1 ? "posts" : "post";
 
   //     if (deletedPosts.length === 0) {
-  //       return new UnknownError(
+  //       return new NotFoundError(
   //         `The provided ${notDeletedPostOrPosts} could not be deleted from bin`
   //       );
   //     }

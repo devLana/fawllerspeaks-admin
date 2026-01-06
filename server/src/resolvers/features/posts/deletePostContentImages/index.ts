@@ -11,7 +11,7 @@ const deletePostContentImages: Delete = async (_, { images }, { user, db }) => {
   const MSG = "Unable to delete post content image";
 
   try {
-    if (!user) return new ErrorResponse("AuthenticationError", MSG);
+    if (!user) return new ErrorResponse("UnauthorizedError", MSG);
 
     const input = await schema.validateAsync(images);
 
@@ -22,7 +22,7 @@ const deletePostContentImages: Delete = async (_, { images }, { user, db }) => {
       [user]
     );
 
-    if (rows.length === 0) return new ErrorResponse("UnknownError", MSG);
+    if (rows.length === 0) return new ErrorResponse("UnauthorizedError", MSG);
 
     if (!rows[0].is_registered) {
       return new ErrorResponse("RegistrationError", MSG);
