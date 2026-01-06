@@ -79,8 +79,12 @@ describe("Bin Post", () => {
     it("Expect an error object response if the user is not logged in", async () => {
       const payload = { query: BIN_POST, variables: { postId: "" } };
 
-      const { data } = await post<BinPostData>(url, payload);
+      const { data, responseHeaders } = await post<BinPostData>(url, payload);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPost).toStrictEqual({

@@ -58,7 +58,6 @@ describe("Change password", () => {
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
       expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
-      expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -66,6 +65,7 @@ describe("Change password", () => {
         message: "Unable to change password",
         status: "ERROR",
       });
+      expect(changePasswordMail).not.toHaveBeenCalled();
     });
 
     it("Expect an error response if the request has no authentication cookie", async () => {
@@ -78,7 +78,6 @@ describe("Change password", () => {
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
       expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
-      expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -86,6 +85,7 @@ describe("Change password", () => {
         message: "Unable to change password",
         status: "ERROR",
       });
+      expect(changePasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -97,7 +97,6 @@ describe("Change password", () => {
 
       const { data } = await post<Data>(url, payload, options);
 
-      expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -105,6 +104,7 @@ describe("Change password", () => {
         ...errors,
         status: "ERROR",
       });
+      expect(changePasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -120,7 +120,6 @@ describe("Change password", () => {
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
       expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
-      expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -128,6 +127,7 @@ describe("Change password", () => {
         message: "Unable to change password",
         status: "ERROR",
       });
+      expect(changePasswordMail).not.toHaveBeenCalled();
     });
 
     it("Expect an error response if the logged in user somehow does not have an active session", async () => {
@@ -140,7 +140,6 @@ describe("Change password", () => {
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
       expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
-      expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -148,6 +147,7 @@ describe("Change password", () => {
         message: "Unable to change password",
         status: "ERROR",
       });
+      expect(changePasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -159,7 +159,6 @@ describe("Change password", () => {
 
       const { data } = await post<Data>(url, payload, options);
 
-      expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -167,6 +166,7 @@ describe("Change password", () => {
         message: "Unable to change password",
         status: "ERROR",
       });
+      expect(changePasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -178,7 +178,6 @@ describe("Change password", () => {
 
       const { data } = await post<Data>(url, payload, options);
 
-      expect(changePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -186,6 +185,7 @@ describe("Change password", () => {
         message: "Unable to change password",
         status: "ERROR",
       });
+      expect(changePasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -197,7 +197,6 @@ describe("Change password", () => {
 
       const { data } = await post<Data>(url, payload, options);
 
-      expect(changePasswordMail).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -205,6 +204,7 @@ describe("Change password", () => {
         message: "Password changed",
         status: "SUCCESS",
       });
+      expect(changePasswordMail).toHaveBeenCalledTimes(1);
     });
 
     it("Should change the user's password even if the confirmation mail fails to send", async () => {
@@ -219,9 +219,6 @@ describe("Change password", () => {
 
       const { data } = await post<Data>(url, payload, options);
 
-      expect(changePasswordMail).toHaveBeenCalledTimes(1);
-      expect(changePasswordMail).toThrow("Unable to send mail");
-      expect(changePasswordMail).toThrow(MailError);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.changePassword).toStrictEqual({
@@ -229,6 +226,9 @@ describe("Change password", () => {
         message: "Password changed",
         status: "SUCCESS",
       });
+      expect(changePasswordMail).toHaveBeenCalledTimes(1);
+      expect(changePasswordMail).toThrow("Unable to send mail");
+      expect(changePasswordMail).toThrow(MailError);
     });
   });
 });

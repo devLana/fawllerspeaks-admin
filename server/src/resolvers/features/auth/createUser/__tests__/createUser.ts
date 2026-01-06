@@ -33,7 +33,6 @@ describe("Create user", () => {
 
       const { data } = await post<CreateUserData>(url, payload);
 
-      expect(createUserMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createUser).toStrictEqual({
@@ -41,6 +40,7 @@ describe("Create user", () => {
         emailError: errorMsg,
         status: "ERROR",
       });
+      expect(createUserMail).not.toHaveBeenCalled();
     });
   });
 
@@ -52,7 +52,6 @@ describe("Create user", () => {
 
       const { data } = await post<CreateUserData>(url, payload);
 
-      expect(createUserMail).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createUser).toStrictEqual({
@@ -60,6 +59,7 @@ describe("Create user", () => {
         message: msg,
         status: "SUCCESS",
       });
+      expect(createUserMail).toHaveBeenCalledTimes(1);
     });
 
     it("Should return an error response if a user with the provided e-mail already exists", async () => {
@@ -68,7 +68,6 @@ describe("Create user", () => {
 
       const { data } = await post<CreateUserData>(url, payload);
 
-      expect(createUserMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createUser).toStrictEqual({
@@ -76,6 +75,7 @@ describe("Create user", () => {
         message: "The new user you are trying to create already exits",
         status: "ERROR",
       });
+      expect(createUserMail).not.toHaveBeenCalled();
     });
 
     it("Should return an error response if the confirmation mail fails to send after creating a new user", async () => {
@@ -89,10 +89,6 @@ describe("Create user", () => {
 
       const { data } = await post<CreateUserData>(url, payload);
 
-      expect(createUserMail).toHaveBeenCalledTimes(1);
-      expect(createUserMail).toThrow("Unable to send mail");
-      expect(createUserMail).toThrow(MailError);
-
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createUser).toStrictEqual({
@@ -100,6 +96,9 @@ describe("Create user", () => {
         message: msg,
         status: "ERROR",
       });
+      expect(createUserMail).toHaveBeenCalledTimes(1);
+      expect(createUserMail).toThrow("Unable to send mail");
+      expect(createUserMail).toThrow(MailError);
     });
   });
 });

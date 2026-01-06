@@ -20,9 +20,9 @@ jest.mock("@services/mail/session", () => {
 });
 
 describe("RefreshData Token", () => {
-  let server: ApolloServer<APIContext>, url: string;
-  let unregisteredJwt: string, newRegisteredJwt: string;
-  let registeredJwt: string, unregisteredCookie: string;
+  let server: ApolloServer<APIContext>, url: string, unregisteredJwt: string;
+  let newRegisteredJwt: string, registeredJwt: string;
+  let unregisteredCookie1: string, unregisteredCookie2: string;
   let newRegisteredCookie: string, registeredCookie: string;
 
   beforeAll(async () => {
@@ -33,13 +33,15 @@ describe("RefreshData Token", () => {
       unregisteredJwt,
       newRegisteredJwt,
       registeredJwt,
-      unregisteredCookie,
+      unregisteredCookie1,
+      unregisteredCookie2,
       newRegisteredCookie,
       registeredCookie,
     ] = await Promise.all([
       loginTestUser(users.unregisteredUser.userUUID),
       loginTestUser(users.newRegisteredUser.userUUID),
       loginTestUser(users.registeredUser.userUUID),
+      testSession(db, users.unregisteredUser.userId, { isRevoked: true }),
       testSession(db, users.unregisteredUser.userId, { isRevoked: true }),
       testSession(db, users.newRegisteredUser.userId, { isExpired: true }),
       testSession(db, users.registeredUser.userId),
@@ -111,7 +113,7 @@ describe("RefreshData Token", () => {
 
     it("Expect an error response if the user tries to refresh another user's session", async () => {
       const mockSessionMail = sessionMail as MockFn;
-      const cookie = unregisteredCookie;
+      const cookie = unregisteredCookie1;
       const payload = { query: GQL };
       const options = { cookie, authorization: `Bearer ${newRegisteredJwt}` };
 
@@ -125,9 +127,6 @@ describe("RefreshData Token", () => {
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
       expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
-      expect(sessionMail).toHaveBeenCalledTimes(1);
-      expect(sessionMail).toHaveBeenCalledWith(unRegisteredUser.email);
-      expect(sessionMail).toThrow(MailError);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.refreshToken).toStrictEqual({
@@ -135,10 +134,13 @@ describe("RefreshData Token", () => {
         message: "Unable to refresh token",
         status: "ERROR",
       });
+      expect(sessionMail).toHaveBeenCalledTimes(1);
+      expect(sessionMail).toHaveBeenCalledWith(unRegisteredUser.email);
+      expect(sessionMail).toThrow(MailError);
     });
 
     it("Expect an error response if the session has been revoked", async () => {
-      const cookie = unregisteredCookie;
+      const cookie = unregisteredCookie2;
       const payload = { query: GQL };
       const options = { cookie, authorization: `Bearer ${unregisteredJwt}` };
 

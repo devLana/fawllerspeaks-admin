@@ -37,8 +37,12 @@ describe("Create post tags", () => {
     it("Should respond with an error response if the user is not logged in", async () => {
       const payload = { query: CREATE_POST_TAGS, variables: { tags: ["tag"] } };
 
-      const { data } = await post<Tags>(url, payload);
+      const { data, responseHeaders } = await post<Tags>(url, payload);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.createPostTags).toStrictEqual({

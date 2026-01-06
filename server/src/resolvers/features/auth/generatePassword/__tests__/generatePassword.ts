@@ -37,7 +37,6 @@ describe("Generate password", () => {
 
       const { data } = await post<DATA>(url, payload);
 
-      expect(generatePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.generatePassword).toStrictEqual({
@@ -45,6 +44,7 @@ describe("Generate password", () => {
         emailError: errorMsg,
         status: "ERROR",
       });
+      expect(generatePasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -63,13 +63,13 @@ describe("Generate password", () => {
 
       const { data } = await post<DATA>(url, payload);
 
-      expect(generatePasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data?.generatePassword).toStrictEqual({
         __typename: "ForbiddenError",
         message: msg,
         status: "ERROR",
       });
+      expect(generatePasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -81,12 +81,12 @@ describe("Generate password", () => {
       const { data } = await post<DATA>(url, payload);
 
       expect(data.errors).toBeUndefined();
-      expect(generatePasswordMail).toHaveBeenCalledTimes(1);
       expect(data.data?.generatePassword).toStrictEqual({
         __typename: "Response",
         message: `Default password generated. ${msg}`,
         status: "SUCCESS",
       });
+      expect(generatePasswordMail).toHaveBeenCalledTimes(1);
     });
 
     it("Should return an error response if the confirmation mail fails to send", async () => {
@@ -101,14 +101,14 @@ describe("Generate password", () => {
       const { data } = await post<DATA>(url, payload);
 
       expect(data.errors).toBeUndefined();
-      expect(generatePasswordMail).toHaveBeenCalledTimes(1);
-      expect(generatePasswordMail).toThrow("Unable to send mail");
-      expect(generatePasswordMail).toThrow(MailError);
       expect(data.data?.generatePassword).toStrictEqual({
         __typename: "ServerError",
         message: MSG,
         status: "ERROR",
       });
+      expect(generatePasswordMail).toHaveBeenCalledTimes(1);
+      expect(generatePasswordMail).toThrow("Unable to send mail");
+      expect(generatePasswordMail).toThrow(MailError);
     });
   });
 });

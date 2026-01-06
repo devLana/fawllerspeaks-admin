@@ -40,7 +40,6 @@ describe("Logout", () => {
 
       const { data, responseHeaders } = await post<Data>(url, payload);
 
-      // expect(loggerMock).toHaveBeenCalled()
       expect(responseHeaders).toHaveProperty("set-cookie");
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
@@ -52,6 +51,7 @@ describe("Logout", () => {
         message: "User logged out",
         status: "SUCCESS",
       });
+      // expect(loggerMock).toHaveBeenCalled()
     });
 
     it("Expect the user to be logged out if the request has no authenticated session", async () => {
@@ -60,7 +60,6 @@ describe("Logout", () => {
 
       const { data, responseHeaders } = await post<Data>(url, payload, options);
 
-      // expect(loggerMock).toHaveBeenCalled()
       expect(responseHeaders).toHaveProperty("set-cookie");
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
@@ -72,6 +71,7 @@ describe("Logout", () => {
         message: "User logged out",
         status: "SUCCESS",
       });
+      // expect(loggerMock).toHaveBeenCalled()
     });
   });
 
@@ -83,7 +83,6 @@ describe("Logout", () => {
 
       const { data, responseHeaders } = await post<Data>(url, payload, options);
 
-      // expect(loggerMock).toHaveBeenCalled()
       expect(responseHeaders).toHaveProperty("set-cookie");
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
@@ -95,6 +94,7 @@ describe("Logout", () => {
         message: "User logged out",
         status: "SUCCESS",
       });
+      // expect(loggerMock).toHaveBeenCalled()
     });
 
     it("Expect the request activity to be logged if a user tries to log out another user's session", async () => {
@@ -104,7 +104,6 @@ describe("Logout", () => {
 
       const { data, responseHeaders } = await post<Data>(url, payload, options);
 
-      // expect(loggerMock).toHaveBeenCalled()
       expect(responseHeaders).toHaveProperty("set-cookie");
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
@@ -116,6 +115,7 @@ describe("Logout", () => {
         message: "User logged out",
         status: "SUCCESS",
       });
+      // expect(loggerMock).toHaveBeenCalled()
     });
   });
 
@@ -127,7 +127,6 @@ describe("Logout", () => {
 
       const { data, responseHeaders } = await post<Data>(url, payload, options);
 
-      // expect(loggerMock).not.toHaveBeenCalled()
       expect(responseHeaders).toHaveProperty("set-cookie");
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
       expect(responseHeaders["set-cookie"]).toHaveLength(1);
@@ -139,6 +138,7 @@ describe("Logout", () => {
         message: "User logged out",
         status: "SUCCESS",
       });
+      // expect(loggerMock).not.toHaveBeenCalled()
     });
   });
 });

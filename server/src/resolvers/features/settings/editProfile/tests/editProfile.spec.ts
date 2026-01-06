@@ -72,7 +72,6 @@ describe("Edit user profile", () => {
 
       const { data } = await post<EditProfile>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editProfile).toStrictEqual({
@@ -80,6 +79,7 @@ describe("Edit user profile", () => {
         ...errors,
         status: "ERROR",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
   });
 
@@ -91,7 +91,6 @@ describe("Edit user profile", () => {
 
       const { data } = await post<EditProfile>(url, payload, options);
 
-      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editProfile).toStrictEqual({
@@ -99,6 +98,7 @@ describe("Edit user profile", () => {
         message: "Unable to edit user profile",
         status: "ERROR",
       });
+      expect(mockEvent).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -109,7 +109,6 @@ describe("Edit user profile", () => {
 
       const { data } = await post<EditProfile>(url, payload, options);
 
-      expect(mockEvent).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data).not.toHaveProperty("message");
@@ -127,6 +126,7 @@ describe("Edit user profile", () => {
         },
         status: "SUCCESS",
       });
+      expect(mockEvent).not.toHaveBeenCalled();
     });
 
     it("Should edit the user's profile with an image", async () => {
@@ -136,7 +136,6 @@ describe("Edit user profile", () => {
 
       const { data } = await post<EditProfile>(url, payload, options);
 
-      expect(mockEvent).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data).not.toHaveProperty("message");
@@ -154,6 +153,7 @@ describe("Edit user profile", () => {
         },
         status: "SUCCESS",
       });
+      expect(mockEvent).toHaveBeenCalledTimes(1);
     });
   });
 });

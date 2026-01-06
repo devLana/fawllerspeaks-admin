@@ -44,8 +44,12 @@ describe("Edit post tags", () => {
       const variables = { tagId: "", name: "" };
       const payload = { query: EDIT_POST_TAG, variables };
 
-      const { data } = await post<EditTag>(url, payload);
+      const { data, responseHeaders } = await post<EditTag>(url, payload);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.editPostTag).toStrictEqual({
@@ -126,7 +130,7 @@ describe("Edit post tags", () => {
     });
   });
 
-  describe("Verify input post tag name, Return a DuplicatePostTagError response", () => {
+  describe("Verify input post tag name", () => {
     it("Should return an error response if the post tag name already exists", async () => {
       const variables = { tagId: postTags[2].id, name: postTags[3].name };
       const payload = { query: EDIT_POST_TAG, variables };

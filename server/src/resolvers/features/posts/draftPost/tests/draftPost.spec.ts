@@ -58,8 +58,12 @@ describe("Draft Post", () => {
       const variables = { post: mocks.argsWithNoImage };
       const payload = { query: DRAFT_POST, variables };
 
-      const { data } = await post<DraftData>(url, payload);
+      const { data, responseHeaders } = await post<DraftData>(url, payload);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.draftPost).toStrictEqual({

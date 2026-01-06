@@ -68,7 +68,6 @@ describe("Reset password", () => {
 
       const { data } = await post<ResetPassword>(url, payload);
 
-      expect(resetPasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.resetPassword).toStrictEqual({
@@ -76,6 +75,7 @@ describe("Reset password", () => {
         message: errorMessage,
         status: "ERROR",
       });
+      expect(resetPasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -88,7 +88,6 @@ describe("Reset password", () => {
 
       const { data } = await post<ResetPassword>(url, payload);
 
-      expect(resetPasswordMail).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.resetPassword).toStrictEqual({
@@ -96,6 +95,7 @@ describe("Reset password", () => {
         message: "Your password has been reset",
         status: "SUCCESS",
       });
+      expect(resetPasswordMail).toHaveBeenCalledTimes(1);
     });
 
     it("Should the reset the password even if the reset password mail failed to send", async () => {
@@ -111,9 +111,6 @@ describe("Reset password", () => {
 
       const { data } = await post<ResetPassword>(url, payload);
 
-      expect(resetPasswordMail).toHaveBeenCalledTimes(1);
-      expect(resetPasswordMail).toThrow("Unable to send mail");
-      expect(resetPasswordMail).toThrow(MailError);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.resetPassword).toStrictEqual({
@@ -121,6 +118,9 @@ describe("Reset password", () => {
         message: "Your password has been reset",
         status: "SUCCESS",
       });
+      expect(resetPasswordMail).toHaveBeenCalledTimes(1);
+      expect(resetPasswordMail).toThrow("Unable to send mail");
+      expect(resetPasswordMail).toThrow(MailError);
     });
   });
 });

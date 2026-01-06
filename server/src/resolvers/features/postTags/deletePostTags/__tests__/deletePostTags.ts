@@ -44,8 +44,12 @@ describe("Delete post tags", () => {
     it("Should respond with an error if the user is not logged in", async () => {
       const payload = { query: DELETE_POST_TAGS, variables: { tagIds: [] } };
 
-      const { data } = await post<DeleteTags>(url, payload);
+      const { data, responseHeaders } = await post<DeleteTags>(url, payload);
 
+      expect(responseHeaders).toHaveProperty("set-cookie");
+      expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
+      expect(responseHeaders["set-cookie"]).toHaveLength(1);
+      expect(responseHeaders["set-cookie"]?.[0]).toMatch(/max-age=0/i);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.deletePostTags).toStrictEqual({
@@ -94,7 +98,7 @@ describe("Delete post tags", () => {
     });
   });
 
-  describe("Verify user verification status", () => {
+  describe("Verify logged in user", () => {
     it("Should return an error response if the user is unregistered", async () => {
       const variables = { tagIds: [UUID, randomUUID()] };
       const payload = { query: DELETE_POST_TAGS, variables };
@@ -131,8 +135,8 @@ describe("Delete post tags", () => {
     });
 
     it("Should respond with a message if at least one post tag could not be deleted", async () => {
-      const [tag1, tag2, tag3, tag4] = postTags;
-      const variables = { tagIds: [tag1.id, tag2.id, tag3.id, tag4.id] };
+      const [, , tag3, tag4] = postTags;
+      const variables = { tagIds: [UUID, randomUUID(), tag3.id, tag4.id] };
       const payload = { query: DELETE_POST_TAGS, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -151,8 +155,7 @@ describe("Delete post tags", () => {
 
   describe("No post tag could be deleted", () => {
     it("Should respond with an error if the one selected post tag could be deleted", async () => {
-      const [tag1] = postTags;
-      const variables = { tagIds: [tag1.id] };
+      const variables = { tagIds: [UUID] };
       const payload = { query: DELETE_POST_TAGS, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
@@ -168,8 +171,7 @@ describe("Delete post tags", () => {
     });
 
     it("Should respond with an error if all the multiple post tags selected could be deleted", async () => {
-      const [tag1, tag2, tag3, tag4] = postTags;
-      const variables = { tagIds: [tag1.id, tag2.id, tag3.id, tag4.id] };
+      const variables = { tagIds: [UUID, randomUUID(), randomUUID()] };
       const payload = { query: DELETE_POST_TAGS, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 

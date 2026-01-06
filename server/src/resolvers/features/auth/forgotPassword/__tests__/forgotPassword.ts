@@ -39,7 +39,6 @@ describe("Forgot password", () => {
 
       const { data } = await post<ForgotPasswordData>(url, payload);
 
-      expect(forgotPasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
@@ -47,6 +46,7 @@ describe("Forgot password", () => {
         emailError: errorMsg,
         status: "ERROR",
       });
+      expect(forgotPasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -57,7 +57,6 @@ describe("Forgot password", () => {
 
       const { data } = await post<ForgotPasswordData>(url, payload);
 
-      expect(forgotPasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
@@ -65,6 +64,7 @@ describe("Forgot password", () => {
         message: "Unable to reset user password",
         status: "ERROR",
       });
+      expect(forgotPasswordMail).not.toHaveBeenCalled();
     });
 
     it("Should return an error response if the email is for an unregistered account", async () => {
@@ -73,7 +73,6 @@ describe("Forgot password", () => {
 
       const { data } = await post<ForgotPasswordData>(url, payload);
 
-      expect(forgotPasswordMail).not.toHaveBeenCalled();
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
@@ -81,6 +80,7 @@ describe("Forgot password", () => {
         message: "Unable to reset user password",
         status: "ERROR",
       });
+      expect(forgotPasswordMail).not.toHaveBeenCalled();
     });
   });
 
@@ -91,7 +91,6 @@ describe("Forgot password", () => {
 
       const { data } = await post<ForgotPasswordData>(url, payload);
 
-      expect(forgotPasswordMail).toHaveBeenCalledTimes(1);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
@@ -99,6 +98,7 @@ describe("Forgot password", () => {
         message: `A password reset link has been sent to the email address provided`,
         status: "SUCCESS",
       });
+      expect(forgotPasswordMail).toHaveBeenCalledTimes(1);
     });
 
     it("Should invalidate the generated password reset link if the confirmation mail fails to send", async () => {
@@ -112,9 +112,6 @@ describe("Forgot password", () => {
 
       const { data } = await post<ForgotPasswordData>(url, payload);
 
-      expect(forgotPasswordMail).toHaveBeenCalledTimes(1);
-      expect(forgotPasswordMail).toThrow("Unable to send forgot password mail");
-      expect(forgotPasswordMail).toThrow(MailError);
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.forgotPassword).toStrictEqual({
@@ -122,6 +119,9 @@ describe("Forgot password", () => {
         message: `An error has occurred in trying to set up your password reset. Please try again later`,
         status: "ERROR",
       });
+      expect(forgotPasswordMail).toHaveBeenCalledTimes(1);
+      expect(forgotPasswordMail).toThrow("Unable to send forgot password mail");
+      expect(forgotPasswordMail).toThrow(MailError);
     });
   });
 });
