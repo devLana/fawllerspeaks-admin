@@ -1,15 +1,12 @@
-import { readFile } from "node:fs/promises";
+import { createReadStream } from "fs";
 
 import type { Response, NextFunction } from "express";
 
-import { storageUrl } from "@services/supabase";
-import { removeFile } from "@events/removeFile";
-
 import { ApiError } from "@lib/Errors";
-import { generateImageFilePath } from "@utils/generateImageFilePath";
-import { UPLOAD_DIR } from "@utils/constants";
+import { removeFile } from "@events/removeFile";
+import { storageUrl } from "@services/supabase";
 import { uploadImage as upload } from "@services/supabase/uploadImage";
-
+import { generateImageFilePath } from "@utils/generateImageFilePath";
 import type { ImageUploadRequest } from "@types";
 
 export const uploadImage = async (
@@ -22,20 +19,21 @@ export const uploadImage = async (
     return next(error);
   }
 
+  let filepath = "";
+
   try {
     const { file, imageCategory } = req.upload;
-    const { mimetype, filepath } = file;
+    const { mimetype } = file;
+    ({ filepath } = file);
 
-    const imageFile = await readFile(filepath);
-    const imageFilePath = await generateImageFilePath(imageCategory, mimetype);
+    const fileStream = createReadStream(filepath);
+    const imageFilePath = await generateImageFilePath(imageCategory, filepath);
 
     const { error: supabaseErr } = await upload(
       imageFilePath,
       mimetype,
-      imageFile
+      fileStream
     );
-
-    removeFile.emit("remove", UPLOAD_DIR);
 
     if (supabaseErr) {
       throw new ApiError(
@@ -43,14 +41,15 @@ export const uploadImage = async (
       );
     }
 
-    res
-      .status(201)
-      .set("Location", `${storageUrl}${imageFilePath}`)
-      .json({ image: imageFilePath });
+    const url = `${storageUrl}${imageFilePath}`;
+
+    res.status(201).set("Location", url).json({ image: imageFilePath });
   } catch (err) {
     if (err instanceof ApiError) return next(err);
 
     const error = new ApiError("Something went wrong. Please try again later");
     next(error);
+  } finally {
+    if (filepath) removeFile.emit("remove", [filepath]);
   }
 };

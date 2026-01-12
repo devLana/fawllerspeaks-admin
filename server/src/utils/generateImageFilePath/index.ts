@@ -1,29 +1,13 @@
-import crypto from "node:crypto";
-import util from "node:util";
-
 import { env } from "@lib/env";
+import generateBytes from "@utils/generateBytes";
 import type { ImageCategory } from "@types";
-
-const mimeTypeDict: Record<string, string | undefined> = {
-  "image/avif": ".avif",
-  "image/bmp": ".bmp",
-  "image/gif": ".gif",
-  "image/vnd.microsoft.icon": ".ico",
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/svg+xml": ".svg",
-  "image/tiff": ".tif",
-  "image/webp": ".webp",
-};
 
 export const generateImageFilePath = async (
   imageCategory: ImageCategory,
-  mimeType: string
+  filepath: string
 ) => {
-  const randomBytes = util.promisify(crypto.randomBytes);
-  const filenameBuf = await randomBytes(25);
-  const filename = filenameBuf.toString("base64url");
-  const extension = mimeTypeDict[mimeType] ?? "";
+  const filename = await generateBytes(20, "base64url");
+  const extension = `.${filepath.split(".").pop()}`;
   let pathname: string;
   let folderName: string;
 

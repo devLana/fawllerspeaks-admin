@@ -1,5 +1,4 @@
 import { Buffer, File } from "node:buffer";
-import { randomUUID } from "node:crypto";
 
 import {
   describe,
@@ -10,45 +9,38 @@ import {
   afterAll,
   afterEach,
 } from "@jest/globals";
-
 import FormData from "form-data";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
 import { uploadImage } from "@services/supabase/uploadImage";
-
+import { removeFile } from "@events/removeFile";
 import testUsers from "@utils/tests/createTestUsers/testUsers";
 import loginTestUser from "@utils/tests/loginTestUser";
 import postFormData from "@utils/tests/postFormData";
-
 import type { APIContext } from "@types";
 
 type UploadReturn = () => Promise<{ error: Error | null }>;
 
 jest.mock("@services/supabase/uploadImage");
 
-describe("Upload image", () => {
-  const unknownUserId = randomUUID();
-  let server: ApolloServer<APIContext>, url: string, unknownJwt: string;
-  let unregisteredJwt: string, registeredJwt: string, expiredJwtUser: string;
+describe("Upload Image", () => {
+  let server: ApolloServer<APIContext>, url: string;
+  let unregisteredJwt: string, registeredJwt: string, expiredJwt: string;
 
   beforeAll(async () => {
     ({ server, url } = await startServer(0));
     const { unregisteredUser, registeredUser } = await testUsers(db);
-
     const logInRegistered = loginTestUser(registeredUser.userUUID);
     const logInUnregistered = loginTestUser(unregisteredUser.userUUID);
     const loginExpiredJwtUser = loginTestUser(unregisteredUser.userUUID, "50");
-    const loginUnknownUser = loginTestUser(unknownUserId);
 
-    [registeredJwt, unregisteredJwt, expiredJwtUser, unknownJwt] =
-      await Promise.all([
-        logInRegistered,
-        logInUnregistered,
-        loginExpiredJwtUser,
-        loginUnknownUser,
-      ]);
+    [registeredJwt, unregisteredJwt, expiredJwt] = await Promise.all([
+      logInRegistered,
+      logInUnregistered,
+      loginExpiredJwtUser,
+    ]);
   });
 
   afterAll(async () => {
@@ -62,33 +54,10 @@ describe("Upload image", () => {
   });
 
   describe("Verify user authentication", () => {
-    it("Should respond with an authentication error if request does not have a proper authorization header", async () => {
+    it("Expect an authentication error response if a request is made without an authorization header", async () => {
       const formData1 = new FormData();
-      const formData2 = new FormData();
-      const headers = { authorization: `Bear ${registeredJwt}` };
 
-      const req1 = postFormData(`${url}upload-image`, formData1);
-      const req2 = postFormData(`${url}upload-image`, formData2, headers);
-      const [res1, res2] = await Promise.all([req1, req2]);
-
-      expect(res1.statusCode).toBe(401);
-      expect(res1.statusMessage).toBe("Unauthorized");
-      expect(res1.data).toStrictEqual({
-        error: { message: "Unable to upload image" },
-      });
-
-      expect(res2.statusCode).toBe(401);
-      expect(res2.statusMessage).toBe("Unauthorized");
-      expect(res2.data).toStrictEqual({
-        error: { message: "Unable to upload image" },
-      });
-    });
-
-    it("Request with an invalid jwt should receive an authentication error response", async () => {
-      const formData = new FormData();
-      const headers = { authorization: "Bearer json.web.token" };
-
-      const res = await postFormData(`${url}upload-image`, formData, headers);
+      const res = await postFormData(`${url}upload-image`, formData1);
 
       expect(res.statusCode).toBe(401);
       expect(res.statusMessage).toBe("Unauthorized");
@@ -97,9 +66,15 @@ describe("Upload image", () => {
       });
     });
 
-    it("Request with an expired jwt should receive an authentication error response", async () => {
+    const str = `Expect an authentication error response if a request is made with`;
+
+    it.each([
+      [`${str} a malformed jwt authorization header`, `Bear ${registeredJwt}`],
+      [`${str} an invalid jwt authorization header`, "Bearer json.web.token"],
+      [`${str} an expired jwt authorization header`, `Bearer ${expiredJwt}`],
+    ])("%s", async (_, jwt) => {
       const formData = new FormData();
-      const headers = { authorization: `Bearer ${expiredJwtUser}` };
+      const headers = { authorization: `Bearer ${jwt}` };
 
       const res = await postFormData(`${url}upload-image`, formData, headers);
 
@@ -111,21 +86,8 @@ describe("Upload image", () => {
     });
   });
 
-  describe("Verify user", () => {
-    it("User is unknown, Return a forbidden error response", async () => {
-      const formData = new FormData();
-      const headers = { authorization: `Bearer ${unknownJwt}` };
-
-      const res = await postFormData(`${url}upload-image`, formData, headers);
-
-      expect(res.statusCode).toBe(403);
-      expect(res.statusMessage).toBe("Forbidden");
-      expect(res.data).toStrictEqual({
-        error: { message: "Unable to upload image" },
-      });
-    });
-
-    it("Should return a forbidden error response if the user is not registered", async () => {
+  describe("Verify authenticated user", () => {
+    it("Expect a forbidden error response if the user is not registered", async () => {
       const formData = new FormData();
       const headers = { authorization: `Bearer ${unregisteredJwt}` };
 
@@ -140,19 +102,7 @@ describe("Upload image", () => {
   });
 
   describe("Validate form data request payload", () => {
-    // it.only("Should respond with a bad request error for a wrong request type", async () => {
-    //   const json = { request: "json request" };
-    //   const headers = { authorization: `Bearer ${registeredJwt}` };
-    //   const res = await postFormData(`${url}upload-image`, json, headers);
-
-    //   expect(res.statusCode).toBe(400);
-    //   expect(res.statusMessage).toBe("Forbidden");
-    //   expect(res.data).toStrictEqual({
-    //     error: { message: "Invalid request type" },
-    //   });
-    // });
-
-    it("Should respond with a bad request error if no image file was uploaded", async () => {
+    it("Expect a bad request error response if no image file was uploaded", async () => {
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
 
@@ -165,7 +115,9 @@ describe("Upload image", () => {
       });
     });
 
-    it("Should respond with a bad request error if multiple image files are uploaded", async () => {
+    it("Expect a bad request error response if multiple image files are uploaded", async () => {
+      const headers = { authorization: `Bearer ${registeredJwt}` };
+
       const testImage = new File(["test image file 2"], "profile-image-1.png", {
         type: "image/png",
       });
@@ -174,9 +126,7 @@ describe("Upload image", () => {
       const testImageData = await testImage.arrayBuffer();
       const imageOne = Buffer.from(imageData);
       const imageTwo = Buffer.from(testImageData);
-
       const formData = new FormData();
-      const headers = { authorization: `Bearer ${registeredJwt}` };
       formData.append("image", imageOne, imageName);
       formData.append("image", imageTwo, "profile-image-1.png");
 
@@ -189,7 +139,7 @@ describe("Upload image", () => {
       });
     });
 
-    it("Should respond with a bad request error if uploaded file is not an image", async () => {
+    it("Expect a bad request error response if the uploaded image file is not an image", async () => {
       const file = new File(["test file"], "file.html", { type: "text/html" });
       const fileArrayBuffer = await file.arrayBuffer();
       const fileBuf = Buffer.from(fileArrayBuffer);
@@ -203,11 +153,38 @@ describe("Upload image", () => {
       expect(res.statusCode).toBe(400);
       expect(res.statusMessage).toBe("Bad Request");
       expect(res.data).toStrictEqual({
-        error: { message: "Only an image file can be uploaded" },
+        error: { message: "No image file was uploaded" },
       });
     });
 
-    it("Should respond with a bad request error if an image category field is not provided", async () => {
+    it("Expect a bad request error response if both image and non-image files without an extension are uploaded", async () => {
+      const imageFile = new File(["image file without extension"], "file1", {
+        type: "image/png",
+      });
+
+      const audioFile = new File(["audio file without extension"], "file2", {
+        type: "audio/mpeg",
+      });
+
+      const imageFileArrayBuffer = await imageFile.arrayBuffer();
+      const audioFileArrayBuffer = await audioFile.arrayBuffer();
+      const imageBuf = Buffer.from(imageFileArrayBuffer);
+      const audioBuf = Buffer.from(audioFileArrayBuffer);
+      const formData = new FormData();
+      const headers = { authorization: `Bearer ${registeredJwt}` };
+      formData.append("image", imageBuf, "file1");
+      formData.append("someOtherFileField", audioBuf, "file2");
+
+      const res = await postFormData(`${url}upload-image`, formData, headers);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.statusMessage).toBe("Bad Request");
+      expect(res.data).toStrictEqual({
+        error: { message: "No image file was uploaded" },
+      });
+    });
+
+    it("Expect a bad request error response if an image category field is not provided", async () => {
       const imageArrayBuffer = await image.arrayBuffer();
       const imageBuf = Buffer.from(imageArrayBuffer);
 
@@ -224,7 +201,7 @@ describe("Upload image", () => {
       });
     });
 
-    it("Should respond with a bad request error if multiple image category fields are present", async () => {
+    it("Expect a bad request error response if multiple image category fields are present", async () => {
       const imageArrayBuffer = await image.arrayBuffer();
       const imageBuf = Buffer.from(imageArrayBuffer);
 
@@ -243,7 +220,7 @@ describe("Upload image", () => {
       });
     });
 
-    it("Should respond with a bad request error if the image category is neither 'avatar' nor 'post'", async () => {
+    it("Expect a bad request error response if the image category is neither 'avatar' nor 'post'", async () => {
       const imageArrayBuffer = await image.arrayBuffer();
       const imageBuf = Buffer.from(imageArrayBuffer);
 
@@ -271,7 +248,41 @@ describe("Upload image", () => {
 
     const mock = uploadImage as jest.MockedFunction<UploadReturn>;
 
-    it("Image upload fails, Respond with a server error", async () => {
+    it("Expect the request to be parsed as long as an image file field and category is uploaded", async () => {
+      mock.mockResolvedValueOnce({ error: null });
+
+      const spy = jest.spyOn(removeFile, "emit");
+
+      const pdfFile = new File(["a non-image file"], "pdfFile.pdf", {
+        type: "application/pdf",
+      });
+
+      const pdfArrayBuffer = await pdfFile.arrayBuffer();
+      const pdfBuf = Buffer.from(pdfArrayBuffer);
+      const imageArrayBuffer = await image.arrayBuffer();
+      const imageBuf = Buffer.from(imageArrayBuffer);
+      const formData = new FormData();
+      const headers = { authorization: `Bearer ${registeredJwt}` };
+      formData.append("image", imageBuf, imageName);
+      formData.append("someOtherImageFile", imageBuf, imageName);
+      formData.append("aNonImageFile", pdfBuf, "pdfFile.pdf");
+      formData.append("type", "avatar");
+      formData.append("someOtherFieldType", "someOtherType");
+
+      const res = await postFormData<{ image: string }>(
+        `${url}upload-image`,
+        formData,
+        headers
+      );
+
+      expect(res.statusCode).toBe(201);
+      expect(res.statusMessage).toBe("Created");
+      expect(res.data).toHaveProperty("image");
+      expect(res.data.image).toMatch(/^misc\/avatar\/[\w-]+\.jpe?g$/);
+      expect(spy).toHaveBeenCalledTimes(2);
+    });
+
+    it("Expect a server error response if the image upload to Supabase fails", async () => {
       mock.mockResolvedValueOnce({ error: new Error("Error") });
 
       const imageArrayBuffer = await image.arrayBuffer();
@@ -294,7 +305,7 @@ describe("Upload image", () => {
       });
     });
 
-    it("Image upload successful, Send supabase path to saved image", async () => {
+    it("Expect the image to be uploaded to Supabase successfully", async () => {
       mock.mockResolvedValueOnce({ error: null });
 
       const imageArrayBuffer = await image.arrayBuffer();

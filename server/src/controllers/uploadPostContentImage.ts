@@ -1,15 +1,12 @@
-import { readFile } from "node:fs/promises";
+import { createReadStream } from "node:fs";
 
 import type { Response, NextFunction } from "express";
 
-import { storageUrl } from "@services/supabase";
-import { removeFile } from "@events/removeFile";
-
 import { ApiError } from "@lib/Errors";
-import { generateImageFilePath } from "@utils/generateImageFilePath";
-import { UPLOAD_DIR } from "@utils/constants";
+import { removeFile } from "@events/removeFile";
+import { storageUrl } from "@services/supabase";
 import { uploadImage } from "@services/supabase/uploadImage";
-
+import { generateImageFilePath as gFP } from "@utils/generateImageFilePath";
 import type { PostContentImageRequest } from "@types";
 
 export const uploadPostContentImage = async (
@@ -22,23 +19,21 @@ export const uploadPostContentImage = async (
     return next(error);
   }
 
+  let filepath = "";
+
   try {
     const { file } = req.upload;
-    const { mimetype, filepath } = file;
+    const { mimetype } = file;
+    ({ filepath } = file);
 
-    const imageFile = await readFile(filepath);
-    const imageFilePath = await generateImageFilePath(
-      "postContentImage",
-      mimetype
-    );
+    const fileStream = createReadStream(filepath);
+    const imageFilePath = await gFP("postContentImage", filepath);
 
     const { error: supabaseErr } = await uploadImage(
       imageFilePath,
       mimetype,
-      imageFile
+      fileStream
     );
-
-    removeFile.emit("remove", UPLOAD_DIR);
 
     if (supabaseErr) {
       throw new ApiError(
@@ -54,5 +49,7 @@ export const uploadPostContentImage = async (
 
     const error = new ApiError("Something went wrong. Please try again later");
     next(error);
+  } finally {
+    if (filepath) removeFile.emit("remove", [filepath]);
   }
 };

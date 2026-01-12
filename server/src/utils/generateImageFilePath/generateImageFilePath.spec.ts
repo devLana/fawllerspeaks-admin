@@ -3,7 +3,9 @@ import { generateImageFilePath } from ".";
 
 describe("@utils | Generate supabase image file path", () => {
   it("Should generate an avatar filepath", async () => {
-    const avatarFilepath = await generateImageFilePath("avatar", "image/jpeg");
+    const testFilepath = "temp/os/folder/test-image.jpg";
+
+    const avatarFilepath = await generateImageFilePath("avatar", testFilepath);
 
     expect(avatarFilepath).toMatch(/^misc\/avatar\/[\w-]+\.jpg$/);
     expect(avatarFilepath).not.toMatch(/post\/banner/);
@@ -11,9 +13,11 @@ describe("@utils | Generate supabase image file path", () => {
   });
 
   it("Should generate a post banner filepath", async () => {
+    const testFilepath = "another/temp/path/image.png";
+
     const postBannerFilepath = await generateImageFilePath(
       "postBanner",
-      "image/png"
+      testFilepath
     );
 
     expect(postBannerFilepath).toMatch(/^misc\/post\/banner\/[\w-]+\.png$/);
@@ -22,9 +26,11 @@ describe("@utils | Generate supabase image file path", () => {
   });
 
   it("Should generate a post content image filepath", async () => {
+    const testFilepath = "some/other/path/picture.webp";
+
     const contentImageFilepath = await generateImageFilePath(
       "postContentImage",
-      "image/webp"
+      testFilepath
     );
 
     expect(contentImageFilepath).toMatch(

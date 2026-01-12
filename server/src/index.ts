@@ -11,7 +11,6 @@ import helmet from "helmet";
 import typeDefs from "./typeDefs";
 import { resolvers } from "./resolvers";
 
-import { createTempDirectory } from "@middleware/createTempDirectory";
 import { authenticateUser } from "@middleware/authenticateUser";
 import { errorMiddleware } from "@middleware/errorMiddleware";
 import { uploadImageParser } from "@middleware/uploadImageParser";
@@ -55,15 +54,11 @@ export const startServer = async (port: number) => {
 
   app.use(/^\/$/, [express.json(), parseCookies], graphqlApi(server));
 
-  app.post(
-    "/upload-image",
-    [authenticateUser, createTempDirectory, uploadImageParser],
-    uploadImage
-  );
+  app.post("/upload-image", [authenticateUser, uploadImageParser], uploadImage);
 
   app.post(
     "/upload-post-content-image",
-    [authenticateUser, createTempDirectory, postContentImageParser],
+    [authenticateUser, postContentImageParser],
     uploadPostContentImage
   );
 

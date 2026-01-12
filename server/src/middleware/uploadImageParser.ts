@@ -3,7 +3,6 @@ import type { Response, NextFunction } from "express";
 
 import { removeFile } from "@events/removeFile";
 import { ApiError, BadRequestError } from "@lib/Errors";
-import { UPLOAD_DIR } from "@utils/constants";
 import type { ImageUploadRequest } from "@types";
 
 export const uploadImageParser = async (
@@ -16,9 +15,26 @@ export const uploadImageParser = async (
     return next(error);
   }
 
+  let imageFilepaths: string[] = [];
+  let otherImageFilepaths: string[] = [];
+
   try {
-    const form = formidable({ uploadDir: UPLOAD_DIR });
+    const form = formidable({
+      allowEmptyFiles: false,
+      keepExtensions: true,
+      filter: ({ mimetype }) => !!mimetype?.startsWith("image/"),
+    });
+
     const [fields, files] = await form.parse<"type", "image">(req);
+
+    Object.entries(files).forEach(([key, fileItems]) => {
+      if (key === "image") {
+        imageFilepaths = fileItems.map(file => file.filepath);
+        return;
+      }
+
+      otherImageFilepaths = fileItems.map(file => file.filepath);
+    });
 
     if (!files.image || files.image.length === 0) {
       throw new BadRequestError("No image file was uploaded");
@@ -49,7 +65,6 @@ export const uploadImageParser = async (
     }
 
     const [{ filepath, mimetype }] = files.image;
-
     const file = { filepath, mimetype };
     const uploadReq = req;
 
@@ -57,7 +72,7 @@ export const uploadImageParser = async (
 
     next();
   } catch (err) {
-    removeFile.emit("remove", UPLOAD_DIR);
+    if (imageFilepaths.length > 0) removeFile.emit("remove", imageFilepaths);
 
     if (err instanceof ApiError) return next(err);
 
@@ -66,5 +81,9 @@ export const uploadImageParser = async (
     );
 
     next(error);
+  } finally {
+    if (otherImageFilepaths.length > 0) {
+      removeFile.emit("remove", otherImageFilepaths);
+    }
   }
 };
