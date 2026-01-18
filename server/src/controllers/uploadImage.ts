@@ -6,7 +6,7 @@ import { ApiError } from "@lib/Errors";
 import { removeFile } from "@events/removeFile";
 import { storageUrl } from "@services/supabase";
 import { uploadImage as upload } from "@services/supabase/uploadImage";
-import { generateImageFilePath } from "@utils/generateImageFilePath";
+import { generateImageFilePath as gfp } from "@utils/generateImageFilePath";
 import type { ImageUploadRequest } from "@types";
 
 export const uploadImage = async (
@@ -27,7 +27,7 @@ export const uploadImage = async (
     ({ filepath } = file);
 
     const fileStream = createReadStream(filepath);
-    const imageFilePath = await generateImageFilePath(imageCategory, filepath);
+    const imageFilePath = await gfp(imageCategory, mimetype, filepath);
 
     const { error: supabaseErr } = await upload(
       imageFilePath,

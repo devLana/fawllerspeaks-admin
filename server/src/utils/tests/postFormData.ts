@@ -1,75 +1,38 @@
-import {
-  request,
-  Agent,
-  type RequestOptions,
-  type IncomingHttpHeaders,
-} from "node:http";
-import { URL } from "node:url";
-import { Buffer } from "node:buffer";
-
-import type FormData from "form-data";
-
 interface PostResponse<U> {
   statusCode?: number;
-  responseHeaders: IncomingHttpHeaders;
+  responseHeaders: Headers;
   statusMessage?: string;
   data: U;
 }
 
-type RequestHeaders = RequestOptions["headers"] & IncomingHttpHeaders;
+type RequestHeaders = Record<string, string>;
 
-const postFormData = <T = unknown>(
+const postFormData = async <T = unknown>(
   address: string,
   formData: FormData,
   reqHeaders: RequestHeaders = {}
-) => {
-  return new Promise<PostResponse<T>>((resolve, reject) => {
-    const url = new URL(address);
-    const options: RequestOptions = {
-      agent: new Agent({ keepAlive: true }),
+): Promise<PostResponse<T>> => {
+  let data: T;
+  let statusCode: number;
+  let responseHeaders: Headers;
+  let statusMessage: string;
+
+  try {
+    const response = await fetch(address, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        ...formData.getHeaders(),
-        ...reqHeaders,
-      },
-    };
-
-    const req = request(url, options);
-
-    req.on("response", res => {
-      const chunkData: Uint8Array[] = [];
-
-      res.on("data", (chunk: Uint8Array) => {
-        chunkData.push(chunk);
-      });
-
-      res.on("end", () => {
-        const resData = Buffer.concat(chunkData).toString();
-
-        try {
-          const responseBody: PostResponse<T> = {
-            statusCode: res.statusCode,
-            responseHeaders: res.headers,
-            statusMessage: res.statusMessage,
-            data: JSON.parse(resData) as T,
-          };
-
-          resolve(responseBody);
-        } catch {
-          reject("Response error - Error parsing response data");
-          res.resume();
-        }
-      });
-
-      res.on("error", err => {
-        reject(`Response error - ${err.message}`);
-        res.resume();
-      });
+      headers: { Accept: "application/json", ...reqHeaders },
+      body: formData,
     });
 
-    formData.pipe(req);
-  });
+    statusCode = response.status;
+    responseHeaders = response.headers;
+    statusMessage = response.statusText;
+    data = (await response.json()) as T;
+  } catch (error) {
+    throw new Error("Response error");
+  }
+
+  return { statusCode, responseHeaders, statusMessage, data };
 };
 
 export default postFormData;

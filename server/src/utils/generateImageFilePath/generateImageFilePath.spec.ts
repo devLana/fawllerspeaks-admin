@@ -2,10 +2,22 @@ import { it, expect, describe } from "@jest/globals";
 import { generateImageFilePath } from ".";
 
 describe("@utils | Generate supabase image file path", () => {
-  it("Should generate an avatar filepath", async () => {
-    const testFilepath = "temp/os/folder/test-image.jpg";
+  it("Should generate a filepath with the correct file extension", async () => {
+    const filepath = await generateImageFilePath(
+      "postContentImage",
+      "image/gif",
+      "some/other/path/picture"
+    );
 
-    const avatarFilepath = await generateImageFilePath("avatar", testFilepath);
+    expect(filepath).toMatch(/^misc\/post\/content-image\/[\w-]+\.gif$/);
+  });
+
+  it("Should generate an avatar filepath", async () => {
+    const avatarFilepath = await generateImageFilePath(
+      "avatar",
+      "image/jpeg",
+      "temp/os/folder/test-image.jpg"
+    );
 
     expect(avatarFilepath).toMatch(/^misc\/avatar\/[\w-]+\.jpg$/);
     expect(avatarFilepath).not.toMatch(/post\/banner/);
@@ -13,11 +25,10 @@ describe("@utils | Generate supabase image file path", () => {
   });
 
   it("Should generate a post banner filepath", async () => {
-    const testFilepath = "another/temp/path/image.png";
-
     const postBannerFilepath = await generateImageFilePath(
       "postBanner",
-      testFilepath
+      "image/png",
+      "another/temp/path/image.png"
     );
 
     expect(postBannerFilepath).toMatch(/^misc\/post\/banner\/[\w-]+\.png$/);
@@ -26,11 +37,10 @@ describe("@utils | Generate supabase image file path", () => {
   });
 
   it("Should generate a post content image filepath", async () => {
-    const testFilepath = "some/other/path/picture.webp";
-
     const contentImageFilepath = await generateImageFilePath(
       "postContentImage",
-      testFilepath
+      "image/webp",
+      "some/other/path/picture.webp"
     );
 
     expect(contentImageFilepath).toMatch(

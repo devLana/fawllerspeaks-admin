@@ -27,7 +27,7 @@ export const uploadPostContentImage = async (
     ({ filepath } = file);
 
     const fileStream = createReadStream(filepath);
-    const imageFilePath = await gFP("postContentImage", filepath);
+    const imageFilePath = await gFP("postContentImage", mimetype, filepath);
 
     const { error: supabaseErr } = await uploadImage(
       imageFilePath,
