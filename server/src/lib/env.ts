@@ -1,45 +1,21 @@
 import * as dotenv from "dotenv";
 import joi from "joi";
-
-interface BaseEnvVars {
-  MAIL_HOST: string;
-  MAIL_PORT: number;
-  MAIL_USER: string;
-  MAIL_PASSWORD: string;
-  ACCESS_TOKEN_SECRET: string;
-  REFRESH_TOKEN_SECRET: string;
-  SUPABASE_SERVICE_ROLE_KEY: string;
-}
-
-interface LocalEnvVars extends BaseEnvVars {
-  NAME: "development" | "test";
-  PG_CONNECTION_STRING: never;
-}
-
-interface LiveEnvVars extends BaseEnvVars {
-  NAME: "production" | "demo";
-  PG_CONNECTION_STRING: string;
-}
-
-type EnvVars = LocalEnvVars | LiveEnvVars;
-type EnvKeys = keyof EnvVars;
-
-type EnvObject = {
-  [Key in EnvKeys]?: string;
-};
+import type { EnvKeys, EnvObject, EnvVars } from "types/mailService";
 
 dotenv.config();
 
 export const rawEnv: EnvObject = {
   NAME: process.env.NODE_ENV,
-  MAIL_HOST: process.env.MAIL_HOST,
-  MAIL_PORT: process.env.MAIL_PORT,
-  MAIL_USER: process.env.MAIL_USER,
-  MAIL_PASSWORD: process.env.MAIL_PASSWORD,
+  LOCAL_MAIL_HOST: process.env.LOCAL_MAIL_HOST,
+  LOCAL_MAIL_PORT: process.env.LOCAL_MAIL_PORT,
+  LOCAL_MAIL_USER: process.env.LOCAL_MAIL_USER,
+  LOCAL_MAIL_PASSWORD: process.env.LOCAL_MAIL_PASSWORD,
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   PG_CONNECTION_STRING: process.env.PG_CONNECTION_STRING,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
+  RESEND_FROM: process.env.RESEND_FROM,
 };
 
 const schema = joi.object<EnvVars>({
@@ -51,33 +27,8 @@ const schema = joi.object<EnvVars>({
     .messages({
       "any.required": "NODE_ENV environment variable is required",
       "string.empty": "NODE_ENV environment variable not provided",
-      "string.only": `NODE_ENV must be initialized with one of 'production', 'demo', 'development', 'test'`,
+      "string.only": `NODE_ENV must be initialized with one of the following values: 'production', 'demo', 'development' or 'test'`,
     }),
-  MAIL_HOST: joi.string().required().trim().messages({
-    "any.required": "MAIL_HOST environment variable is required",
-    "string.empty": "MAIL_HOST environment variable not provided",
-  }),
-  MAIL_PORT: joi
-    .string()
-    .required()
-    .trim()
-    .custom((value: string, helpers) => {
-      const num = Number(value);
-      return !Number.isFinite(num) ? helpers.error("number.base") : num;
-    })
-    .messages({
-      "any.required": "MAIL_PORT environment variable is required",
-      "string.empty": "MAIL_PORT environment variable not provided",
-      "number.base": `MAIL_PORT environment variable is not a valid port number`,
-    }),
-  MAIL_USER: joi.string().required().trim().messages({
-    "any.required": "MAIL_USER environment variable is required",
-    "string.empty": "MAIL_USER environment variable not provided",
-  }),
-  MAIL_PASSWORD: joi.string().required().trim().messages({
-    "any.required": "MAIL_PASSWORD environment variable is required",
-    "string.empty": "MAIL_PASSWORD environment variable not provided",
-  }),
   ACCESS_TOKEN_SECRET: joi.string().required().trim().messages({
     "any.required": "ACCESS_TOKEN_SECRET environment variable is required",
     "string.empty": "ACCESS_TOKEN_SECRET environment variable not provided",
@@ -87,10 +38,57 @@ const schema = joi.object<EnvVars>({
     "string.empty": "REFRESH_TOKEN_SECRET environment variable not provided",
   }),
   SUPABASE_SERVICE_ROLE_KEY: joi.string().required().trim().messages({
-    "any.required":
-      "SUPABASE_SERVICE_ROLE_KEY environment variable is required",
-    "string.empty":
-      "SUPABASE_SERVICE_ROLE_KEY environment variable not provided",
+    "any.required": `SUPABASE_SERVICE_ROLE_KEY environment variable is required`,
+    "string.empty": `SUPABASE_SERVICE_ROLE_KEY environment variable not provided`,
+  }),
+  LOCAL_MAIL_HOST: joi.string().when("NAME", {
+    is: joi.string().valid("development", "test"),
+    then: joi.string().required().trim().messages({
+      "any.required": "LOCAL_MAIL_HOST environment variable is required",
+      "string.empty": "LOCAL_MAIL_HOST environment variable not provided",
+    }),
+    otherwise: joi.any().forbidden().messages({
+      "any.unknown": `LOCAL_MAIL_HOST is not needed in production or demo environments`,
+    }),
+  }),
+  LOCAL_MAIL_PORT: joi.string().when("NAME", {
+    is: joi.string().valid("development", "test"),
+    then: joi
+      .string()
+      .required()
+      .trim()
+      .custom((value: string, helpers) => {
+        const num = Number(value);
+        return !Number.isFinite(num) ? helpers.error("number.base") : num;
+      })
+      .messages({
+        "any.required": "LOCAL_MAIL_PORT environment variable is required",
+        "string.empty": "LOCAL_MAIL_PORT environment variable not provided",
+        "number.base": `LOCAL_MAIL_PORT environment variable is not a valid port number`,
+      }),
+    otherwise: joi.any().forbidden().messages({
+      "any.unknown": `LOCAL_MAIL_PORT is not needed in production or demo environments`,
+    }),
+  }),
+  LOCAL_MAIL_USER: joi.string().when("NAME", {
+    is: joi.string().valid("development", "test"),
+    then: joi.string().required().trim().messages({
+      "any.required": "LOCAL_MAIL_USER environment variable is required",
+      "string.empty": "LOCAL_MAIL_USER environment variable not provided",
+    }),
+    otherwise: joi.any().forbidden().messages({
+      "any.unknown": `LOCAL_MAIL_USER is not needed in production or demo environments`,
+    }),
+  }),
+  LOCAL_MAIL_PASSWORD: joi.string().when("NAME", {
+    is: joi.string().valid("development", "test"),
+    then: joi.string().required().trim().messages({
+      "any.required": "LOCAL_MAIL_PASSWORD environment variable is required",
+      "string.empty": "LOCAL_MAIL_PASSWORD environment variable not provided",
+    }),
+    otherwise: joi.any().forbidden().messages({
+      "any.unknown": `LOCAL_MAIL_PASSWORD is not needed in production or demo environments`,
+    }),
   }),
   PG_CONNECTION_STRING: joi.string().when("NAME", {
     is: joi.string().valid("production", "demo"),
@@ -102,13 +100,33 @@ const schema = joi.object<EnvVars>({
       "any.unknown": `PG_CONNECTION_STRING is not needed in development or test environments`,
     }),
   }),
+  RESEND_API_KEY: joi.string().when("NAME", {
+    is: joi.string().valid("production", "demo"),
+    then: joi.string().required().trim().messages({
+      "any.required": "RESEND_API_KEY environment variable is required",
+      "string.empty": "RESEND_API_KEY environment variable not provided",
+    }),
+    otherwise: joi.any().forbidden().messages({
+      "any.unknown": `RESEND_API_KEY is not needed in development or test environments`,
+    }),
+  }),
+  RESEND_FROM: joi.string().when("NAME", {
+    is: joi.string().valid("production", "demo"),
+    then: joi.string().required().trim().messages({
+      "any.required": "RESEND_FROM environment variable is required",
+      "string.empty": "RESEND_FROM environment variable not provided",
+    }),
+    otherwise: joi.any().forbidden().messages({
+      "any.unknown": `RESEND_FROM is not needed in development or test environments`,
+    }),
+  }),
 });
 
-const { error, value } = schema.validate(rawEnv, { abortEarly: false });
+const result = schema.validate(rawEnv, { abortEarly: false });
 
-if (error) {
+if (result.error) {
   // Collect all errors in a readable format
-  const errors = error.details.reduce<EnvObject>((errs, errorItem) => {
+  const errors = result.error.details.reduce<EnvObject>((errs, errorItem) => {
     const errorsMap = { ...errs };
     const { message } = errorItem;
     const [field] = errorItem.path as EnvKeys[];
@@ -128,4 +146,4 @@ if (error) {
   process.exit(1);
 }
 
-export const env = value;
+export const env = result.value;

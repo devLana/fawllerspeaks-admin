@@ -1,89 +1,54 @@
-import { sendMail } from "@services/mail";
+import mailService from ".";
+import mailTemplate from "./mailTemplate";
 import { urls } from "@lib/ClientUrls";
 import { MailError } from "@lib/Errors";
 
 const generatePasswordMail = async (email: string, password: string) => {
-  const html = `
-    <div
-      style="
-        font-family: Verdana, sans-serif;
-        color: #404040;
-        text-align: center;
-        background-color: #fff;
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 10px;
-      "
-    >
-      <h1 style="color: #7dd1f3">Fawller Speaks</h1>
-      <div>
-        <p>
-          Your request for a new default log in password for your new admin console account has been received.
-        </p>
-        <p>
-          Please copy your new default password below and head over to the <a href=${urls.login} style="color: #6a6a6a; font-weight: bold">admin console log in page</a> to log in.
-        </p>
-        <p>
-          You will be mandated to change this password to your preferred password upon your first log in attempt.
-        </p>
-      </div>
-      <div style="margin-top: 25px">
-        <span>Password:</span>
-        <span
-          style="
-            background-color: #7dd1f3;
-            border-radius: 5px;
-            padding: 20px;
-            display: inline-block;
-            color: #404040;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-          "
-        >
-          ${password}
-        </span>
-      </div>
-      <div style="margin-top: 25px">
-        <p>
-          <strong>Didn't make this request?</strong>
-        </p>
-        <p>
-          Please ensure your e-mail address is secure and open a ticket at
-          <a
-            style="color: #6a6a6a; font-weight: bold"
-            href="mailto:info@fawllerspeaks.com"
-          >
-            info@fawllerspeaks.com
-          </a>.
-        </p>
-        </p>
-      </div>
+  const body = `
+    <p>
+      You have requested a new auto generated log in password for your admin dashboard.
+    </p>
+    <p style="margin:15px 0">
+      Please copy your new password below and head over to the <a href="${urls.login}" target="_blank" rel="nofollow noopener noreferrer" style="color:#6a6a6a;font-weight:bold">dashboard</a> to log in.
+    </p>
+    <p>
+      Upon initial login attempt, you will be required to register your account and change to your preferred password.
+    </p>
+    <div style="margin:25px 0">
+      <span>New Password:</span>
+      <span style="background-color:#7dd1f3;border-radius:5px;padding:20px;display:inline-block;color:#404040;font-weight:bold;letter-spacing:0.5px">${password}</span>
     </div>
+    <p>
+      <strong>If you were not the one who initiated this request, please ensure that your e-mail address is secure and ignore this email.</strong>
+    </p>
   `;
 
   const text = `
     Fawller Speaks
-    --------------
 
-    Your request for a new default log in password for your new admin console account has been received.
+    ---
 
-    Please copy your new default password below and head over to the admin console login page at ${urls.login} to log in.
+    You have requested a new auto generated log in password for your admin dashboard.
 
-    You will be mandated to change this password to your preferred password upon your first log in attempt.
+    Please copy your new password below and head over to the dashboard to login at ${urls.login}.
 
-    Password: ${password}
+    Upon initial login attempt, you will be required to register your account and change to your preferred password.
 
-    Didn't make this request?
-    Please ensure your e-mail address is secure and open a ticket at info@fawllerspeaks.com
+    New password: ${password}
+
+    If you were not the one who initiated this request, please ensure that your e-mail address is secure and ignore this email.
   `;
 
   const subject = "Fawller Speaks Admin New Login Password";
+  const html = mailTemplate(body);
 
   try {
-    await sendMail({ to: email, subject, text, html });
-  } catch {
+    await mailService.send({ to: email, subject, html, text });
+  } catch (e) {
+    const msg = `A confirmation mail could not be sent for the generation of a password for user with email ${email}`;
+
     throw new MailError(
-      `A confirmation mail could not be sent for the generation of a new default password for user with email ${email}`
+      `${msg}${e instanceof Error ? `. Error: ${e.message}` : ""}`,
     );
   }
 };

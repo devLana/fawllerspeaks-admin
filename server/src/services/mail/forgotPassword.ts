@@ -1,5 +1,7 @@
-import { sendMail } from ".";
 import { URL } from "node:url";
+
+import mailService from ".";
+import mailTemplate from "./mailTemplate";
 import { MailError } from "@lib/Errors";
 import { urls } from "@lib/ClientUrls";
 
@@ -7,78 +9,53 @@ const forgotPasswordMail = async (email: string, token: string) => {
   try {
     const { href } = new URL(`${urls.resetPassword}?tId=${token}`);
 
-    const html = `
-      <div
-        style="
-          font-family: Verdana, sans-serif;
-          color: #404040;
-          text-align: center;
-          background-color: #fff;
-          max-width: 900px;
-          margin: 0 auto;
-          padding: 10px;
-        "
-      >
-        <h1 style="color: #7dd1f3">Fawller Speaks</h1>
-        <div>
-          <p>Hi,</p>
-          <p>
-            A request has been made to reset your Fawller Speaks Admin Console password.
-          </p>
-          <p>
-            You can click the link below to proceed with the request:
-          </p>
-          <p>
-            <a
-              href=${href}
-              style="
-                background-color: #7dd1f3;
-                border-radius: 5px;
-                padding: 20px;
-                display: inline-block;
-                color: #404040;
-                font-weight: bold;
-                text-decoration: none;
-              "
-            >
-              Reset Password
-            </a>
-          </p>
-          <p>
-            Please take note that this link will only be valid for 5 minutes.
-          </p>
-          <div style="margin-top: 60px">
-            <p>
-              <strong>Didn't make this request?</strong>
-            </p>
-            <p>
-              Please ensure your e-mail address is secure and proceed to the console to change your password.
-            </p>
-          </div>
-        </div>
-      </div>
+    const body = `
+      <p style="margin-bottom:15px">
+        A request has been made to reset the password of your Fawller Speaks admin dashboard account.
+      </p>
+      <p style="margin-bottom:25px">
+        You can click the link below to proceed with your password reset:
+      </p>
+      <p style="margin-bottom:25px">
+        <a href="${href}" style="background-color:#7dd1f3;border-radius:5px;padding:20px;display:inline-block;color:#404040;font-weight:bold;text-decoration:none">Reset Password</a>
+      </p>
+      <p style="margin-bottom:15px">
+        Please take note that this link will only be valid for the next 5 minutes.
+      </p>
+      <p style="margin-bottom:15px">
+        <strong>If you were not the one who initiated this request, please ensure that your e-mail address is secure and ignore this email.</strong>
+      </p>
+      <p>
+        <strong>Optionally, you can proceed to the admin dashboard to change your password.</strong>
+      </p>
     `;
 
     const text = `
       Fawller Speaks
-      --------------
 
-      A request has been made to reset your Fawller Speaks Admin Console password.
+      ---
 
-      You can copy the link below and paste in your browser to proceed with the request:
+      A request has been made to reset the password of your Fawller Speaks admin dashboard account.
+
+      You can click the link below to proceed with your password reset:
       ${href}
-      please take note that this link will only be valid for 5 minutes.
 
-      Didn't make this request?
-      Please ensure your e-mail address is secure and proceed to the console to change your password.
+      Please take note that this link will only be valid for the next 5 minutes.
+
+      If you were not the one who initiated this request, please ensure that your e-mail address is secure and ignore this email.
+
+      Optionally, you can proceed to the admin dashboard to change your password.
     `;
 
     const subject = "Fawller Speaks Admin Reset Password";
+    const html = mailTemplate(body);
 
-    await sendMail({ to: email, subject, text, html });
-  } catch (err) {
+    await mailService.send({ to: email, subject, html, text });
+  } catch (e) {
+    const msg = `Unable to send password reset link. Please try again later`;
+
     throw new MailError(
-      "Unable to send password reset link. Please try again later"
+      `${msg}${e instanceof Error ? `. Error: ${e.message}` : ""}`,
     );
   }
 };
