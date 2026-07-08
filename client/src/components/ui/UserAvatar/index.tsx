@@ -1,20 +1,22 @@
+import Image from "next/image";
 import Avatar, { type AvatarProps } from "@mui/material/Avatar";
-import type { Theme } from "@mui/material/styles";
 
-import useGetUserInfo from "@hooks/session/useGetUserInfo";
 import NextLink from "../NextLink";
-import type { SxPropsArray } from "@types";
+import type { SxPropArray } from "@appTypes";
 
 interface UserAvatarProps {
+  image: string | null | undefined;
+  firstName: string | undefined;
+  lastName: string | undefined;
+  hasLink?: boolean;
   sx?: AvatarProps["sx"];
-  renderWithLink?: boolean;
 }
 
-const UserAvatar = ({ renderWithLink = false, sx = [] }: UserAvatarProps) => {
-  const userInfo = useGetUserInfo();
-  const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
+const UserAvatar = (props: UserAvatarProps) => {
+  const { image, firstName, lastName, hasLink = false, sx = [] } = props;
+  const sxProp: SxPropArray = Array.isArray(sx) ? sx : [sx];
 
-  if (!userInfo) {
+  if (!firstName || !lastName) {
     return (
       <Avatar
         aria-label="User avatar"
@@ -23,45 +25,30 @@ const UserAvatar = ({ renderWithLink = false, sx = [] }: UserAvatarProps) => {
     );
   }
 
-  const { firstName, lastName, image } = userInfo;
-
-  if (image) {
-    return renderWithLink ? (
-      <NextLink href="/settings/me">
-        <Avatar
-          src={image}
-          alt={`${firstName} ${lastName} avatar`}
-          sx={[...sxProp]}
-        />
-      </NextLink>
-    ) : (
-      <Avatar
-        src={image}
-        alt={`${firstName} ${lastName} avatar`}
-        sx={[...sxProp]}
-      />
-    );
-  }
-
-  const bgcolor = (theme: Theme) => {
-    return theme.appTheme.themeMode === "sunny"
-      ? "secondary.light"
-      : "secondary.dark";
-  };
-
-  return renderWithLink ? (
-    <NextLink href="/settings/me" sx={{ fontStyle: "normal" }}>
-      <Avatar
-        sx={[{ bgcolor, color: "primary.main", fontSize: 17 }, ...sxProp]}
-      >
-        {`${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()}
-      </Avatar>
-    </NextLink>
-  ) : (
-    <Avatar sx={[{ bgcolor, color: "primary.main", fontSize: 17 }, ...sxProp]}>
+  const avatar = (
+    <Avatar
+      src={image ?? undefined}
+      alt={`${firstName} ${lastName} avatar`}
+      sx={[
+        {
+          color: "primary.main",
+          fontSize: 17,
+          position: "relative",
+          bgcolor({ appTheme: { themeMode: mode } }) {
+            return mode === "sunny" ? "secondary.light" : "secondary.dark";
+          },
+        },
+        ...sxProp,
+      ]}
+      slotProps={
+        { img: { component: Image, fill: true } } as AvatarProps["slotProps"]
+      }
+    >
       {`${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()}
     </Avatar>
   );
+
+  return hasLink ? <NextLink href="/settings/me">{avatar}</NextLink> : avatar;
 };
 
 export default UserAvatar;
