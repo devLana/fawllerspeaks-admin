@@ -1,10 +1,10 @@
-import type { MuiIconType } from "@types";
+import type { MuiIconType } from "@appTypes";
 
 export type ThemeMode = "sunny" | "sunset" | "pitch black";
-export type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";
+type CapitalizeThemeMode = "Sunny" | "Sunset" | "Pitch Black";
 export type ThemeColors = "#7dd1f3" | "#6a6a6a";
 
-export interface ThemeColor {
+interface ThemeColor {
   main: ThemeColors;
   transparent: string;
 }
@@ -14,6 +14,11 @@ export interface AppTheme {
   fontSize: number;
   color: ThemeColors;
 }
+
+export type AppThemeHandler = <T extends keyof AppTheme>(
+  key: T,
+  value: AppTheme[T],
+) => void;
 
 export interface AppThemeItem {
   id: ThemeMode;
