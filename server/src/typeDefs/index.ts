@@ -14,6 +14,9 @@ const types = `#graphql
     getPosts(after: ID, size: Int, sort: SortPostsBy, status: PostStatus): GetPosts!
     "Get post by slug"
     getPost(slug: String!): GetPost!
+
+    ####Auth####
+    me: User!
   }
 
   type Mutation {
