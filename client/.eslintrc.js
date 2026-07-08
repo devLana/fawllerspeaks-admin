@@ -3,17 +3,20 @@ module.exports = {
   env: { browser: true, node: true, es2022: true },
   extends: [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:@typescript-eslint/strict",
+    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
     "next/core-web-vitals",
   ],
-  ignorePatterns: ["next.config.js", "vitest.config.mts", "ckeditor5"],
+  ignorePatterns: [
+    "next.config.js",
+    "vitest.config.mts",
+    "src/types/graphql.ts",
+  ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
-    project: "tsconfig.json",
     sourceType: "module",
+    projectService: true,
     tsconfigRootDir: __dirname,
   },
   plugins: ["@typescript-eslint"],
@@ -26,73 +29,86 @@ module.exports = {
       ],
       extends: ["plugin:testing-library/react"],
       rules: {
-        "testing-library/no-global-regexp-flag-in-query": 1,
         "@typescript-eslint/unbound-method": 0,
+        "@typescript-eslint/no-confusing-void-expression": [
+          1,
+          { ignoreVoidReturningFunctions: true },
+        ],
+        "testing-library/no-debugging-utils": 2,
+        "testing-library/no-global-regexp-flag-in-query": 1,
       },
     },
   ],
   rules: {
-    /* Disable ESLint Rules for {TypeScript Extension Rules} Below */
-    "default-param-last": 0,
-    "no-dupe-class-members": 0,
-    "no-empty-function": 0,
-    "no-redeclare": 0,
-    "no-shadow": 0,
-    "no-unused-vars": 0,
-
     /* ESLint Rules */
+    "array-callback-return": [2, { checkForEach: true }],
+    "no-await-in-loop": 2,
+    "no-constant-binary-expression": 2,
     "no-duplicate-imports": [2, { includeExports: true }],
     "no-promise-executor-return": 2,
     "no-sparse-arrays": 1,
-    "no-unreachable": 1,
+    "no-unmodified-loop-condition": 1,
     "no-unreachable-loop": 1,
-    "no-use-before-define": [1, { functions: false, classes: false }],
     "require-atomic-updates": 2,
 
     /* ESLint Suggestions */
     "accessor-pairs": [2, { enforceForClassMembers: true }],
+    "block-scoped-var": 2,
     "default-case": 1,
-    eqeqeq: 1,
+    eqeqeq: 2,
     "guard-for-in": 1,
-    "max-params": [1, 3],
     "no-console": 1,
+    "no-continue": 1,
+    "no-else-return": [1, { allowElseIf: false }],
     "no-extra-boolean-cast": 1,
     "no-lonely-if": 1,
+    "no-negated-condition": 1,
     "no-param-reassign": [2, { props: true }],
     "no-unneeded-ternary": 1,
+    "no-useless-return": 1,
     "object-shorthand": 1,
-    "prefer-destructuring": 1,
     "prefer-object-has-own": 1,
     yoda: 1,
 
-    /* TypeScript Rules */
-    "@typescript-eslint/array-type": 1,
-    "@typescript-eslint/consistent-type-assertions": 2,
-    "@typescript-eslint/consistent-type-definitions": [1, "interface"],
+    ///////////////typescript-eslint rules///////////////
+    /* TypeScript Optional Rules */
     "@typescript-eslint/consistent-type-exports": 1,
-    "@typescript-eslint/consistent-type-imports": [
-      1,
-      { prefer: "type-imports" },
-    ],
+    "@typescript-eslint/consistent-type-imports": 1,
     "@typescript-eslint/method-signature-style": 1,
+    "@typescript-eslint/no-import-type-side-effects": 2,
+    "@typescript-eslint/no-unsafe-type-assertion": 2,
+    "@typescript-eslint/promise-function-async": 2,
+    "@typescript-eslint/require-array-sort-compare": 1,
+    "@typescript-eslint/strict-void-return": 2,
+
+    /* TypeScript Strict Rules */
+    "@typescript-eslint/no-confusing-void-expression": [
+      1,
+      { ignoreArrowShorthand: true },
+    ],
     "@typescript-eslint/no-floating-promises": [2, { ignoreIIFE: true }],
-    "@typescript-eslint/no-inferrable-types": 1,
     "@typescript-eslint/no-misused-promises": [
       1,
       { checksVoidReturn: { attributes: false } },
     ],
-    "@typescript-eslint/no-redundant-type-constituents": 1,
-    "@typescript-eslint/no-unnecessary-qualifier": 1,
 
-    /* TypeScript Extension Rules */
-    "@typescript-eslint/default-param-last": 1,
-    "@typescript-eslint/no-dupe-class-members": 1,
-    "@typescript-eslint/no-empty-function": 0,
-    "@typescript-eslint/no-redeclare": [1, { ignoreDeclarationMerge: true }],
-    "@typescript-eslint/no-shadow": [2, { ignoreTypeValueShadow: false }],
+    /* TypeScript Stylistic Rules */
+    "@typescript-eslint/array-type": [1, { default: "array-simple" }],
+    "@typescript-eslint/consistent-type-definitions": 1,
+    "@typescript-eslint/no-empty-function": [1, { allow: ["arrowFunctions"] }],
     "@typescript-eslint/no-unused-vars": [
       1,
       { argsIgnorePattern: "^_+", varsIgnorePattern: "^_+" },
     ],
+
+    /* TypeScript Extension Rules that extend Eslint Rules */
+    "@typescript-eslint/default-param-last": 2,
+    "@typescript-eslint/max-params": 2,
+    "@typescript-eslint/no-loop-func": 2,
+    "@typescript-eslint/no-use-before-define": [
+      2,
+      { functions: false, ignoreTypeReferences: false },
+    ],
+    "@typescript-eslint/prefer-destructuring": 1,
   },
 };
