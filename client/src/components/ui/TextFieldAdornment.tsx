@@ -4,7 +4,7 @@ import InputAdornment, {
 import Tooltip from "@mui/material/Tooltip";
 import IconButton, { type IconButtonProps } from "@mui/material/IconButton";
 
-import type { MuiIconType } from "@types";
+import type { MuiIconType } from "@appTypes";
 
 interface TextFieldAdornmentProps {
   color?: IconButtonProps["color"];

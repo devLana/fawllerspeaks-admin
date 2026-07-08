@@ -1,4 +1,4 @@
-import * as React from "react";
+import { forwardRef } from "react";
 import { styled } from "@mui/material/styles";
 
 const StyledFileInput = styled("input")({
@@ -19,8 +19,8 @@ type FileInputProps = Omit<
   "type"
 >;
 
-export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
+export const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
   function FileInputBase(props, ref) {
     return <StyledFileInput ref={ref} type="file" {...props} />;
-  }
+  },
 );

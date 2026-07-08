@@ -1,10 +1,6 @@
-import * as React from "react";
-import Slide, { type SlideProps } from "@mui/material/Slide";
+import Slide from "@mui/material/Slide";
+import type { TransitionProps } from "@appTypes";
 
-type TransitionProps = Omit<SlideProps, "direction">;
-
-const Down = React.forwardRef(function SlideDown(props: TransitionProps, ref) {
-  return <Slide {...props} ref={ref} direction="down" />;
-});
+const Down = (props: TransitionProps) => <Slide {...props} direction="down" />;
 
 export default Down;
