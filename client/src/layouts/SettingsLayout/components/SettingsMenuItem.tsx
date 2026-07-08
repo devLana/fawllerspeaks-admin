@@ -6,7 +6,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import NextLink from "@components/ui/NextLink";
-import type { MuiIconType } from "@types";
+import type { MuiIconType } from "@appTypes";
 
 interface SettingsMenuItemProps {
   to: string;

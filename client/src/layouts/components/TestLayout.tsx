@@ -3,12 +3,12 @@ import Loader from "./Loader";
 
 interface TestLayoutProps {
   children: React.ReactElement;
-  clientHasRendered: boolean;
+  isVerifying: boolean;
   errorMessage: string | null;
 }
 
 const TestLayout = (props: TestLayoutProps) => {
-  if (!props.clientHasRendered) return <Loader />;
+  if (props.isVerifying) return <Loader />;
 
   if (props.errorMessage) return <ErrorAlert message={props.errorMessage} />;
 

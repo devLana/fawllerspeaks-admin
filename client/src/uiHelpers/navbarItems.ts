@@ -5,7 +5,10 @@ import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded";
-import type { NavbarButtonItem, NavbarLinkItem } from "types/layouts/navbar";
+import type {
+  NavbarButtonItem,
+  NavbarLinkItem,
+} from "@appTypes/layouts/navbar";
 
 interface LinkItem extends NavbarLinkItem {
   type: "link";
@@ -15,7 +18,7 @@ interface ButtonItem extends NavbarButtonItem {
   type: "button";
 }
 
-export const navbarItems: (LinkItem | ButtonItem)[] = [
+export const navbarItems: Array<LinkItem | ButtonItem> = [
   {
     type: "link",
     href: "/posts/new",

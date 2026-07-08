@@ -24,15 +24,7 @@ const Navbar = (props: NavbarProps) => {
 
   const minWidth = "calc(51px + 1.5em)";
   const maxWidth = "calc(67px + 6.85em)";
-  let showTooltip: boolean;
-
-  if (md_Above) {
-    showTooltip = isOpen;
-  } else if (sm_Above) {
-    showTooltip = !isOpen;
-  } else {
-    showTooltip = false;
-  }
+  const showTooltip = md_Above ? isOpen : sm_Above ? !isOpen : false;
 
   const navItems = navbarItems.map(item => {
     if (item.type === "link") {

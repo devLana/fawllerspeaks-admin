@@ -15,8 +15,10 @@ const SettingsLayout = ({ pageHeading, children }: SettingsLayoutProps) => (
     <Divider
       orientation="vertical"
       flexItem
-      light
-      sx={theme => ({ [theme.breakpoints.down("md")]: { display: "none" } })}
+      sx={theme => ({
+        opacity: 0.6,
+        [theme.breakpoints.down("md")]: { display: "none" },
+      })}
     />
     <Box sx={{ flexGrow: { md: 1 } }}>
       <Typography variant="h1" gutterBottom id="page-title">

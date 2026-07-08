@@ -4,7 +4,7 @@ import Box, { type BoxProps } from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
-import type { SxPropsArray } from "@types";
+import type { SxPropArray } from "@appTypes";
 
 interface ErrorAlertProps {
   sx?: BoxProps["sx"];
@@ -13,7 +13,7 @@ interface ErrorAlertProps {
 
 const ErrorAlert = ({ message, sx = [] }: ErrorAlertProps) => {
   const { reload } = useRouter();
-  const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
+  const sxProp: SxPropArray = Array.isArray(sx) ? sx : [sx];
 
   return (
     <Box

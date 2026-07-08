@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -9,15 +9,21 @@ import ErrorAlert from "@layouts/components/ErrorAlert";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import PageBreadcrumbs from "./components/PageBreadcrumbs";
-import type { RootLayoutProps } from "types/layouts";
+import type { MetadataProps } from "@appTypes";
+
+export interface RootLayoutProps extends MetadataProps {
+  errorMessage: string | null;
+  isVerifying: boolean;
+  children: React.ReactElement;
+}
 
 const RootLayout = (props: RootLayoutProps) => {
-  const { children, clientHasRendered, errorMessage, ...metaProps } = props;
-  const [navBarIsOpen, setNavBarIsOpen] = React.useState(false);
+  const { children, isVerifying, errorMessage, ...metaProps } = props;
+  const [navBarIsOpen, setNavBarIsOpen] = useState(false);
 
   let content: React.ReactElement;
 
-  if (!clientHasRendered) {
+  if (isVerifying) {
     content = <Loader />;
   } else if (errorMessage) {
     content = <ErrorAlert message={errorMessage} sx={{ mt: 4 }} />;
@@ -41,20 +47,17 @@ const RootLayout = (props: RootLayoutProps) => {
       }}
     >
       <Metadata {...metaProps} />
-      <Header
-        onClick={() => setNavBarIsOpen(true)}
-        isLoading={!clientHasRendered}
-      />
+      <Header onClick={() => setNavBarIsOpen(true)} isLoading={isVerifying} />
       <Navbar
         isOpen={navBarIsOpen}
-        isLoading={!clientHasRendered}
+        isLoading={isVerifying}
         onToggleNav={() => setNavBarIsOpen(!navBarIsOpen)}
         onCloseNav={() => setNavBarIsOpen(false)}
       />
       <Box
         component="main"
         aria-live="polite"
-        aria-busy={!clientHasRendered}
+        aria-busy={isVerifying}
         sx={{ py: 4, flexGrow: { sm: 1 }, minWidth: { sm: 0 } }}
       >
         {content}

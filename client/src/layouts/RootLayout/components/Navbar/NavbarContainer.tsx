@@ -57,8 +57,8 @@ const NavbarContainer = (props: NavbarContainerProps) => {
             backgroundColor: "background.paper",
             zIndex: theme.zIndex.drawer,
             boxShadow: 16,
-            borderTopRightRadius: `${theme.shape.borderRadius}px`,
-            borderBottomRightRadius: `${theme.shape.borderRadius}px`,
+            borderTopRightRadius: `${String(theme.shape.borderRadius)}px`,
+            borderBottomRightRadius: `${String(theme.shape.borderRadius)}px`,
             ...(theme.appTheme.themeMode !== "sunny" && {
               backgroundImage:
                 "linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15))",

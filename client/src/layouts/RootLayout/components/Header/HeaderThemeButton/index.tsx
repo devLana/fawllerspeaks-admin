@@ -2,8 +2,8 @@ import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 
-import { useAppTheme } from "@context/AppTheme";
-import { appThemes as themes } from "@context/AppTheme/helpers/appThemes";
+import { useAppTheme } from "@hooks/common/useAppTheme";
+import { appThemes as themes } from "@providers/AppTheme/helpers/appThemes";
 
 const HeaderThemeButton = () => {
   const { appTheme } = useTheme();
@@ -17,7 +17,9 @@ const HeaderThemeButton = () => {
   return (
     <Tooltip title="Change app theme">
       <IconButton
-        onClick={() => handleAppTheme("themeMode", id)}
+        onClick={() => {
+          handleAppTheme("themeMode", id);
+        }}
         color="primary"
       >
         <Icon />

@@ -24,7 +24,7 @@ describe("Page Breadcrumbs", () => {
 
     it("Should not render breadcrumbs if the current page is a posts dynamic route", () => {
       const router = useRouter();
-      router.pathname = "/posts/[[...postsPage]]";
+      router.pathname = "/posts/[[...params]]";
 
       renderUI(<PageBreadcrumbs />);
       expect(screen.queryByRole("navigation", name)).not.toBeInTheDocument();
@@ -51,11 +51,11 @@ describe("Page Breadcrumbs", () => {
       expect(crumbs).toHaveLength(2);
 
       expect(crumbs[0]).toContainElement(
-        screen.getByRole("link", { name: "Settings" })
+        screen.getByRole("link", { name: "Settings" }),
       );
 
       expect(
-        within(crumbs[0]).getByRole("link", { name: "Settings" })
+        within(crumbs[0]).getByRole("link", { name: "Settings" }),
       ).toHaveAttribute("href", "/settings");
 
       expect(crumbs[1]).toContainElement(screen.getByRole("paragraph"));
@@ -74,25 +74,24 @@ describe("Page Breadcrumbs", () => {
       expect(newCrumbs).toHaveLength(3);
 
       expect(newCrumbs[0]).toContainElement(
-        screen.getByRole("link", { name: "Settings" })
+        screen.getByRole("link", { name: "Settings" }),
       );
 
       expect(
-        within(newCrumbs[0]).getByRole("link", { name: "Settings" })
+        within(newCrumbs[0]).getByRole("link", { name: "Settings" }),
       ).toHaveAttribute("href", "/settings");
 
       expect(newCrumbs[1]).toContainElement(
-        screen.getByRole("link", { name: "Me" })
+        screen.getByRole("link", { name: "Me" }),
       );
 
       expect(
-        within(newCrumbs[1]).getByRole("link", { name: "Me" })
+        within(newCrumbs[1]).getByRole("link", { name: "Me" }),
       ).toHaveAttribute("href", "/settings/me");
 
       expect(newCrumbs[2]).toContainElement(screen.getByRole("paragraph"));
-
       expect(within(newCrumbs[2]).getByRole("paragraph")).toHaveTextContent(
-        "Edit"
+        "Edit",
       );
     });
 
@@ -109,17 +108,16 @@ describe("Page Breadcrumbs", () => {
       expect(crumbs).toHaveLength(2);
 
       expect(crumbs[0]).toContainElement(
-        screen.getByRole("link", { name: "Posts" })
+        screen.getByRole("link", { name: "Posts" }),
       );
 
       expect(
-        within(crumbs[0]).getByRole("link", { name: "Posts" })
+        within(crumbs[0]).getByRole("link", { name: "Posts" }),
       ).toHaveAttribute("href", "/posts");
 
       expect(crumbs[1]).toContainElement(screen.getByRole("paragraph"));
-
       expect(within(crumbs[1]).getByRole("paragraph")).toHaveTextContent(
-        "Néw Pöst Tìtlë By Jóhn Ölèg"
+        "Néw Pöst Tìtlë By Jóhn Ölèg",
       );
     });
   });

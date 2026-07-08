@@ -1,7 +1,7 @@
 import Head from "next/head";
-import type { MetaDataProps } from "types/layouts";
+import type { MetadataProps } from "@appTypes";
 
-const Metadata = ({ title, description }: MetaDataProps) => (
+const Metadata = ({ title, description }: MetadataProps) => (
   <Head>
     <title>{title}</title>
     {description && <meta name="description" content={description} />}

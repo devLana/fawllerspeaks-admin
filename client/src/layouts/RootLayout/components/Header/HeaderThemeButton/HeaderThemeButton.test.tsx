@@ -16,7 +16,7 @@ describe("Root layout header theme button", () => {
     await user.click(screen.getByRole("button", name));
 
     expect(localStorage.getItem(DEFAULT_THEME)).toMatch(
-      /"themeMode":"pitch black"/
+      /"themeMode":"pitch black"/,
     );
 
     await user.click(screen.getByRole("button", name));

@@ -13,10 +13,11 @@ const PageBreadcrumbs = () => {
   if (pathname === "/404" || pathname === "/500") return null;
 
   if (/\[(?:\.\.\.)?[\w-]+\]/.test(pathname)) {
-    if (pathname === "/posts/[[...postsPage]]") return null;
+    if (pathname === "/posts/[[...params]]") return null;
 
     if (/^\/posts\/(?:edit|view)/.test(pathname)) {
-      const path = `/posts/${query.slug as string}`;
+      if (typeof query.slug !== "string") return null;
+      const path = `/posts/${query.slug}`;
       pathnames = path.split("/").filter(Boolean);
     } else {
       // pathnames = decodeURI(asPath).split("/").filter(Boolean);

@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import type { Palette } from "@mui/material/styles";
 
-import type { AppTheme } from "types/appTheme";
+import type { AppTheme } from "@appTypes/appTheme";
 
 const stylesOne = (theme: AppTheme, secondary: Palette["secondary"]) => ({
   backgroundColor:
