@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/unbound-method */
-import AppDocument, {
+import {
   Html,
   Head,
   Main,
@@ -7,26 +6,23 @@ import AppDocument, {
   type DocumentProps,
   type DocumentContext,
 } from "next/document";
-import type { AppType } from "next/app";
 
-import createEmotionServer from "@emotion/server/create-instance";
+import {
+  DocumentHeadTags,
+  documentGetInitialProps,
+  type DocumentHeadTagsProps,
+} from "@mui/material-nextjs/v15-pagesRouter";
 
 import createEmotionCache from "../configs/createEmotionCache";
-import type { NextAppProps } from "@types";
 
-type AppProps = Omit<NextAppProps, "Component">;
-type TApp = React.ComponentType<React.ComponentProps<AppType> & AppProps>;
+type MyDocumentProps = DocumentProps & DocumentHeadTagsProps;
 
-interface MyDocumentProps extends DocumentProps {
-  emotionStyleTags: JSX.Element[];
-}
-
-export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
+export default function MyDocument(props: MyDocumentProps) {
   return (
     <Html lang="en">
       <Head>
+        <DocumentHeadTags {...props} />
         <link rel="icon" href="/favicon.ico" />
-        {emotionStyleTags}
       </Head>
       <body>
         <Main />
@@ -37,30 +33,9 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
 }
 
 MyDocument.getInitialProps = async (ctx: DocumentContext) => {
-  const originalRenderPage = ctx.renderPage;
-  const cache = createEmotionCache();
-  const { extractCriticalToChunks } = createEmotionServer(cache);
-  const newCtx = { ...ctx };
+  const finalProps = await documentGetInitialProps(ctx, {
+    emotionCache: createEmotionCache(),
+  });
 
-  newCtx.renderPage = () =>
-    originalRenderPage({
-      enhanceApp: (App: TApp) => props => {
-        return <App emotionCache={cache} {...props} />;
-      },
-    });
-
-  const initialProps = await AppDocument.getInitialProps(newCtx);
-  const emotionStyles = extractCriticalToChunks(initialProps.html);
-  const emotionStyleTags = emotionStyles.styles.map(style => (
-    <style
-      data-emotion={`${style.key} ${style.ids.join(" ")}`}
-      key={style.key}
-      dangerouslySetInnerHTML={{ __html: style.css }}
-    />
-  ));
-
-  return {
-    ...initialProps,
-    emotionStyleTags,
-  };
+  return finalProps;
 };
