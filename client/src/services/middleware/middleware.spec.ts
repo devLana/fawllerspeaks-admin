@@ -1,58 +1,40 @@
 import { NextResponse } from "next/server";
-import { middlewareService, type MiddlewareAuthCookies } from ".";
+import { middlewareService } from ".";
 
 describe("Middleware Service", () => {
   const url = "https://example-site.com";
 
-  const validCookies: MiddlewareAuthCookies = {
-    authCookie: "authCookie",
-    sigCookie: "sigCookie",
-    tokenCookie: "tokenCookie",
-  };
-
   describe("Unauthenticated user request", () => {
-    const inValidCookies1: MiddlewareAuthCookies = {
-      authCookie: undefined,
-      sigCookie: undefined,
-      tokenCookie: undefined,
-    };
-
-    const inValidCookies2: MiddlewareAuthCookies = {
-      authCookie: "authCookie",
-      sigCookie: undefined,
-      tokenCookie: "tokenCookie",
-    };
-
     it("When the user requests for a protected page, Redirect to the login page", () => {
-      middlewareService(inValidCookies1, "/", url);
+      middlewareService(undefined, "/", url);
 
       expect(NextResponse.redirect).toHaveBeenCalledOnce();
 
       expect(NextResponse.redirect).toHaveBeenCalledWith(
-        new URL("/login", url)
+        new URL("/login", url),
       );
 
       expect(NextResponse.next).not.toHaveBeenCalled();
 
-      middlewareService(inValidCookies1, "/settings/me", url);
+      middlewareService(undefined, "/settings/me", url);
 
       expect(NextResponse.redirect).toHaveBeenCalledTimes(2);
 
       expect(NextResponse.redirect).toHaveBeenNthCalledWith(
         1,
-        new URL("/login", url)
+        new URL("/login", url),
       );
 
       expect(NextResponse.redirect).toHaveBeenNthCalledWith(
         2,
-        new URL("/login", url)
+        new URL("/login", url),
       );
 
       expect(NextResponse.next).not.toHaveBeenCalled();
     });
 
     it("When the user requests for a non-protected page, Allow the request", () => {
-      middlewareService(inValidCookies2, "/non-protected-page", url);
+      middlewareService("", "/non-protected-page", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledOnce();
@@ -61,14 +43,14 @@ describe("Middleware Service", () => {
 
   describe("Authenticated user request", () => {
     it("When the user requests for a non-authentication page, Allow the request", () => {
-      middlewareService(validCookies, "/404", url);
+      middlewareService("authCookie", "/404", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledOnce();
     });
 
     it("When the user requests for an authentication page, Redirect to the dashboard page", () => {
-      middlewareService(validCookies, "/login", url);
+      middlewareService("authCookie", "/login", url);
 
       expect(NextResponse.redirect).toHaveBeenCalledOnce();
       expect(NextResponse.redirect).toHaveBeenCalledWith(new URL("/", url));
@@ -78,37 +60,37 @@ describe("Middleware Service", () => {
 
   describe("Authenticated user request for 'posts' pages", () => {
     it("When the user makes a request to a supported posts page, Allow the request", () => {
-      middlewareService(validCookies, "/posts/new", url);
+      middlewareService("authCookie", "/posts/new", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledOnce();
 
-      middlewareService(validCookies, "/posts/new/", url);
+      middlewareService("authCookie", "/posts/new/", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledTimes(2);
 
-      middlewareService(validCookies, "/posts/edit/blog-post1-slug", url);
+      middlewareService("authCookie", "/posts/edit/blog-post1-slug", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledTimes(3);
 
-      middlewareService(validCookies, "/posts/edit/blog-post-slug/", url);
+      middlewareService("authCookie", "/posts/edit/blog-post-slug/", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledTimes(4);
 
-      middlewareService(validCookies, "/posts/view/blog-post-slug", url);
+      middlewareService("authCookie", "/posts/view/blog-post-slug", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledTimes(5);
 
-      middlewareService(validCookies, "/posts/view/blog-post1-slug/", url);
+      middlewareService("authCookie", "/posts/view/blog-post1-slug/", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledTimes(6);
 
-      middlewareService(validCookies, "/posts/view/blög-póst1-slùg/", url);
+      middlewareService("authCookie", "/posts/view/blög-póst1-slùg/", url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.rewrite).not.toHaveBeenCalled();
@@ -125,43 +107,43 @@ describe("Middleware Service", () => {
         "/posts/after/djfy73tvby633246",
       ],
     ])("%s", (_, pathname) => {
-      middlewareService(validCookies, `${pathname}`, url);
+      middlewareService("authCookie", pathname, url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledOnce();
 
-      middlewareService(validCookies, `${pathname}/`, url);
+      middlewareService("authCookie", `${pathname}/`, url);
 
       expect(NextResponse.redirect).not.toHaveBeenCalled();
       expect(NextResponse.next).toHaveBeenCalledTimes(2);
     });
 
     it("When the user makes a request for a supported posts page but without a post id, Redirect to the not found page", () => {
-      middlewareService(validCookies, "/posts/edit", url);
+      middlewareService("authCookie", "/posts/edit", url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledOnce();
       expect(NextResponse.rewrite).toHaveBeenCalledWith(new URL("/404", url));
       expect(NextResponse.next).not.toHaveBeenCalled();
 
-      middlewareService(validCookies, "/posts/view/", url);
+      middlewareService("authCookie", "/posts/view/", url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledTimes(2);
 
       expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
         1,
-        new URL("/404", url)
+        new URL("/404", url),
       );
 
       expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
         2,
-        new URL("/404", url)
+        new URL("/404", url),
       );
 
       expect(NextResponse.next).not.toHaveBeenCalled();
     });
 
     it("When the user requests for the posts page with no pagination cursor, Redirect to the not found page", () => {
-      middlewareService(validCookies, "/posts/after/", url);
+      middlewareService("authCookie", "/posts/after/", url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledOnce();
       expect(NextResponse.rewrite).toHaveBeenCalledWith(new URL("/404", url));
@@ -169,28 +151,28 @@ describe("Middleware Service", () => {
     });
 
     it("When the user makes a request for an unsupported posts page, Redirect to the not found page", () => {
-      middlewareService(validCookies, "/posts/blog-post", url);
+      middlewareService("authCookie", "/posts/blog-post", url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledOnce();
       expect(NextResponse.rewrite).toHaveBeenCalledWith(new URL("/404", url));
       expect(NextResponse.next).not.toHaveBeenCalled();
 
-      middlewareService(validCookies, "/posts/blog-post/", url);
+      middlewareService("authCookie", "/posts/blog-post/", url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledTimes(2);
       expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
         1,
-        new URL("/404", url)
+        new URL("/404", url),
       );
       expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
         2,
-        new URL("/404", url)
+        new URL("/404", url),
       );
       expect(NextResponse.next).not.toHaveBeenCalled();
     });
 
     it("When the user requests for the posts page with the wrong pagination cursor type, Redirect to the not found page", () => {
-      middlewareService(validCookies, "/posts/afters/cursor", url);
+      middlewareService("authCookie", "/posts/afters/cursor", url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledOnce();
       expect(NextResponse.rewrite).toHaveBeenCalledWith(new URL("/404", url));
@@ -200,7 +182,7 @@ describe("Middleware Service", () => {
     it("When the user requests for the posts page with a pagination cursor and also with unsupported pathnames, Redirect to the not found page", () => {
       const pathname1 = "/posts/after/cursor/unsupported/path/names";
 
-      middlewareService(validCookies, pathname1, url);
+      middlewareService("authCookie", pathname1, url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledOnce();
       expect(NextResponse.rewrite).toHaveBeenCalledWith(new URL("/404", url));
@@ -208,18 +190,18 @@ describe("Middleware Service", () => {
 
       const pathname2 = "/posts/after/cursor/unsupported/path/names/";
 
-      middlewareService(validCookies, pathname2, url);
+      middlewareService("authCookie", pathname2, url);
 
       expect(NextResponse.rewrite).toHaveBeenCalledTimes(2);
 
       expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
         1,
-        new URL("/404", url)
+        new URL("/404", url),
       );
 
       expect(NextResponse.rewrite).toHaveBeenNthCalledWith(
         2,
-        new URL("/404", url)
+        new URL("/404", url),
       );
 
       expect(NextResponse.next).not.toHaveBeenCalled();
