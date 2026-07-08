@@ -1,16 +1,16 @@
-import { type CodegenConfig } from "@graphql-codegen/cli";
+import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
+  overwrite: true,
   schema: "http://localhost:7692/",
+  documents: ["src/**/*.{ts,tsx}"],
+  ignoreNoDocuments: true,
   generates: {
-    "src/types/api/": {
-      preset: "client",
-      plugins: [],
-      config: { enumsAsTypes: true },
-      presetConfig: { gqlTagName: "codeGenGQL" },
+    "src/types/graphql.ts": {
+      plugins: ["typescript-operations"],
+      config: { nonOptionalTypename: true, skipTypeNameForRoot: true },
     },
   },
-  ignoreNoDocuments: true,
 };
 
 export default config;
