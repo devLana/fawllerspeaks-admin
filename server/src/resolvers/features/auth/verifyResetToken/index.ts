@@ -24,7 +24,7 @@ const verifyResetToken: VerifyToken = async (_, { token }, { db }) => {
       FROM password_reset pr
       INNER JOIN users u ON pr.user_id = u.id
       WHERE pr.token = $1`,
-      [hash]
+      [hash],
     );
 
     if (rows.length === 0) return new ErrorResponse("ForbiddenError", MSG);

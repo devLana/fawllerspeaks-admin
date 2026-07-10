@@ -8,12 +8,13 @@ import { PostTagsTypes } from "./typeResolvers/postTags";
 
 export const resolvers = {
   Query: {
+    ...authResolvers.Query,
     ...postsResolvers.Queries,
     ...postTagsResolvers.Query,
   },
 
   Mutation: {
-    ...authResolvers,
+    ...authResolvers.Mutations,
     ...postsResolvers.Mutations,
     ...postTagsResolvers.Mutations,
     ...settingsResolvers,

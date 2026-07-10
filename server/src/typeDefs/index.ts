@@ -16,7 +16,10 @@ const types = `#graphql
     getPost(slug: String!): GetPost!
 
     ####Auth####
+    "Get user"
     me: User!
+    "Verify password reset token"
+    verifyResetToken(token: String!): VerifyResetToken!
   }
 
   type Mutation {
@@ -37,8 +40,6 @@ const types = `#graphql
     registerUser(userInput: RegisterUserInput!): RegisterUser!
     "Verify user email and initiate password reset"
     forgotPassword(email: String!): ForgotPassword!
-    "Verify password reset token"
-    verifyResetToken(token: String!): VerifyResetToken!
     "Reset password for registered user"
     resetPassword(token: String!, password: String!, confirmPassword: String!): ResetPassword!
 

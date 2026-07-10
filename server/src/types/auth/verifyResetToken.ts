@@ -1,8 +1,8 @@
-import { type MutationResolvers } from "@resolverTypes";
+import { type QueryResolvers } from "@resolverTypes";
 import type { ResolverFunc } from "@types";
 import type { TestData } from "types/tests";
 
-export type VerifyToken = ResolverFunc<MutationResolvers["verifyResetToken"]>;
+export type VerifyToken = ResolverFunc<QueryResolvers["verifyResetToken"]>;
 
 export interface VerifyData {
   email: string;
