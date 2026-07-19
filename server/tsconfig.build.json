@@ -1,6 +1,6 @@
 {
   // Top Level
-  "include": ["src/**/*"],
+  "extends": "./tsconfig.json",
   "exclude": [
     "src/types",
     "src/**/__tests__",
@@ -8,12 +8,5 @@
     "src/**/*.spec.ts",
     "src/**/*.testUtils.ts",
     "src/**/tests"
-  ],
-  "extends": "./tsconfig.base.json",
-
-  "compilerOptions": {
-    // Emit
-    "noEmitOnError": true,
-    "outDir": "build"
-  }
+  ]
 }
