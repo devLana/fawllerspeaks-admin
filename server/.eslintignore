@@ -1,5 +1,0 @@
-node_modules
-build
-jest.config.ts
-babel.config.json
-**/types/resolverTypes.ts
