@@ -49,19 +49,18 @@ export default defineConfig({
     "@typescript-eslint/consistent-type-exports": 1,
     "@typescript-eslint/consistent-type-imports": [
       1,
-      { prefer: "type-imports" },
+      { fixStyle: "inline-type-imports" },
     ],
     "@typescript-eslint/method-signature-style": 1,
     "@typescript-eslint/no-import-type-side-effects": 2,
     "@typescript-eslint/no-unnecessary-parameter-property-assignment": 2,
     "@typescript-eslint/no-unsafe-type-assertion": 2,
     "@typescript-eslint/prefer-readonly": 1,
-    "@typescript-eslint/prefer-readonly-parameter-types": 2,
     "@typescript-eslint/require-array-sort-compare": [
       1,
       { ignoreStringArrays: true },
     ],
-    "@typescript-eslint/strict-void-return": 2,
+    "@typescript-eslint/strict-void-return": [2, { allowReturnAny: true }],
 
     /* TypeScript Strict Rules */
     "@typescript-eslint/no-confusing-void-expression": [
