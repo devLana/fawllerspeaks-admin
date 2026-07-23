@@ -4,7 +4,7 @@ import sanitize from "sanitize-html";
 import { sanitizeOptions } from "@utils/posts/sanitizeOptions";
 import { processAnchorTags } from "@utils/posts/processAnchorTags";
 import { stripContentRegex } from "@utils/posts/constants";
-import type { DraftPostInput } from "@resolverTypes";
+import type { DraftPostInput } from "@appTypes/resolverTypes";
 
 export const draftPostSchema = Joi.object<DraftPostInput>({
   title: Joi.string().required().trim().max(255).messages({
@@ -36,7 +36,7 @@ export const draftPostSchema = Joi.object<DraftPostInput>({
       Joi.string().trim().uuid({ version: "uuidv4", separator: "-" }).messages({
         "string.empty": "Input post tag ids cannot be empty values",
         "string.guid": "Invalid post tag id provided",
-      })
+      }),
     )
     .min(1)
     .max(5)

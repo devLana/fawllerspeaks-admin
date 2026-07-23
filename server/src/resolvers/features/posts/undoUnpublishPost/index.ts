@@ -6,8 +6,8 @@ import { PostIdValidationError } from "@typeResolvers/posts/PostIdValidationErro
 import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { postUUIDSchema } from "@validators/posts/postUUID";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { GetPostDBData, UnpublishUndo } from "types/posts";
-import type { UndoUnpublishPost as Fn } from "types/posts/undoUnpublishPost";
+import type { GetPostDBData, UnpublishUndo } from "@appTypes/posts";
+import type { UndoUnpublishPost as Fn } from "@appTypes/posts/undoUnpublishPost";
 
 const undoUnpublishPost: Fn = async (_, { postId }, { db, res, user }) => {
   const MSG = "Unable to undo unpublish post";

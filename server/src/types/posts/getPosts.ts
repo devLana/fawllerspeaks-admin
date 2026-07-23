@@ -1,7 +1,7 @@
-import type { QueryResolvers } from "@resolverTypes";
-import type { ResolverFunc } from "@types";
+import type { GetPostsData, QueryResolvers } from "@appTypes/resolverTypes";
+import type { ResolverFunc } from "@appTypes";
 import type { PostFieldResolver } from ".";
-import type { TestData } from "types/tests";
+import type { TestData } from "@appTypes/tests";
 
 export type GetPosts = PostFieldResolver<
   ResolverFunc<QueryResolvers["getPosts"]>
@@ -18,4 +18,5 @@ export interface Sort {
   order: "ASC" | "DESC";
 }
 
-export type GetPostsTestData = TestData<{ getPosts: Record<string, unknown> }>;
+export type Get = TestData<{ getPosts: Record<string, unknown> }>;
+export type GetData = TestData<{ getPosts: GetPostsData }>;

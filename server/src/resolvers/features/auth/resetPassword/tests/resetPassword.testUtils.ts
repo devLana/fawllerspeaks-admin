@@ -3,7 +3,7 @@ import {
   otherNewRegisteredReset,
   unregisteredReset,
 } from "@utils/tests/mocks";
-import type { InputErrors } from "types/tests";
+import type { InputErrors } from "@appTypes/tests";
 
 interface Input {
   token: string;
@@ -11,7 +11,7 @@ interface Input {
   confirmPassword: string;
 }
 
-export const validations: [string, Input, InputErrors<Input>][] = [
+export const validations: Array<[string, Input, InputErrors<Input>]> = [
   [
     "Should return an error response if the input values are empty strings",
     { token: "", password: "", confirmPassword: "" },
@@ -54,7 +54,7 @@ export const validations: [string, Input, InputErrors<Input>][] = [
   ],
 ];
 
-export const verify: [string, string, string][] = [
+export const verify: Array<[string, string, string]> = [
   [
     "Should return an error response if the password reset token does not exist",
     "token_token_token",

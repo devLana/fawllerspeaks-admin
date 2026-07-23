@@ -1,6 +1,6 @@
-import { type MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc } from "@types";
-import type { TestData } from "types/tests";
+import type { MutationResolvers } from "@appTypes/resolverTypes";
+import type { ResolverFunc } from "@appTypes";
+import type { TestData } from "@appTypes/tests";
 
 export type VerifySession = ResolverFunc<MutationResolvers["verifySession"]>;
 export type Verify = TestData<{ verifySession: Record<string, unknown> }>;

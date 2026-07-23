@@ -9,7 +9,7 @@ interface IClientUrls {
 
 class ClientUrls implements IClientUrls {
   private readonly env = env.NAME;
-  private testUrl = "https://test-url.com";
+  private readonly testUrl = "https://test-url.com";
 
   get login() {
     if (this.env === "production") {

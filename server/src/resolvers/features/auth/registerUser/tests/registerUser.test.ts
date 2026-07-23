@@ -5,13 +5,13 @@ import { startServer } from "@server";
 import { db } from "@services/db";
 import { userInput, validations } from "./registerUser.testUtils";
 import { REGISTER_USER } from "@utils/tests/gqlQueries/authTestQueries";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
 import { unRegisteredUser } from "@utils/tests/mocks";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { DbTestUser } from "types/tests";
-import type { RegisterUserData as Data } from "types/auth/registerUser";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { DbTestUser } from "@appTypes/tests";
+import type { RegisterUserData as Data } from "@appTypes/auth/registerUser";
 
 describe("Register user", () => {
   let server: ApolloServer<APIContext>, url: string, user: DbTestUser;

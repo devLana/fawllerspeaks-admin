@@ -1,7 +1,7 @@
-import type { QueryResolvers } from "@resolverTypes";
-import type { ResolverFunc } from "@types";
+import type { QueryResolvers } from "@appTypes/resolverTypes";
+import type { ResolverFunc } from "@appTypes";
 import type { PostFieldResolver } from ".";
-import type { TestData } from "types/tests";
+import type { TestData } from "@appTypes/tests";
 
 export type GetPost = PostFieldResolver<
   ResolverFunc<QueryResolvers["getPost"]>

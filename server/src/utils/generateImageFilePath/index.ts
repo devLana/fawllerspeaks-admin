@@ -1,8 +1,8 @@
 import path from "path";
 
 import { env } from "@lib/env";
-import generateBytes from "@utils/generateBytes";
-import type { ImageCategory } from "@types";
+import { generateBytes } from "@utils/generateBytes";
+import type { ImageCategory } from "@appTypes";
 
 const mimetypeToExtension: Record<string, string> = {
   "image/avif": ".avif",
@@ -26,7 +26,7 @@ const getExtension = (filepath: string, mimetype: string): string => {
 export const generateImageFilePath = async (
   imageCategory: ImageCategory,
   mimetype: string,
-  filepath: string
+  filepath: string,
 ) => {
   const extension = getExtension(filepath, mimetype);
   const filename = await generateBytes(20, "base64url");

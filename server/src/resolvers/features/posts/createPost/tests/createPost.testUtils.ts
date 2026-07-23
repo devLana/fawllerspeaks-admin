@@ -1,8 +1,10 @@
 import { randomUUID } from "node:crypto";
-import type { InputErrors } from "types/tests";
-import type { CreatePostInput, PostContent } from "@resolverTypes";
+import type { InputErrors } from "@appTypes/tests";
+import type { CreatePostInput, PostContent } from "@appTypes/resolverTypes";
 
-type Validations = [string, CreatePostInput, InputErrors<CreatePostInput>][];
+type Validations = Array<
+  [string, CreatePostInput, InputErrors<CreatePostInput>]
+>;
 
 const ID = randomUUID();
 

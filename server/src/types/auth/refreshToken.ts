@@ -1,7 +1,6 @@
-import type { jest } from "@jest/globals";
-import type { MutationResolvers } from "@resolverTypes";
-import type { ResolverFunc } from "@types";
-import type { TestData } from "types/tests";
+import type { MutationResolvers } from "@appTypes/resolverTypes";
+import type { ResolverFunc } from "@appTypes";
+import type { TestData } from "@appTypes/tests";
 
 export type Refresh = ResolverFunc<MutationResolvers["refreshToken"]>;
 
@@ -16,4 +15,3 @@ export interface DBResponse {
 }
 
 export type RefreshData = TestData<{ refreshToken: Record<string, unknown> }>;
-export type MockFn = jest.MockedFunction<() => unknown>;

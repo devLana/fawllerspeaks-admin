@@ -1,6 +1,6 @@
-import type { MailProvider, SendOptions } from "types/mailService";
-import GmailProvider from "./MailProviders/Gmail";
-import ResendProvider from "./MailProviders/Resend";
+import type { MailProvider, SendOptions } from "@appTypes/mailService";
+import { GmailProvider } from "./MailProviders/Gmail";
+import { ResendProvider } from "./MailProviders/Resend";
 import { env } from "@lib/env";
 
 const createMailProvider = (): MailProvider => {
@@ -29,7 +29,7 @@ const createMailProvider = (): MailProvider => {
 };
 
 class MailService {
-  private provider: MailProvider;
+  private readonly provider: MailProvider;
 
   constructor() {
     this.provider = createMailProvider();
@@ -40,6 +40,4 @@ class MailService {
   }
 }
 
-const mailService = new MailService();
-
-export default mailService;
+export const mailService = new MailService();

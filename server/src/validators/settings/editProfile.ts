@@ -1,5 +1,5 @@
 import Joi from "joi";
-import type { MutationEditProfileArgs } from "@resolverTypes";
+import type { MutationEditProfileArgs } from "@appTypes/resolverTypes";
 
 export const editProfileValidator = Joi.object<MutationEditProfileArgs>({
   firstName: Joi.string()

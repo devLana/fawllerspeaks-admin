@@ -1,12 +1,12 @@
 import type { Pool } from "pg";
 
-import type { PostTag } from "@resolverTypes";
-import type { EditPostCTE } from "types/posts/editPost";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { EditPostCTE } from "@appTypes/posts/editPost";
 
 export const findRows = async (
   db: Pool,
   user: string,
-  postId: string
+  postId: string,
 ): Promise<EditPostCTE[]> => {
   const { rows } = await db.query<EditPostCTE>(
     `WITH find_user AS (
@@ -25,7 +25,7 @@ export const findRows = async (
     SELECT *
     FROM find_user
     LEFT JOIN find_post_by_id ON true`,
-    [user, postId]
+    [user, postId],
   );
 
   return rows;
@@ -34,7 +34,7 @@ export const findRows = async (
 export const editTags = async (
   db: Pool,
   tagIds: readonly string[] | null,
-  postId: number
+  postId: number,
 ): Promise<PostTag[] | null> => {
   if (tagIds === null) {
     await db.query(`DELETE FROM post_tags_to_posts WHERE post_id = $1`, [
@@ -85,7 +85,7 @@ export const editTags = async (
       date_created "dateCreated",
       last_modified "lastModified"
     FROM resolved_tags`,
-    [dbTags, postId]
+    [dbTags, postId],
   );
 
   if (editedTags.length > 0) return editedTags;
@@ -96,7 +96,7 @@ export const editTags = async (
 export const editContent = async (
   db: Pool,
   content: string | null,
-  postId: number
+  postId: number,
 ): Promise<string | null> => {
   if (content === null) {
     await db.query(`DELETE FROM post_contents WHERE post_id = $1`, [postId]);
@@ -109,7 +109,7 @@ export const editContent = async (
     ON CONFLICT (post_id)
     DO UPDATE SET content = EXCLUDED.content
     RETURNING content`,
-    [postId, content]
+    [postId, content],
   );
 
   if (upsertContent.length > 0) return upsertContent[0].content;

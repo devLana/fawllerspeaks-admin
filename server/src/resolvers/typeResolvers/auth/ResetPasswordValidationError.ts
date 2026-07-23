@@ -1,7 +1,7 @@
 import type {
   ResetPasswordValidationError as Errors,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class ResetPasswordValidationError implements Errors {
   readonly status: Status;
@@ -10,7 +10,7 @@ export class ResetPasswordValidationError implements Errors {
   constructor(
     readonly tokenError?: string,
     readonly passwordError?: string,
-    readonly confirmPasswordError?: string
+    readonly confirmPasswordError?: string,
   ) {
     this.status = "ERROR";
     this.__typename = "ResetPasswordValidationError";

@@ -4,12 +4,12 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@services/db";
 import { LOGOUT } from "@utils/tests/gqlQueries/authTestQueries";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import testSession from "@utils/tests/testSession";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { LogoutData as Data } from "types/auth/logout";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { testSession } from "@utils/tests/testSession";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { LogoutData as Data } from "@appTypes/auth/logout";
 
 describe("Logout", () => {
   let server: ApolloServer<APIContext>, url: string, unregisteredJwt: string;

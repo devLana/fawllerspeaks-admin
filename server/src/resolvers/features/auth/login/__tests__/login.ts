@@ -6,12 +6,12 @@ import { startServer } from "@server";
 import { db } from "@services/db";
 import { JWT_REGEX } from "@utils/tests/constants";
 import { LOGIN } from "@utils/tests/gqlQueries/authTestQueries";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
 import { registeredUser } from "@utils/tests/mocks";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { DbTestUser } from "types/tests";
-import type { LoginData } from "types/auth/login";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { DbTestUser } from "@appTypes/tests";
+import type { LoginData } from "@appTypes/auth/login";
 
 describe("Login", () => {
   let server: ApolloServer<APIContext>, url: string, user: DbTestUser;

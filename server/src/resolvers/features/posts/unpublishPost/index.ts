@@ -6,8 +6,8 @@ import { PostIdValidationError } from "@typeResolvers/posts/PostIdValidationErro
 import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { postUUIDSchema } from "@validators/posts/postUUID";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { GetPostDBData, UnpublishUndo } from "types/posts";
-import type { UnpublishPost as Fn } from "types/posts/unpublishPost";
+import type { GetPostDBData, UnpublishUndo } from "@appTypes/posts";
+import type { UnpublishPost as Fn } from "@appTypes/posts/unpublishPost";
 
 const unpublishPost: Fn = async (_, { postId }, { db, res, user }) => {
   try {
@@ -30,7 +30,7 @@ const unpublishPost: Fn = async (_, { postId }, { db, res, user }) => {
       SELECT *
       FROM find_user
       LEFT JOIN find_post ON true`,
-      [user, post]
+      [user, post],
     );
 
     if (rows.length === 0) {
@@ -121,7 +121,7 @@ const unpublishPost: Fn = async (_, { postId }, { db, res, user }) => {
         us.last_modified,
         p.views,
         p.binned_at`,
-      [post]
+      [post],
     );
 
     const [updated] = updatePost;

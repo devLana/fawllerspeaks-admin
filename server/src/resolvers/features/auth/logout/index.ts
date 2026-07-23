@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 
 import { Response } from "@typeResolvers/commonResolvers";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { Logout } from "types/auth/logout";
+import type { Logout } from "@appTypes/auth/logout";
 
 const logout: Logout = async (_, __, { db, user, req, res }) => {
   try {
@@ -38,7 +38,7 @@ const logout: Logout = async (_, __, { db, user, req, res }) => {
 
     clearAuthCookie(res);
     return new Response("User logged out");
-  } catch (err) {
+  } catch {
     // log any system errors
 
     throw new GraphQLError("Unable to logout. Please try again later");

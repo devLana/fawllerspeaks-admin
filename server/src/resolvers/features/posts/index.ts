@@ -9,9 +9,6 @@ import unpublishPost from "./unpublishPost";
 import undoUnpublishPost from "./undoUnpublishPost";
 import binPosts from "./binPosts";
 import binPost from "./binPost";
-// import unBinPosts from "./unBinPosts";
-// import deletePostsFromBin from "./deletePostsFromBin";
-// import emptyBin from "./emptyBin";
 
 export const postsResolvers = {
   Queries: { getPost, getPosts },
@@ -25,8 +22,5 @@ export const postsResolvers = {
     undoUnpublishPost,
     binPosts,
     binPost,
-    // unBinPosts,
-    // deletePostsFromBin,
-    // emptyBin,
   },
 };

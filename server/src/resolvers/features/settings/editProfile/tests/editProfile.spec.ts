@@ -5,14 +5,14 @@ import { db } from "@services/db";
 import { supabaseEvent } from "@events/supabase";
 import { startServer } from "@server";
 import { registeredUser as mockUser } from "@utils/tests/mocks";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import post from "@utils/tests/post";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { post } from "@utils/tests/post";
 import { EDIT_PROFILE } from "@utils/tests/gqlQueries/settingsTestQueries";
 import * as mocks from "./editProfile.testUtils";
-import type { APIContext } from "@types";
-import type { DbTestUser } from "types/tests";
-import type { EditProfile } from "types/settings/editProfile";
+import type { APIContext } from "@appTypes";
+import type { DbTestUser } from "@appTypes/tests";
+import type { EditProfile } from "@appTypes/settings/editProfile";
 
 jest.mock("@events/supabase");
 

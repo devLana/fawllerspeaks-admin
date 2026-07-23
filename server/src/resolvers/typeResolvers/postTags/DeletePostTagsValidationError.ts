@@ -1,7 +1,7 @@
 import type {
   DeletePostTagsValidationError as ValidationError,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class DeletePostTagsValidationError implements ValidationError {
   readonly status: Status;

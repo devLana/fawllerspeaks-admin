@@ -1,7 +1,7 @@
 import { test, expect } from "@jest/globals";
-import Joi, { type ValidationError } from "joi";
+import Joi, { ValidationError } from "joi";
 
-import generateErrorsObject from ".";
+import { generateErrorsObject } from ".";
 
 const schema = Joi.object().keys({
   stringField: Joi.string().required().messages({
@@ -17,25 +17,24 @@ const schema = Joi.object().keys({
     "any.required": "array field required",
   }),
   arrayItems: Joi.array().items(
-    Joi.string().trim().messages({ "string.empty": "array items required" })
+    Joi.string().trim().messages({ "string.empty": "array items required" }),
   ),
+  objectField: Joi.object().keys({}).required().messages({
+    "any.required": "object field required",
+  }),
   nestedObjectField: Joi.object().keys({
     nestedField: Joi.string().required().messages({
       "any.required": "nested field required",
     }),
   }),
-  objectField: Joi.object().keys({}).required().messages({
-    "any.required": "object field required",
-  }),
 });
 
-test("@utils | Generate user input validation error object", () => {
-  return schema
-    .validateAsync(
-      { nestedObjectField: {}, arrayItems: ["", ""] },
-      { abortEarly: false }
-    )
-    .catch((err: ValidationError) => {
+test("@utils | Generate user input validation error object", async () => {
+  try {
+    const rawObj = { nestedObjectField: {}, arrayItems: ["", ""] };
+    await schema.validateAsync(rawObj, { abortEarly: false });
+  } catch (err) {
+    if (err instanceof ValidationError) {
       const errResult = generateErrorsObject(err.details);
 
       expect(errResult).toStrictEqual({
@@ -44,8 +43,9 @@ test("@utils | Generate user input validation error object", () => {
         booleanFieldError: "boolean field required",
         arrayItemsError: "array items required",
         arrayFieldError: "array field required",
-        nestedFieldError: "nested field required",
         objectFieldError: "object field required",
+        nestedFieldError: "nested field required",
       });
-    });
+    }
+  }
 });

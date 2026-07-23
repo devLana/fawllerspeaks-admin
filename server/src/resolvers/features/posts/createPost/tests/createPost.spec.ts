@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { afterAll, beforeAll, describe, it, expect, jest } from "@jest/globals";
-import { type ApolloServer } from "@apollo/server";
+import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { supabaseEvent } from "@events/supabase";
@@ -9,16 +9,16 @@ import { db } from "@services/db";
 import { storageUrl } from "@services/supabase";
 import { urls } from "@lib/ClientUrls";
 import * as mocks from "./createPost.testUtils";
-import loginTestUser from "@utils/tests/loginTestUser";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import post from "@utils/tests/post";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import { post } from "@utils/tests/post";
 import { registeredUser as user } from "@utils/tests/mocks";
 import { CREATE_POST } from "@utils/tests/gqlQueries/postsTestQueries";
 import { DATE_REGEX, UUID_REGEX } from "@utils/tests/constants";
-import type { APIContext } from "@types";
-import type { Post, PostTag } from "@resolverTypes";
-import type { Create } from "types/posts/createPost";
+import type { APIContext } from "@appTypes";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { Create, CreateData } from "@appTypes/posts/createPost";
 
 jest.mock("@events/supabase");
 
@@ -202,11 +202,11 @@ describe("Create Post", () => {
       const payload = { query: CREATE_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await post<Create>(url, payload, options);
+      const { data } = await post<CreateData>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-      expect((data.data?.createPost.post as Post).url.slug).toMatch(
+      expect(data.data?.createPost.post.url.slug).toMatch(
         new RegExp("^another-blog-post-title-[a-z0-9]{4}$")
       );
       expect(mockEvent).not.toHaveBeenCalled();
@@ -218,11 +218,11 @@ describe("Create Post", () => {
       const payload = { query: CREATE_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await post<Create>(url, payload, options);
+      const { data } = await post<CreateData>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-      expect((data.data?.createPost.post as Post).tags).toBeNull();
+      expect(data.data?.createPost.post.tags).toBeNull();
       expect(mockEvent).not.toHaveBeenCalled();
     });
 
@@ -233,14 +233,14 @@ describe("Create Post", () => {
       const payload = { query: CREATE_POST, variables };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await post<Create>(url, payload, options);
+      const { data } = await post<CreateData>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
-      expect((data.data?.createPost.post as Post).tags).toStrictEqual(
+      expect(mockEvent).not.toHaveBeenCalled();
+      expect(data.data?.createPost.post.tags).toStrictEqual(
         expect.arrayContaining([tag1, tag5])
       );
-      expect(mockEvent).not.toHaveBeenCalled();
     });
   });
 });

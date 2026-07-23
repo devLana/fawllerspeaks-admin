@@ -2,19 +2,19 @@ import { GraphQLError } from "graphql";
 
 import { RefreshData } from "@typeResolvers/auth/RefreshData";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
-import sessionMail from "@services/mail/session";
+import { sessionMail } from "@services/mail/session";
 import { MailError } from "@lib/Errors";
 import { setAuthCookie, clearAuthCookie } from "@utils/auth/cookies";
 import signTokens from "@utils/auth/signTokens";
-import type { DBResponse, Refresh } from "types/auth/refreshToken";
+import type { DBResponse, Refresh } from "@appTypes/auth/refreshToken";
 
 const refreshToken: Refresh = async (_, __, { db, req, res, user }) => {
   const MSG = "Unable to refresh token";
 
   try {
     const { auth } = req.cookies;
-    const ip = req.ip || null;
-    const userAgent = req.headers["user-agent"] || null;
+    const ip = req.ip ?? null;
+    const userAgent = req.headers["user-agent"] ?? null;
 
     if (!user || !auth) {
       clearAuthCookie(res);

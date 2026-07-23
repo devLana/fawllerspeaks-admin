@@ -6,16 +6,16 @@ import type { ApolloServer } from "@apollo/server";
 import { db } from "@services/db";
 import { startServer } from "@server";
 import { BIN_POST } from "@utils/tests/gqlQueries/postsTestQueries";
-import post from "@utils/tests/post";
-import loginTestUser from "@utils/tests/loginTestUser";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import createTestPost from "@utils/tests/createTestPost";
+import { post } from "@utils/tests/post";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import { createTestPost } from "@utils/tests/createTestPost";
 import { registeredUser as user, testPostData } from "@utils/tests/mocks";
 import { DATE_REGEX } from "@utils/tests/constants";
-import type { APIContext } from "@types";
-import type { PostTag, Post, SinglePost as SP } from "@resolverTypes";
-import type { BinPostData } from "types/posts/binPost";
+import type { APIContext } from "@appTypes";
+import type { PostTag, Post } from "@appTypes/resolverTypes";
+import type { BinPostData, BinPostSuccess } from "@appTypes/posts/binPost";
 
 describe("Bin Post", () => {
   const postId = randomUUID();
@@ -185,14 +185,14 @@ describe("Bin Post", () => {
       const payload = { query: BIN_POST, variables: { postId: id } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await post<BinPostData>(url, payload, options);
+      const { data } = await post<BinPostSuccess>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPost).toHaveProperty("__typename", "SinglePost");
       expect(data.data?.binPost).toHaveProperty("status", "SUCCESS");
-      expect((data.data?.binPost as SP).post.binnedAt).not.toBeNull();
-      expect((data.data?.binPost as SP).post.binnedAt).toMatch(DATE_REGEX);
+      expect(data.data?.binPost.post.binnedAt).not.toBeNull();
+      expect(data.data?.binPost.post.binnedAt).toMatch(DATE_REGEX);
     });
   });
 });

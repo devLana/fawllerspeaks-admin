@@ -1,6 +1,6 @@
-import type { EmptyBinWarning as Error, Status } from "@resolverTypes";
+import type { Status } from "@appTypes/resolverTypes";
 
-export class EmptyBinWarning implements Error {
+export class EmptyBinWarning {
   readonly status: Status;
   readonly __typename: "EmptyBinWarning";
 

@@ -6,9 +6,9 @@ import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { RegisterUserValidationError } from "@typeResolvers/auth/RegisterUserValidationError";
 import { RegisteredUser } from "@typeResolvers/auth/RegisteredUser";
 import { registerUserValidator as schema } from "@validators/auth/registerUser";
-import generateErrorsObject from "@utils/generateErrorsObject";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { RegisterUser as Fn, Select } from "types/auth/registerUser";
+import type { RegisterUser as Fn, Select } from "@appTypes/auth/registerUser";
 
 const registerUser: Fn = async (_, { userInput }, { db, user, res }) => {
   try {

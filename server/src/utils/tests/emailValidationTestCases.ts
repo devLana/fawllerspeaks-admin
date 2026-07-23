@@ -1,4 +1,4 @@
-export const emailValidationsTestCases: [string, string, string][] = [
+export const emailValidationsTestCases: Array<[string, string, string]> = [
   [
     "E-mail validation fails, Return an error response for an empty email string",
     "",

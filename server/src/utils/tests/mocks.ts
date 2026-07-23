@@ -1,6 +1,6 @@
-import getPostSlug from "@utils/posts/getPostSlug";
-import type { RemoveNull } from "@types";
-import type { TestPostData } from "types/tests";
+import { getPostSlug } from "@utils/posts/getPostSlug";
+import type { RemoveNull } from "@appTypes";
+import type { TestPostData } from "@appTypes/tests";
 
 interface TestUser {
   readonly firstName: string | null;

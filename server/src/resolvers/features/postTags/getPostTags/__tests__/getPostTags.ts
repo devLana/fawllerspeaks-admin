@@ -4,13 +4,13 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@services/db";
 import { GET_POST_TAGS } from "@utils/tests/gqlQueries/postTagsTestQueries";
-import post from "@utils/tests/post";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import type { APIContext } from "@types";
-import type { PostTag } from "@resolverTypes";
-import type { GetPostTagsData as Data } from "types/postTags/getPostTags";
+import { post } from "@utils/tests/post";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import type { APIContext } from "@appTypes";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { GetPostTagsData as Data } from "@appTypes/postTags/getPostTags";
 
 describe("Get post tags", () => {
   let server: ApolloServer<APIContext>, url: string;

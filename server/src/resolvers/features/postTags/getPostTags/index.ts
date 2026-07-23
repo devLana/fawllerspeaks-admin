@@ -3,8 +3,8 @@ import { GraphQLError } from "graphql";
 import { PostTags } from "@typeResolvers/postTags/PostTags";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { PostTag } from "@resolverTypes";
-import type { GetPostTags } from "types/postTags/getPostTags";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { GetPostTags } from "@appTypes/postTags/getPostTags";
 
 const getPostTags: GetPostTags = async (_, __, { db, user, res }) => {
   try {
@@ -39,22 +39,22 @@ const getPostTags: GetPostTags = async (_, __, { db, user, res }) => {
     );
 
     tags.sort(({ name: tagName1 }, { name: tagName2 }) => {
-      const match1 = tagName1.match(/^\d+/);
+      const match1 = /^\d+/.exec(tagName1);
 
       if (match1) {
-        const match = tagName2.match(/^\d+/);
+        const match = /^\d+/.exec(tagName2);
 
         if (!match) return -1;
 
         return +match1[0] - +match[0];
       }
 
-      const match2 = tagName1.match(/\d+$/);
+      const match2 = /\d+$/.exec(tagName1);
 
       if (match2) {
         if (/^\d+/.test(tagName2)) return 1;
 
-        const match = tagName2.match(/\d+$/);
+        const match = /\d+$/.exec(tagName2);
 
         if (match) return +match2[0] - +match[0];
 

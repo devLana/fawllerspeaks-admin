@@ -2,7 +2,7 @@ import { createHmac } from "node:crypto";
 
 import { sign } from "@lib/tokenPromise";
 import { env } from "@lib/env";
-import generateBytes from "@utils/generateBytes";
+import { generateBytes } from "@utils/generateBytes";
 
 interface ResultTuple {
   refreshTokenHash: string;

@@ -6,16 +6,16 @@ import { createPostValidator as schema } from "@validators/posts/createPost";
 import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { PostValidationError } from "@typeResolvers/posts/PostValidationError";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
-import generateErrorsObject from "@utils/generateErrorsObject";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import getPostSlug from "@utils/posts/getPostSlug";
-import generateUniqueSlug from "@utils/posts/generateUniqueSlug";
+import { getPostSlug } from "@utils/posts/getPostSlug";
+import { generateUniqueSlug } from "@utils/posts/generateUniqueSlug";
 import { resolvePostTags, findRows } from "@utils/posts/create_draft";
-import type { CreatePost, InsertedPost } from "types/posts/createPost";
-import type { PostTag } from "@resolverTypes";
+import type { CreatePost, InsertedPost } from "@appTypes/posts/createPost";
+import type { PostTag } from "@appTypes/resolverTypes";
 
 const createPost: CreatePost = async (_, { post }, { db, user, res }) => {
-  const postImage = post.imageBanner && post.imageBanner.trim();
+  const postImage = post.imageBanner?.trim();
 
   try {
     if (!user) {

@@ -6,7 +6,7 @@ import { VerifyResetTokenValidationError } from "@typeResolvers/auth/VerifyReset
 import { VerifiedResetToken } from "@typeResolvers/auth/VerifiedResetToken";
 import { verifyTokenValidator } from "@validators/auth/verifyToken";
 import { generateResetHash } from "@utils/auth/generateResetToken";
-import type { VerifyData, VerifyToken } from "types/auth/verifyResetToken";
+import type { VerifyData, VerifyToken } from "@appTypes/auth/verifyResetToken";
 
 const verifyResetToken: VerifyToken = async (_, { token }, { db }) => {
   const MSG = "Unable to verify password reset token";

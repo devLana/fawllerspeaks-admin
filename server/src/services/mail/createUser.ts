@@ -1,9 +1,9 @@
-import mailService from ".";
-import mailTemplate from "./mailTemplate";
+import { mailService } from ".";
+import { mailTemplate } from "./mailTemplate";
 import { MailError } from "@lib/Errors";
 import { urls } from "@lib/ClientUrls";
 
-const createUserMail = async (email: string, password: string) => {
+export const createUserMail = async (email: string, password: string) => {
   const body = `
     <p>
       You have been added as a new user to Fawller Speaks Admin.
@@ -47,5 +47,3 @@ const createUserMail = async (email: string, password: string) => {
     );
   }
 };
-
-export default createUserMail;

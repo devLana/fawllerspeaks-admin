@@ -1,5 +1,5 @@
 import { registeredUser } from "@utils/tests/mocks";
-import type { InputErrors } from "types/tests";
+import type { InputErrors } from "@appTypes/tests";
 
 interface Input {
   currentPassword: string;
@@ -9,14 +9,10 @@ interface Input {
 
 export const PASSWORD = "PassW3!ord1@";
 
-export const validations: [string, Input, InputErrors<Input>][] = [
+export const validations: Array<[string, Input, InputErrors<Input>]> = [
   [
     "Should return a validation error response if the input strings are empty",
-    {
-      currentPassword: "",
-      newPassword: "",
-      confirmNewPassword: "",
-    },
+    { currentPassword: "", newPassword: "", confirmNewPassword: "" },
     {
       currentPasswordError: "Enter current password",
       newPasswordError: "Enter new password",

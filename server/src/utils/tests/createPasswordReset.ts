@@ -8,11 +8,11 @@ import {
   otherNewRegisteredReset,
 } from "./mocks";
 
-const createPasswordReset = async (
+export const createPasswordReset = async (
   db: Pool,
   registeredId: number,
   unregisteredId: number,
-  newRegisteredId: number
+  newRegisteredId: number,
 ) => {
   try {
     await db.query(
@@ -45,12 +45,12 @@ const createPasswordReset = async (
         otherRegisteredReset.hash,
         new Date(Date.now() + 300_000).toISOString(),
         false,
-      ]
+      ],
     );
   } catch (err) {
     console.error("Create Test Password Reset Tokens Error - ", err);
-    throw new Error("Unable to create test password reset tokens");
+    throw new Error("Unable to create test password reset tokens", {
+      cause: err,
+    });
   }
 };
-
-export default createPasswordReset;

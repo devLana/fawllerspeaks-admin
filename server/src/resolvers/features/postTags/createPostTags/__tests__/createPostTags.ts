@@ -4,12 +4,12 @@ import type { ApolloServer } from "@apollo/server";
 import { db } from "@services/db";
 import { startServer } from "@server";
 import { CREATE_POST_TAGS } from "@utils/tests/gqlQueries/postTagsTestQueries";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import post from "@utils/tests/post";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { post } from "@utils/tests/post";
 import { DATE_REGEX, UUID_REGEX } from "@utils/tests/constants";
-import type { APIContext } from "@types";
-import type { Tags, Success, Warning } from "types/postTags/createPostTags";
+import type { APIContext } from "@appTypes";
+import type { Tags, Success, Warning } from "@appTypes/postTags/createPostTags";
 
 describe("Create post tags", () => {
   let server: ApolloServer<APIContext>, url: string;

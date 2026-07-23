@@ -1,5 +1,8 @@
-import type { PostValidationError as Errors, Status } from "@resolverTypes";
-import type { RemoveNull } from "@types";
+import type {
+  PostValidationError as Errors,
+  Status,
+} from "@appTypes/resolverTypes";
+import type { RemoveNull } from "@appTypes";
 
 export class PostValidationError implements Errors {
   readonly titleError?: string;

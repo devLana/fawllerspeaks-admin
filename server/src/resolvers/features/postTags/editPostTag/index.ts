@@ -6,10 +6,10 @@ import { EditedPostTag } from "@typeResolvers/postTags/EditedPostTag";
 import { EditedPostTagWarning } from "@typeResolvers/postTags/EditedPostTagWarning";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { editPostTagValidator as schema } from "@validators/postTags/editPostTag";
-import generateErrorsObject from "@utils/generateErrorsObject";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { PostTag } from "@resolverTypes";
-import type { EditPostTag } from "types/postTags/editPostTag";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { EditPostTag } from "@appTypes/postTags/editPostTag";
 
 const editPostTag: EditPostTag = async (_, args, { db, user, res }) => {
   try {

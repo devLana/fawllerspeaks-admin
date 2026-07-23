@@ -1,19 +1,19 @@
 import { afterAll, beforeAll, describe, it, expect } from "@jest/globals";
-import { type ApolloServer } from "@apollo/server";
+import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
 import * as mocks from "./getPosts.testUtils";
 import { GET_POSTS } from "@utils/tests/gqlQueries/postsTestQueries";
-import post from "@utils/tests/post";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import createTestPost from "@utils/tests/createTestPost";
+import { post } from "@utils/tests/post";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import { createTestPost } from "@utils/tests/createTestPost";
 import { testPostData, registeredUser as user } from "@utils/tests/mocks";
-import type { APIContext } from "@types";
-import type { GetPostsData, PostTag } from "@resolverTypes";
-import type { GetPostsTestData as Data } from "types/posts/getPosts";
+import type { APIContext } from "@appTypes";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { Get, GetData } from "@appTypes/posts/getPosts";
 
 describe("Get Posts", () => {
   let server: ApolloServer<APIContext>, url: string, postTags: PostTag[];
@@ -289,7 +289,7 @@ describe("Get Posts", () => {
   describe("Verify user authentication", () => {
     it("Expect an error response if the user is not logged in", async () => {
       const payload = { query: GET_POSTS };
-      const { data, responseHeaders } = await post<Data>(url, payload);
+      const { data, responseHeaders } = await post<Get>(url, payload);
 
       expect(responseHeaders).toHaveProperty("set-cookie");
       expect(Array.isArray(responseHeaders["set-cookie"])).toBe(true);
@@ -310,7 +310,7 @@ describe("Get Posts", () => {
       const options = { authorization: `Bearer ${unregisteredJwt}` };
       const payload = { query: GET_POSTS, variables };
 
-      const { data } = await post<Data>(url, payload, options);
+      const { data } = await post<Get>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -326,7 +326,7 @@ describe("Get Posts", () => {
     it("Expect an error response if the logged in user is unregistered", async () => {
       const options = { authorization: `Bearer ${unregisteredJwt}` };
 
-      const { data } = await post<Data>(url, { query: GET_POSTS }, options);
+      const { data } = await post<Get>(url, { query: GET_POSTS }, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -343,7 +343,7 @@ describe("Get Posts", () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload = { query: GET_POSTS, variables: mocks.page };
 
-      const { data } = await post<Data>(url, payload, options);
+      const { data } = await post<Get>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -360,7 +360,7 @@ describe("Get Posts", () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload1 = { query: GET_POSTS };
 
-      const { data: data1 } = await post<Data>(url, payload1, options);
+      const { data: data1 } = await post<GetData>(url, payload1, options);
 
       expect(data1.errors).toBeUndefined();
       expect(data1.data).toBeDefined();
@@ -375,10 +375,10 @@ describe("Get Posts", () => {
         status: "SUCCESS",
       });
 
-      const { next } = (data1.data?.getPosts as GetPostsData).pageData;
+      const next = data1.data?.getPosts.pageData.next;
       const payload2 = { query: GET_POSTS, variables: { after: next } };
 
-      const { data: data2 } = await post<Data>(url, payload2, options);
+      const { data: data2 } = await post<Get>(url, payload2, options);
 
       expect(data2.errors).toBeUndefined();
       expect(data2.data).toBeDefined();
@@ -394,7 +394,7 @@ describe("Get Posts", () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload = { query: GET_POSTS, variables: mocks.e2eFilters1 };
 
-      const { data } = await post<Data>(url, payload, options);
+      const { data } = await post<Get>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -414,7 +414,7 @@ describe("Get Posts", () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload = { query: GET_POSTS, variables: mocks.e2eFilters2 };
 
-      const { data } = await post<Data>(url, payload, options);
+      const { data } = await post<Get>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
@@ -434,7 +434,7 @@ describe("Get Posts", () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload1 = { query: GET_POSTS, variables: { size: 6 } };
 
-      const { data: data1 } = await post<Data>(url, payload1, options);
+      const { data: data1 } = await post<GetData>(url, payload1, options);
 
       expect(data1.errors).toBeUndefined();
       expect(data1.data).toBeDefined();
@@ -449,11 +449,11 @@ describe("Get Posts", () => {
         status: "SUCCESS",
       });
 
-      const { next: next1 } = (data1.data?.getPosts as GetPostsData).pageData;
+      const next1 = data1.data?.getPosts.pageData.next;
       const vars1 = { after: next1, size: 6 };
       const payload2 = { query: GET_POSTS, variables: vars1 };
 
-      const { data: data2 } = await post<Data>(url, payload2, options);
+      const { data: data2 } = await post<GetData>(url, payload2, options);
 
       expect(data2.errors).toBeUndefined();
       expect(data2.data).toBeDefined();
@@ -468,11 +468,11 @@ describe("Get Posts", () => {
         status: "SUCCESS",
       });
 
-      const { next: next2 } = (data2.data?.getPosts as GetPostsData).pageData;
+      const next2 = data2.data?.getPosts.pageData.next;
       const vars2 = { after: next2, size: 6 };
       const payload3 = { query: GET_POSTS, variables: vars2 };
 
-      const { data: data3 } = await post<Data>(url, payload3, options);
+      const { data: data3 } = await post<Get>(url, payload3, options);
 
       expect(data3.errors).toBeUndefined();
       expect(data3.data).toBeDefined();

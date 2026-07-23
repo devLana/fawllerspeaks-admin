@@ -1,4 +1,4 @@
-import { type IOptions } from "sanitize-html";
+import type { IOptions } from "sanitize-html";
 
 export const sanitizeOptions: IOptions = {
   allowedTags: [

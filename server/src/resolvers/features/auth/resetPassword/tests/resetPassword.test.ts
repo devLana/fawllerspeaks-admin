@@ -2,20 +2,23 @@ import { it, expect, describe, beforeAll, afterAll, jest } from "@jest/globals";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import resetPasswordMail from "@services/mail/resetPassword";
+import { resetPasswordMail } from "@services/mail/resetPassword";
 import { db } from "@services/db";
 import { MailError } from "@lib/Errors";
 import { validations, verify } from "./resetPassword.testUtils";
 import { RESET_PASSWORD } from "@utils/tests/gqlQueries/authTestQueries";
-import authUsers from "@utils/tests/createTestUsers/authUsers";
-import createPasswordReset from "@utils/tests/createPasswordReset";
+import { authUsers } from "@utils/tests/createTestUsers/authUsers";
+import { createPasswordReset } from "@utils/tests/createPasswordReset";
 import { otherRegisteredReset, registeredReset } from "@utils/tests/mocks";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { ResetPassword } from "types/auth/resetPassword";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { ResetPassword } from "@appTypes/auth/resetPassword";
 
 jest.mock("@services/mail/resetPassword", () => {
-  return jest.fn().mockName("resetPasswordMail");
+  return {
+    __esModule: true,
+    resetPasswordMail: jest.fn().mockName("resetPasswordMail"),
+  };
 });
 
 describe("Reset password", () => {
@@ -103,7 +106,7 @@ describe("Reset password", () => {
       const password = "$eRtu78#@";
       const variables = { token, password, confirmPassword: password };
       const payload = { query: RESET_PASSWORD, variables };
-      const mock = resetPasswordMail as jest.MockedFunction<() => never>;
+      const mock = jest.mocked(resetPasswordMail);
 
       mock.mockImplementation(() => {
         throw new MailError("Unable to send mail");

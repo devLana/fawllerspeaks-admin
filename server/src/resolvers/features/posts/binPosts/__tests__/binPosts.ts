@@ -6,16 +6,16 @@ import type { ApolloServer } from "@apollo/server";
 import { db } from "@services/db";
 import { startServer } from "@server";
 import { BIN_POSTS } from "@utils/tests/gqlQueries/postsTestQueries";
-import post from "@utils/tests/post";
-import loginTestUser from "@utils/tests/loginTestUser";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import createTestPost from "@utils/tests/createTestPost";
+import { post } from "@utils/tests/post";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import { createTestPost } from "@utils/tests/createTestPost";
 import { registeredUser as user, testPostData } from "@utils/tests/mocks";
 import { DATE_REGEX } from "@utils/tests/constants";
-import type { APIContext } from "@types";
-import type { PostTag, Post, Posts } from "@resolverTypes";
-import type { BinPostsData } from "types/posts/binPosts";
+import type { APIContext } from "@appTypes";
+import type { PostTag, Post } from "@appTypes/resolverTypes";
+import type { BinPostsData, BinPostsSuccess } from "@appTypes/posts/binPosts";
 
 describe("Bin Posts", () => {
   const UUID = randomUUID();
@@ -262,23 +262,17 @@ describe("Bin Posts", () => {
       const payload = { query: BIN_POSTS, variables: { postIds } };
       const options = { authorization: `Bearer ${registeredJwt}` };
 
-      const { data } = await post<BinPostsData>(url, payload, options);
+      const { data } = await post<BinPostsSuccess>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPosts).toHaveProperty("__typename", "Posts");
       expect(data.data?.binPosts).toHaveProperty("status", "SUCCESS");
-      expect((data.data?.binPosts as Posts).posts.length).toBe(2);
-      expect((data.data?.binPosts as Posts).posts[0].binnedAt).not.toBeNull();
-      expect((data.data?.binPosts as Posts).posts[1].binnedAt).not.toBeNull();
-
-      expect((data.data?.binPosts as Posts).posts[0].binnedAt).toMatch(
-        DATE_REGEX
-      );
-
-      expect((data.data?.binPosts as Posts).posts[1].binnedAt).toMatch(
-        DATE_REGEX
-      );
+      expect(data.data?.binPosts.posts.length).toBe(2);
+      expect(data.data?.binPosts.posts[0].binnedAt).not.toBeNull();
+      expect(data.data?.binPosts.posts[1].binnedAt).not.toBeNull();
+      expect(data.data?.binPosts.posts[0].binnedAt).toMatch(DATE_REGEX);
+      expect(data.data?.binPosts.posts[1].binnedAt).toMatch(DATE_REGEX);
     });
 
     it("Expect some of the provided posts to be moved to bin with a warning message", async () => {
@@ -287,19 +281,16 @@ describe("Bin Posts", () => {
       const options = { authorization: `Bearer ${registeredJwt}` };
       const msg = "1 out of 4 posts moved to bin";
 
-      const { data } = await post<BinPostsData>(url, payload, options);
+      const { data } = await post<BinPostsSuccess>(url, payload, options);
 
       expect(data.errors).toBeUndefined();
       expect(data.data).toBeDefined();
       expect(data.data?.binPosts).toHaveProperty("__typename", "PostsWarning");
       expect(data.data?.binPosts).toHaveProperty("status", "WARN");
       expect(data.data?.binPosts).toHaveProperty("message", msg);
-      expect((data.data?.binPosts as Posts).posts.length).toBe(1);
-      expect((data.data?.binPosts as Posts).posts[0].binnedAt).not.toBeNull();
-
-      expect((data.data?.binPosts as Posts).posts[0].binnedAt).toMatch(
-        DATE_REGEX
-      );
+      expect(data.data?.binPosts.posts.length).toBe(1);
+      expect(data.data?.binPosts.posts[0].binnedAt).not.toBeNull();
+      expect(data.data?.binPosts.posts[0].binnedAt).toMatch(DATE_REGEX);
     });
   });
 });

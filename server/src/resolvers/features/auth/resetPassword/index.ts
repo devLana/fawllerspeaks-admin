@@ -4,12 +4,12 @@ import bcrypt from "bcrypt";
 
 import { ErrorResponse, Response } from "@typeResolvers/commonResolvers";
 import { ResetPasswordValidationError } from "@typeResolvers/auth/ResetPasswordValidationError";
-import resetPasswordMail from "@services/mail/resetPassword";
+import { resetPasswordMail } from "@services/mail/resetPassword";
 import { resetPasswordValidator as schema } from "@validators/auth/resetPassword";
 import { MailError } from "@lib/Errors";
 import { generateResetHash } from "@utils/auth/generateResetToken";
-import generateErrorsObject from "@utils/generateErrorsObject";
-import type { Reset, User } from "types/auth/resetPassword";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
+import type { Reset, User } from "@appTypes/auth/resetPassword";
 
 const resetPassword: Reset = async (_, args, { db }) => {
   try {
@@ -70,9 +70,9 @@ const resetPassword: Reset = async (_, args, { db }) => {
       const errors = generateErrorsObject(err.details);
 
       return new ResetPasswordValidationError(
-        errors.tokenError,
-        errors.passwordError,
-        errors.confirmPasswordError
+        errors["tokenError"],
+        errors["passwordError"],
+        errors["confirmPasswordError"]
       );
     }
 

@@ -7,8 +7,9 @@ supabaseEvent.on("removeImage", (image: string) => {
   client.storage
     .from("images")
     .remove([image])
-    .catch((error: Error) => {
-      if (error) console.error("Supabase delete image error - ", error);
+    .catch((error: unknown) => {
+      // log the error for debugging purposes
+      console.error("Supabase delete image error - ", error);
     });
 });
 

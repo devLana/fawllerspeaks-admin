@@ -1,6 +1,6 @@
 import { storageUrl } from "@services/supabase";
 
-const mailTemplate = (body: string) => {
+export const mailTemplate = (body: string) => {
   return `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html lang="en">
@@ -15,5 +15,3 @@ const mailTemplate = (body: string) => {
     </html>
   `;
 };
-
-export default mailTemplate;

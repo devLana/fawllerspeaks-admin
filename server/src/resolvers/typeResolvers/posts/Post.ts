@@ -1,13 +1,13 @@
 import { storageUrl } from "@services/supabase";
-import dateToISOString from "@utils/dateToISOString";
+import { dateToISOString } from "@utils/dateToISOString";
 import { getPostContentResponse } from "@utils/posts/getPostContentResponse";
 
-import type { PostResolvers } from "@resolverTypes";
+import type { PostResolvers } from "@appTypes/resolverTypes";
 
 export const Post: PostResolvers = {
   content: parent => {
-    if (!parent.content) return null;
-    return getPostContentResponse(parent.content as unknown as string);
+    if (!parent.content || typeof parent.content !== "string") return null;
+    return getPostContentResponse(parent.content);
   },
 
   dateCreated: parent => dateToISOString(parent.dateCreated),

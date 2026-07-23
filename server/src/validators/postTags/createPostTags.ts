@@ -1,12 +1,12 @@
 import Joi from "joi";
-import type { MutationCreatePostTagsArgs as Args } from "@resolverTypes";
+import type { MutationCreatePostTagsArgs as Args } from "@appTypes/resolverTypes";
 
 export const createPostTagsValidator = Joi.array<Args["tags"]>()
   .required()
   .items(
     Joi.string().trim().messages({
       "string.empty": "Input tags cannot contain empty values",
-    })
+    }),
   )
   .min(1)
   .max(10)

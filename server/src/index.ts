@@ -25,10 +25,10 @@ import { catchAll } from "@controllers/catchAll";
 
 import { startServerHandler } from "@lib/startServerHandler";
 import { corsOptions } from "@lib/corsOptions";
-import getServerUrl from "@lib/getServerUrl";
+import { getServerUrl } from "@lib/getServerUrl";
 import { env } from "@lib/env";
 
-import type { APIContext } from "@types";
+import type { APIContext } from "@appTypes";
 
 export const startServer = async (port: number) => {
   const httpServer = createServer();
@@ -44,6 +44,7 @@ export const startServer = async (port: number) => {
   const app = express();
 
   app.use(cors(corsOptions));
+
   app.use(
     helmet({
       contentSecurityPolicy: env.NAME === "production" || env.NAME === "demo",
@@ -74,9 +75,9 @@ export const startServer = async (port: number) => {
 };
 
 if (env.NAME !== "test") {
-  const port = process.env.PORT ? +process.env.PORT : 7692;
+  const port = process.env["PORT"] ? +process.env["PORT"] : 7692;
 
   startServer(port)
     .then(startServerHandler)
-    .catch(err => console.error("Error: Unable to start server", err));
+    .catch((e: unknown) => console.error("Error: Unable to start server", e));
 }

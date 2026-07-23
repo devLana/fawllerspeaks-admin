@@ -1,7 +1,7 @@
-import generateBytes from "@utils/generateBytes";
+import { generateBytes } from "@utils/generateBytes";
 import { SLUG_MAX_LENGTH } from "../constants";
 
-const generateUniqueSlug = async (slug: string) => {
+export const generateUniqueSlug = async (slug: string) => {
   const bytes = await generateBytes(2, "hex");
 
   if (slug.length > SLUG_MAX_LENGTH - 6) {
@@ -17,5 +17,3 @@ const generateUniqueSlug = async (slug: string) => {
 
   return `${slug}-${bytes}`;
 };
-
-export default generateUniqueSlug;

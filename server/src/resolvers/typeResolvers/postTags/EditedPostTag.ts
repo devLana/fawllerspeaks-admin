@@ -1,4 +1,8 @@
-import type { EditedPostTag as Tag, PostTag, Status } from "@resolverTypes";
+import type {
+  EditedPostTag as Tag,
+  PostTag,
+  Status,
+} from "@appTypes/resolverTypes";
 
 export class EditedPostTag implements Tag {
   readonly status: Status;

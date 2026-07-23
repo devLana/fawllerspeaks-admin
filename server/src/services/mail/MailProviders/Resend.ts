@@ -3,10 +3,10 @@ import type {
   ResendConfig,
   MailProvider,
   SendOptions,
-} from "types/mailService";
+} from "@appTypes/mailService";
 
-export default class ResendProvider implements MailProvider {
-  private client: Resend;
+export class ResendProvider implements MailProvider {
+  private readonly client: Resend;
 
   constructor(protected readonly config: ResendConfig) {
     this.client = new Resend(config.RESEND_API_KEY);

@@ -1,21 +1,21 @@
 import * as dotenv from "dotenv";
 import joi from "joi";
-import type { EnvKeys, EnvObject, EnvVars } from "types/mailService";
+import type { EnvObject, EnvVars } from "@appTypes/environment";
 
 dotenv.config();
 
-export const rawEnv: EnvObject = {
-  NAME: process.env.NODE_ENV,
-  LOCAL_MAIL_HOST: process.env.LOCAL_MAIL_HOST,
-  LOCAL_MAIL_PORT: process.env.LOCAL_MAIL_PORT,
-  LOCAL_MAIL_USER: process.env.LOCAL_MAIL_USER,
-  LOCAL_MAIL_PASSWORD: process.env.LOCAL_MAIL_PASSWORD,
-  ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
-  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
-  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-  PG_CONNECTION_STRING: process.env.PG_CONNECTION_STRING,
-  RESEND_API_KEY: process.env.RESEND_API_KEY,
-  RESEND_FROM: process.env.RESEND_FROM,
+const rawEnv: EnvObject = {
+  NAME: process.env["NODE_ENV"],
+  LOCAL_MAIL_HOST: process.env["LOCAL_MAIL_HOST"],
+  LOCAL_MAIL_PORT: process.env["LOCAL_MAIL_PORT"],
+  LOCAL_MAIL_USER: process.env["LOCAL_MAIL_USER"],
+  LOCAL_MAIL_PASSWORD: process.env["LOCAL_MAIL_PASSWORD"],
+  ACCESS_TOKEN_SECRET: process.env["ACCESS_TOKEN_SECRET"],
+  REFRESH_TOKEN_SECRET: process.env["REFRESH_TOKEN_SECRET"],
+  SUPABASE_SERVICE_ROLE_KEY: process.env["SUPABASE_SERVICE_ROLE_KEY"],
+  PG_CONNECTION_STRING: process.env["PG_CONNECTION_STRING"],
+  RESEND_API_KEY: process.env["RESEND_API_KEY"],
+  RESEND_FROM: process.env["RESEND_FROM"],
 };
 
 const schema = joi.object<EnvVars>({
@@ -126,15 +126,13 @@ const result = schema.validate(rawEnv, { abortEarly: false });
 
 if (result.error) {
   // Collect all errors in a readable format
-  const errors = result.error.details.reduce<EnvObject>((errs, errorItem) => {
-    const errorsMap = { ...errs };
-    const { message } = errorItem;
-    const [field] = errorItem.path as EnvKeys[];
+  const errors = result.error.details.reduce((errs, errorItem) => {
+    const { message, path } = errorItem;
+    const [field] = path;
 
-    if (Object.hasOwn(errorsMap, field)) return errorsMap;
+    if (typeof field !== "string" || Object.hasOwn(errs, field)) return errs;
 
-    errorsMap[field] = message;
-    return errorsMap;
+    return { ...errs, [field]: message };
   }, {});
 
   console.error("Environment variable validation failed:");

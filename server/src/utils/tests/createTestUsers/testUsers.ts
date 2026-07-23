@@ -2,15 +2,15 @@ import bcrypt from "bcrypt";
 import type { Pool } from "pg";
 
 import { unRegisteredUser, registeredUser } from "../mocks";
-import dateToISOString from "@utils/dateToISOString";
-import type { DbTestUser } from "types/tests";
+import { dateToISOString } from "@utils/dateToISOString";
+import type { DbTestUser } from "@appTypes/tests";
 
 interface Users {
   readonly registeredUser: DbTestUser;
   readonly unregisteredUser: DbTestUser;
 }
 
-const testUsers = async (db: Pool): Promise<Users> => {
+export const testUsers = async (db: Pool): Promise<Users> => {
   try {
     const unregisterPromise = bcrypt.hash(unRegisteredUser.password, 10);
     const registerPromise = bcrypt.hash(registeredUser.password, 10);
@@ -40,7 +40,7 @@ const testUsers = async (db: Pool): Promise<Users> => {
         registeredUser.lastName,
         registeredUser.registered,
         registeredUser.image,
-      ]
+      ],
     );
 
     const unRegistered = db.query<DbTestUser>(
@@ -53,7 +53,7 @@ const testUsers = async (db: Pool): Promise<Users> => {
         id "userId",
         user_id "userUUID",
         date_created "dateCreated"`,
-      [unRegisteredUser.email, unRegisterHash, unRegisteredUser.registered]
+      [unRegisteredUser.email, unRegisterHash, unRegisteredUser.registered],
     );
 
     const [registerRes, unregisterRes] = await Promise.all([
@@ -73,8 +73,6 @@ const testUsers = async (db: Pool): Promise<Users> => {
     };
   } catch (err) {
     console.error("Create Test Users Error - ", err);
-    throw new Error("Unable to create test users");
+    throw new Error("Unable to create test users", { cause: err });
   }
 };
-
-export default testUsers;

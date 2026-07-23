@@ -1,7 +1,7 @@
 import type {
   EditPostTagValidationError as ValidationErrors,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class EditPostTagValidationError implements ValidationErrors {
   readonly status: Status;
@@ -9,7 +9,7 @@ export class EditPostTagValidationError implements ValidationErrors {
 
   constructor(
     public readonly tagIdError?: string,
-    public readonly nameError?: string
+    public readonly nameError?: string,
   ) {
     this.status = "ERROR";
     this.__typename = "EditPostTagValidationError";

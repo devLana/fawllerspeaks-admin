@@ -2,22 +2,20 @@ import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import sessionMail from "@services/mail/session";
+import { sessionMail } from "@services/mail/session";
 import { db } from "@services/db";
 import { MailError } from "@lib/Errors";
 import { unRegisteredUser } from "@utils/tests/mocks";
 import { REFRESH_TOKEN as GQL } from "@utils/tests/gqlQueries/authTestQueries";
 import { JWT_REGEX } from "@utils/tests/constants";
-import authUsers from "@utils/tests/createTestUsers/authUsers";
-import testSession from "@utils/tests/testSession";
-import post from "@utils/tests/post";
-import loginTestUser from "@utils/tests/loginTestUser";
-import type { APIContext } from "@types";
-import type { RefreshData as Data, MockFn } from "types/auth/refreshToken";
+import { authUsers } from "@utils/tests/createTestUsers/authUsers";
+import { testSession } from "@utils/tests/testSession";
+import { post } from "@utils/tests/post";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import type { APIContext } from "@appTypes";
+import type { RefreshData as Data } from "@appTypes/auth/refreshToken";
 
-jest.mock("@services/mail/session", () => {
-  return jest.fn().mockName("sessionMail");
-});
+jest.mock("@services/mail/session");
 
 describe("RefreshData Token", () => {
   let server: ApolloServer<APIContext>, url: string, unregisteredJwt: string;
@@ -112,7 +110,7 @@ describe("RefreshData Token", () => {
     });
 
     it("Expect an error response if the user tries to refresh another user's session", async () => {
-      const mockSessionMail = sessionMail as MockFn;
+      const mockSessionMail = jest.mocked(sessionMail).mockName("sessionMail");
       const cookie = unregisteredCookie1;
       const payload = { query: GQL };
       const options = { cookie, authorization: `Bearer ${newRegisteredJwt}` };

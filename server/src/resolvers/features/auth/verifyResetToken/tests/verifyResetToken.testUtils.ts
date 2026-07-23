@@ -4,7 +4,7 @@ import {
   unregisteredReset,
 } from "@utils/tests/mocks";
 
-export const validations: [string, string][] = [
+export const validations: Array<[string, string]> = [
   [
     "Should return a validation error response if the password reset token is an empty string",
     "",
@@ -15,7 +15,7 @@ export const validations: [string, string][] = [
   ],
 ];
 
-export const verify: [string, string, string][] = [
+export const verify: Array<[string, string, string]> = [
   [
     "Should return an error response if the password reset token is unknown",
     "token",

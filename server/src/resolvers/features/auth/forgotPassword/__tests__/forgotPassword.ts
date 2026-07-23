@@ -2,19 +2,22 @@ import { describe, it, expect, jest, beforeAll, afterAll } from "@jest/globals";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import forgotPasswordMail from "@services/mail/forgotPassword";
+import { forgotPasswordMail } from "@services/mail/forgotPassword";
 import { db } from "@services/db";
 import { MailError } from "@lib/Errors";
 import { emailValidationsTestCases } from "@utils/tests/emailValidationTestCases";
 import { FORGOT_PASSWORD } from "@utils/tests/gqlQueries/authTestQueries";
 import { unRegisteredUser, registeredUser } from "@utils/tests/mocks";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { ForgotPasswordData } from "types/auth/forgotPassword";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { ForgotPasswordData } from "@appTypes/auth/forgotPassword";
 
 jest.mock("@services/mail/forgotPassword", () => {
-  return jest.fn().mockName("forgotPasswordMail");
+  return {
+    __esModule: true,
+    forgotPasswordMail: jest.fn().mockName("forgotPasswordMail"),
+  };
 });
 
 describe("Forgot password", () => {
@@ -104,7 +107,7 @@ describe("Forgot password", () => {
     it("Should invalidate the generated password reset link if the confirmation mail fails to send", async () => {
       const variables = { email: registeredUser.email };
       const payload = { query: FORGOT_PASSWORD, variables };
-      const mock = forgotPasswordMail as jest.MockedFunction<() => never>;
+      const mock = jest.mocked(forgotPasswordMail);
 
       mock.mockImplementation(() => {
         throw new MailError("Unable to send forgot password mail");

@@ -1,5 +1,5 @@
 import Joi from "joi";
-import type { MutationChangePasswordArgs } from "@resolverTypes";
+import type { MutationChangePasswordArgs } from "@appTypes/resolverTypes";
 
 export const changePasswordValidator = Joi.object<MutationChangePasswordArgs>({
   currentPassword: Joi.string().required().messages({

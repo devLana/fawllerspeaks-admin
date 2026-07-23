@@ -1,7 +1,7 @@
 import type {
   EmailValidationError as ValidationErrors,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class EmailValidationError implements ValidationErrors {
   readonly __typename: "EmailValidationError";

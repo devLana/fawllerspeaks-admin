@@ -6,13 +6,13 @@ import { storageUrl } from "@services/supabase";
 import { db } from "@services/db";
 import { JWT_REGEX } from "@utils/tests/constants";
 import { VERIFY_SESSION } from "@utils/tests/gqlQueries/authTestQueries";
-import testSession from "@utils/tests/testSession";
-import authUsers from "@utils/tests/createTestUsers/authUsers";
+import { testSession } from "@utils/tests/testSession";
+import { authUsers } from "@utils/tests/createTestUsers/authUsers";
 import { registeredUser as registeredTestUser } from "@utils/tests/mocks";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { DbTestUser } from "types/tests";
-import type { Verify as GQL } from "types/auth/verifySession";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { DbTestUser } from "@appTypes/tests";
+import type { Verify as GQL } from "@appTypes/auth/verifySession";
 
 describe("Verify Session", () => {
   let server: ApolloServer<APIContext>, url: string;

@@ -1,5 +1,5 @@
-import type { Posts as BlogPosts, Status } from "@resolverTypes";
-import type { PostData, PostDataMapper } from "types/posts";
+import type { Posts as BlogPosts, Status } from "@appTypes/resolverTypes";
+import type { PostData, PostDataMapper } from "@appTypes/posts";
 
 export class Posts implements PostDataMapper<BlogPosts> {
   readonly status: Status;

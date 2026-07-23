@@ -1,4 +1,4 @@
-import type { InputErrors } from "types/tests";
+import type { InputErrors } from "@appTypes/tests";
 
 interface Input {
   firstName: string;
@@ -14,7 +14,7 @@ export const userInput = {
   confirmPassword: "abcdEf65#",
 };
 
-export const validations: [string, Input, InputErrors<Input>][] = [
+export const validations: Array<[string, Input, InputErrors<Input>]> = [
   [
     "Invalid first name, last name, password and confirmPassword mismatch, Return an error response",
     {
@@ -32,12 +32,7 @@ export const validations: [string, Input, InputErrors<Input>][] = [
   ],
   [
     "Should return an error response if the input values are empty strings",
-    {
-      firstName: "",
-      lastName: "",
-      password: "",
-      confirmPassword: "",
-    },
+    { firstName: "", lastName: "", password: "", confirmPassword: "" },
     {
       firstNameError: "Enter first name",
       lastNameError: "Enter last name",

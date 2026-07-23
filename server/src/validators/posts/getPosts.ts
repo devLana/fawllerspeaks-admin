@@ -1,5 +1,5 @@
 import Joi from "joi";
-import type { QueryGetPostsArgs } from "@resolverTypes";
+import type { QueryGetPostsArgs } from "@appTypes/resolverTypes";
 
 export const getPostsSchema = Joi.object<QueryGetPostsArgs>({
   after: Joi.string().trim().allow(null).messages({

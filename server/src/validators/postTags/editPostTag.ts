@@ -1,5 +1,5 @@
 import Joi from "joi";
-import type { MutationEditPostTagArgs } from "@resolverTypes";
+import type { MutationEditPostTagArgs } from "@appTypes/resolverTypes";
 
 export const editPostTagValidator = Joi.object<MutationEditPostTagArgs>({
   tagId: Joi.string()

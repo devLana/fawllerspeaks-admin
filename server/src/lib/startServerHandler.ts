@@ -4,7 +4,7 @@ import type { ApolloServer } from "@apollo/server";
 
 import { db } from "@services/db";
 import { env } from "@lib/env";
-import type { APIContext } from "@types";
+import type { APIContext } from "@appTypes";
 
 interface Prop {
   url: string;

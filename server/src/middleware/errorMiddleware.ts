@@ -6,8 +6,8 @@ export const errorMiddleware = (
   err: ApiError,
   _: Request,
   res: Response,
-  __: NextFunction
+  __: NextFunction,
 ): void => {
-  const { message, statusCode = 500 } = err;
+  const { message, statusCode } = err;
   res.status(statusCode).json({ error: { message } });
 };

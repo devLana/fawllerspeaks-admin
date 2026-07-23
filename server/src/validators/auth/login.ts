@@ -1,5 +1,5 @@
 import Joi from "joi";
-import type { MutationLoginArgs } from "@resolverTypes";
+import type { MutationLoginArgs } from "@appTypes/resolverTypes";
 
 export const loginValidator = Joi.object<MutationLoginArgs>({
   email: Joi.string().email().required().trim().messages({

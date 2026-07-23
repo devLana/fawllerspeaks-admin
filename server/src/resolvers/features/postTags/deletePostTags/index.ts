@@ -7,7 +7,10 @@ import { DeletedPostTagsWarning } from "@typeResolvers/postTags/DeletedPostTagsW
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { deletePostTagsValidator as schema } from "@validators/postTags/deletePostTags";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { DeletePostTags as Fn, Del } from "types/postTags/deletePostTags";
+import type {
+  DeletePostTags as Fn,
+  Del,
+} from "@appTypes/postTags/deletePostTags";
 
 const deletePostTags: Fn = async (_, { tagIds }, { db, user, res }) => {
   const MSG = `Unable to delete post ${tagIds.length > 1 ? "tags" : "tag"}`;
@@ -53,7 +56,7 @@ const deletePostTags: Fn = async (_, { tagIds }, { db, user, res }) => {
     const deletedTagIds = allDeletedTags.map(tag => tag.id);
 
     if (allDeletedTags.length < inputTags.length) {
-      const message = `${allDeletedTags.length} out of ${inputTags.length} post tags deleted`;
+      const message = `${String(allDeletedTags.length)} out of ${inputTags.length.toString()} post tags deleted`;
       return new DeletedPostTagsWarning(deletedTagIds, message);
     }
 

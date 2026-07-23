@@ -6,15 +6,15 @@ import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { editPostValidator as schema } from "@validators/posts/editPost";
 import { supabaseEvent } from "@events/supabase";
-import generateErrorsObject from "@utils/generateErrorsObject";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
 import { clearAuthCookie } from "@utils/auth/cookies";
 import { findRows, editContent, editTags } from "@utils/posts/editPost";
-import type { Edit, SqlValues } from "types/posts/editPost";
-import type { PostTag } from "@resolverTypes";
-import type { Draft_Edit } from "types/posts";
+import type { Edit, SqlValues } from "@appTypes/posts/editPost";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { Draft_Edit } from "@appTypes/posts";
 
 const editPost: Edit = async (_, { post }, { user, db, res }) => {
-  const postImage = post.imageBanner && post.imageBanner.trim();
+  const postImage = post.imageBanner?.trim();
 
   try {
     const MSG = "Unable to edit post";
@@ -78,11 +78,11 @@ const editPost: Edit = async (_, { post }, { user, db, res }) => {
       }
 
       updateValues.push(description, excerpt);
-      updateFields = `${updateFields}, description = $${++index}, excerpt = $${++index}`;
+      updateFields = `${updateFields}, description = $${String(++index)}, excerpt = $${String(++index)}`;
 
       if (imageBanner || imageBanner === null) {
         updateValues.push(imageBanner);
-        updateFields = `${updateFields}, image_banner = $${++index}`;
+        updateFields = `${updateFields}, image_banner = $${String(++index)}`;
       }
 
       if (editStatus) {
@@ -95,17 +95,17 @@ const editPost: Edit = async (_, { post }, { user, db, res }) => {
     } else {
       if (description || description === null) {
         updateValues.push(description);
-        updateFields = `${updateFields}, description = $${++index}`;
+        updateFields = `${updateFields}, description = $${String(++index)}`;
       }
 
       if (excerpt || excerpt === null) {
         updateValues.push(excerpt);
-        updateFields = `${updateFields}, excerpt = $${++index}`;
+        updateFields = `${updateFields}, excerpt = $${String(++index)}`;
       }
 
       if (imageBanner || imageBanner === null) {
         updateValues.push(imageBanner);
-        updateFields = `${updateFields}, image_banner = $${++index}`;
+        updateFields = `${updateFields}, image_banner = $${String(++index)}`;
       }
     }
 

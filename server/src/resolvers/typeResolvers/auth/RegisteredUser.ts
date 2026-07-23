@@ -2,7 +2,7 @@ import type {
   RegisteredUser as RegisteredUserResponse,
   User,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class RegisteredUser implements RegisteredUserResponse {
   readonly status: Status;

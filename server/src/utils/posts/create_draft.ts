@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import type { PostTag } from "@resolverTypes";
+import type { PostTag } from "@appTypes/resolverTypes";
 
 interface CreateDraftUser {
   id: number;
@@ -12,7 +12,7 @@ interface CreateDraftUser {
 export const findRows = async (
   db: Pool,
   user: string,
-  slug: string
+  slug: string,
 ): Promise<CreateDraftUser[]> => {
   const { rows } = await db.query<CreateDraftUser>(
     `WITH find_user AS (
@@ -30,7 +30,7 @@ export const findRows = async (
     SELECT *
     FROM find_user
     LEFT JOIN find_post ON true`,
-    [user, slug]
+    [user, slug],
   );
 
   return rows;
@@ -39,7 +39,7 @@ export const findRows = async (
 export const resolvePostTags = async (
   db: Pool,
   postId: number,
-  tagIds: readonly string[]
+  tagIds: readonly string[],
 ): Promise<PostTag[] | null> => {
   const dbTags = `{${tagIds.join(",")}}`;
 
@@ -61,7 +61,7 @@ export const resolvePostTags = async (
       date_created "dateCreated",
       last_modified "lastModified"
     FROM resolved_tags`,
-    [dbTags, postId]
+    [dbTags, postId],
   );
 
   if (insertedTags.length > 0) return insertedTags;

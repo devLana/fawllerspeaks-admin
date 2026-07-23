@@ -7,8 +7,8 @@ import { PostsWarning } from "@typeResolvers/posts/PostsWarning";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { binPostsValidator as schema } from "@validators/posts/binPosts";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { GetPostDBData } from "types/posts";
-import type { BinPosts } from "types/posts/binPosts";
+import type { GetPostDBData } from "@appTypes/posts";
+import type { BinPosts } from "@appTypes/posts/binPosts";
 
 const binPosts: BinPosts = async (_, { postIds }, { res, db, user }) => {
   const MSG = `Unable to move ${postIds.length > 1 ? "posts" : "post"} to bin`;
@@ -37,8 +37,8 @@ const binPosts: BinPosts = async (_, { postIds }, { res, db, user }) => {
 
     const { rows: binnedPosts } = await db.query<Omit<GetPostDBData, "postId">>(
       `WITH bin_posts AS (
-        UPDATE posts SET
-          binned_at = CURRENT_TIMESTAMP(3)
+        UPDATE posts
+        SET binned_at = CURRENT_TIMESTAMP(3)
         WHERE post_id = ANY ($1) AND binned_at IS NULL
         RETURNING *
       )
@@ -106,7 +106,7 @@ const binPosts: BinPosts = async (_, { postIds }, { res, db, user }) => {
     }
 
     if (binnedPosts.length < ids.length) {
-      const message = `${binnedPosts.length} out of ${ids.length} posts moved to bin`;
+      const message = `${String(binnedPosts.length)} out of ${ids.length.toString()} posts moved to bin`;
       return new PostsWarning(binnedPosts, message);
     }
 

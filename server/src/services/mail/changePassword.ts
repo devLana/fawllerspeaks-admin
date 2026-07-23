@@ -1,9 +1,9 @@
-import mailService from ".";
-import mailTemplate from "./mailTemplate";
+import { mailService } from ".";
+import { mailTemplate } from "./mailTemplate";
 import { MailError } from "@lib/Errors";
 import { urls } from "@lib/ClientUrls";
 
-const changePasswordMail = async (email: string) => {
+export const changePasswordMail = async (email: string) => {
   const body = `
     <p>Your password has been successfully changed.</p>
     <p style="margin:15px 0">
@@ -51,5 +51,3 @@ const changePasswordMail = async (email: string) => {
     );
   }
 };
-
-export default changePasswordMail;

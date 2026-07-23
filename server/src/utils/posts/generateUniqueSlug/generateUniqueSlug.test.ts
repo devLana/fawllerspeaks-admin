@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import generateUniqueSlug from ".";
+import { generateUniqueSlug } from ".";
 
 describe("Posts | Should convert a post title to a lowercased post url slug", () => {
   test.each([
@@ -53,6 +53,6 @@ describe("Posts | Should convert a post title to a lowercased post url slug", ()
     async (slug, expected) => {
       const result = await generateUniqueSlug(slug);
       expect(result).toMatch(new RegExp(`^${expected}-[a-z0-9]{4}$`));
-    }
+    },
   );
 });

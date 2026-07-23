@@ -1,7 +1,7 @@
 import type {
   RefreshData as RefreshDataResponse,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class RefreshData implements RefreshDataResponse {
   readonly status: Status;

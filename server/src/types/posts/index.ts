@@ -5,7 +5,7 @@ import type {
   PostTag,
   PostUrl,
   ResolverTypeWrapper,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export interface DBPostData {
   readonly id: string;
@@ -36,8 +36,8 @@ export interface PostData extends Omit<Post, "content"> {
 export type PostDataMapper<T extends object> = T extends { post: Post }
   ? Omit<T, "post"> & { post: PostData }
   : T extends { posts: readonly Post[] }
-  ? Omit<T, "posts"> & { posts: PostData[] }
-  : T;
+    ? Omit<T, "posts"> & { posts: PostData[] }
+    : T;
 
 type FunctionLike = (...args: never[]) => object;
 

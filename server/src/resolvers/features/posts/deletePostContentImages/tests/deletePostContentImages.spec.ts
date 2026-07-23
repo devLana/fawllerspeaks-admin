@@ -1,21 +1,23 @@
 import { describe, it, expect, beforeAll, afterAll, jest } from "@jest/globals";
+import { StorageError } from "@supabase/storage-js";
 import type { ApolloServer } from "@apollo/server";
 
 import { db } from "@services/db";
 import { startServer } from "@server";
 import { DELETE_POST_CONTENT_IMAGES as MUTATION } from "@utils/tests/gqlQueries/postsTestQueries";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import post from "@utils/tests/post";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { post } from "@utils/tests/post";
 import * as mocks from "./deletePostContentImages.testUtils";
 import { deleteImages } from "@services/supabase/deleteImages";
-import type { APIContext } from "@types";
-import type { Result, DeleteData } from "types/posts/deletePostContentImages";
+import type { APIContext } from "@appTypes";
+import type { DeleteData } from "@appTypes/posts/deletePostContentImages";
 
 jest.mock("@services/supabase/deleteImages");
 
 describe("Delete Post Content Images", () => {
-  const mockFn = deleteImages as unknown as jest.MockedFunction<Result>;
+  const mockFn = jest.mocked(deleteImages);
+
   let server: ApolloServer<APIContext>, url: string;
   let registeredJwt: string, unregisteredJwt: string;
 
@@ -111,7 +113,8 @@ describe("Delete Post Content Images", () => {
 
   describe("DeleteData request failed", () => {
     it("Expect an error object response if the request fails", async () => {
-      mockFn.mockResolvedValueOnce({ error: "Request Failed" });
+      const error = new StorageError("Error");
+      mockFn.mockResolvedValueOnce({ error, data: null });
 
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload = { query: MUTATION, variables: { images: mocks.images } };
@@ -132,7 +135,7 @@ describe("Delete Post Content Images", () => {
 
   describe("Images deleted", () => {
     it("Expect a success object response if the post content images are successfully deleted", async () => {
-      mockFn.mockResolvedValueOnce({ error: null });
+      mockFn.mockResolvedValueOnce({ error: null, data: [] });
 
       const options = { authorization: `Bearer ${registeredJwt}` };
       const payload = { query: MUTATION, variables: { images: mocks.images } };

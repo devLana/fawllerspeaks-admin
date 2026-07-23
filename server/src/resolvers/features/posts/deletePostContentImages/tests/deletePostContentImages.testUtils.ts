@@ -8,7 +8,7 @@ export const images = [
   "https://testing.com",
 ];
 
-export const validations: [string, string[], string][] = [
+export const validations: Array<[string, string[], string]> = [
   [
     "Should return a validation error for an empty input array",
     [],

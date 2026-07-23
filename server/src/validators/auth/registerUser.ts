@@ -1,5 +1,5 @@
 import Joi from "joi";
-import type { RegisterUserInput } from "@resolverTypes";
+import type { RegisterUserInput } from "@appTypes/resolverTypes";
 
 export const registerUserValidator = Joi.object<RegisterUserInput>({
   firstName: Joi.string()

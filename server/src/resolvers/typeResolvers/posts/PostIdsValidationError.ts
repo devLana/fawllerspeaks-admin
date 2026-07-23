@@ -1,7 +1,7 @@
 import type {
   PostIdsValidationError as ValidationError,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class PostIdsValidationError implements ValidationError {
   readonly status: Status;

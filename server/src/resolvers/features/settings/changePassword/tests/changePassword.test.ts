@@ -3,19 +3,22 @@ import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
-import changePasswordMail from "@services/mail/changePassword";
+import { changePasswordMail } from "@services/mail/changePassword";
 import { MailError } from "@lib/Errors";
 import * as mocks from "./changePassword.testUtils";
 import { CHANGE_PASSWORD } from "@utils/tests/gqlQueries/settingsTestQueries";
-import authUsers from "@utils/tests/createTestUsers/authUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { ChangePasswordData as Data } from "types/settings/changePassword";
-import testSession from "@utils/tests/testSession";
+import { authUsers } from "@utils/tests/createTestUsers/authUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { post } from "@utils/tests/post";
+import { testSession } from "@utils/tests/testSession";
+import type { APIContext } from "@appTypes";
+import type { ChangePasswordData as Data } from "@appTypes/settings/changePassword";
 
 jest.mock("@services/mail/changePassword", () => {
-  return jest.fn().mockName("changePasswordMail");
+  return {
+    __esModule: true,
+    changePasswordMail: jest.fn().mockName("changePasswordMail"),
+  };
 });
 
 describe("Change password", () => {
@@ -208,7 +211,7 @@ describe("Change password", () => {
     });
 
     it("Should change the user's password even if the confirmation mail fails to send", async () => {
-      const mock = changePasswordMail as jest.MockedFunction<() => never>;
+      const mock = jest.mocked(changePasswordMail);
       const cookie = registeredCookie;
       const options = { authorization: `Bearer ${registeredJWT}`, cookie };
       const payload = { query: CHANGE_PASSWORD, variables: mocks.validInput2 };

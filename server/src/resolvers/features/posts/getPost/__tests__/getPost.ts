@@ -1,18 +1,18 @@
 import { afterAll, beforeAll, describe, test, expect } from "@jest/globals";
-import { type ApolloServer } from "@apollo/server";
+import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
-import post from "@utils/tests/post";
+import { post } from "@utils/tests/post";
 import { GET_POST } from "@utils/tests/gqlQueries/postsTestQueries";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import createTestPost from "@utils/tests/createTestPost";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { createTestPost } from "@utils/tests/createTestPost";
 import { testPostData, registeredUser as user } from "@utils/tests/mocks";
-import type { PostTag, Post } from "@resolverTypes";
-import type { APIContext } from "@types";
-import type { GetPostData } from "types/posts/getPost";
+import type { PostTag, Post } from "@appTypes/resolverTypes";
+import type { APIContext } from "@appTypes";
+import type { GetPostData } from "@appTypes/posts/getPost";
 
 describe("Get Post", () => {
   let server: ApolloServer<APIContext>, url: string, post1: Post;

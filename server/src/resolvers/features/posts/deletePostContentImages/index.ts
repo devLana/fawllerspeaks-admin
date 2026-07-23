@@ -5,7 +5,7 @@ import { ErrorResponse, Response } from "@typeResolvers/commonResolvers";
 import { DeletePostContentImagesValidationError } from "@typeResolvers/posts/DeletePostContentImagesValidationError";
 import { deleteImages } from "@services/supabase/deleteImages";
 import { deletePostContentImageSchema as schema } from "@validators/posts/deletePostContentImages";
-import type { Delete } from "types/posts/deletePostContentImages";
+import type { Delete } from "@appTypes/posts/deletePostContentImages";
 
 const deletePostContentImages: Delete = async (_, { images }, { user, db }) => {
   const MSG = "Unable to delete post content image";
@@ -19,7 +19,7 @@ const deletePostContentImages: Delete = async (_, { images }, { user, db }) => {
 
     const { rows } = await db.query<{ is_registered: boolean }>(
       `SELECT is_registered FROM users WHERE user_id = $1`,
-      [user]
+      [user],
     );
 
     if (rows.length === 0) return new ErrorResponse("UnauthorizedError", MSG);

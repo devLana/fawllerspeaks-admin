@@ -1,7 +1,7 @@
 import type {
   VerifyResetTokenValidationError as Errors,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class VerifyResetTokenValidationError implements Errors {
   readonly status: Status;

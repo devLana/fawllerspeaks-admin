@@ -3,11 +3,11 @@ import { ValidationError } from "joi";
 
 import { EmailValidationError } from "@typeResolvers/auth/EmailValidationError";
 import { ErrorResponse, Response } from "@typeResolvers/commonResolvers";
-import createUserMail from "@services/mail/createUser";
+import { createUserMail } from "@services/mail/createUser";
 import { emailValidator } from "@validators/auth/email";
 import { MailError } from "@lib/Errors";
-import bytesHash from "@utils/auth/bytesHash";
-import type { CreateUser } from "types/auth/createUser";
+import { bytesHash } from "@utils/auth/bytesHash";
+import type { CreateUser } from "@appTypes/auth/createUser";
 
 const createUser: CreateUser = async (_, { email }, { db }) => {
   try {

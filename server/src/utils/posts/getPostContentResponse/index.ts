@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import type { PostContent, PostTableOfContents } from "@resolverTypes";
+import type { PostContent, PostTableOfContents } from "@appTypes/resolverTypes";
 
 export const getPostContentResponse = (content: string): PostContent => {
   const $ = cheerio.load(content, undefined, false);

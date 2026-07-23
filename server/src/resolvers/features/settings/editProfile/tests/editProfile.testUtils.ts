@@ -1,6 +1,6 @@
 import { storageUrl } from "@services/supabase";
 import { registeredUser } from "@utils/tests/mocks";
-import type { InputErrors } from "types/tests";
+import type { InputErrors } from "@appTypes/tests";
 
 interface Input {
   firstName: string;
@@ -11,7 +11,7 @@ interface Input {
 export const image = "folder/image-folder/image.png";
 export const args = { firstName: "Jõhn-Döe", lastName: "Smíth" };
 
-export const validations: [string, Input, InputErrors<Input>][] = [
+export const validations: Array<[string, Input, InputErrors<Input>]> = [
   [
     "The provided input values are empty strings, Should return a validation error response",
     { firstName: "", lastName: "", image: "" },

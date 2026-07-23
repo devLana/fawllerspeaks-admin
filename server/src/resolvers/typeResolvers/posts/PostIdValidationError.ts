@@ -1,4 +1,7 @@
-import type { PostIdValidationError as Error, Status } from "@resolverTypes";
+import type {
+  PostIdValidationError as Error,
+  Status,
+} from "@appTypes/resolverTypes";
 
 export class PostIdValidationError implements Error {
   readonly status: Status;

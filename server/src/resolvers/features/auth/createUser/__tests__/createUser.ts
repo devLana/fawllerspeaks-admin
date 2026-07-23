@@ -3,16 +3,19 @@ import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
-import createUserMail from "@services/mail/createUser";
+import { createUserMail } from "@services/mail/createUser";
 import { MailError } from "@lib/Errors";
 import { emailValidationsTestCases } from "@utils/tests/emailValidationTestCases";
 import { CREATE_USER } from "@utils/tests/gqlQueries/authTestQueries";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { CreateUserData } from "types/auth/createUser";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { CreateUserData } from "@appTypes/auth/createUser";
 
 jest.mock("@services/mail/createUser", () => {
-  return jest.fn().mockName("createUserMail");
+  return {
+    __esModule: true,
+    createUserMail: jest.fn().mockName("createUserMail"),
+  };
 });
 
 describe("Create user", () => {
@@ -82,7 +85,7 @@ describe("Create user", () => {
       const variables = { email: "lanas_mail@example.org" };
       const payload = { query: CREATE_USER, variables };
       const msg = `An error has occurred in trying to create the new user. Please try again later`;
-      const mock = createUserMail as jest.MockedFunction<() => never>;
+      const mock = jest.mocked(createUserMail);
       mock.mockImplementation(() => {
         throw new MailError("Unable to send mail");
       });

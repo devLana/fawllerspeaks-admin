@@ -1,7 +1,7 @@
 import type {
   DeletePostContentImagesValidationError as ValidationError,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class DeletePostContentImagesValidationError implements ValidationError {
   readonly status: Status;

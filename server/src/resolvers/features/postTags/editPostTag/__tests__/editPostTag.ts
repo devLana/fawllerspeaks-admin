@@ -6,14 +6,14 @@ import type { ApolloServer } from "@apollo/server";
 import { startServer } from "@server";
 import { db } from "@services/db";
 import { EDIT_POST_TAG } from "@utils/tests/gqlQueries/postTagsTestQueries";
-import post from "@utils/tests/post";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
+import { post } from "@utils/tests/post";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
 import { DATE_REGEX } from "@utils/tests/constants";
-import type { APIContext } from "@types";
-import type { PostTag } from "@resolverTypes";
-import type { EditTag } from "types/postTags/editPostTag";
+import type { APIContext } from "@appTypes";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { EditTag } from "@appTypes/postTags/editPostTag";
 
 describe("Edit post tags", () => {
   let server: ApolloServer<APIContext>, url: string;

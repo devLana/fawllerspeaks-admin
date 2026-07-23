@@ -6,8 +6,8 @@ import { PostIdValidationError } from "@typeResolvers/posts/PostIdValidationErro
 import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { postUUIDSchema as schema } from "@validators/posts/postUUID";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { BinPost, BinPostCTE } from "types/posts/binPost";
-import type { GetPostDBData } from "types/posts";
+import type { BinPost, BinPostCTE } from "@appTypes/posts/binPost";
+import type { GetPostDBData } from "@appTypes/posts";
 
 const binPost: BinPost = async (_, { postId }, { res, db, user }) => {
   const MSG = "Unable to move post to bin";
@@ -34,7 +34,7 @@ const binPost: BinPost = async (_, { postId }, { res, db, user }) => {
         WHERE post_id = $2
       )
       SELECT * FROM find_user LEFT JOIN find_post ON true`,
-      [user, inputPostId]
+      [user, inputPostId],
     );
 
     if (rows.length === 0) {
@@ -111,7 +111,7 @@ const binPost: BinPost = async (_, { postId }, { res, db, user }) => {
         bp.last_modified,
         bp.views,
         bp.binned_at`,
-      [post.id]
+      [post.id],
     );
 
     const [binned] = binnedPost;

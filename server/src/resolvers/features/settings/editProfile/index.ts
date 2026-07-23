@@ -7,11 +7,15 @@ import { EditProfileValidationError } from "@typeResolvers/settings/EditProfileV
 import { supabaseEvent } from "@events/supabase";
 import { editProfileValidator as schema } from "@validators/settings/editProfile";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import generateErrorsObject from "@utils/generateErrorsObject";
-import type { Edit, SelectInfo, UserInfo } from "types/settings/editProfile";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
+import type {
+  Edit,
+  SelectInfo,
+  UserInfo,
+} from "@appTypes/settings/editProfile";
 
 const editProfile: Edit = async (_, args, { db, user, res }) => {
-  const argsImage = args.image && args.image.trim();
+  const argsImage = args.image?.trim();
   const MSG = "Unable to edit user profile";
 
   try {
@@ -73,9 +77,9 @@ const editProfile: Edit = async (_, args, { db, user, res }) => {
       const errors = generateErrorsObject(err.details);
 
       return new EditProfileValidationError(
-        errors.firstNameError,
-        errors.lastNameError,
-        errors.imageError
+        errors["firstNameError"],
+        errors["lastNameError"],
+        errors["imageError"]
       );
     }
 

@@ -8,17 +8,17 @@ import { db } from "@services/db";
 import { startServer } from "@server";
 
 import { validationsTable } from "./deletePostsFromBin.testUtils";
-import post from "@utils/tests/post";
+import { post } from "@utils/tests/post";
 import { DELETE_POSTS_FROM_BIN } from "@utils/tests/gqlQueries/postsTestQueries";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
 // import createDeleteTestPosts
 // import postAuthor
 // import postsUsers
 
-import type { APIContext } from "@types";
-import type { TestData } from "types/tests";
-import type { PostTag, Post } from "@resolverTypes";
+import type { APIContext } from "@appTypes";
+import type { TestData } from "@appTypes/tests";
+import type { PostTag, Post } from "@appTypes/resolverTypes";
 
 type DeletePosts = TestData<{ deletePostsFromBin: Record<string, unknown> }>;
 

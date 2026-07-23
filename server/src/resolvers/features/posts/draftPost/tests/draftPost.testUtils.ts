@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
-import type { InputErrors } from "types/tests";
-import type { DraftPostInput, PostContent } from "@resolverTypes";
+import type { InputErrors } from "@appTypes/tests";
+import type { DraftPostInput, PostContent } from "@appTypes/resolverTypes";
 
-type Validations = [string, DraftPostInput, InputErrors<DraftPostInput>][];
+type Validations = Array<[string, DraftPostInput, InputErrors<DraftPostInput>]>;
 
 export const UUID = randomUUID();
 export const imageBanner = "post/image/banner";

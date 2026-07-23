@@ -2,8 +2,8 @@ import bcrypt from "bcrypt";
 import type { Pool } from "pg";
 
 import { unRegisteredUser, registeredUser, newRegisteredUser } from "../mocks";
-import dateToISOString from "@utils/dateToISOString";
-import type { DbTestUser } from "types/tests";
+import { dateToISOString } from "@utils/dateToISOString";
+import type { DbTestUser } from "@appTypes/tests";
 
 interface Users {
   readonly registeredUser: DbTestUser;
@@ -11,7 +11,7 @@ interface Users {
   readonly newRegisteredUser: DbTestUser;
 }
 
-const authUsers = async (db: Pool): Promise<Users> => {
+export const authUsers = async (db: Pool): Promise<Users> => {
   try {
     const unregisterPromise = bcrypt.hash(unRegisteredUser.password, 10);
     const registerPromise = bcrypt.hash(registeredUser.password, 10);
@@ -103,9 +103,7 @@ const authUsers = async (db: Pool): Promise<Users> => {
       },
     };
   } catch (err) {
-    console.error("Create Reset Password Users Error - ", err);
-    throw new Error("Unable to create reset password test users");
+    console.error("Create Auth Test Users Error - ", err);
+    throw new Error("Unable to create auth test users", { cause: err });
   }
 };
-
-export default authUsers;

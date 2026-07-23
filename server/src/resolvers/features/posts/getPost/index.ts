@@ -6,8 +6,8 @@ import { GetPostValidationError } from "@typeResolvers/posts/GetPostValidationEr
 import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { getPostSchema } from "@validators/posts/getPost";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { GetPostDBData } from "types/posts";
-import type { GetPost } from "types/posts/getPost";
+import type { GetPostDBData } from "@appTypes/posts";
+import type { GetPost } from "@appTypes/posts/getPost";
 
 const getPost: GetPost = async (_, { slug }, { user, db, res }) => {
   try {
@@ -22,7 +22,7 @@ const getPost: GetPost = async (_, { slug }, { user, db, res }) => {
 
     const { rows: foundUser } = await db.query<{ is_registered: boolean }>(
       `SELECT is_registered FROM users WHERE user_id = $1`,
-      [user]
+      [user],
     );
 
     if (foundUser.length === 0) {
@@ -86,7 +86,7 @@ const getPost: GetPost = async (_, { slug }, { user, db, res }) => {
         p.last_modified,
         p.views,
         p.binned_at`,
-      [postSlug]
+      [postSlug],
     );
 
     if (foundPost.length === 0) return new ErrorResponse("NotFoundError", MSG);

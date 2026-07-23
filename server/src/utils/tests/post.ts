@@ -1,8 +1,9 @@
 import {
   request,
   Agent,
-  type RequestOptions,
   type IncomingHttpHeaders,
+  type OutgoingHttpHeaders,
+  type RequestOptions,
 } from "node:http";
 import { URL } from "node:url";
 import { Buffer } from "node:buffer";
@@ -14,9 +15,9 @@ interface PostResponse<U> {
   data: U;
 }
 
-type RequestHeaders = RequestOptions["headers"] & IncomingHttpHeaders;
+type RequestHeaders = OutgoingHttpHeaders & IncomingHttpHeaders;
 
-const post = <T = unknown>(
+export const post = <T = unknown>(
   address: string,
   data: Record<string, unknown>,
   reqHeaders: RequestHeaders = {}
@@ -47,42 +48,43 @@ const post = <T = unknown>(
         const resData = Buffer.concat(chunkData).toString();
 
         try {
-          const responseBody: PostResponse<T> = {
-            statusCode,
-            responseHeaders: headers,
-            statusMessage,
-            data: JSON.parse(resData) as T,
-          };
-
-          if (
-            res.statusCode &&
-            (res.statusCode < 200 || res.statusCode >= 300)
-          ) {
-            reject(resData);
+          if (!statusCode || !statusMessage) {
+            reject(new Error("Request failed", { cause: resData }));
+            res.resume();
+          } else if (statusCode < 200 || statusCode >= 300) {
+            reject(new Error("Request failed", { cause: resData }));
             res.resume();
           } else {
+            const responseBody: PostResponse<T> = {
+              statusCode,
+              responseHeaders: headers,
+              statusMessage,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+              data: JSON.parse(resData) as T,
+            };
+
             resolve(responseBody);
           }
-        } catch {
-          reject("Response error - Error parsing response data");
+        } catch (error) {
+          reject(
+            new Error("Response error - Error parsing response data", {
+              cause: error,
+            })
+          );
           res.resume();
         }
       });
 
       res.on("error", err => {
-        reject(`Response error - ${err.message}`);
+        reject(err);
         res.resume();
       });
     });
 
-    req.on("error", err => {
-      reject(`Request error - ${err.message}`);
-    });
+    req.on("error", err => reject(err));
 
     req.write(JSON.stringify(data));
 
     req.end();
   });
 };
-
-export default post;

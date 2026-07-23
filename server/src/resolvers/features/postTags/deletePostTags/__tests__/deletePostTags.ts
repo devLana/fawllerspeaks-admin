@@ -6,13 +6,13 @@ import type { ApolloServer } from "@apollo/server";
 import { db } from "@services/db";
 import { startServer } from "@server";
 import { DELETE_POST_TAGS } from "@utils/tests/gqlQueries/postTagsTestQueries";
-import post from "@utils/tests/post";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import type { APIContext } from "@types";
-import type { PostTag } from "@resolverTypes";
-import type { DeleteTags } from "types/postTags/deletePostTags";
+import { post } from "@utils/tests/post";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import type { APIContext } from "@appTypes";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { DeleteTags } from "@appTypes/postTags/deletePostTags";
 
 describe("Delete post tags", () => {
   const UUID = randomUUID();

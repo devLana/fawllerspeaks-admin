@@ -1,17 +1,18 @@
 import type { Response, NextFunction } from "express";
 
-import type { Cookies, GQLRequest } from "@types";
+import type { Cookies, GQLRequest } from "@appTypes";
 import { hmacRefreshToken } from "@utils/auth/signTokens";
 
 export const parseCookies = (
   req: GQLRequest,
   _: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.headers.cookie) {
     const cookieReq = req;
     cookieReq.cookies = {};
-    return next();
+    next();
+    return;
   }
 
   const cookies = req.headers.cookie.split(/;\s?/);

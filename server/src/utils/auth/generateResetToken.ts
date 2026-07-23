@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import generateBytes from "../generateBytes";
+import { generateBytes } from "../generateBytes";
 
 export const generateResetHash = (token: string) => {
   return createHash("sha256").update(token, "base64url").digest("hex");

@@ -2,12 +2,12 @@ import { expressMiddleware } from "@apollo/server/express4";
 import type { ApolloServer } from "@apollo/server";
 
 import { db } from "@services/db";
-import getUser from "@lib/getUser";
-import type { APIContext } from "@types";
+import { getUser } from "@lib/getUser";
+import type { APIContext } from "@appTypes";
 
 export const graphqlApi = (server: ApolloServer<APIContext>) => {
   return expressMiddleware(server, {
-    context: async ({ req, res }) => {
+    async context({ req, res }) {
       const user = await getUser(req.headers.authorization);
       return { db, user, req, res };
     },

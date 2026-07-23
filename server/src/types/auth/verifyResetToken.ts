@@ -1,6 +1,6 @@
-import { type QueryResolvers } from "@resolverTypes";
-import type { ResolverFunc } from "@types";
-import type { TestData } from "types/tests";
+import type { QueryResolvers } from "@appTypes/resolverTypes";
+import type { ResolverFunc } from "@appTypes";
+import type { TestData } from "@appTypes/tests";
 
 export type VerifyToken = ResolverFunc<QueryResolvers["verifyResetToken"]>;
 

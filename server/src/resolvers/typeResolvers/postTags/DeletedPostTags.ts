@@ -1,4 +1,4 @@
-import type { DeletedPostTags as Tags, Status } from "@resolverTypes";
+import type { DeletedPostTags as Tags, Status } from "@appTypes/resolverTypes";
 
 export class DeletedPostTags implements Tags {
   readonly status: Status;

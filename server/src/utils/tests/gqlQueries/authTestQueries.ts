@@ -163,7 +163,7 @@ export const RESET_PASSWORD = `#graphql
 `;
 
 export const VERIFY_PASSWORD_RESET_TOKEN = `#graphql
-  mutation VerifyPasswordResetToken($token: String!) {
+  query VerifyPasswordResetToken($token: String!) {
     verifyResetToken(token: $token) {
       ... on BaseResponse {
         __typename

@@ -1,22 +1,22 @@
 import { afterAll, beforeAll, describe, it, expect, jest } from "@jest/globals";
-import { type ApolloServer } from "@apollo/server";
+import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
 import { supabaseEvent } from "@events/supabase";
 import { storageUrl } from "@services/supabase";
 import * as mocks from "./editPost.testUtils";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import createTestPost from "@utils/tests/createTestPost";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import post from "@utils/tests/post";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import { createTestPost } from "@utils/tests/createTestPost";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { post } from "@utils/tests/post";
 import { registeredUser as user, testPostData } from "@utils/tests/mocks";
 import { EDIT_POST } from "@utils/tests/gqlQueries/postsTestQueries";
 import { DATE_REGEX } from "@utils/tests/constants";
-import type { APIContext } from "@types";
-import type { Post, PostTag } from "@resolverTypes";
-import type { EditData } from "types/posts/editPost";
+import type { APIContext } from "@appTypes";
+import type { Post, PostTag } from "@appTypes/resolverTypes";
+import type { EditData } from "@appTypes/posts/editPost";
 
 jest.mock("@events/supabase");
 

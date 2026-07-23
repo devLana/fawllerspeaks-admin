@@ -6,17 +6,17 @@ import { SinglePost } from "@typeResolvers/posts/SinglePost";
 import { PostValidationError } from "@typeResolvers/posts/PostValidationError";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { draftPostSchema as schema } from "@validators/posts/draftPost";
-import generateErrorsObject from "@utils/generateErrorsObject";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import getPostSlug from "@utils/posts/getPostSlug";
-import generateUniqueSlug from "@utils/posts/generateUniqueSlug";
+import { getPostSlug } from "@utils/posts/getPostSlug";
+import { generateUniqueSlug } from "@utils/posts/generateUniqueSlug";
 import { resolvePostTags, findRows } from "@utils/posts/create_draft";
-import type { DraftPost } from "types/posts/draftPost";
-import type { PostTag } from "@resolverTypes";
-import type { Draft_Edit } from "types/posts";
+import type { DraftPost } from "@appTypes/posts/draftPost";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { Draft_Edit } from "@appTypes/posts";
 
 const draftPost: DraftPost = async (_, { post }, { db, user, res }) => {
-  const postImage = post.imageBanner && post.imageBanner.trim();
+  const postImage = post.imageBanner?.trim();
   const MSG = "Unable to save post to draft";
 
   try {
@@ -57,19 +57,19 @@ const draftPost: DraftPost = async (_, { post }, { db, user, res }) => {
     if (description) {
       insertValues.push(description);
       postInsertFields = `${postInsertFields}, description`;
-      postInsertParams = `${postInsertParams}, $${++index}`;
+      postInsertParams = `${postInsertParams}, $${String(++index)}`;
     }
 
     if (excerpt) {
       insertValues.push(excerpt);
       postInsertFields = `${postInsertFields}, excerpt`;
-      postInsertParams = `${postInsertParams}, $${++index}`;
+      postInsertParams = `${postInsertParams}, $${String(++index)}`;
     }
 
     if (imageBanner) {
       insertValues.push(imageBanner);
       postInsertFields = `${postInsertFields}, image_banner`;
-      postInsertParams = `${postInsertParams}, $${++index}`;
+      postInsertParams = `${postInsertParams}, $${String(++index)}`;
     }
 
     await db.query("BEGIN");

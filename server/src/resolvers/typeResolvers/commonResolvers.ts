@@ -1,4 +1,4 @@
-import type { BaseResponse as BR, Status } from "@resolverTypes";
+import type { BaseResponse as BR, Status } from "@appTypes/resolverTypes";
 
 type ErrorResponseNames =
   | "NotFoundError"
@@ -10,7 +10,10 @@ type ErrorResponseNames =
 export class ErrorResponse<T extends ErrorResponseNames> implements BR {
   readonly status: Status;
 
-  constructor(readonly __typename: T, readonly message: string) {
+  constructor(
+    readonly __typename: T,
+    readonly message: string
+  ) {
     this.status = "ERROR";
   }
 }

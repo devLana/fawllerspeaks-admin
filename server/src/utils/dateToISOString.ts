@@ -1,5 +1,1 @@
-const dateToISOString = (dateString: string) => {
-  return new Date(dateString).toISOString();
-};
-
-export default dateToISOString;
+export const dateToISOString = (date: string) => new Date(date).toISOString();

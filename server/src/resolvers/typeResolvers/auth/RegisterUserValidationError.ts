@@ -1,9 +1,9 @@
-import type { RemoveNull } from "@types";
+import type { RemoveNull } from "@appTypes";
 
 import type {
   RegisterUserValidationError as Errors,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class RegisterUserValidationError implements Errors {
   readonly firstNameError?: string;

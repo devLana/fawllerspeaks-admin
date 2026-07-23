@@ -2,19 +2,22 @@ import { it, expect, describe, jest, beforeAll, afterAll } from "@jest/globals";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
-import generatePasswordMail from "@services/mail/generatePassword";
+import { generatePasswordMail } from "@services/mail/generatePassword";
 import { db } from "@services/db";
 import { MailError } from "@lib/Errors";
 import { emailValidationsTestCases } from "@utils/tests/emailValidationTestCases";
 import { GENERATE_PASSWORD } from "@utils/tests/gqlQueries/authTestQueries";
 import { unRegisteredUser, registeredUser } from "@utils/tests/mocks";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { GeneratePasswordData as DATA } from "types/auth/generatePassword";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { GeneratePasswordData as DATA } from "@appTypes/auth/generatePassword";
 
 jest.mock("@services/mail/generatePassword", () => {
-  return jest.fn().mockName("generatePasswordMail");
+  return {
+    __esModule: true,
+    generatePasswordMail: jest.fn().mockName("generatePasswordMail"),
+  };
 });
 
 describe("Generate password", () => {
@@ -93,7 +96,7 @@ describe("Generate password", () => {
       const variables = { email: unRegisteredUser.email };
       const payload = { query: GENERATE_PASSWORD, variables };
       const MSG = `An error has occurred in generating a new default password. Please try again later`;
-      const mock = generatePasswordMail as jest.MockedFunction<() => never>;
+      const mock = jest.mocked(generatePasswordMail);
       mock.mockImplementation(() => {
         throw new MailError("Unable to send mail");
       });

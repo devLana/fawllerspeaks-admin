@@ -1,5 +1,5 @@
 import Joi from "joi";
-import type { MutationResetPasswordArgs } from "@resolverTypes";
+import type { MutationResetPasswordArgs } from "@appTypes/resolverTypes";
 
 export const resetPasswordValidator = Joi.object<MutationResetPasswordArgs>({
   token: Joi.string()

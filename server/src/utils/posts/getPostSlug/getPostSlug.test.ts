@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import getPostUrl from ".";
+import { getPostSlug } from ".";
 
 describe("Posts | Should convert a post title to a lowercased post url slug", () => {
   test.each([
@@ -49,7 +49,7 @@ describe("Posts | Should convert a post title to a lowercased post url slug", ()
       "going-very-long-blog-post-title-over-80-characters-length-so-i-am-going-fill-up",
     ],
   ])("Expect {%s} to be converted to {%s}", (title, expected) => {
-    const result = getPostUrl(title);
+    const result = getPostSlug(title);
     expect(result).toMatch(expected);
   });
 });

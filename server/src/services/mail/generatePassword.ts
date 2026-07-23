@@ -1,9 +1,9 @@
-import mailService from ".";
-import mailTemplate from "./mailTemplate";
+import { mailService } from ".";
+import { mailTemplate } from "./mailTemplate";
 import { urls } from "@lib/ClientUrls";
 import { MailError } from "@lib/Errors";
 
-const generatePasswordMail = async (email: string, password: string) => {
+export const generatePasswordMail = async (email: string, password: string) => {
   const body = `
     <p>
       You have requested a new auto generated log in password for your admin dashboard.
@@ -52,5 +52,3 @@ const generatePasswordMail = async (email: string, password: string) => {
     );
   }
 };
-
-export default generatePasswordMail;

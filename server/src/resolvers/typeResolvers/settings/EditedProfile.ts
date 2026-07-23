@@ -2,7 +2,7 @@ import type {
   EditedProfile as EditedUserProfile,
   User,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class EditedProfile implements EditedUserProfile {
   readonly status: Status;

@@ -5,16 +5,16 @@ import type { ApolloServer } from "@apollo/server";
 
 import { db } from "@services/db";
 import { startServer } from "@server";
-import post from "@utils/tests/post";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
+import { post } from "@utils/tests/post";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
 import { UN_BIN_POSTS } from "@utils/tests/gqlQueries/postsTestQueries";
 // import postAuthor
 // import postsUsers
 // import createBinnedTestPosts
-import type { APIContext } from "@types";
-import type { TestData } from "types/tests";
-import type { PostTag, Post } from "@resolverTypes";
+import type { APIContext } from "@appTypes";
+import type { TestData } from "@appTypes/tests";
+import type { PostTag, Post } from "@appTypes/resolverTypes";
 import { testTable1 } from "./unBinPosts.testUtils";
 
 type UnBinPost = TestData<{ unBinPosts: Record<string, unknown> }>;

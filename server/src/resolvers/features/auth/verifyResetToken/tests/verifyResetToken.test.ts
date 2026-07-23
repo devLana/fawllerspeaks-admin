@@ -4,13 +4,13 @@ import type { ApolloServer } from "@apollo/server";
 import { db } from "@services/db";
 import { startServer } from "@server";
 import { VERIFY_PASSWORD_RESET_TOKEN } from "@utils/tests/gqlQueries/authTestQueries";
-import authUsers from "@utils/tests/createTestUsers/authUsers";
-import createPasswordReset from "@utils/tests/createPasswordReset";
+import { authUsers } from "@utils/tests/createTestUsers/authUsers";
+import { createPasswordReset } from "@utils/tests/createPasswordReset";
 import { validations, verify } from "./verifyResetToken.testUtils";
 import { registeredUser, registeredReset } from "@utils/tests/mocks";
-import post from "@utils/tests/post";
-import type { APIContext } from "@types";
-import type { VerifyResetToken } from "types/auth/verifyResetToken";
+import { post } from "@utils/tests/post";
+import type { APIContext } from "@appTypes";
+import type { VerifyResetToken } from "@appTypes/auth/verifyResetToken";
 
 describe("Verify password reset token", () => {
   let server: ApolloServer<APIContext>, url: string;

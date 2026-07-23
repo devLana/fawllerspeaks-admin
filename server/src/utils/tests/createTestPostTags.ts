@@ -1,19 +1,19 @@
 import type { Pool } from "pg";
 
-import dateToISOString from "@utils/dateToISOString";
-import type { PostTag } from "@resolverTypes";
+import { dateToISOString } from "@utils/dateToISOString";
+import type { PostTag } from "@appTypes/resolverTypes";
 
-const createTestPostTags = async (
+export const createTestPostTags = async (
   db: Pool,
-  numberOfTags = 5
+  numberOfTags = 5,
 ): Promise<PostTag[]> => {
   const values: string[] = [];
   let params = "";
 
   for (let i = 1; i <= numberOfTags; i++) {
     const comma = i === 1 ? "" : ", ";
-    values.push(`Post Tag ${i}`);
-    params = `${params}${comma}($${i})`;
+    values.push(`Post Tag ${i.toString()}`);
+    params = `${params}${comma}($${i.toString()})`;
   }
 
   try {
@@ -26,7 +26,7 @@ const createTestPostTags = async (
         name,
         date_created "dateCreated",
         last_Modified "lastModified"`,
-      values
+      values,
     );
 
     return rows.map(row => ({
@@ -39,8 +39,6 @@ const createTestPostTags = async (
     }));
   } catch (err) {
     console.error("Create Test Post Tags Error - ", err);
-    throw new Error("Unable to create test post tags");
+    throw new Error("Unable to create test post tags", { cause: err });
   }
 };
-
-export default createTestPostTags;

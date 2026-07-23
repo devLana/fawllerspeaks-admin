@@ -3,14 +3,14 @@ import type { Pool } from "pg";
 import { storageUrl } from "@services/supabase";
 import { getPostContentResponse } from "@utils/posts/getPostContentResponse";
 import { urls } from "@lib/ClientUrls";
-import dateToISOString from "@utils/dateToISOString";
-import type { PostDBData, TestPostData } from "types/tests";
+import { dateToISOString } from "@utils/dateToISOString";
+import type { PostDBData, TestPostData } from "@appTypes/tests";
 import type {
   Post,
   PostContent,
   PostTableOfContents,
   PostTag,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 interface TestPostAuthor {
   readonly userId: number;
@@ -26,7 +26,7 @@ interface Options {
   postData: TestPostData;
 }
 
-const createTestPost = async (params: Options): Promise<Post> => {
+export const createTestPost = async (params: Options): Promise<Post> => {
   const { db, postTags, postAuthor, postData } = params;
   const tagIds = postTags?.map(postTag => postTag.id);
   const dbTags = tagIds ? `{${tagIds.join(",")}}` : null;
@@ -116,7 +116,7 @@ const createTestPost = async (params: Options): Promise<Post> => {
         postData.binnedAt,
         dbTags,
         postData.content,
-      ]
+      ],
     );
 
     const [post] = rows;
@@ -180,8 +180,6 @@ const createTestPost = async (params: Options): Promise<Post> => {
     };
   } catch (err) {
     console.error("Create Test Post Error - ", err);
-    throw new Error("Unable to create test post");
+    throw new Error("Unable to create test post", { cause: err });
   }
 };
-
-export default createTestPost;

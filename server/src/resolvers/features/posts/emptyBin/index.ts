@@ -1,25 +1,8 @@
-import { GraphQLError } from "graphql";
-
-import { Posts } from "@typeResolvers/posts/Posts";
-import { EmptyBinWarning } from "./EmptyBinWarning";
-import getPostSlug from "@utils/posts/getPostSlug";
-// import mapPostTags from "@features/posts/utils/mapPostTags";
-import dateToISOString from "@utils/dateToISOString";
-
-import type { MutationResolvers, PostTag } from "@resolverTypes";
-import type { ResolverFunc } from "@types";
-import type { GetPostDBData } from "types/posts";
+import type { MutationResolvers } from "@appTypes/resolverTypes";
+import type { ResolverFunc } from "@appTypes";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 
 type EmptyBin = ResolverFunc<MutationResolvers["emptyBin"]>;
-
-interface DbUser {
-  isRegistered: boolean;
-  name: string;
-  image: string | null;
-}
-
-type DbPost = Omit<GetPostDBData, "author" | "isInBin" | "isDeleted">;
 
 const emptyBin: EmptyBin = () => {
   return new ErrorResponse(

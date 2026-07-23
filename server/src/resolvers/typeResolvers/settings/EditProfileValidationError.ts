@@ -1,7 +1,7 @@
 import type {
   EditProfileValidationError as Errors,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class EditProfileValidationError implements Errors {
   readonly status: Status;
@@ -10,7 +10,7 @@ export class EditProfileValidationError implements Errors {
   constructor(
     readonly firstNameError?: string,
     readonly lastNameError?: string,
-    readonly imageError?: string
+    readonly imageError?: string,
   ) {
     this.status = "ERROR";
     this.__typename = "EditProfileValidationError";

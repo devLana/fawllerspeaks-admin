@@ -1,6 +1,6 @@
 import { SLUG_MAX_LENGTH } from "../constants";
 
-const getPostSlug = (title: string) => {
+export const getPostSlug = (title: string) => {
   const stopWords = new Set([
     "a",
     "an",
@@ -90,5 +90,3 @@ const getPostSlug = (title: string) => {
 
   return slug;
 };
-
-export default getPostSlug;

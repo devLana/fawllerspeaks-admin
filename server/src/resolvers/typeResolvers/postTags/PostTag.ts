@@ -1,5 +1,5 @@
-import dateToISOString from "@utils/dateToISOString";
-import type { PostTagResolvers } from "@resolverTypes";
+import { dateToISOString } from "@utils/dateToISOString";
+import type { PostTagResolvers } from "@appTypes/resolverTypes";
 
 export const PostTag: PostTagResolvers = {
   dateCreated: parent => dateToISOString(parent.dateCreated),

@@ -1,11 +1,13 @@
 import crypto from "node:crypto";
-import util from "node:util";
 
-const generateBytes = async (size: number, encoding: BufferEncoding) => {
-  const randomBytes = util.promisify(crypto.randomBytes);
-  const buf = await randomBytes(size);
-
-  return buf.toString(encoding);
+export const generateBytes = async (size: number, encoding: BufferEncoding) => {
+  return new Promise<string>((resolve, reject) => {
+    crypto.randomBytes(size, (err, buf) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(buf.toString(encoding));
+      }
+    });
+  });
 };
-
-export default generateBytes;

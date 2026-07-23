@@ -1,11 +1,11 @@
 import { URL } from "node:url";
 
-import mailService from ".";
-import mailTemplate from "./mailTemplate";
+import { mailService } from ".";
+import { mailTemplate } from "./mailTemplate";
 import { MailError } from "@lib/Errors";
 import { urls } from "@lib/ClientUrls";
 
-const forgotPasswordMail = async (email: string, token: string) => {
+export const forgotPasswordMail = async (email: string, token: string) => {
   try {
     const { href } = new URL(`${urls.resetPassword}?tId=${token}`);
 
@@ -59,5 +59,3 @@ const forgotPasswordMail = async (email: string, token: string) => {
     );
   }
 };
-
-export default forgotPasswordMail;

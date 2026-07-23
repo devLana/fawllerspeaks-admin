@@ -9,18 +9,17 @@ import {
   afterAll,
   afterEach,
 } from "@jest/globals";
+import { StorageError } from "@supabase/storage-js";
 import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
 import { uploadImage } from "@services/supabase/uploadImage";
 import { removeFile } from "@events/removeFile";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import loginTestUser from "@utils/tests/loginTestUser";
-import postFormData from "@utils/tests/postFormData";
-import type { APIContext } from "@types";
-
-type UploadReturn = () => Promise<{ error: Error | null }>;
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { postFormData } from "@utils/tests/postFormData";
+import type { APIContext } from "@appTypes";
 
 jest.mock("@services/supabase/uploadImage");
 
@@ -173,7 +172,7 @@ describe("Upload Post Content Image", () => {
       jest.resetAllMocks();
     });
 
-    const mock = uploadImage as jest.MockedFunction<UploadReturn>;
+    const mock = jest.mocked(uploadImage);
 
     it("Expect the request to be parsed as long as an upload image field is provided in the form data", async () => {
       mock.mockResolvedValueOnce({ error: null });
@@ -221,7 +220,7 @@ describe("Upload Post Content Image", () => {
     });
 
     it("Expect a server error response if the image upload to Supabase failed", async () => {
-      mock.mockResolvedValueOnce({ error: new Error("Error") });
+      mock.mockResolvedValueOnce({ error: new StorageError("Error") });
 
       const formData = new FormData();
       const headers = { authorization: `Bearer ${registeredJwt}` };
@@ -233,8 +232,7 @@ describe("Upload Post Content Image", () => {
       expect(res.statusMessage).toBe("Internal Server Error");
       expect(res.data).toEqual({
         error: {
-          message:
-            "Something has gone wrong and your image could not be uploaded. Please try again later",
+          message: `Something has gone wrong and your image could not be uploaded. Please try again later`,
         },
       });
     });

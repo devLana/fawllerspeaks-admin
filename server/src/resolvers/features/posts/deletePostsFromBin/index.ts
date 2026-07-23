@@ -1,26 +1,8 @@
-import { GraphQLError } from "graphql";
-import Joi, { ValidationError } from "joi";
-
-import getPostSlug from "@utils/posts/getPostSlug";
-// import  mapPostTags from "@features/posts/utils/mapPostTags";
-import { Posts } from "@typeResolvers/posts/Posts";
-import { PostIdsValidationError } from "@typeResolvers/posts/PostIdsValidationError";
-import { PostsWarning } from "@typeResolvers/posts/PostsWarning";
-import dateToISOString from "@utils/dateToISOString";
-
-import type { MutationResolvers, PostTag, Post } from "@resolverTypes";
-import type { ResolverFunc } from "@types";
-import type { GetPostDBData } from "types/posts";
+import type { MutationResolvers } from "@appTypes/resolverTypes";
+import type { ResolverFunc } from "@appTypes";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 
 type DeletePosts = ResolverFunc<MutationResolvers["deletePostsFromBin"]>;
-type DbPost = Omit<GetPostDBData, "author" | "isInBin" | "isDeleted">;
-
-interface User {
-  isRegistered: boolean;
-  name: string;
-  image: string | null;
-}
 
 const deletePostsFromBin: DeletePosts = () => {
   return new ErrorResponse(

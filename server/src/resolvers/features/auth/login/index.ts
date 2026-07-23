@@ -6,16 +6,16 @@ import { LoginValidationError } from "@typeResolvers/auth/LoginValidationError";
 import { SessionData } from "@typeResolvers/auth/SessionData";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { loginValidator as schema } from "@validators/auth/login";
-import generateErrorsObject from "@utils/generateErrorsObject";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
 import signTokens from "@utils/auth/signTokens";
 import { setAuthCookie } from "@utils/auth/cookies";
-import type { Login, DBUser } from "types/auth/login";
+import type { Login, DBUser } from "@appTypes/auth/login";
 
 const login: Login = async (_, args, { db, req, res }) => {
   try {
     const MSG = "Invalid email or password";
-    const ip = req.ip || null;
-    const userAgent = req.headers["user-agent"] || null;
+    const ip = req.ip ?? null;
+    const userAgent = req.headers["user-agent"] ?? null;
 
     const input = await schema.validateAsync(args, { abortEarly: false });
 
@@ -43,9 +43,8 @@ const login: Login = async (_, args, { db, req, res }) => {
 
     if (!match) return new ErrorResponse("ForbiddenError", MSG);
 
-    const { refreshTokenHash, refreshToken, accessToken } = await signTokens(
-      user_id
-    );
+    const { refreshTokenHash, refreshToken, accessToken } =
+      await signTokens(user_id);
 
     await db.query(
       `INSERT INTO sessions (refresh_token, user_id, ip_address, user_agent)

@@ -1,9 +1,9 @@
-import mailService from ".";
-import mailTemplate from "./mailTemplate";
+import { mailService } from ".";
+import { mailTemplate } from "./mailTemplate";
 import { MailError } from "@lib/Errors";
 import { urls } from "@lib/ClientUrls";
 
-const sessionMail = async (email: string) => {
+export const sessionMail = async (email: string) => {
   const body = `
     <p>
       <strong>Suspicious activity has been detected on your Fawller Speaks admin dashboard account</strong>.
@@ -49,5 +49,3 @@ const sessionMail = async (email: string) => {
     );
   }
 };
-
-export default sessionMail;

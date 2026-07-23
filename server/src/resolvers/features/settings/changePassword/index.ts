@@ -2,14 +2,17 @@ import { GraphQLError } from "graphql";
 import { ValidationError } from "joi";
 import bcrypt from "bcrypt";
 
-import changePasswordMail from "@services/mail/changePassword";
+import { changePasswordMail } from "@services/mail/changePassword";
 import { ChangePasswordValidationError } from "@typeResolvers/settings/ChangePasswordValidationError";
 import { ErrorResponse, Response } from "@typeResolvers/commonResolvers";
 import { changePasswordValidator as schema } from "@validators/settings/changePassword";
 import { MailError } from "@lib/Errors";
-import generateErrorsObject from "@utils/generateErrorsObject";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { ChangePassword as Fn, User } from "types/settings/changePassword";
+import type {
+  ChangePassword as Fn,
+  User,
+} from "@appTypes/settings/changePassword";
 
 const changePassword: Fn = async (_, args, { db, user, req, res }) => {
   try {
@@ -82,9 +85,9 @@ const changePassword: Fn = async (_, args, { db, user, req, res }) => {
       const errors = generateErrorsObject(err.details);
 
       return new ChangePasswordValidationError(
-        errors.currentPasswordError,
-        errors.newPasswordError,
-        errors.confirmNewPasswordError
+        errors["currentPasswordError"],
+        errors["newPasswordError"],
+        errors["confirmNewPasswordError"]
       );
     }
 

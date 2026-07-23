@@ -3,10 +3,10 @@ import type {
   LocalMailConfig,
   MailProvider,
   SendOptions,
-} from "types/mailService";
+} from "@appTypes/mailService";
 
-export default class GmailProvider implements MailProvider {
-  private transporter: Transporter;
+export class GmailProvider implements MailProvider {
+  private readonly transporter: Transporter;
 
   constructor(protected readonly config: LocalMailConfig) {
     this.transporter = nodemailer.createTransport({

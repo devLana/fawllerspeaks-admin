@@ -4,13 +4,13 @@ import { SessionData } from "@typeResolvers/auth/SessionData";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import signTokens from "@utils/auth/signTokens";
 import { clearAuthCookie, setAuthCookie } from "@utils/auth/cookies";
-import type { DBResponse, VerifySession } from "types/auth/verifySession";
+import type { DBResponse, VerifySession } from "@appTypes/auth/verifySession";
 
 const verifySession: VerifySession = async (_, __, { db, req, res }) => {
   try {
     const { auth } = req.cookies;
-    const ip = req.ip || null;
-    const userAgent = req.headers["user-agent"] || null;
+    const ip = req.ip ?? null;
+    const userAgent = req.headers["user-agent"] ?? null;
     const MSG = "Unable to verify session";
 
     if (!auth) {
@@ -87,7 +87,7 @@ const verifySession: VerifySession = async (_, __, { db, req, res }) => {
     };
 
     return new SessionData(userData, accessToken);
-  } catch (err) {
+  } catch {
     // log any system errors
     throw new GraphQLError("Unable to verify session. Please try again later");
   }

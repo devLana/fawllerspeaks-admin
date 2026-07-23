@@ -1,9 +1,9 @@
-import mailService from ".";
-import mailTemplate from "./mailTemplate";
+import { mailService } from ".";
+import { mailTemplate } from "./mailTemplate";
 import { urls } from "@lib/ClientUrls";
 import { MailError } from "@lib/Errors";
 
-const resetPasswordMail = async (email: string) => {
+export const resetPasswordMail = async (email: string) => {
   const body = `
     <p>
       The password for your admin dashboard has been reset. You can now go ahead and
@@ -55,5 +55,3 @@ const resetPasswordMail = async (email: string) => {
     );
   }
 };
-
-export default resetPasswordMail;

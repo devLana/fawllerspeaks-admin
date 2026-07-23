@@ -1,14 +1,18 @@
 import type { Pool } from "pg";
 
 import { hmacRefreshToken } from "@utils/auth/signTokens";
-import generateBytes from "@utils/generateBytes";
+import { generateBytes } from "@utils/generateBytes";
 
 interface Options {
   isExpired?: boolean;
   isRevoked?: boolean;
 }
 
-const testSession = async (db: Pool, userId: number, options?: Options) => {
+export const testSession = async (
+  db: Pool,
+  userId: number,
+  options?: Options,
+) => {
   try {
     const refresh = await generateBytes(48, "hex");
     const refreshHash = hmacRefreshToken(refresh);
@@ -22,14 +26,12 @@ const testSession = async (db: Pool, userId: number, options?: Options) => {
     await db.query(
       `INSERT INTO sessions (refresh_token, user_id, expire_date, revoked_at)
       VALUES ($1, $2, ${expired}, ${revoked})`,
-      [refreshHash, userId]
+      [refreshHash, userId],
     );
 
     return `auth=${refresh}`;
   } catch (err) {
     console.error("Create Test User Session Error - ", err);
-    throw new Error("Unable to create test user session");
+    throw new Error("Unable to create test user session", { cause: err });
   }
 };
-
-export default testSession;

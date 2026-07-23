@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import type { InputErrors } from "types/tests";
-import type { EditPostInput, PostContent } from "@resolverTypes";
+import type { InputErrors } from "@appTypes/tests";
+import type { EditPostInput, PostContent } from "@appTypes/resolverTypes";
 
 const UUID = randomUUID();
 const tagIds = [UUID, randomUUID(), randomUUID()];
@@ -22,7 +22,7 @@ export const expectedPostContent: PostContent = {
   ],
 };
 
-type Validations = [string, EditPostInput, InputErrors<EditPostInput>][];
+type Validations = Array<[string, EditPostInput, InputErrors<EditPostInput>]>;
 
 export const validations: Validations = [
   [
@@ -86,13 +86,7 @@ export const validations: Validations = [
   ],
   [
     "Should return a post tags input validation error if the post tags input array is empty",
-    {
-      id: UUID,
-      title: "title",
-      tagIds: [],
-      description: null,
-      excerpt: null,
-    },
+    { id: UUID, title: "title", tagIds: [], description: null, excerpt: null },
     {
       idError: null,
       titleError: null,

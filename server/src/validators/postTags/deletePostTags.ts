@@ -1,5 +1,5 @@
 import Joi from "joi";
-import type { MutationDeletePostTagsArgs as Args } from "@resolverTypes";
+import type { MutationDeletePostTagsArgs as Args } from "@appTypes/resolverTypes";
 
 export const deletePostTagsValidator = Joi.array<Args["tagIds"]>()
   .required()
@@ -7,7 +7,7 @@ export const deletePostTagsValidator = Joi.array<Args["tagIds"]>()
     Joi.string().trim().guid({ version: "uuidv4", separator: "-" }).messages({
       "string.empty": "Input tag ids cannot be empty strings",
       "string.guid": "Invalid post tag id",
-    })
+    }),
   )
   .min(1)
   .unique()

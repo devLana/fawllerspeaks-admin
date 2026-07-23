@@ -7,8 +7,8 @@ import { CreatedPostTagsWarning } from "@typeResolvers/postTags/CreatedPostTagsW
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { createPostTagsValidator as schema } from "@validators/postTags/createPostTags";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import type { PostTag } from "@resolverTypes";
-import type { CreatePostTags as Fn } from "types/postTags/createPostTags";
+import type { PostTag } from "@appTypes/resolverTypes";
+import type { CreatePostTags as Fn } from "@appTypes/postTags/createPostTags";
 
 const createPostTags: Fn = async (_, { tags }, { user, db, res }) => {
   const tagOrTags = tags.length > 1 ? "tags" : "tag";
@@ -43,7 +43,7 @@ const createPostTags: Fn = async (_, { tags }, { user, db, res }) => {
     inputTags.forEach((tag, index, arr) => {
       const comma = index !== arr.length - 1 ? "," : "";
 
-      params = `${params}($${index + 1})${comma}`;
+      params = `${params}($${String(index + 1)})${comma}`;
       values.push(tag);
     });
 
@@ -73,7 +73,7 @@ const createPostTags: Fn = async (_, { tags }, { user, db, res }) => {
     if (createdPostTags.length < inputTags.length) {
       const _tagOrTags = createdPostTags.length > 1 ? "tags" : "tag";
       const diff = Math.abs(createdPostTags.length - inputTags.length);
-      const msg = `${createdPostTags.length} post ${_tagOrTags} created. ${diff} of the post ${tagOrTags} provided already exist`;
+      const msg = `${String(createdPostTags.length)} post ${_tagOrTags} created. ${diff.toString()} of the post ${tagOrTags} provided already exist`;
 
       return new CreatedPostTagsWarning(createdPostTags, msg);
     }

@@ -1,10 +1,10 @@
-import type { ResolverFunc } from "@types";
-import type { TestData } from "types/tests";
+import type { ResolverFunc } from "@appTypes";
+import type { TestData } from "@appTypes/tests";
 import type {
   MutationResolvers,
   CreatedPostTagsWarning,
   PostTags,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export type CreatePostTags = ResolverFunc<MutationResolvers["createPostTags"]>;
 export type Tags = TestData<{ createPostTags: Record<string, unknown> }>;

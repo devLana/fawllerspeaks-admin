@@ -4,10 +4,10 @@ import { ValidationError } from "joi";
 import { EmailValidationError } from "@typeResolvers/auth/EmailValidationError";
 import { ErrorResponse, Response } from "@typeResolvers/commonResolvers";
 import { emailValidator } from "@validators/auth/email";
-import generatePasswordMail from "@services/mail/generatePassword";
+import { generatePasswordMail } from "@services/mail/generatePassword";
 import { MailError } from "@lib/Errors";
-import bytesHash from "@utils/auth/bytesHash";
-import type { GeneratePassword } from "types/auth/generatePassword";
+import { bytesHash } from "@utils/auth/bytesHash";
+import type { GeneratePassword } from "@appTypes/auth/generatePassword";
 
 const generatePassword: GeneratePassword = async (_, arg, { db }) => {
   try {

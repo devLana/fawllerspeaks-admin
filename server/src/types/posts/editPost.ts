@@ -1,7 +1,7 @@
-import type { MutationResolvers, PostStatus } from "@resolverTypes";
-import type { ResolverFunc } from "@types";
+import type { MutationResolvers, PostStatus } from "@appTypes/resolverTypes";
+import type { ResolverFunc } from "@appTypes";
 import type { PostFieldResolver } from ".";
-import type { TestData } from "types/tests";
+import type { TestData } from "@appTypes/tests";
 
 export type Edit = PostFieldResolver<
   ResolverFunc<MutationResolvers["editPost"]>

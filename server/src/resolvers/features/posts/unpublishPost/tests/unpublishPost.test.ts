@@ -1,21 +1,21 @@
 import { randomUUID } from "node:crypto";
 
 import { afterAll, beforeAll, describe, it, expect } from "@jest/globals";
-import { type ApolloServer } from "@apollo/server";
+import type { ApolloServer } from "@apollo/server";
 
 import { startServer } from "@server";
 import { db } from "@services/db";
-import post from "@utils/tests/post";
-import loginTestUser from "@utils/tests/loginTestUser";
-import createTestPostTags from "@utils/tests/createTestPostTags";
-import testUsers from "@utils/tests/createTestUsers/testUsers";
-import createTestPost from "@utils/tests/createTestPost";
+import { post } from "@utils/tests/post";
+import { loginTestUser } from "@utils/tests/loginTestUser";
+import { createTestPostTags } from "@utils/tests/createTestPostTags";
+import { testUsers } from "@utils/tests/createTestUsers/testUsers";
+import { createTestPost } from "@utils/tests/createTestPost";
 import { UNPUBLISH_POST as GQL } from "@utils/tests/gqlQueries/postsTestQueries";
 import { testPostData, registeredUser as user } from "@utils/tests/mocks";
 import { DATE_REGEX } from "@utils/tests/constants";
-import type { APIContext } from "@types";
-import type { PostTag, Post } from "@resolverTypes";
-import type { UnpublishPostData as Data } from "types/posts/unpublishPost";
+import type { APIContext } from "@appTypes";
+import type { PostTag, Post } from "@appTypes/resolverTypes";
+import type { UnpublishPostData as Data } from "@appTypes/posts/unpublishPost";
 
 describe("Unpublish Post", () => {
   const UUID = randomUUID();

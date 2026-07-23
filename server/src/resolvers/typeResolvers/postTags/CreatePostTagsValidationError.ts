@@ -1,7 +1,7 @@
 import type {
   CreatePostTagsValidationError as ValidationError,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class CreatePostTagsValidationError implements ValidationError {
   readonly status: Status;

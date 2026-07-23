@@ -1,7 +1,7 @@
 import type {
   ChangePasswordValidationError as ValidationErrors,
   Status,
-} from "@resolverTypes";
+} from "@appTypes/resolverTypes";
 
 export class ChangePasswordValidationError implements ValidationErrors {
   readonly status: Status;

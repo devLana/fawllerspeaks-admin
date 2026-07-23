@@ -8,9 +8,9 @@ import { GetPostsData } from "@typeResolvers/posts/GetPostsData";
 import { ErrorResponse } from "@typeResolvers/commonResolvers";
 import { getPostsSchema as schema } from "@validators/posts/getPosts";
 import { clearAuthCookie } from "@utils/auth/cookies";
-import generateErrorsObject from "@utils/generateErrorsObject";
-import type { GetPostDBData } from "types/posts";
-import type { GetPosts, PreviousPost, Sort } from "types/posts/getPosts";
+import { generateErrorsObject } from "@utils/generateErrorsObject";
+import type { GetPostDBData } from "@appTypes/posts";
+import type { GetPosts, PreviousPost, Sort } from "@appTypes/posts/getPosts";
 
 const getPosts: GetPosts = async (_, args, { db, user, res }) => {
   try {
@@ -41,7 +41,7 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
     const { after, size, sort: sortFilter, status } = input;
     const LIMIT = size ?? 12;
     const sort: Sort = { column: "p.date_created", order: "DESC" };
-    const sqlArgs: (string | number)[] = [];
+    const sqlArgs: Array<string | number> = [];
     let where = "WHERE binned_at IS NULL";
     let orderBy = "p.date_created DESC, p.id DESC";
     let operator: "<" | ">" = "<";
@@ -49,6 +49,7 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
 
     if (sortFilter) {
       const [column, order] = sortFilter.split("_");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       sort.order = order.toUpperCase() as Sort["order"];
       operator = sort.order === "DESC" ? "<" : ">";
 
@@ -70,16 +71,16 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
           return new ErrorResponse("ForbiddenError", MSG);
         }
 
-        where = `${where} AND ${column} ${operator}= $${++count} AND p.id ${operator} $${++count}`;
+        where = `${where} AND ${column} ${operator}= $${String(++count)} AND p.id ${operator} $${String(++count)}`;
         sqlArgs.push(...cursor.split("_"));
       } else {
-        where = `${where} AND ${column} ${operator} $${++count}`;
+        where = `${where} AND ${column} ${operator} $${String(++count)}`;
         sqlArgs.push(cursor);
       }
     }
 
     if (status) {
-      where = `${where} AND p.status = $${++count}`;
+      where = `${where} AND p.status = $${String(++count)}`;
       sqlArgs.push(status);
     }
 
@@ -138,7 +139,7 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
         p.views,
         p.binned_at
       ORDER BY ${orderBy}
-      LIMIT ${LIMIT + 1}`,
+      LIMIT ${String(LIMIT + 1)}`,
       sqlArgs
     );
 
@@ -152,7 +153,7 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
 
       if (sort.column === "p.date_created") {
         const dateString = new Date(dateCreated).toISOString();
-        const dateId = `${dateString}_${postId}`;
+        const dateId = `${dateString}_${postId.toString()}`;
         pageData.next = Buffer.from(dateId).toString("base64url");
       } else {
         pageData.next = Buffer.from(title).toString("base64url");
@@ -164,7 +165,7 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
       const { column, order } = sort;
       const cursor = Buffer.from(after, "base64url").toString();
       const prevOperator = operator === ">" ? "<=" : ">=";
-      const prevArgs: (number | string)[] = [];
+      const prevArgs: Array<number | string> = [];
       const prevOrder = order === "DESC" ? "ASC" : "DESC";
       let prevWhere = "WHERE binned_at IS NULL";
       let prevOrderBy: string;
@@ -172,16 +173,16 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
 
       if (column === "p.title") {
         prevOrderBy = `p.title ${prevOrder}`;
-        prevWhere = `${prevWhere} AND ${column} ${prevOperator} $${++prevCount}`;
+        prevWhere = `${prevWhere} AND ${column} ${prevOperator} $${String(++prevCount)}`;
         prevArgs.push(cursor);
       } else {
         prevOrderBy = `p.date_created ${prevOrder}, p.id ${prevOrder}`;
-        prevWhere = `${prevWhere} AND ${column} ${prevOperator} $${++prevCount} AND p.id ${prevOperator} $${++prevCount}`;
+        prevWhere = `${prevWhere} AND ${column} ${prevOperator} $${String(++prevCount)} AND p.id ${prevOperator} $${String(++prevCount)}`;
         prevArgs.push(...cursor.split("_"));
       }
 
       if (status) {
-        prevWhere = `${prevWhere} AND status = $${++prevCount}`;
+        prevWhere = `${prevWhere} AND status = $${String(++prevCount)}`;
         prevArgs.push(status);
       }
 
@@ -190,7 +191,7 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
         FROM posts p
         ${prevWhere}
         ORDER BY ${prevOrderBy}
-        LIMIT ${LIMIT + 1}`,
+        LIMIT ${String(LIMIT + 1)}`,
         prevArgs
       );
 
@@ -201,7 +202,7 @@ const getPosts: GetPosts = async (_, args, { db, user, res }) => {
 
         if (sort.column === "p.date_created") {
           const dateString = new Date(date_created).toISOString();
-          const dateId = `${dateString}_${id}`;
+          const dateId = `${dateString}_${id.toString()}`;
           const cursorStr = Buffer.from(dateId).toString("base64url");
           pageData.previous = cursorStr;
         } else {
