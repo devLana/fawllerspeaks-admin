@@ -8,8 +8,8 @@
     "dev": "next dev -p 4040",
     "build": "next build",
     "start": "next start",
-    "lint": "npx eslint .",
-    "lint:fix": "npx eslint --fix .",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "test": "vitest"
   },
   "dependencies": {
