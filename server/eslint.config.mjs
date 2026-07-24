@@ -81,7 +81,7 @@ export default defineConfig({
     /* TypeScript Extension Rules that extend Eslint Rules */
     "@typescript-eslint/class-methods-use-this": 1,
     "@typescript-eslint/default-param-last": 1,
-    "@typescript-eslint/max-params": [1, { max: 4 }],
+    "@typescript-eslint/max-params": [2, { max: 4 }],
     "@typescript-eslint/no-shadow": [2, { ignoreTypeValueShadow: false }],
     "@typescript-eslint/no-unused-private-class-members": 2,
     "@typescript-eslint/no-unused-vars": [

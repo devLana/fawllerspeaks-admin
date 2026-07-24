@@ -17,7 +17,6 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
     projectService: true,
-    tsconfigRootDir: __dirname,
   },
   plugins: ["@typescript-eslint"],
   overrides: [
@@ -40,7 +39,7 @@ module.exports = {
     },
   ],
   rules: {
-    /* ESLint Rules */
+    /* ESLint Possible Problems Rules */
     "array-callback-return": [2, { checkForEach: true }],
     "no-await-in-loop": 2,
     "no-constant-binary-expression": 2,
@@ -62,6 +61,7 @@ module.exports = {
     "no-else-return": [1, { allowElseIf: false }],
     "no-extra-boolean-cast": 1,
     "no-lonely-if": 1,
+    "no-loop-func": 2,
     "no-negated-condition": 1,
     "no-param-reassign": [2, { props: true }],
     "no-unneeded-ternary": 1,
@@ -70,16 +70,22 @@ module.exports = {
     "prefer-object-has-own": 1,
     yoda: 1,
 
-    ///////////////typescript-eslint rules///////////////
     /* TypeScript Optional Rules */
     "@typescript-eslint/consistent-type-exports": 1,
     "@typescript-eslint/consistent-type-imports": 1,
+    // "@typescript-eslint/consistent-type-imports": [
+    //   1,
+    //   { fixStyle: "inline-type-imports" },
+    // ],
     "@typescript-eslint/method-signature-style": 1,
     "@typescript-eslint/no-import-type-side-effects": 2,
     "@typescript-eslint/no-unsafe-type-assertion": 2,
     "@typescript-eslint/promise-function-async": 2,
-    "@typescript-eslint/require-array-sort-compare": 1,
-    "@typescript-eslint/strict-void-return": 2,
+    "@typescript-eslint/require-array-sort-compare": [
+      1,
+      { ignoreStringArrays: true },
+    ],
+    "@typescript-eslint/strict-void-return": [2, { allowReturnAny: true }],
 
     /* TypeScript Strict Rules */
     "@typescript-eslint/no-confusing-void-expression": [
@@ -96,15 +102,14 @@ module.exports = {
     "@typescript-eslint/array-type": [1, { default: "array-simple" }],
     "@typescript-eslint/consistent-type-definitions": 1,
     "@typescript-eslint/no-empty-function": [1, { allow: ["arrowFunctions"] }],
-    "@typescript-eslint/no-unused-vars": [
-      1,
-      { argsIgnorePattern: "^_+", varsIgnorePattern: "^_+" },
-    ],
 
     /* TypeScript Extension Rules that extend Eslint Rules */
     "@typescript-eslint/default-param-last": 2,
     "@typescript-eslint/max-params": 2,
-    "@typescript-eslint/no-loop-func": 2,
+    "@typescript-eslint/no-unused-vars": [
+      1,
+      { argsIgnorePattern: "^_+", varsIgnorePattern: "^_+" },
+    ],
     "@typescript-eslint/no-use-before-define": [
       2,
       { functions: false, ignoreTypeReferences: false },
