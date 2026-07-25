@@ -1,14 +1,16 @@
 import { Fragment, useState } from "react";
-import { useForm } from "..";
-import { schema } from "./schema";
+
 import type { InferType } from "yup";
+
+import { useForm } from "@hooks/common/useForm";
+import { useFormSchema as schema } from "@validators/useFormSchema";
 
 type Values = InferType<typeof schema>;
 
 const hobbies = ["reading", "movies", "cycling", "running", "cooking"];
 const titles = ["Mr", "Mrs", "Miss"];
 
-export const TestForm = () => {
+export const UseFormTest = () => {
   const [values, setValues] = useState<Values | null>(null);
   const { errors, handleSubmit, register } = useForm({
     schema,

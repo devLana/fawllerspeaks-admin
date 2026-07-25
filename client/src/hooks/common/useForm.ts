@@ -13,7 +13,7 @@ interface UseFormProps<T extends AnyObjectSchema> {
   schema: T;
   onSubmit: (
     values: InferType<T>,
-    options: OnSubmitOptions<T>,
+    options: OnSubmitOptions<T>
   ) => Promise<void> | void;
 }
 

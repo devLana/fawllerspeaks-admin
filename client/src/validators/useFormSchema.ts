@@ -1,19 +1,19 @@
 import * as yup from "yup";
 
-export const schema = yup
+export const useFormSchema = yup
   .object({
     name: yup.string().required("Provide name").trim("Provide name"),
     age: yup
       .number()
-      .typeError("Enter your age")
+      .min(18)
       .required("Enter your age")
-      .min(18),
+      .typeError("Enter your age"),
     email: yup
       .string()
+      .email("Invalid email entered")
       .required("Email required")
-      .trim("Email required")
-      .email("Invalid email entered"),
-    title: yup.string().required("Select a title").oneOf(["Mr", "Mrs", "Miss"]),
+      .trim("Email required"),
+    title: yup.string().oneOf(["Mr", "Mrs", "Miss"]).required("Select a title"),
     hobbies: yup
       .array()
       .transform((value: string | string[] | undefined) => {
@@ -21,9 +21,9 @@ export const schema = yup
         if (typeof value === "string") return [value];
         return value;
       })
-      .defined("No hobby selected")
       .of(yup.string().ensure())
-      .max(3, "Only three hobbies allowed"),
+      .max(3, "Only three hobbies allowed")
+      .defined("No hobby selected"),
     avatar: yup
       .mixed<File>()
       .defined()

@@ -1,11 +1,11 @@
 import { render, screen, type RenderOptions } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { TestForm } from "./TestForm";
+import { UseFormTest } from ".";
 
 const renderFn = (renderOptions: RenderOptions = {}) => {
   const user = userEvent.setup({ applyAccept: false });
-  const view = render(<TestForm />, renderOptions);
+  const view = render(<UseFormTest />, renderOptions);
 
   return { user, ...view };
 };
@@ -17,27 +17,27 @@ describe("useForm hook", () => {
     await user.click(screen.getByRole("button", { name: /^submit$/i }));
 
     expect(
-      screen.getByRole("textbox", { name: /^name$/i }),
+      screen.getByRole("textbox", { name: /^name$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("spinbutton", { name: /^age$/i }),
+      screen.getByRole("spinbutton", { name: /^age$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("textbox", { name: /^e-mail$/i }),
+      screen.getByRole("textbox", { name: /^e-mail$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("group", { name: /^select title$/i }),
+      screen.getByRole("group", { name: /^select title$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("group", { name: /^select your hobbies$/i }),
+      screen.getByRole("group", { name: /^select your hobbies$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByLabelText(/^avatar$/i),
+      screen.getByLabelText(/^avatar$/i)
     ).not.toHaveAccessibleErrorMessage();
   });
 
@@ -47,79 +47,79 @@ describe("useForm hook", () => {
     await user.click(screen.getByRole("button", { name: /^submit$/i }));
 
     expect(
-      screen.getByRole("textbox", { name: /^name$/i }),
+      screen.getByRole("textbox", { name: /^name$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("spinbutton", { name: /^age$/i }),
+      screen.getByRole("spinbutton", { name: /^age$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("textbox", { name: /^e-mail$/i }),
+      screen.getByRole("textbox", { name: /^e-mail$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("group", { name: /^select title$/i }),
+      screen.getByRole("group", { name: /^select title$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("group", { name: /^select your hobbies$/i }),
+      screen.getByRole("group", { name: /^select your hobbies$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByLabelText(/^avatar$/i),
+      screen.getByLabelText(/^avatar$/i)
     ).not.toHaveAccessibleErrorMessage();
 
     await user.click(screen.getByRole("textbox", { name: /^name$/i }));
 
     expect(
-      screen.getByRole("textbox", { name: /^name$/i }),
+      screen.getByRole("textbox", { name: /^name$/i })
     ).not.toHaveAccessibleErrorMessage();
 
     await user.click(screen.getByRole("spinbutton", { name: /^age$/i }));
 
     expect(
-      screen.getByRole("textbox", { name: /^name$/i }),
+      screen.getByRole("textbox", { name: /^name$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("spinbutton", { name: /^age$/i }),
+      screen.getByRole("spinbutton", { name: /^age$/i })
     ).not.toHaveAccessibleErrorMessage();
 
     await user.click(screen.getByRole("textbox", { name: /^e-mail$/i }));
 
     expect(
-      screen.getByRole("spinbutton", { name: /^age$/i }),
+      screen.getByRole("spinbutton", { name: /^age$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("textbox", { name: /^e-mail$/i }),
+      screen.getByRole("textbox", { name: /^e-mail$/i })
     ).not.toHaveAccessibleErrorMessage();
 
     await user.click(screen.getByRole("radio", { name: /^mr$/i }));
 
     expect(
-      screen.getByRole("textbox", { name: /^e-mail$/i }),
+      screen.getByRole("textbox", { name: /^e-mail$/i })
     ).toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("group", { name: /^select title$/i }),
+      screen.getByRole("group", { name: /^select title$/i })
     ).not.toHaveAccessibleErrorMessage();
 
     await user.click(screen.getByRole("checkbox", { name: /^movies$/i }));
 
     expect(
-      screen.getByRole("group", { name: /^select title$/i }),
+      screen.getByRole("group", { name: /^select title$/i })
     ).not.toHaveAccessibleErrorMessage();
 
     expect(
-      screen.getByRole("group", { name: /^select your hobbies$/i }),
+      screen.getByRole("group", { name: /^select your hobbies$/i })
     ).not.toHaveAccessibleErrorMessage();
 
     await user.click(screen.getByLabelText(/^avatar$/i));
 
     expect(
-      screen.getByRole("group", { name: /^select your hobbies$/i }),
+      screen.getByRole("group", { name: /^select your hobbies$/i })
     ).not.toHaveAccessibleErrorMessage();
   });
 
@@ -142,19 +142,19 @@ describe("useForm hook", () => {
     expect(await screen.findByLabelText(/^form values$/i)).toBeInTheDocument();
 
     expect(screen.getByLabelText(/^form values$/i)).toHaveTextContent(
-      `Name is Mr ${name}`,
+      `Name is Mr ${name}`
     );
 
     expect(screen.getByLabelText(/^form values$/i)).toHaveTextContent(
-      `Age is ${age}`,
+      `Age is ${age}`
     );
 
     expect(screen.getByLabelText(/^form values$/i)).toHaveTextContent(
-      `E-mail address is ${email}`,
+      `E-mail address is ${email}`
     );
 
     expect(screen.getByLabelText(/^form values$/i)).toHaveTextContent(
-      `Hobbies are movies, cycling, running`,
+      `Hobbies are movies, cycling, running`
     );
   });
 });
