@@ -1,11 +1,6 @@
 import { GraphQLError } from "graphql";
-import { delay, graphql } from "msw";
-import { setupServer } from "msw/node";
-import { screen } from "@testing-library/react";
-import type { UserEvent } from "@testing-library/user-event/dist/types/setup/setup";
-
-import { REGISTER_USER } from "@mutations/registerUser/REGISTER_USER";
-import { mswData, mswErrors } from "@utils/tests/msw";
+import { delay, graphql, HttpResponse } from "msw";
+import { REGISTER_USER } from "@mutations/auth/registerUser";
 
 export interface Input {
   firstName: string;
@@ -14,80 +9,96 @@ export interface Input {
   confirmPassword: string;
 }
 
-const passwordStr = (prefix: string) => `${prefix}_p@55W0rd`;
 const FIRST_NAME = "FIRST_NAME";
 const LAST_NAME = "LAST_NAME";
+const MSG = `You cannot register your account at this time. Please try again later`;
+const networkMSG = `The server is currently unreachable. Please try again later`;
+const gqlMSG = "This is a graphql error message";
+const passwordStr = (prefix: string) => `${prefix}_p@55W0rd`;
+export const fN = { name: /^first name$/i };
+export const lN = { name: /^last name$/i };
+export const btn = { name: /^register$/i };
+export const pw = /^password$/i;
+export const cPw = /^confirm password$/i;
 export const invalidFirstName = "First name contains an invalid character";
 export const invalidLastName = "Last name contains an invalid character";
 export const shortPassword = "Password must be at least 8 characters long";
+export const invalidPassword = `Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol`;
 
-export const invalidPassword =
-  "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
-
-const MESSAGE =
-  "You are unable to register your account. Please try again later";
-
-export const server = setupServer(
-  graphql.mutation(REGISTER_USER, async ({ variables: { userInput } }) => {
-    const { password } = userInput as { password: string };
-
-    await delay(50);
+export const registerUserHandler = graphql.mutation(
+  REGISTER_USER,
+  async ({ variables: { userInput } }) => {
+    const { password } = userInput;
 
     if (password === passwordStr("auth")) {
-      return mswData("registerUser", "AuthenticationError");
-    }
-
-    if (password === passwordStr("unknown")) {
-      return mswData("registerUser", "UnknownError");
+      return HttpResponse.json({
+        data: { registerUser: { __typename: "UnauthorizedError" } },
+      });
     }
 
     if (password === passwordStr("registered")) {
-      return mswData("registerUser", "RegistrationError");
-    }
-
-    if (password === passwordStr("unsupported")) {
-      return mswData("registerUser", "UnsupportedType");
+      return HttpResponse.json({
+        data: { registerUser: { __typename: "RegistrationError" } },
+      });
     }
 
     if (password === passwordStr("validation")) {
-      return mswData("registerUser", "RegisterUserValidationError", {
-        firstNameError: invalidFirstName,
-        lastNameError: invalidLastName,
-        passwordError: shortPassword,
-        confirmPasswordError: "Passwords do not match",
+      return HttpResponse.json({
+        data: {
+          registerUser: {
+            __typename: "RegisterUserValidationError",
+            firstNameError: invalidFirstName,
+            lastNameError: invalidLastName,
+            passwordError: shortPassword,
+            confirmPasswordError: "Passwords do not match",
+          },
+        },
       });
     }
 
     if (password === passwordStr("success")) {
-      return mswData("registerUser", "RegisteredUser", {
-        user: {
-          __typename: "User",
-          id: "SOME_RANDOM_USER_ID",
-          email: "user_mail@example.com",
-          firstName: FIRST_NAME,
-          lastName: LAST_NAME,
-          image: null,
-          isRegistered: true,
+      return HttpResponse.json({
+        data: {
+          registerUser: {
+            __typename: "RegisteredUser",
+            user: {
+              __typename: "User",
+              id: "SOME_RANDOM_USER_ID",
+              email: "user_mail@example.com",
+              firstName: FIRST_NAME,
+              lastName: LAST_NAME,
+              image: null,
+              isRegistered: true,
+            },
+          },
         },
       });
     }
 
     if (password === passwordStr("graphql")) {
-      return mswErrors(new GraphQLError(MESSAGE));
+      return HttpResponse.json({ errors: [new GraphQLError(gqlMSG)] });
     }
 
-    if (password === passwordStr("network")) {
-      return mswErrors(new Error(), { status: 503 });
+    if (password === passwordStr("network")) return HttpResponse.error();
+
+    if (password === passwordStr("unsupported")) {
+      await delay(80);
+      return HttpResponse.json({
+        data: { registerUser: { __typename: "UnsupportedType" } },
+      });
     }
 
-    return mswErrors(new Error(), { status: 400 });
-  })
+    return HttpResponse.json();
+  }
 );
 
 class Mock<T extends string | undefined = undefined> {
   input: Input;
 
-  constructor(prefix: string, readonly message: T) {
+  constructor(
+    prefix: string,
+    readonly message: T
+  ) {
     this.input = {
       firstName: FIRST_NAME,
       lastName: LAST_NAME,
@@ -98,81 +109,46 @@ class Mock<T extends string | undefined = undefined> {
 }
 
 export const validation = new Mock("validation", undefined);
+export const unsupported = new Mock("unsupported", MSG);
 const success = new Mock("success", undefined);
 const auth = new Mock("auth", undefined);
-const unknown = new Mock("unknown", undefined);
 const registered = new Mock("registered", undefined);
-const unsupported = new Mock("unsupported", MESSAGE);
-const network = new Mock("network", MESSAGE);
-const gql = new Mock("graphql", MESSAGE);
+const network = new Mock("network", networkMSG);
+const gql = new Mock("graphql", gqlMSG);
 
-const text = "Should display an alert toast message if the API";
-export const alerts: [string, Mock<string>][] = [
-  [`${text} throws a graphql error`, gql],
-  [`${text} failed with a network error`, network],
-  [`${text} responded with an unsupported object type`, unsupported],
+const text = "Expect an alert toast if the";
+export const alerts: Array<[string, Mock<string>]> = [
+  [`${text} API responds with a graphql error`, gql],
+  [`${text} request failed with a network error`, network],
 ];
 
-interface Params {
-  pathname: string;
-  query: Record<string, string>;
-}
-
-export const errorRedirects: [string, Params, Mock][] = [
+export const errorRedirects = [
   [
-    "Should redirect the user to the login page if the user is not logged in",
-    { pathname: "/login", query: { status: "unauthenticated" } },
+    "Expect an unauthorized user to be redirected to the login page",
+    { pathname: "/login", query: { status: "unauthorized" } },
     auth,
   ],
   [
-    "Should redirect the user to the login page if the user's credentials could not be verified",
-    { pathname: "/login", query: { status: "unauthorized" } },
-    unknown,
-  ],
-  [
-    "Should redirect the user to the home(dashboard) page if the user has already registered their account",
+    "Expect an already registered user to be redirected to the home(dashboard) page",
     { pathname: "/", query: { status: "registered" } },
     registered,
   ],
-];
+] as const;
 
-interface Query {
-  query: { redirectTo: string } | Record<string, never>;
-  page: string;
-}
-
-export const successRedirects: [string, Query, Mock][] = [
+export const successRedirects = [
   [
-    "Should redirect the user to the home(dashboard) page",
+    "Expect a newly registered user to be redirected to the home(dashboard) page",
     { query: {}, page: "/" },
     success,
   ],
   [
-    "Should redirect the user based on the value of the 'redirectTo' url query",
+    "Expect a newly registered user to be redirected to a route based on the 'redirectTo' url query",
     { query: { redirectTo: "/post-tags" }, page: "/post-tags" },
     success,
   ],
   [
-    "Should redirect the user to the home(dashboard) page if the value of the 'redirectTo' url query is not allowed",
+    "Expect a newly registered user to be redirected to the home(dashboard) page if the 'redirectTo' route is not supported",
     { query: { redirectTo: "forgot-password" }, page: "/" },
     success,
   ],
-];
-
-export const dryEvents = async (user: UserEvent, input: Input) => {
-  await user.type(
-    screen.getByRole("textbox", { name: /^first name$/i }),
-    input.firstName
-  );
-
-  await user.type(
-    screen.getByRole("textbox", { name: /^last name$/i }),
-    input.lastName
-  );
-
-  await user.type(screen.getByLabelText(/^password$/i), input.password);
-  await user.type(screen.getByLabelText(/^confirm password$/i), input.password);
-  await user.click(screen.getByRole("button", { name: /^register$/i }));
-
-  expect(screen.getByRole("button", { name: /^register$/i })).toBeDisabled();
-};
+] as const;

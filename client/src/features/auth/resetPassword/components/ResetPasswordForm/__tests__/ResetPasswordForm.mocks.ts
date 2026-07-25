@@ -1,118 +1,84 @@
 import { GraphQLError } from "graphql";
-import { delay, graphql } from "msw";
-import { setupServer } from "msw/node";
-
-import { RESET_PASSWORD } from "@mutations/resetPassword/RESET_PASSWORD";
-import { mswData, mswErrors } from "@utils/tests/msw";
+import { delay, graphql, HttpResponse } from "msw";
+import { RESET_PASSWORD } from "@mutations/auth/resetPassword";
 
 export const resetButton = { name: /^reset password$/i };
-
-export const msg1 =
-  "Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol";
-
-export const msg2 = "Password must be at least 8 characters long";
-export const msg3 = "Passwords do not match";
-
+export const MSG = `Password must contain at least one number, one lowercase & one uppercase letter, and one special character or symbol`;
+export const msg1 = "Password must be at least 8 characters long";
+export const msg2 = "Passwords do not match";
 const errorMessage = "Unable to verify password reset token";
+const pwdStr = (prefix: string) => `${prefix}_p@5Sw0Rd`;
 
-const passwordStr = (prefix: string) => `${prefix}_p@5Sw0Rd`;
-
-export const server = setupServer(
-  graphql.mutation(RESET_PASSWORD, async ({ variables: { password } }) => {
-    await delay(50);
-
-    if (password === passwordStr("notAllowed")) {
-      return mswData("resetPassword", "NotAllowedError");
-    }
-
-    if (password === passwordStr("unregistered")) {
-      return mswData("resetPassword", "RegistrationError");
-    }
-
-    if (password === passwordStr("unsupported")) {
-      return mswData("resetPassword", "UnsupportedType");
-    }
-
-    if (password === passwordStr("validation1")) {
-      return mswData("resetPassword", "ResetPasswordValidationError", {
-        tokenError: null,
-        passwordError: msg2,
-        confirmPasswordError: msg3,
+export const resetPasswordHandler = graphql.mutation(
+  RESET_PASSWORD,
+  async ({ variables: { password } }) => {
+    if (password === pwdStr("validate1")) {
+      return HttpResponse.json({
+        data: {
+          resetPassword: {
+            __typename: "ResetPasswordValidationError",
+            tokenError: null,
+            passwordError: msg1,
+            confirmPasswordError: msg2,
+          },
+        },
       });
     }
 
-    if (password === passwordStr("validation2")) {
-      return mswData("resetPassword", "ResetPasswordValidationError", {
-        tokenError: "Provide password reset token",
-        passwordError: null,
-        confirmPasswordError: null,
+    if (password === pwdStr("verify")) {
+      return HttpResponse.json({
+        data: {
+          resetPassword: {
+            __typename: "ResetPasswordValidationError",
+            tokenError: "Provide password reset token",
+            passwordError: null,
+            confirmPasswordError: null,
+          },
+        },
       });
     }
 
-    if (password === passwordStr("success")) {
-      return mswData("resetPassword", "Response", { status: "SUCCESS" });
+    if (password === pwdStr("forbid")) {
+      return HttpResponse.json({
+        data: { resetPassword: { __typename: "ForbiddenError" } },
+      });
     }
 
-    if (password === passwordStr("warn")) {
-      return mswData("resetPassword", "Response", { status: "WARN" });
+    if (password === pwdStr("success")) {
+      return HttpResponse.json({
+        data: { resetPassword: { __typename: "Response" } },
+      });
     }
 
-    if (password === passwordStr("network")) {
-      return mswErrors(new Error(), { status: 503 });
+    if (password === pwdStr("network")) return HttpResponse.error();
+
+    if (password === pwdStr("graphql")) {
+      return HttpResponse.json({ errors: [new GraphQLError(errorMessage)] });
     }
 
-    if (password === passwordStr("graphql")) {
-      return mswErrors(new GraphQLError(errorMessage));
+    if (password === pwdStr("unsupported")) {
+      await delay(80);
+      return HttpResponse.json({
+        data: { resetPassword: { __typename: "UnsupportedType" } },
+      });
     }
 
-    return mswErrors(new Error(), { status: 400 });
-  })
+    return HttpResponse.json();
+  }
 );
 
-const mock = (prefix: string) => ({ password: passwordStr(prefix) });
+export const validate1 = pwdStr("validate1");
+const verify = pwdStr("verify");
+const forbid = pwdStr("forbid");
+export const success = pwdStr("success");
+const network = pwdStr("network");
+const gql = pwdStr("graphql");
+export const unsupported = pwdStr("unsupported");
 
-export const validation1 = mock("validation1");
-const unregistered = mock("unregistered");
-const success = mock("success");
-const warn = mock("warn");
-const notAllowed = mock("notAllowed");
-const unsupported = mock("unsupported");
-const network = mock("network");
-const gql = mock("graphql");
-const validation2 = mock("validation2");
-
-const text = "Should redirect to the forgot password page if the";
-export const redirects: [string, string, ReturnType<typeof mock>][] = [
-  [`${text} API request fails with a network error`, "network", network],
-  [`${text} API throws a graphql error`, "api", gql],
-  [
-    `${text} API responds with a token input validation error`,
-    "validation",
-    validation2,
-  ],
-  [
-    `${text} API responds with an unsupported object type`,
-    "unsupported",
-    unsupported,
-  ],
-  [
-    `${text} password reset token is unknown or has expired`,
-    "fail",
-    notAllowed,
-  ],
-];
-
-const str = "Expect the page view to be changed to the";
-export const views: [string, [string, { password: string }, string][]][] = [
-  [
-    "The user's account is unregistered",
-    [[`${str} unregistered error view`, unregistered, "unregistered error"]],
-  ],
-  [
-    "User password is successfully reset",
-    [
-      [`${str} password reset success view`, success, "success"],
-      [`${str} password reset warning view`, warn, "warn"],
-    ],
-  ],
+const text = "Expect a redirect to the forgot password page if the";
+export const redirects: Array<[string, string, string]> = [
+  [`${text} reset token could not be verified`, "error", verify],
+  [`${text} password reset token could not be verified`, "error", forbid],
+  [`${text} API request failed with a network error`, "network", network],
+  [`${text} API responded with a graphql error`, "error", gql],
 ];

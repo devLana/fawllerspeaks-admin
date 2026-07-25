@@ -1,153 +1,113 @@
-import { useMutation } from "@apollo/client";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from "@apollo/client/react";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import LoadingButton from "@mui/lab/LoadingButton";
 
-import useRegisterUser from "@hooks/registerUser/useRegisterUser";
-import AlertToast from "@features/auth/components/AlertToast";
-import Down from "@components/SlideTransitions/Down";
+import { useForm } from "@hooks/common/useForm";
+import { useRegisterUser } from "@hooks/auth/registerUser/useRegisterUser";
 import PasswordInput from "@components/ui/PasswordInput";
-import { REGISTER_USER } from "@mutations/registerUser/REGISTER_USER";
-import { registerUserSchema } from "@validators/registerUserSchema";
-import type { RegisterUserInput as Args } from "@apiTypes";
+import { REGISTER_USER } from "@mutations/auth/registerUser";
+import { registerUserSchema as schema } from "@validators/registerUserSchema";
 
 const RegisterUserForm = () => {
-  const [registerUser, { error }] = useMutation(REGISTER_USER);
+  const [registerUser] = useMutation(REGISTER_USER);
+  const { isLoading, onCompleted, onError, setIsLoading } = useRegisterUser();
 
-  const { register, handleSubmit, formState, setError } = useForm<Args>({
-    resolver: yupResolver(registerUserSchema),
+  const { register, handleSubmit, errors } = useForm({
+    schema,
+    onSubmit(userInput, { setErrors }) {
+      setIsLoading(true);
+      void registerUser({
+        variables: { userInput },
+        onError,
+        onCompleted: onCompleted(setErrors),
+      });
+    },
   });
 
-  const { formStatus, setFormStatus, onCompleted } = useRegisterUser(setError);
-
-  const submitHandler = (values: Args) => {
-    setFormStatus("loading");
-
-    void registerUser({
-      variables: { userInput: values },
-      onError: () => setFormStatus("error"),
-      onCompleted,
-    });
-  };
-
-  const { errors } = formState;
-
-  let alertMessage =
-    "You are unable to register your account. Please try again later";
-
-  if (error?.graphQLErrors?.[0]) {
-    alertMessage = error.graphQLErrors[0].message;
-  }
+  const fNameAriaId = errors.firstName ? "first-name-error-message" : undefined;
+  const lNameAriaId = errors.lastName ? "last-name-error-message" : undefined;
 
   return (
-    <>
-      <AlertToast
-        horizontal="center"
-        vertical="top"
-        isOpen={formStatus === "error"}
-        onClose={() => setFormStatus("idle")}
-        transition={Down}
-        severity="error"
-        content={alertMessage}
-      />
-      <form
-        onSubmit={handleSubmit(submitHandler)}
-        noValidate
-        aria-labelledby="page-title"
+    <form onSubmit={handleSubmit} noValidate aria-labelledby="page-title">
+      <Box sx={{ mb: 3.3 }}>
+        <Typography align="center" gutterBottom>
+          Account information
+        </Typography>
+        <Grid container rowSpacing={3} columnSpacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              {...register("firstName")}
+              autoFocus
+              fullWidth
+              autoComplete="given-name"
+              label="First Name"
+              error={!!errors.firstName}
+              helperText={errors.firstName ?? null}
+              slotProps={{
+                formHelperText: { id: "first-name-error-message" },
+                htmlInput: {
+                  "aria-errormessage": fNameAriaId,
+                  "aria-describedby": fNameAriaId,
+                },
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              {...register("lastName")}
+              fullWidth
+              autoComplete="family-name"
+              label="Last Name"
+              helperText={errors.lastName ?? null}
+              error={!!errors.lastName}
+              slotProps={{
+                formHelperText: { id: "last-name-error-message" },
+                htmlInput: {
+                  "aria-errormessage": lNameAriaId,
+                  "aria-describedby": lNameAriaId,
+                },
+              }}
+            />
+          </Grid>
+        </Grid>
+      </Box>
+      <Box sx={{ mb: 3 }}>
+        <Typography align="center" gutterBottom>
+          Update account password
+        </Typography>
+        <Grid container rowSpacing={3} columnSpacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <PasswordInput
+              {...register("password")}
+              label="Password"
+              autoComplete="new-password"
+              fieldError={errors.password}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <PasswordInput
+              {...register("confirmPassword")}
+              label="Confirm Password"
+              autoComplete="new-password"
+              fieldError={errors.confirmPassword}
+            />
+          </Grid>
+        </Grid>
+      </Box>
+      <Button
+        fullWidth
+        type="submit"
+        size="large"
+        variant="contained"
+        loading={isLoading}
+        sx={{ textTransform: "uppercase" }}
       >
-        <Box sx={{ mb: 3.3 }}>
-          <Typography align="center" gutterBottom>
-            Account information
-          </Typography>
-          <Grid container rowSpacing={3} columnSpacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                id="first-name"
-                autoFocus
-                autoComplete="given-name"
-                label="First Name"
-                margin="none"
-                error={!!errors.firstName}
-                helperText={errors.firstName?.message ?? null}
-                fullWidth
-                {...register("firstName")}
-                FormHelperTextProps={{ id: "first-name-error-message" }}
-                inputProps={{
-                  "aria-errormessage": errors.firstName
-                    ? "first-name-error-message"
-                    : undefined,
-                  "aria-describedby": errors.firstName
-                    ? "first-name-error-message"
-                    : undefined,
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                id="last-name"
-                autoComplete="family-name"
-                label="Last Name"
-                margin="none"
-                helperText={errors.lastName?.message ?? null}
-                error={!!errors.lastName}
-                fullWidth
-                {...register("lastName")}
-                FormHelperTextProps={{ id: "last-name-error-message" }}
-                inputProps={{
-                  "aria-errormessage": errors.lastName
-                    ? "last-name-error-message"
-                    : undefined,
-                  "aria-describedby": errors.lastName
-                    ? "last-name-error-message"
-                    : undefined,
-                }}
-              />
-            </Grid>
-          </Grid>
-        </Box>
-        <Box sx={{ mb: 3 }}>
-          <Typography align="center" gutterBottom>
-            Update account password
-          </Typography>
-          <Grid container rowSpacing={3} columnSpacing={2}>
-            <Grid item xs={12} sm={6}>
-              <PasswordInput
-                id="password"
-                autoComplete="new-password"
-                label="Password"
-                register={register("password")}
-                fieldError={errors.password}
-                margin="none"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <PasswordInput
-                id="confirm-password"
-                autoComplete="new-password"
-                label="Confirm Password"
-                register={register("confirmPassword")}
-                fieldError={errors.confirmPassword}
-                margin="none"
-              />
-            </Grid>
-          </Grid>
-        </Box>
-        <LoadingButton
-          loading={formStatus === "loading"}
-          variant="contained"
-          size="large"
-          type="submit"
-          fullWidth
-          sx={{ textTransform: "uppercase" }}
-        >
-          <span>Register</span>
-        </LoadingButton>
-      </form>
-    </>
+        Register
+      </Button>
+    </form>
   );
 };
 

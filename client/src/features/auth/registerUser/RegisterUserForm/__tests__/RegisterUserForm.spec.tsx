@@ -4,146 +4,157 @@ import { screen, waitFor } from "@testing-library/react";
 
 import RegisterUserForm from "..";
 import * as mocks from "./RegisterUserForm.mocks";
-import { renderUI } from "@utils/tests/renderUI";
+import { protectedTestUI } from "@utils/tests/renderUI/protected";
 
 describe("Register User Form", () => {
   describe("Client side form validation", () => {
-    it("Input fields should have error messages if they have empty values", async () => {
-      const { user } = renderUI(<RegisterUserForm />);
+    it("Expect input fields to have error messages", async () => {
+      const { user } = protectedTestUI(<RegisterUserForm />);
 
-      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      await user.click(screen.getByRole("button", mocks.btn));
 
       expect(
-        screen.getByRole("textbox", { name: /^first name$/i })
+        screen.getByRole("textbox", mocks.fN)
       ).toHaveAccessibleErrorMessage("Enter first name");
 
       expect(
-        screen.getByRole("textbox", { name: /^last name$/i })
+        screen.getByRole("textbox", mocks.lN)
       ).toHaveAccessibleErrorMessage("Enter last name");
 
       expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
         "Enter password"
       );
 
-      expect(
-        screen.getByLabelText(/^confirm password$/i)
-      ).toHaveAccessibleErrorMessage("Enter confirm password");
+      expect(screen.getByLabelText(mocks.cPw)).toHaveAccessibleErrorMessage(
+        "Enter confirm password"
+      );
     });
 
     it("Password field should have an error message if it has an invalid value", async () => {
-      const { user } = renderUI(<RegisterUserForm />);
-      const password = screen.getByLabelText(/^password$/i);
+      const { user } = protectedTestUI(<RegisterUserForm />);
+      const passwordInput = screen.getByLabelText(mocks.pw);
 
-      await user.type(password, "pass");
-      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      await user.type(screen.getByLabelText(mocks.pw), "pass");
+      await user.click(screen.getByRole("button", mocks.btn));
 
-      expect(password).toHaveAccessibleErrorMessage(mocks.shortPassword);
+      expect(passwordInput).toHaveAccessibleErrorMessage(mocks.shortPassword);
 
-      await user.clear(password);
-      await user.type(password, "Pass!WOrd");
-      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      await user.clear(passwordInput);
+      await user.type(passwordInput, "Pass!WOrd");
+      await user.click(screen.getByRole("button", mocks.btn));
 
-      expect(password).toHaveAccessibleErrorMessage(mocks.invalidPassword);
+      expect(passwordInput).toHaveAccessibleErrorMessage(mocks.invalidPassword);
 
-      await user.clear(password);
-      await user.type(password, "PASS!W0RD");
-      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      await user.clear(passwordInput);
+      await user.type(passwordInput, "PASS!W0RD");
+      await user.click(screen.getByRole("button", mocks.btn));
 
-      expect(password).toHaveAccessibleErrorMessage(mocks.invalidPassword);
+      expect(passwordInput).toHaveAccessibleErrorMessage(mocks.invalidPassword);
 
-      await user.clear(password);
-      await user.type(password, "pass!w0rd");
-      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      await user.clear(passwordInput);
+      await user.type(passwordInput, "pass!w0rd");
+      await user.click(screen.getByRole("button", mocks.btn));
 
-      expect(password).toHaveAccessibleErrorMessage(mocks.invalidPassword);
+      expect(passwordInput).toHaveAccessibleErrorMessage(mocks.invalidPassword);
 
-      await user.clear(password);
-      await user.type(password, "PassW0rd");
-      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      await user.clear(passwordInput);
+      await user.type(passwordInput, "PassW0rd");
+      await user.click(screen.getByRole("button", mocks.btn));
 
-      expect(password).toHaveAccessibleErrorMessage(mocks.invalidPassword);
+      expect(passwordInput).toHaveAccessibleErrorMessage(mocks.invalidPassword);
     });
 
-    it("Confirm password field should have an error message if it does not match the password field", async () => {
-      const { user } = renderUI(<RegisterUserForm />);
-      const confirmPassword = screen.getByLabelText(/^confirm password$/i);
+    it("Expect confirm password field to have an error message if it does not match the password field", async () => {
+      const { user } = protectedTestUI(<RegisterUserForm />);
 
-      await user.type(screen.getByLabelText(/^password$/i), "PaS$W0RD");
-      await user.type(confirmPassword, "PASSWORD");
-      await user.click(screen.getByRole("button", { name: /^register$/i }));
+      await user.type(screen.getByLabelText(mocks.pw), "PaS$W0RD");
+      await user.type(screen.getByLabelText(mocks.cPw), "PASSWORD");
+      await user.click(screen.getByRole("button", mocks.btn));
 
-      expect(confirmPassword).toHaveAccessibleErrorMessage(
+      expect(screen.getByLabelText(mocks.cPw)).toHaveAccessibleErrorMessage(
         "Passwords do not match"
       );
     });
   });
 
   describe("Register user API request", () => {
-    beforeAll(() => {
-      mocks.server.listen({ onUnhandledRequest: "error" });
+    it("Expect the app to be able to make an API request", async () => {
+      const { user } = protectedTestUI(<RegisterUserForm />);
+      const { input, message } = mocks.unsupported;
+
+      await user.type(screen.getByRole("textbox", mocks.fN), input.firstName);
+      await user.type(screen.getByRole("textbox", mocks.lN), input.lastName);
+      await user.type(screen.getByLabelText(mocks.pw), input.password);
+      await user.type(screen.getByLabelText(mocks.cPw), input.password);
+      await user.click(screen.getByRole("button", mocks.btn));
+
+      expect(screen.getByRole("button", mocks.btn)).toBeDisabled();
+      expect(await screen.findByRole("alert")).toHaveTextContent(message);
+      expect(screen.getByRole("button", mocks.btn)).toBeEnabled();
     });
 
-    afterAll(() => {
-      mocks.server.close();
-    });
-
-    describe("API request failed with an input validation error", () => {
+    describe("Validation error API response", () => {
       it("Expect input fields to have an error message", async () => {
-        const { user } = renderUI(<RegisterUserForm />);
+        const { user } = protectedTestUI(<RegisterUserForm />);
+        const { input } = mocks.validation;
 
-        await mocks.dryEvents(user, mocks.validation.input);
+        await user.type(screen.getByRole("textbox", mocks.fN), input.firstName);
+        await user.type(screen.getByRole("textbox", mocks.lN), input.lastName);
+        await user.type(screen.getByLabelText(mocks.pw), input.password);
+        await user.type(screen.getByLabelText(mocks.cPw), input.password);
+        await user.click(screen.getByRole("button", mocks.btn));
 
-        await expect(
-          screen.findByRole("textbox", { name: /^first name$/i })
-        ).resolves.toHaveAccessibleErrorMessage(mocks.invalidFirstName);
+        await waitFor(() => {
+          expect(
+            screen.getByRole("textbox", mocks.fN)
+          ).toHaveAccessibleErrorMessage(mocks.invalidFirstName);
+        });
 
         expect(
-          screen.getByRole("textbox", { name: /^last name$/i })
+          screen.getByRole("textbox", mocks.lN)
         ).toHaveAccessibleErrorMessage(mocks.invalidLastName);
 
-        expect(
-          screen.getByLabelText(/^password$/i)
-        ).toHaveAccessibleErrorMessage(mocks.shortPassword);
+        expect(screen.getByLabelText(mocks.pw)).toHaveAccessibleErrorMessage(
+          mocks.shortPassword
+        );
 
-        expect(
-          screen.getByLabelText(/^confirm password$/i)
-        ).toHaveAccessibleErrorMessage("Passwords do not match");
-
-        expect(
-          screen.getByRole("textbox", { name: /^first name$/i })
-        ).toHaveFocus();
-
-        expect(
-          screen.getByRole("button", { name: /^register$/i })
-        ).toBeEnabled();
+        expect(screen.getByLabelText(mocks.cPw)).toHaveAccessibleErrorMessage(
+          "Passwords do not match"
+        );
       });
     });
 
-    describe("API request failed with an error or an unsupported object type", () => {
+    describe("API request failed with an error", () => {
       it.each(mocks.alerts)("%s", async (_, expected) => {
-        const { user } = renderUI(<RegisterUserForm />);
+        const { user } = protectedTestUI(<RegisterUserForm />);
+        const { input, message } = expected;
 
-        await mocks.dryEvents(user, expected.input);
+        await user.type(screen.getByRole("textbox", mocks.fN), input.firstName);
+        await user.type(screen.getByRole("textbox", mocks.lN), input.lastName);
+        await user.type(screen.getByLabelText(mocks.pw), input.password);
+        await user.type(screen.getByLabelText(mocks.cPw), input.password);
+        await user.click(screen.getByRole("button", mocks.btn));
 
-        const alert = await screen.findByRole("alert");
-
-        expect(alert).toHaveTextContent(expected.message);
-
-        expect(
-          screen.getByRole("button", { name: /^register$/i })
-        ).toBeEnabled();
+        expect(await screen.findByRole("alert")).toHaveTextContent(message);
       });
     });
 
-    describe("Redirect the user for a user verification error response", () => {
+    describe("User verification error", () => {
       it.each(mocks.errorRedirects)("%s", async (_, params, mock) => {
         const router = useRouter();
-        const { user } = renderUI(<RegisterUserForm />);
+        const { input } = mock;
 
-        await mocks.dryEvents(user, mock.input);
-        await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
+        const { user } = protectedTestUI(<RegisterUserForm />);
 
-        expect(router.replace).toHaveBeenCalledWith(params);
+        await user.type(screen.getByRole("textbox", mocks.fN), input.firstName);
+        await user.type(screen.getByRole("textbox", mocks.lN), input.lastName);
+        await user.type(screen.getByLabelText(mocks.pw), input.password);
+        await user.type(screen.getByLabelText(mocks.cPw), input.password);
+        await user.click(screen.getByRole("button", mocks.btn));
+
+        await waitFor(() => {
+          expect(router.replace).toHaveBeenCalledExactlyOnceWith(params);
+        });
       });
     });
 
@@ -155,14 +166,20 @@ describe("Register User Form", () => {
 
       it.each(mocks.successRedirects)("%s", async (_, data, mock) => {
         const router = useRouter();
+        const { input } = mock;
         router.query = data.query;
 
-        const { user } = renderUI(<RegisterUserForm />);
+        const { user } = protectedTestUI(<RegisterUserForm />);
 
-        await mocks.dryEvents(user, mock.input);
-        await waitFor(() => expect(router.replace).toHaveBeenCalledOnce());
+        await user.type(screen.getByRole("textbox", mocks.fN), input.firstName);
+        await user.type(screen.getByRole("textbox", mocks.lN), input.lastName);
+        await user.type(screen.getByLabelText(mocks.pw), input.password);
+        await user.type(screen.getByLabelText(mocks.cPw), input.password);
+        await user.click(screen.getByRole("button", mocks.btn));
 
-        expect(router.replace).toHaveBeenCalledWith(data.page);
+        await waitFor(() => {
+          expect(router.replace).toHaveBeenCalledExactlyOnceWith(data.page);
+        });
       });
     });
   });

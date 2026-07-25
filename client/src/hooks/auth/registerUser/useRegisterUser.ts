@@ -6,11 +6,9 @@ import { CombinedGraphQLErrors } from "@apollo/client/errors";
 
 import { useToast } from "@hooks/common/useToast";
 import Down from "@components/SlideTransitions/Down";
-import type {
-  RegisterUserMutation as Data,
-  RegisterUserMutationVariables as Vars,
-} from "@appTypes/graphql";
+import type { RegisterUserMutationVariables } from "@appTypes/graphql";
 import type { MutateOption } from "@appTypes";
+import type { RegisterUserData as Data } from "@appTypes/auth/registerUser";
 
 interface Errors {
   firstName?: string;
@@ -19,21 +17,20 @@ interface Errors {
   confirmPassword?: string;
 }
 
-type OnError = MutateOption<Data, Vars, "onError">;
+type OnError = MutateOption<Data, RegisterUserMutationVariables, "onError">;
 type OnCompleted = (
-  setErrors: (errors: Errors) => void,
-) => MutateOption<Data, Vars, "onCompleted">;
+  setErrors: (errors: Errors) => void
+) => MutateOption<Data, RegisterUserMutationVariables, "onCompleted">;
 
 export const useRegisterUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { replace, query } = useRouter();
-
   const client = useApolloClient();
   const toast = useToast();
 
-  const onError: OnError = err => {
-    let MSG = `You cannot register your account at this time. Please try again later`;
+  let MSG = `You cannot register your account at this time. Please try again later`;
 
+  const onError: OnError = err => {
     if (CombinedGraphQLErrors.is(err)) {
       MSG = err.errors[0].message;
     } else if (err instanceof TypeError && err.message === "Failed to fetch") {
@@ -87,7 +84,6 @@ export const useRegisterUser = () => {
       }
 
       default: {
-        const MSG = `You cannot register your account at this time. Please try again later`;
         setIsLoading(false);
         toast({
           key: MSG,

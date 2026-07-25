@@ -1,28 +1,15 @@
 import Typography from "@mui/material/Typography";
 
-import useStatusAlert from "@hooks/registerUser/useStatusAlert";
-import AuthRootLayout from "@layouts/AuthRootLayout";
-import AlertToast from "@features/auth/components/AlertToast";
-import Down from "@components/SlideTransitions/Down";
+import useRegisterUserStatusAlert from "@hooks/auth/registerUser/useRegisterUserStatusAlert";
 import Card from "@features/auth/components/Card";
 import RegisterUserForm from "@features/auth/registerUser/RegisterUserForm";
-import uiLayout from "@utils/layouts/uiLayout";
-import type { NextPageWithLayout } from "@types";
+import registerUserLayout from "@utils/layouts/registerUserLayout";
 
-const RegisterUser: NextPageWithLayout = () => {
-  const { open, message, handleCloseAlert } = useStatusAlert();
+export const RegisterUser = () => {
+  useRegisterUserStatusAlert();
 
   return (
     <>
-      <AlertToast
-        horizontal="center"
-        vertical="top"
-        isOpen={open}
-        onClose={handleCloseAlert}
-        transition={Down}
-        severity="info"
-        content={message}
-      />
       <Typography align="center" variant="h1" id="page-title">
         Register Your Account
       </Typography>
@@ -33,8 +20,6 @@ const RegisterUser: NextPageWithLayout = () => {
   );
 };
 
-RegisterUser.layout = uiLayout(AuthRootLayout, {
+export default registerUserLayout(RegisterUser, {
   title: "Register Your FawllerSpeaks Admin Account",
 });
-
-export default RegisterUser;

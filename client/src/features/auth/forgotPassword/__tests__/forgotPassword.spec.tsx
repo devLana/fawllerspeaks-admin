@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 
 import { screen } from "@testing-library/react";
 
-import ForgotPasswordPage from "@pages/forgot-password";
+import { ForgotPassword } from "@pages/forgot-password";
 import { renderUI } from "@utils/tests/renderUI";
 
 vi.mock("../ForgotPasswordForm");
@@ -15,45 +15,20 @@ describe("Forgot Password Page", () => {
 
   it.each([
     [
-      "Should display an alert message toast if a malformed password reset token string was provided",
-      "invalid",
-      "Invalid password reset token",
-    ],
-    [
-      "Should display an alert message toast if a password reset token validation error occurred",
-      "validation",
-      "Invalid password reset token",
-    ],
-    [
-      "Should display an alert message toast if the password reset token was unknown or had expired",
-      "fail",
-      "Unable to verify password reset token",
-    ],
-    [
-      "Should display an alert message toast if the password reset token verification response was an unsupported object type",
-      "unsupported",
-      "Unable to verify password reset token",
-    ],
-    [
-      "Should display an alert message toast if a graphql error was thrown while verifying the password reset token ",
-      "api",
-      "Unable to verify password reset token",
-    ],
-    [
-      "Should display an alert message toast if a network error failed the password reset token verification",
+      "Expect an alert message toast if a network error occurred while trying to reset a password",
       "network",
-      "Unable to verify password reset token. Please try again later",
+      "We cannot verify your password reset token at this time. Please try again later",
     ],
     [
-      "Should display an alert message toast if there was an error trying to reset the password",
+      "Expect an alert message toast if there was an error while trying to reset the password",
       "error",
-      "There was an error trying to reset your password. Please try again later",
+      "You cannot reset your password right now. Please try again later",
     ],
   ])("%s", (_, status, message) => {
     const router = useRouter();
     router.query = { status };
 
-    renderUI(<ForgotPasswordPage />);
+    renderUI(<ForgotPassword />);
 
     expect(screen.getByRole("alert")).toHaveTextContent(message);
   });

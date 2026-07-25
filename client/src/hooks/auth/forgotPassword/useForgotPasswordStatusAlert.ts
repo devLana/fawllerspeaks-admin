@@ -17,29 +17,14 @@ export const useForgotPasswordStatusAlert = () => {
       } as const;
 
       switch (query.status) {
-        case "invalid":
-        case "validation": {
-          const msg = "Invalid password reset token";
-          showToast({ content: msg, key: msg, ...toastOptions });
-          break;
-        }
-
-        case "fail":
-        case "unsupported":
-        case "api": {
-          const msg = "Unable to verify password reset token";
-          showToast({ content: msg, key: msg, ...toastOptions });
-          break;
-        }
-
         case "network": {
-          const msg = `Unable to verify password reset token. Please try again later`;
+          const msg = `We cannot verify your password reset token at this time. Please try again later`;
           showToast({ content: msg, key: msg, ...toastOptions });
           break;
         }
 
         case "error": {
-          const msg = `There was an error trying to reset your password. Please try again later`;
+          const msg = `You cannot reset your password right now. Please try again later`;
           showToast({ content: msg, key: msg, ...toastOptions });
           break;
         }

@@ -1,5 +1,5 @@
 import Box, { type BoxProps } from "@mui/material/Box";
-import type { SxPropsArray } from "@types";
+import type { SxPropArray } from "@appTypes";
 
 interface CardProps {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ const Card = ({
   smMaxWidth = "25rem",
   children,
 }: CardProps) => {
-  const sxProp: SxPropsArray = Array.isArray(sx) ? sx : [sx];
+  const sxProp: SxPropArray = Array.isArray(sx) ? sx : [sx];
 
   return (
     <Box

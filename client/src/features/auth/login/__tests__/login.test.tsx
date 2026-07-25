@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 
 import { screen } from "@testing-library/react";
 
-import LoginPage from "@pages/login";
+import { Login } from "@pages/login";
 import { renderUI } from "@utils/tests/renderUI";
 
 vi.mock("../LoginForm");
@@ -15,25 +15,20 @@ describe("Login Page", () => {
 
   it.each([
     [
-      "Should display an alert toast if the user attempted an unauthorized action",
+      "Should display an alert toast if the user's session could not be authorized",
       "unauthorized",
-      "You are unable to perform that action. Please log in",
+      "Something has gone wrong and you will have to log in again to continue using the dashboard",
     ],
     [
-      "Should display an alert toast if the user is unauthenticated",
-      "unauthenticated",
-      "You are unable to perform that action. Please log in",
-    ],
-    [
-      "Should display an alert toast if the current session has expired",
-      "expired",
-      "Current session has expired. Please log in",
+      "Should display an alert toast if the current session becomes invalid",
+      "invalid",
+      "Your session has ended. Please log in again to continue",
     ],
   ])("%s", (_, status, message) => {
     const router = useRouter();
     router.query = { status };
 
-    renderUI(<LoginPage />);
+    renderUI(<Login />);
 
     expect(screen.getByRole("alert")).toHaveTextContent(message);
   });

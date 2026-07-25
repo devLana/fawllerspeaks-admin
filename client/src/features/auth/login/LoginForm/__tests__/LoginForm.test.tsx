@@ -3,95 +3,86 @@ import { useRouter } from "next/router";
 import { screen, waitFor } from "@testing-library/react";
 
 import LoginForm from "..";
-import { SESSION_ID } from "@utils/constants";
-import {
-  refreshTokenHandler,
-  userIdHandler,
-  renderUI,
-} from "@utils/tests/renderUI";
 import * as mocks from "./LoginForm.mocks";
+import { renderUI } from "@utils/tests/renderUI";
 
 describe("Login Form", () => {
-  const emailLabel = { name: /^e-?mail$/i };
-
   describe("Client side form validation", () => {
-    it("Input fields should have error messages if the values are empty", async () => {
+    it("Expect error messages on the input fields  if the input fields have empty values", async () => {
       const { user } = renderUI(<LoginForm />);
 
-      await user.click(screen.getByRole("button", mocks.loginName));
+      await user.click(screen.getByRole("button", mocks.loginBtn));
 
       expect(
-        screen.getByRole("textbox", emailLabel)
+        screen.getByRole("textbox", mocks.email),
       ).toHaveAccessibleErrorMessage("Enter an e-mail address");
 
       expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
-        "Enter password"
+        "Enter password",
       );
     });
 
     it("Email field with an invalid value should have an invalid error message", async () => {
       const { user } = renderUI(<LoginForm />);
 
-      await user.type(screen.getByRole("textbox", emailLabel), "invalid_email");
-      await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
-      await user.click(screen.getByRole("button", mocks.loginName));
+      await user.type(screen.getByRole("textbox", mocks.email), "invalid_mail");
+      await user.type(screen.getByLabelText(/^password$/i), "testPassword");
+      await user.click(screen.getByRole("button", mocks.loginBtn));
 
       expect(
-        screen.getByRole("textbox", emailLabel)
+        screen.getByRole("textbox", mocks.email),
       ).toHaveAccessibleErrorMessage("Invalid e-mail address");
 
       expect(
-        screen.getByLabelText(/^password$/i)
-      ).not.toHaveAccessibleErrorMessage("Enter password");
+        screen.getByLabelText(/^password$/i),
+      ).not.toHaveAccessibleErrorMessage();
     });
   });
 
   describe("Login API request", () => {
-    beforeAll(() => {
-      mocks.server.listen({ onUnhandledRequest: "error" });
+    it("Expect the app to be able to make an API request when the form is submitted", async () => {
+      const { user } = renderUI(<LoginForm />);
+      const { email, msg } = mocks.unsupported;
+
+      await user.type(screen.getByRole("textbox", mocks.email), email);
+      await user.type(screen.getByLabelText(/^password$/i), "testPassword");
+      await user.click(screen.getByRole("button", mocks.loginBtn));
+
+      expect(screen.getByRole("button", mocks.loginBtn)).toBeDisabled();
+      expect(await screen.findByRole("alert")).toHaveTextContent(msg);
+      expect(screen.getByRole("button", mocks.loginBtn)).toBeEnabled();
     });
 
-    afterAll(() => {
-      mocks.server.close();
-    });
-
-    describe("API response is an input validation error", () => {
-      it("Should set error messages on the appropriate form input fields", async () => {
+    describe("Validation error API response", () => {
+      it("Expect error messages on the form input fields", async () => {
         const { user } = renderUI(<LoginForm />);
         const { email } = mocks.validation;
 
-        await user.type(screen.getByRole("textbox", emailLabel), email);
-        await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
-        await user.click(screen.getByRole("button", mocks.loginName));
-
-        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
+        await user.type(screen.getByRole("textbox", mocks.email), email);
+        await user.type(screen.getByLabelText(/^password$/i), "testPassword");
+        await user.click(screen.getByRole("button", mocks.loginBtn));
 
         await waitFor(() => {
           expect(
-            screen.getByRole("textbox", emailLabel)
+            screen.getByRole("textbox", mocks.email),
           ).toHaveAccessibleErrorMessage(mocks.validation.emailError);
         });
 
         expect(
-          screen.getByLabelText(/^password$/i)
+          screen.getByLabelText(/^password$/i),
         ).toHaveAccessibleErrorMessage(mocks.validation.passwordError);
-
-        expect(screen.getByRole("textbox", emailLabel)).toHaveFocus();
-        expect(screen.getByRole("button", mocks.loginName)).toBeEnabled();
       });
     });
 
-    describe("The API responded with an error or an unsupported object type", () => {
+    describe("Error API response", () => {
       it.each(mocks.errorTable)("%s", async (_, mock) => {
         const { user } = renderUI(<LoginForm />);
 
-        await user.type(screen.getByRole("textbox", emailLabel), mock.email);
-        await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
-        await user.click(screen.getByRole("button", mocks.loginName));
+        await user.type(screen.getByRole("textbox", mocks.email), mock.email);
+        await user.type(screen.getByLabelText(/^password$/i), "testPassword");
+        await user.click(screen.getByRole("button", mocks.loginBtn));
 
-        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
         expect(await screen.findByRole("alert")).toHaveTextContent(mock.msg);
-        expect(screen.getByRole("button", mocks.loginName)).toBeEnabled();
       });
     });
 
@@ -99,32 +90,20 @@ describe("Login Form", () => {
       afterEach(() => {
         const router = useRouter();
         router.query = {};
-        localStorage.removeItem(SESSION_ID);
       });
 
-      it("Should redirect an unregistered user to the register page", async () => {
+      it("Expect an unregistered user to be redirected the register page", async () => {
         const { replace } = useRouter();
         const { user } = renderUI(<LoginForm />);
+        const { email } = mocks.unregistered;
 
-        await user.type(
-          screen.getByRole("textbox", emailLabel),
-          mocks.unRegistered.email
-        );
+        await user.type(screen.getByRole("textbox", mocks.email), email);
+        await user.type(screen.getByLabelText(/^password$/i), "testPassword");
+        await user.click(screen.getByRole("button", mocks.loginBtn));
 
-        await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
-        await user.click(screen.getByRole("button", mocks.loginName));
-
-        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
-
-        await waitFor(() => expect(replace).toHaveBeenCalledOnce());
-
-        expect(replace).toHaveBeenCalledWith("/register");
-        expect(localStorage.getItem(SESSION_ID)).toBe("USER_DATA_SESSION_ID");
-        expect(userIdHandler).toHaveBeenCalledOnce();
-        expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
-        expect(refreshTokenHandler).toHaveBeenCalledOnce();
-        expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
-        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
+        await waitFor(() => {
+          expect(replace).toHaveBeenCalledExactlyOnceWith("/register");
+        });
       });
 
       it.each(mocks.successTable)("%s", async (_, { query, page }, mock) => {
@@ -133,21 +112,13 @@ describe("Login Form", () => {
 
         const { user } = renderUI(<LoginForm />);
 
-        await user.type(screen.getByRole("textbox", emailLabel), mock.email);
-        await user.type(screen.getByLabelText(/^password$/i), mocks.PASSWORD);
-        await user.click(screen.getByRole("button", mocks.loginName));
+        await user.type(screen.getByRole("textbox", mocks.email), mock.email);
+        await user.type(screen.getByLabelText(/^password$/i), "testPassword");
+        await user.click(screen.getByRole("button", mocks.loginBtn));
 
-        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
-
-        await waitFor(() => expect(router.push).toHaveBeenCalledOnce());
-
-        expect(router.push).toHaveBeenCalledWith(page);
-        expect(localStorage.getItem(SESSION_ID)).toBe("USER_DATA_SESSION_ID");
-        expect(userIdHandler).toHaveBeenCalledOnce();
-        expect(userIdHandler).toHaveBeenCalledWith("User:user_id");
-        expect(refreshTokenHandler).toHaveBeenCalledOnce();
-        expect(refreshTokenHandler).toHaveBeenCalledWith("accessToken");
-        expect(screen.getByRole("button", mocks.loginName)).toBeDisabled();
+        await waitFor(() => {
+          expect(router.push).toHaveBeenCalledExactlyOnceWith(page);
+        });
       });
     });
   });

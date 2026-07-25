@@ -1,4 +1,4 @@
-import type { Mutation } from "@apiTypes";
-import type { RemoveApiStatusMapper } from "@types";
+import type { LoginMutation } from "@appTypes/graphql";
+import type { TypeMapper } from "@appTypes";
 
-export type LoginData = RemoveApiStatusMapper<Pick<Mutation, "login">>;
+export type LoginData = TypeMapper<LoginMutation>;

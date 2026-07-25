@@ -1,103 +1,105 @@
-import { useMutation } from "@apollo/client";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
+
+import { useMutation } from "@apollo/client/react";
+import { CombinedGraphQLErrors } from "@apollo/client/errors";
+import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import LoadingButton from "@mui/lab/LoadingButton";
 
-import useForgotPassword from "@hooks/forgotPassword/useForgotPassword";
-import AlertToast from "@features/auth/components/AlertToast";
+import { useToast } from "@hooks/common/useToast";
+import { useForm } from "@hooks/common/useForm";
 import Down from "@components/SlideTransitions/Down";
-import { FORGOT_PASSWORD } from "@mutations/forgotPassword/FORGOT_PASSWORD";
-import { forgotPasswordSchema } from "@validators/forgotPasswordSchema";
-import type { AuthPageView } from "@types";
-import type { MutationForgotPasswordArgs as Args } from "@apiTypes";
+import { FORGOT_PASSWORD } from "@mutations/auth/forgotPassword";
+import { forgotPasswordSchema as schema } from "@validators/forgotPasswordSchema";
 
-interface ForgotPasswordFormProps {
-  handleView: (view: Exclude<AuthPageView, "form">) => void;
-}
+const ForgotPasswordForm = ({ onSuccess }: { onSuccess: () => void }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [forgotPassword] = useMutation(FORGOT_PASSWORD);
+  const showToast = useToast();
 
-const ForgotPasswordForm = ({ handleView }: ForgotPasswordFormProps) => {
-  const [forgotPassword, { error, data }] = useMutation(FORGOT_PASSWORD);
+  const { errors, handleSubmit, register } = useForm({
+    schema,
+    onSubmit(variables, { setErrors }) {
+      const toastOptions = {
+        severity: "error",
+        placement: { horizontal: "center", vertical: "top" },
+        transition: Down,
+      } as const;
 
-  const { register, handleSubmit, formState, setError } = useForm<Args>({
-    resolver: yupResolver(forgotPasswordSchema),
+      setIsLoading(true);
+
+      forgotPassword({ variables })
+        .then(({ data }) => {
+          switch (data?.forgotPassword.__typename) {
+            case "EmailValidationError": {
+              const { emailError } = data.forgotPassword;
+              setErrors({ email: emailError });
+              break;
+            }
+
+            case "ForbiddenError":
+            case "ServerError": {
+              const msg = data.forgotPassword.message;
+              showToast({ ...toastOptions, key: msg, content: msg });
+              break;
+            }
+
+            case "Response":
+              onSuccess();
+              break;
+
+            default:
+              throw new Error("Unsupported object type received");
+          }
+        })
+        .catch((err: unknown) => {
+          let MSG = `You are unable to reset your password at this time. Please try again later`;
+
+          if (CombinedGraphQLErrors.is(err)) {
+            MSG = err.errors[0].message;
+          } else if (
+            err instanceof TypeError &&
+            err.message === "Failed to fetch"
+          ) {
+            MSG = "The server is currently unreachable. Please try again later";
+          }
+
+          showToast({ ...toastOptions, key: MSG, content: MSG });
+        })
+        .finally(() => setIsLoading(false));
+    },
   });
 
-  const { formStatus, setFormStatus, onCompleted } = useForgotPassword(
-    setError,
-    handleView
-  );
-
-  const submitHandler = (values: Args) => {
-    setFormStatus("loading");
-
-    void forgotPassword({
-      variables: values,
-      onError: () => setFormStatus("error"),
-      onCompleted,
-    });
-  };
-
-  const { errors } = formState;
-  const ariaId = errors.email ? "email-error-message" : undefined;
-
-  let alertMessage =
-    "You are unable to reset your password at the moment. Please try again later";
-
-  if (
-    data?.forgotPassword.__typename === "NotAllowedError" ||
-    data?.forgotPassword.__typename === "ServerError"
-  ) {
-    alertMessage = data.forgotPassword.message;
-  } else if (error?.graphQLErrors?.[0]) {
-    alertMessage = error.graphQLErrors[0].message;
-  }
-
   return (
-    <>
-      <AlertToast
-        horizontal="center"
-        vertical="top"
-        isOpen={formStatus === "error"}
-        onClose={() => setFormStatus("idle")}
-        transition={Down}
-        severity="error"
-        content={alertMessage}
+    <form onSubmit={handleSubmit} noValidate aria-labelledby="page-title">
+      <TextField
+        {...register("email")}
+        autoFocus
+        fullWidth
+        type="email"
+        autoComplete="email"
+        label="E-Mail"
+        error={!!errors.email}
+        helperText={errors.email ?? null}
+        margin={errors.email ? "dense" : "normal"}
+        slotProps={{
+          formHelperText: { id: "error" },
+          htmlInput: {
+            "aria-errormessage": errors.email ? "error" : undefined,
+            "aria-describedby": errors.email ? "error" : undefined,
+          },
+        }}
       />
-      <form
-        onSubmit={handleSubmit(submitHandler)}
-        noValidate
-        aria-labelledby="page-title"
+      <Button
+        fullWidth
+        type="submit"
+        size="large"
+        variant="contained"
+        loading={isLoading}
+        sx={{ textTransform: "uppercase", mt: 3 }}
       >
-        <TextField
-          type="email"
-          id="email"
-          autoComplete="email"
-          autoFocus
-          label="E-Mail"
-          margin={errors.email ? "dense" : "normal"}
-          error={!!errors.email}
-          fullWidth
-          {...register("email")}
-          helperText={errors.email?.message ?? null}
-          FormHelperTextProps={{ id: "email-error-message" }}
-          inputProps={{
-            "aria-errormessage": ariaId,
-            "aria-describedby": ariaId,
-          }}
-        />
-        <LoadingButton
-          loading={formStatus === "loading"}
-          variant="contained"
-          size="large"
-          type="submit"
-          fullWidth
-          sx={{ textTransform: "uppercase", mt: 3 }}
-        >
-          <span>Send Reset Link</span>
-        </LoadingButton>
-      </form>
-    </>
+        Get Reset Link
+      </Button>
+    </form>
   );
 };
 

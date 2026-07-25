@@ -1,12 +1,10 @@
-import { gql, type TypedDocumentNode as Node } from "@apollo/client";
+import { gql, type TypedDocumentNode } from "@apollo/client";
 
 import { USER_FIELDS } from "@fragments/session/user";
-import type {
-  RegisterUserMutation,
-  RegisterUserMutationVariables,
-} from "@appTypes/graphql";
+import type { RegisterUserMutationVariables as Vars } from "@appTypes/graphql";
+import type { RegisterUserData } from "@appTypes/auth/registerUser";
 
-type RegisterUser = Node<RegisterUserMutation, RegisterUserMutationVariables>;
+type RegisterUser = TypedDocumentNode<RegisterUserData, Vars>;
 
 export const REGISTER_USER: RegisterUser = gql`
   ${USER_FIELDS}

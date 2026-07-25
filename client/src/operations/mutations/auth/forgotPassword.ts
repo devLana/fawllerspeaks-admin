@@ -1,10 +1,13 @@
-import { gql, type TypedDocumentNode as DocNode } from "@apollo/client";
+import { gql, type TypedDocumentNode } from "@apollo/client";
+
+import type { TypeMapper } from "@appTypes";
 import type {
-  ForgotPasswordMutation as Data,
+  ForgotPasswordMutation,
   ForgotPasswordMutationVariables as Vars,
 } from "@appTypes/graphql";
 
-type ForgotPassword = DocNode<Data, Vars>;
+type ForgotPasswordData = TypeMapper<ForgotPasswordMutation>;
+type ForgotPassword = TypedDocumentNode<ForgotPasswordData, Vars>;
 
 export const FORGOT_PASSWORD: ForgotPassword = gql`
   mutation ForgotPassword($email: String!) {

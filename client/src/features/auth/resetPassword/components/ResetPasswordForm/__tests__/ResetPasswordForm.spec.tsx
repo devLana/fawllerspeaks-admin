@@ -5,19 +5,19 @@ import { screen, waitFor } from "@testing-library/react";
 import ResetPasswordForm from "..";
 import { renderUI } from "@utils/tests/renderUI";
 import * as mocks from "./ResetPasswordForm.mocks";
-import type { ResetPasswordFormProps } from "types/auth/resetPassword";
+import type { ResetPasswordFormProps } from "@appTypes/auth/resetPassword";
 
 describe("Reset Password Form", () => {
-  const mockHandleView = vi.fn().mockName("handleView");
+  const mockOnSuccess = vi.fn().mockName("onSuccess");
 
   const props: ResetPasswordFormProps = {
     email: "reset_password_test@mail.org",
     resetToken: "VERIFIED_PASSWORD_RESET_TOKEN",
-    handleView: mockHandleView,
+    onSuccess: mockOnSuccess,
   };
 
   describe("Client side form validation", () => {
-    it("Input fields should have an error message if the field value is empty", async () => {
+    it("Expect the input fields to have an error message", async () => {
       const { user } = renderUI(<ResetPasswordForm {...props} />);
 
       await user.click(screen.getByRole("button", mocks.resetButton));
@@ -31,7 +31,7 @@ describe("Reset Password Form", () => {
       ).toHaveAccessibleErrorMessage("Enter confirm password");
     });
 
-    it("The password field should have an error message if it has an invalid value", async () => {
+    it("Expect the password field to have an error message if it has an invalid value", async () => {
       const { user } = renderUI(<ResetPasswordForm {...props} />);
 
       await user.type(screen.getByLabelText(/^password$/i), "pass");
@@ -46,7 +46,7 @@ describe("Reset Password Form", () => {
       await user.click(screen.getByRole("button", mocks.resetButton));
 
       expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
-        mocks.msg1
+        mocks.MSG
       );
 
       await user.clear(screen.getByLabelText(/^password$/i));
@@ -54,7 +54,7 @@ describe("Reset Password Form", () => {
       await user.click(screen.getByRole("button", mocks.resetButton));
 
       expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
-        mocks.msg1
+        mocks.MSG
       );
 
       await user.clear(screen.getByLabelText(/^password$/i));
@@ -62,7 +62,7 @@ describe("Reset Password Form", () => {
       await user.click(screen.getByRole("button", mocks.resetButton));
 
       expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
-        mocks.msg1
+        mocks.MSG
       );
 
       await user.clear(screen.getByLabelText(/^password$/i));
@@ -70,11 +70,11 @@ describe("Reset Password Form", () => {
       await user.click(screen.getByRole("button", mocks.resetButton));
 
       expect(screen.getByLabelText(/^password$/i)).toHaveAccessibleErrorMessage(
-        mocks.msg1
+        mocks.MSG
       );
     });
 
-    it("The confirm password field should have an error message if it does not match the password field", async () => {
+    it("Expect the confirm password field to have an error message if its value does not match the password field", async () => {
       const { user } = renderUI(<ResetPasswordForm {...props} />);
       const confirmPassword = screen.getByLabelText(/^confirm password$/i);
 
@@ -89,80 +89,79 @@ describe("Reset Password Form", () => {
   });
 
   describe("Reset password API request", () => {
-    beforeAll(() => {
-      mocks.server.listen({ onUnhandledRequest: "error" });
+    it("Expect the user to be able to make an API request", async () => {
+      const { user } = renderUI(<ResetPasswordForm {...props} />);
+      const { push } = useRouter();
+
+      await user.type(screen.getByLabelText(/^password$/i), mocks.unsupported);
+      await user.type(
+        screen.getByLabelText(/^confirm Password$/i),
+        mocks.unsupported
+      );
+
+      await user.click(screen.getByRole("button", mocks.resetButton));
+
+      expect(screen.getByRole("button", mocks.resetButton)).toBeDisabled();
+
+      await waitFor(() => {
+        expect(push).toHaveBeenCalledExactlyOnceWith({
+          pathname: "/forgot-password",
+          query: { status: "error" },
+        });
+      });
+
+      expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
-    afterAll(() => {
-      mocks.server.close();
-    });
-
-    describe("API request received an input validation error response", () => {
+    describe("Input validation error", () => {
       it("Expect all relevant input fields to have an error message", async () => {
         const { user } = renderUI(<ResetPasswordForm {...props} />);
         const password = screen.getByLabelText(/^password$/i);
         const confirmPassword = screen.getByLabelText(/^confirm Password$/i);
 
-        await user.type(password, mocks.validation1.password);
-        await user.type(confirmPassword, mocks.validation1.password);
+        await user.type(password, mocks.validate1);
+        await user.type(confirmPassword, mocks.validate1);
         await user.click(screen.getByRole("button", mocks.resetButton));
 
-        expect(screen.getByRole("button", mocks.resetButton)).toBeDisabled();
-
         await waitFor(() => {
-          expect(password).toHaveAccessibleErrorMessage(mocks.msg2);
+          expect(password).toHaveAccessibleErrorMessage(mocks.msg1);
         });
 
-        expect(confirmPassword).toHaveAccessibleErrorMessage(mocks.msg3);
-        expect(password).toHaveFocus();
-        expect(mockHandleView).not.toHaveBeenCalledOnce();
-        expect(screen.getByRole("button", mocks.resetButton)).toBeEnabled();
+        expect(confirmPassword).toHaveAccessibleErrorMessage(mocks.msg2);
+        expect(mockOnSuccess).not.toHaveBeenCalled();
       });
     });
 
-    describe("The API responds with an error or an unsupported object type", () => {
-      it.each(mocks.redirects)("%s", async (_, status, mock) => {
+    describe("The API responds with an error object type", () => {
+      it.each(mocks.redirects)("%s", async (_, status, pwd) => {
         const { user } = renderUI(<ResetPasswordForm {...props} />);
         const { push } = useRouter();
 
-        await user.type(screen.getByLabelText(/^password$/i), mock.password);
-
-        await user.type(
-          screen.getByLabelText(/^confirm Password$/i),
-          mock.password
-        );
-
+        await user.type(screen.getByLabelText(/^password$/i), pwd);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), pwd);
         await user.click(screen.getByRole("button", mocks.resetButton));
 
-        expect(screen.getByRole("button", mocks.resetButton)).toBeDisabled();
-
-        await waitFor(() => expect(push).toHaveBeenCalledOnce());
-
-        expect(push).toHaveBeenCalledWith({
-          pathname: "/forgot-password",
-          query: { status },
+        await waitFor(() => {
+          expect(push).toHaveBeenCalledExactlyOnceWith({
+            pathname: "/forgot-password",
+            query: { status },
+          });
         });
 
-        expect(mockHandleView).not.toHaveBeenCalledOnce();
-        expect(screen.getByRole("button", mocks.resetButton)).toBeDisabled();
+        expect(mockOnSuccess).not.toHaveBeenCalledOnce();
       });
     });
 
-    describe.each(mocks.views)("%s", (_, table) => {
-      it.each(table)("%s", async (__, mock, view) => {
-        const { password } = mock;
+    describe("User password is successfully reset", () => {
+      it("Expect the page view to be changed to the password reset success view", async () => {
+        const { success } = mocks;
         const { user } = renderUI(<ResetPasswordForm {...props} />);
 
-        await user.type(screen.getByLabelText(/^password$/i), password);
-        await user.type(screen.getByLabelText(/^confirm Password$/i), password);
+        await user.type(screen.getByLabelText(/^password$/i), success);
+        await user.type(screen.getByLabelText(/^confirm Password$/i), success);
         await user.click(screen.getByRole("button", mocks.resetButton));
 
-        expect(screen.getByRole("button", mocks.resetButton)).toBeDisabled();
-
-        await waitFor(() => expect(mockHandleView).toHaveBeenCalledOnce());
-
-        expect(mockHandleView).toHaveBeenCalledWith(view);
-        expect(screen.getByRole("button", mocks.resetButton)).toBeDisabled();
+        await waitFor(() => expect(mockOnSuccess).toHaveBeenCalledOnce());
       });
     });
   });

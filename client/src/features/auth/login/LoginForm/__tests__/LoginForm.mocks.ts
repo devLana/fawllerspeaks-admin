@@ -1,78 +1,84 @@
 import { GraphQLError } from "graphql";
-import { graphql, delay } from "msw";
-import { setupServer } from "msw/node";
-
-import { LOGIN_USER } from "@mutations/login/LOGIN_USER";
-import { mswData, mswErrors } from "@utils/tests/msw";
+import { graphql, delay, HttpResponse } from "msw";
+import { LOGIN } from "@mutations/auth/login";
 
 interface Redirects {
   query: { redirectTo: string } | Record<string, never>;
   page: string;
 }
 
-export const PASSWORD = "testPassword";
-export const loginName = { name: /^login$/i };
+export const loginBtn = { name: /^login$/i };
+export const email = { name: /^e-?mail$/i };
 const emailStr = (label: string) => `${label}_test@mail.com`;
-const msg1 = "You are unable to login at the moment. Please try again later";
+const msg1 = "You can't login at this time. Please try again later";
 const msg2 = "Invalid e-mail or password";
 const msg3 = "Server responded with a graphql error";
+const msg4 = "The server is currently unreachable. Please try again later";
 
 const response = (isRegistered: boolean) => {
-  return mswData("login", "LoggedInUser", {
-    accessToken: "accessToken",
-    sessionId: "USER_DATA_SESSION_ID",
-    user: {
-      __typename: "User",
-      id: "user_id",
-      email: "mail@example.com",
-      firstName: "first name",
-      lastName: "last Name",
-      image: null,
-      isRegistered,
+  return HttpResponse.json({
+    data: {
+      login: {
+        __typename: "SessionData",
+        accessToken: "accessToken",
+        user: {
+          __typename: "User",
+          id: "user_id",
+          email: "mail@example.com",
+          firstName: "first name",
+          lastName: "last Name",
+          image: null,
+          isRegistered,
+        },
+      },
     },
   });
 };
 
-export const server = setupServer(
-  graphql.mutation(LOGIN_USER, async ({ variables: { email } }) => {
-    await delay(50);
+export const loginHandler = graphql.mutation(LOGIN, async ({ variables }) => {
+  if (variables.email === emailStr("validation")) {
+    return HttpResponse.json({
+      data: {
+        login: {
+          __typename: "LoginValidationError",
+          emailError: "Invalid e-mail address",
+          passwordError: "Enter Password",
+        },
+      },
+    });
+  }
 
-    if (email === emailStr("validation")) {
-      return mswData("login", "LoginValidationError", {
-        emailError: "Invalid e-mail address",
-        passwordError: "Enter Password",
-      });
-    }
+  if (variables.email === emailStr("forbid")) {
+    return HttpResponse.json({
+      data: { login: { __typename: "ForbiddenError", message: msg2 } },
+    });
+  }
 
-    if (
-      email === emailStr("unrecognised") ||
-      email === emailStr("email_password_error")
-    ) {
-      return mswData("login", "NotAllowedError", { message: msg2 });
-    }
+  if (variables.email === emailStr("registered")) return response(true);
+  if (variables.email === emailStr("unregistered")) return response(false);
+  if (variables.email === emailStr("network")) return HttpResponse.error();
 
-    if (email === emailStr("unsupported")) {
-      return mswData("login", "UnsupportedType");
-    }
+  if (variables.email === emailStr("graphql")) {
+    return HttpResponse.json({ errors: [new GraphQLError(msg3)] });
+  }
 
-    if (email === emailStr("registered")) return response(true);
+  if (variables.email === emailStr("unsupported")) {
+    await delay(80);
+    return HttpResponse.json({
+      data: { login: { __typename: "UnsupportedType" } },
+    });
+  }
 
-    if (email === emailStr("unregistered")) return response(false);
-
-    if (email === emailStr("network")) {
-      return mswErrors(new Error(msg1), { status: 503 });
-    }
-
-    if (email === emailStr("graphql")) return mswErrors(new GraphQLError(msg3));
-
-    return mswErrors(new Error(), { status: 400 });
-  })
-);
+  return HttpResponse.json();
+});
 
 class Mock<T extends string | undefined = undefined> {
   email: string;
 
-  constructor(email: string, readonly msg: T) {
+  constructor(
+    email: string,
+    readonly msg: T
+  ) {
     this.email = emailStr(email);
   }
 }
@@ -83,36 +89,33 @@ export const validation = {
   passwordError: "Enter Password",
 };
 
-const unrecognized = new Mock("unrecognised", msg2);
-const emailPasswordError = new Mock("email_password_error", msg2);
-const unsupported = new Mock("unsupported", msg1);
+export const unsupported = new Mock("unsupported", msg1);
+export const unregistered = new Mock("unregistered", undefined);
 const registered = new Mock("registered", undefined);
-export const unRegistered = new Mock("unregistered", undefined);
+const forbid = new Mock("forbid", msg2);
+const network = new Mock("network", msg4);
 const gql = new Mock("graphql", msg3);
-const network = new Mock("network", msg1);
 
-const text = "Should display an alert message toast if the";
-export const errorTable: [string, Mock<string>][] = [
-  [`${text} email was unrecognized by the server`, unrecognized],
-  [`${text} email and password do not match`, emailPasswordError],
-  [`${text} request failed with a network error`, network],
-  [`${text} API throws a graphql error`, gql],
-  [`${text} API response is an unsupported object type`, unsupported],
+const text = "Expect an alert toast if";
+export const errorTable: Array<[string, Mock<string>]> = [
+  [`${text} there was an error verifying login credentials`, forbid],
+  [`${text} the request failed with a network error`, network],
+  [`${text} the API throws a graphql error`, gql],
 ];
 
-export const successTable: [string, Redirects, Mock][] = [
+export const successTable: Array<[string, Redirects, Mock]> = [
   [
-    "Should redirect a registered user to the dashboard/home page",
+    "Expect a registered user to be redirected to the dashboard/home page",
     { page: "/", query: {} },
     registered,
   ],
   [
-    "Should redirect the user using the value of the 'redirectTo' query params",
+    "Expect a registered user to be redirected to the route in the 'redirectTo' query params",
     { query: { redirectTo: "/posts" }, page: "/posts" },
     registered,
   ],
   [
-    "Should redirect the user to the dashboard page if the 'redirectTo' query params is not a supported value",
+    "Expect a registered user to be redirected to the dashboard page if the 'redirectTo' query params is not a supported route",
     { query: { redirectTo: "/login" }, page: "/" },
     registered,
   ],

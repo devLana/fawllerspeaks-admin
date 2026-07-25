@@ -1,63 +1,57 @@
-import * as React from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
-
-import type { MutationResetPasswordArgs } from "@appTypes/graphql";
-import type { OnCompleted, Status } from "@appTypes";
-import type { UseFormSetError } from "react-hook-form";
+import type { MutateOption } from "@appTypes";
+import type { ResetPasswordMutationVariables as Vars } from "@appTypes/graphql";
 import type { ResetPasswordData } from "@appTypes/auth/resetPassword";
 
-const useResetPassword = (
-  setError: UseFormSetError<Omit<MutationResetPasswordArgs, "token">>,
-  onSuccess: () => void,
-) => {
-  const [formStatus, setFormStatus] = React.useState<Status>("idle");
+type OnError = MutateOption<ResetPasswordData, Vars, "onError">;
+
+type OnCompleted = (
+  setErrors: (errors: { password?: string; confirmPassword?: string }) => void,
+  onSuccess: () => void
+) => MutateOption<ResetPasswordData, Vars, "onCompleted">;
+
+export const useResetPassword = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const { push } = useRouter();
 
-  const onCompleted: OnCompleted<ResetPasswordData> = data => {
+  const onCompleted: OnCompleted = (setErrors, onSuccess) => data => {
+    const query = { status: "error" };
+
     switch (data.resetPassword.__typename) {
       case "ResetPasswordValidationError": {
-        const focus = { shouldFocus: true };
-        const query = { status: "validation" };
-
-        const {
-          passwordError,
-          confirmPasswordError: confirmPwdErr,
-          tokenError,
-        } = data.resetPassword;
-
-        if (tokenError) {
+        if (data.resetPassword.tokenError) {
           void push({ pathname: "/forgot-password", query });
           return;
         }
 
-        if (confirmPwdErr) {
-          setError("confirmPassword", { message: confirmPwdErr }, focus);
-        }
-
-        if (passwordError) {
-          setError("password", { message: passwordError }, focus);
-        }
-
-        setFormStatus("idle");
+        setErrors({
+          confirmPassword: data.resetPassword.confirmPasswordError ?? undefined,
+          password: data.resetPassword.passwordError ?? undefined,
+        });
+        setIsLoading(false);
         break;
       }
 
       case "ForbiddenError":
-        void push({ pathname: "/forgot-password", query: { status: "fail" } });
+      default:
+        void push({ pathname: "/forgot-password", query });
         break;
 
       case "Response":
         onSuccess();
-        break;
-
-      default: {
-        const query = { status: "unsupported" };
-        void push({ pathname: "/forgot-password", query });
-      }
     }
   };
 
-  return { formStatus, setFormStatus, onCompleted };
-};
+  const onError: OnError = err => {
+    let status = "error";
 
-export default useResetPassword;
+    if (err instanceof TypeError && err.message === "Failed to fetch") {
+      status = "network";
+    }
+
+    void push({ pathname: "/forgot-password", query: { status } });
+  };
+
+  return { isLoading, setIsLoading, onCompleted, onError };
+};
